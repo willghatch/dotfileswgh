@@ -1,0 +1,16 @@
+
+# At one point I wanted to have a global xinitrc file, then source local options,
+# but for now I think I'll just have a template that I can modify... If it doesn't
+# end up being a bother syncing because I just use different options on different
+# machines (which has somewhat been the case so far), then it won't matter.
+
+# Unclutter hides the mouse pointer after the given number of seconds
+unclutter -idle 5 &
+
+xscreensaver -no-splash &
+stopTouchpadClick.sh &
+xmodmap ~/.Xmodmap
+
+
+exec awesome
+

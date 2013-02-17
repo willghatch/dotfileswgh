@@ -1,0 +1,57 @@
+
+# Lines configured by zsh-newuser-install
+HISTFILE=~/.histfile
+HISTSIZE=1000
+SAVEHIST=1000
+bindkey -e
+# End of lines configured by zsh-newuser-install
+# The following lines were added by compinstall
+zstyle :compinstall filename '/home/wgh/.zshrc'
+
+autoload -Uz compinit
+compinit
+# End of lines added by compinstall
+#
+#
+
+autoload -U colors && colors
+
+setopt PROMPT_SUBST
+
+umask 077
+
+if [ -f ~/.bazsh_common ]
+then
+    source ~/.bazsh_common
+fi
+
+PS1_time='%F{cyan}%T'
+PS1_user_host='%F{green}[%B%n%b%F{yellow}@%B%m%b%F{green}]'
+PS1_dir='%F{blue}%B%~'
+PS1_cmd_stat='%b%F{cyan}<%F{red}%?%F{cyan}>'
+PS1_end='%F{default}
+%# '
+PS1_batt_state="\$(batt_state.bash)" 
+
+#PS1="%T [%n@%m] %~ %?%# "
+#PS1='%F{cyan}%T %F{green}[%B%n%b%F{yellow}@%B%m%b%F{green}] %F{blue}%B%~ %b%F{cyan}<%F{red}%?%F{cyan}>%F{default}%#
+#'
+PS1="${PS1_time} ${PS1_user_host} ${PS1_dir} ${PS1_cmd_stat}${PS1_end}"
+
+
+
+if [ -f ~/.wgh_shell_local ]
+then
+    source ~/.wgh_shell_local
+fi
+
+if [ -f ~/.zshrc.local ]
+then
+    source ~/.zshrc.local
+fi
+
+if [ -x ~/vscripts/motd.sh ]
+then
+    ~/vscripts/motd.sh
+fi
+

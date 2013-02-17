@@ -1,0 +1,4 @@
+# disable build cleaning so I can fix stuff that goes wrong sometimes...
+clean=false
+cleandevel=false
+

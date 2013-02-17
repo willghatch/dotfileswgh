@@ -1,0 +1,10 @@
+[roxterm profile]
+colour_scheme=Default
+font=Liberation Mono 10
+hide_menubar=1
+show_resize_grip=1
+always_show_tabs=0
+show_add_tab_btn=0
+audible_bell=0
+visible_bell=1
+scrollbar_pos=1

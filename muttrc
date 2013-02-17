@@ -1,0 +1,77 @@
+
+set editor="/usr/bin/vim"
+set text_flowed=yes
+
+# source aliases
+
+source ~/dotfileswgh_pri/mutt/rc
+
+
+macro index Ag '<change-folder>imaps://imap.gmail.com<enter>'
+macro index Ay '<change-folder>imaps://imap.mail.yahoo.com<enter>'
+macro index Ac '<change-folder>imaps://mail.ldschurch.org<enter>'
+macro index Al "<change-folder>/var/spool/mail/$USER<enter>"
+
+set header_cache=~/.mutt/cache/headers
+set message_cachedir=~/.mutt/cache/bodies
+set certificate_file=~/.mutt/certificates
+
+set move = no
+# -*-muttrc-*-
+
+# Palette for use with the Linux console.  Black background.
+
+color hdrdefault blue black
+color quoted blue black
+color signature blue black
+color attachment red black
+color message brightred black
+color error brightred black
+color indicator black red
+color status brightgreen blue
+color tree white black
+color normal white black
+color markers red black
+color search white black
+color tilde brightmagenta black
+color index blue black ~F
+color index red black "~N|~O"
+
+# color body brightwhite black '\*+[^*]+\*+'
+# color body brightwhite black '_+[^_]+_+'
+
+set copy=yes  # make a copy of outgoing mail
+set include   # include message when replying
+set indent_string="> " # how to indent copied lines on reply
+set help      # show help lines
+set mail_check=10 # how often to poll for new mail
+set sort=threads  # how to sort conversation threads
+
+
+
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+#
+# Key bindings
+#
+#	maps:
+#		alias		alias menu
+#		attach		attachment menu
+#		browser		directory browser
+#		compose		compose menu
+#		index		message index
+#		pgp		pgp menu
+#		postpone	postponed message recall menu
+#		generic		generic keymap for all of the above
+#		editor		line editor
+#		pager		text viewer
+#
+
+
+bind pager j next-line
+bind pager k previous-line
+bind pager \Cf next-page
+bind pager \Cb previous-page
+
+
+
+
