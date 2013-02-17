@@ -1,0 +1,6 @@
+
+
+#xscreensaver -no-splash &
+
+exec startfluxbox
+

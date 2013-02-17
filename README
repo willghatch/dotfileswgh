@@ -1,0 +1,4 @@
+This git repository is for my personal configuration files.
+The root of this directory has files that go to the root of the home directory.
+Files are then stored within folders like .config and .fluxbox that go
+inside the home directory.

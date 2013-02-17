@@ -1,0 +1,5 @@
+
+xscreensaver -no-splash &
+
+exec awesome
+
