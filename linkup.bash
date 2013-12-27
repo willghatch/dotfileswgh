@@ -54,7 +54,7 @@ function linkConfigSubdirs() {
         then
             mkdir -p ".config/$f"
         else
-            mklink "$orig" ".config/$f"
+            mklink "$HOME/$orig" ".config/$f"
         fi
     done
 }
