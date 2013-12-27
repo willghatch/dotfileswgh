@@ -59,6 +59,15 @@ function linkConfigSubdirs() {
     done
 }
 
+function mkSundries() {
+# Make sundry directories and files so things (especially vim) don't complain
+# and stuff that I just like to be there in general
+    touch $HOME/.vimrc.local
+    mkdir -p $HOME/.vimtmp
+    mkdir -p $HOME/dl # my default download directory
+    mkdir -p $HOME/vsvr
+    mkdir -p $HOME/tmp
+}
 
 #######################################
 
@@ -68,7 +77,10 @@ then
 elif [ "s-$1" = "s-configdir" ]
 then
     linkConfigSubdirs
+elif [ "s-$1" = "s-sundries" ]
+then
+    mkSundries
 else
-    echo "usage: linkup.bash < dotfiles | configdir >"
+    echo "usage: linkup.bash < dotfiles | configdir | sundries >"
 fi
 
