@@ -6,7 +6,7 @@ SAVEHIST=1000
 bindkey -e
 # End of lines configured by zsh-newuser-install
 # The following lines were added by compinstall
-zstyle :compinstall filename '/home/wgh/.zshrc'
+zstyle :compinstall filename '$HOME/.zshrc'
 
 autoload -Uz compinit
 compinit
@@ -20,9 +20,10 @@ setopt PROMPT_SUBST
 
 umask 077
 
-if [ -f ~/.bazsh_common ]
+bazsh_common=$HOME/dotfileswgh/bazsh_common
+if [ -f $bazsh_common ]
 then
-    source ~/.bazsh_common
+    source $bazsh_common
 fi
 
 PS1_time='%F{cyan}%T'

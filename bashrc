@@ -70,4 +70,8 @@ if [ -f ~/.wgh_shell_local ]; then
       . ~/.wgh_shell_local
 fi
 
+if [ -f ~/.bashrc.local ]; then
+      . ~/.bashrc.local
+fi
+
 
