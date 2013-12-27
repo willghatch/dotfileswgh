@@ -1,4 +1,11 @@
 This git repository is for my personal configuration files.
-The root of this directory has files that go to the root of the home directory.
-Files are then stored within folders like .config and .fluxbox that go
-inside the home directory.
+
+In the root directory are common dotfiles that go in the home directory, some other add-ons (I keep stuff that works for both bash and zsh in bazsh_common, for example), and some directories which are generally analagous to $HOME/.dirname.
+
+Many of them are only slightly modified from defaults.  Some are fairly heavily customized.
+
+If you have any questions, comments, or suggestions let me know!
+
+Be warned -- I do weird stuff and experiment with things a lot.  You may find things that you think are crazy.
+
+
