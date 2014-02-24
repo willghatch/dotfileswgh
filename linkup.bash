@@ -23,7 +23,7 @@ function die() {
 
 function mklink() {
     # $1 is the file and $2 is the symlink name
-    if [ -f $2 ]
+    if [ -e $2 ]
     then
         mv $2 ${2}.old
     fi
