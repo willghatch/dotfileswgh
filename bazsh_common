@@ -39,6 +39,8 @@ export XDG_DOWNLOAD_DIR="$HOME/dl"
 export EDITOR=vim
 export XTERM=xterm
 export PAGER=less
+export TERMEM=lxterminal
+export TERMEM2=xfce4-terminal
 
 
 # For color in less (for man pages)
