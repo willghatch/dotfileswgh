@@ -1,6 +1,7 @@
 /* See LICENSE file for copyright and license details. */
 
 
+// My const and function definitions
 
 #define MYNUMTAGS 9
 #define MYTAGMASK ((1 << MYNUMTAGS) -1)
@@ -41,10 +42,11 @@ tagAndViewNext(const Arg *arg) {
         viewNext(arg);
 }
 
-
-
-
-
+void
+tagAndFocusMon(const Arg *arg) {
+        tagmon(arg);
+        focusmon(arg);
+}
 
 
 
@@ -68,8 +70,9 @@ static const char *tags[] = { "1", "2", "3", "4", "5", "6", "7", "8", "9" };
 
 static const Rule rules[] = {
 	/* class      instance    title       tags mask     isfloating   monitor */
-	{ "Gimp",     NULL,       NULL,       0,            True,        -1 },
-	{ "Firefox",  NULL,       NULL,       1 << 8,       False,       -1 },
+	//{ "Gimp",     NULL,       NULL,       0,            True,        -1 },
+	{ "bashrun",     NULL,       NULL,       0,            True,        -1 },
+	//{ "Firefox",  NULL,       NULL,       1 << 8,       False,       -1 },
 };
 
 /* layout(s) */
@@ -85,10 +88,11 @@ static const Layout layouts[] = {
 };
 
 /* key definitions */
-#define SUPKEY Mod2Mask
-#define HYPKEY Mod4Mask
+#define SUPKEY Mod4Mask
+#define HYPKEY Mod2Mask
 #define ALTKEY Mod1Mask
 #define CTRLKEY ControlMask
+// I don't even use this thing, but I'll leave it in case
 #define TAGKEYS(KEY,TAG) \
 	{ HYPKEY,                       KEY,      view,           {.ui = 1 << TAG} }, \
 	{ HYPKEY|ControlMask,           KEY,      toggleview,     {.ui = 1 << TAG} }, \
@@ -101,45 +105,49 @@ static const Layout layouts[] = {
 /* commands */
 static const char *dmenucmd[] = { "dmenu_run", "-fn", font, "-nb", normbgcolor, "-nf", normfgcolor, "-sb", selbgcolor, "-sf", selfgcolor, NULL };
 static const char *termcmd[]  = { "gnome-terminal", NULL };
+static const char *bashruncmd[]  = { "bashrun", NULL };
 
 static Key keys[] = {
 	/* modifier                     key        function        argument */
 	{ HYPKEY,                       XK_p,      spawn,          {.v = dmenucmd } },
-	{ HYPKEY|ShiftMask,             XK_Return, spawn,          {.v = termcmd } },
-	{ HYPKEY,                       XK_b,      togglebar,      {0} },
+	{ HYPKEY,                       XK_Return, spawn,          {.v = termcmd } },
+	{ HYPKEY|SUPKEY,                XK_Return, spawn,          {.v = bashruncmd } },
+	//{ HYPKEY,                       XK_b,      togglebar,      {0} },
 	{ HYPKEY,                       XK_j,      focusstack,     {.i = +1 } },
 	{ HYPKEY,                       XK_k,      focusstack,     {.i = -1 } },
-	{ HYPKEY,                       XK_i,      incnmaster,     {.i = +1 } },
-	{ HYPKEY,                       XK_d,      incnmaster,     {.i = -1 } },
+	{ HYPKEY|SUPKEY,                XK_h,      incnmaster,     {.i = +1 } },
+	{ HYPKEY|SUPKEY,                XK_l,      incnmaster,     {.i = -1 } },
 	{ HYPKEY,                       XK_h,      setmfact,       {.f = -0.05} },
 	{ HYPKEY,                       XK_l,      setmfact,       {.f = +0.05} },
-	{ HYPKEY,                       XK_Return, zoom,           {0} },
-	{ HYPKEY,                       XK_Tab,    view,           {0} },
-	{ HYPKEY|ShiftMask,             XK_c,      killclient,     {0} },
+	//{ HYPKEY,                       XK_Return, zoom,           {0} },
+	//{ HYPKEY,                       XK_Tab,    view,           {0} },
+	{ HYPKEY,                       XK_c,      killclient,     {0} },
 	{ HYPKEY,                       XK_t,      setlayout,      {.v = &layouts[0]} },
 	{ HYPKEY,                       XK_f,      setlayout,      {.v = &layouts[1]} },
 	{ HYPKEY,                       XK_m,      setlayout,      {.v = &layouts[2]} },
 	{ HYPKEY,                       XK_space,  setlayout,      {0} },
 	{ HYPKEY|ShiftMask,             XK_space,  togglefloating, {0} },
-	{ HYPKEY,                       XK_0,      view,           {.ui = ~0 } },
-	{ HYPKEY|ShiftMask,             XK_0,      tag,            {.ui = ~0 } },
+	//{ HYPKEY,                       XK_0,      view,           {.ui = ~0 } },
+	//{ HYPKEY|ShiftMask,             XK_0,      tag,            {.ui = ~0 } },
 	{ HYPKEY,                       XK_comma,  focusmon,       {.i = -1 } },
 	{ HYPKEY,                       XK_period, focusmon,       {.i = +1 } },
-	{ HYPKEY|ShiftMask,             XK_comma,  tagmon,         {.i = -1 } },
-	{ HYPKEY|ShiftMask,             XK_period, tagmon,         {.i = +1 } },
+	//{ HYPKEY|ShiftMask,             XK_comma,  tagmon,         {.i = -1 } },
+	//{ HYPKEY|ShiftMask,             XK_period, tagmon,         {.i = +1 } },
+	{ HYPKEY|SUPKEY,             XK_comma,  tagAndFocusMon, {.i = -1 } },
+	{ HYPKEY|SUPKEY,             XK_period, tagAndFocusMon, {.i = +1 } },
 	{ HYPKEY,                       XK_o,      viewNext,       {.ui = 0 } },
 	{ HYPKEY,                       XK_e,      viewNext,       {.ui = 1 } },
-	{ HYPKEY|ALTKEY,                XK_o,      tagAndViewNext, {.ui = 0 } },
-	{ HYPKEY|ALTKEY,                XK_e,      tagAndViewNext, {.ui = 1 } },
-	TAGKEYS(                        XK_1,                      0)
-	TAGKEYS(                        XK_2,                      1)
-	TAGKEYS(                        XK_3,                      2)
-	TAGKEYS(                        XK_4,                      3)
-	TAGKEYS(                        XK_5,                      4)
-	TAGKEYS(                        XK_6,                      5)
-	TAGKEYS(                        XK_7,                      6)
-	TAGKEYS(                        XK_8,                      7)
-	TAGKEYS(                        XK_9,                      8)
+	{ HYPKEY|SUPKEY,                XK_o,      tagAndViewNext, {.ui = 0 } },
+	{ HYPKEY|SUPKEY,                XK_e,      tagAndViewNext, {.ui = 1 } },
+	//TAGKEYS(                        XK_1,                      0)
+	//TAGKEYS(                        XK_2,                      1)
+	//TAGKEYS(                        XK_3,                      2)
+	//TAGKEYS(                        XK_4,                      3)
+	//TAGKEYS(                        XK_5,                      4)
+	//TAGKEYS(                        XK_6,                      5)
+	//TAGKEYS(                        XK_7,                      6)
+	//TAGKEYS(                        XK_8,                      7)
+	//TAGKEYS(                        XK_9,                      8)
 	{ HYPKEY|ShiftMask,             XK_q,      quit,           {0} },
 };
 
