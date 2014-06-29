@@ -106,12 +106,14 @@ static const Layout layouts[] = {
 static const char *dmenucmd[] = { "dmenu_run", "-fn", font, "-nb", normbgcolor, "-nf", normfgcolor, "-sb", selbgcolor, "-sf", selfgcolor, NULL };
 static const char *termcmd[]  = { "gnome-terminal", NULL };
 static const char *bashruncmd[]  = { "bashrun", NULL };
+static const char *lockcmd[]  = { "lockscreen.sh", NULL };
 
 static Key keys[] = {
 	/* modifier                     key        function        argument */
-	{ HYPKEY,                       XK_p,      spawn,          {.v = dmenucmd } },
+	//{ HYPKEY,                       XK_p,      spawn,          {.v = dmenucmd } },
 	{ HYPKEY,                       XK_Return, spawn,          {.v = termcmd } },
 	{ SUPKEY,                       XK_Return, spawn,          {.v = bashruncmd } },
+	{ SUPKEY|HYPKEY|ALTKEY,         XK_l, spawn,               {.v = lockcmd } },
 	//{ HYPKEY,                       XK_b,      togglebar,      {0} },
 	{ HYPKEY,                       XK_j,      focusstack,     {.i = +1 } },
 	{ HYPKEY,                       XK_k,      focusstack,     {.i = -1 } },
