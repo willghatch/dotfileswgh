@@ -111,7 +111,7 @@ static Key keys[] = {
 	/* modifier                     key        function        argument */
 	{ HYPKEY,                       XK_p,      spawn,          {.v = dmenucmd } },
 	{ HYPKEY,                       XK_Return, spawn,          {.v = termcmd } },
-	{ HYPKEY|SUPKEY,                XK_Return, spawn,          {.v = bashruncmd } },
+	{ SUPKEY,                       XK_Return, spawn,          {.v = bashruncmd } },
 	//{ HYPKEY,                       XK_b,      togglebar,      {0} },
 	{ HYPKEY,                       XK_j,      focusstack,     {.i = +1 } },
 	{ HYPKEY,                       XK_k,      focusstack,     {.i = -1 } },
