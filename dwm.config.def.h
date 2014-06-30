@@ -104,7 +104,7 @@ static const Layout layouts[] = {
 
 /* commands */
 static const char *dmenucmd[] = { "dmenu_run", "-fn", font, "-nb", normbgcolor, "-nf", normfgcolor, "-sb", selbgcolor, "-sf", selfgcolor, NULL };
-static const char *termcmd[]  = { "gnome-terminal", NULL };
+static const char *termcmd[]  = { "launchterm", NULL };
 static const char *bashruncmd[]  = { "bashrun", NULL };
 static const char *lockcmd[]  = { "lockscreen.sh", NULL };
 
