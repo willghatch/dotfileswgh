@@ -104,16 +104,16 @@ static const Layout layouts[] = {
 
 /* commands */
 static const char *dmenucmd[] = { "dmenu_run", "-fn", font, "-nb", normbgcolor, "-nf", normfgcolor, "-sb", selbgcolor, "-sf", selfgcolor, NULL };
-static const char *termcmd[]  = { "launchterm", NULL };
-static const char *bashruncmd[]  = { "bashrun", NULL };
-static const char *lockcmd[]  = { "lockscreen.sh", NULL };
+static const char *termcmd[]  = { "dwmlaunch", "terminal", NULL };
+static const char *launchercmd[]  = { "dwmlaunch", "launcher", NULL };
+static const char *lockcmd[]  = { "dwmlaunch", "lockscreen", NULL };
 
 static Key keys[] = {
 	/* modifier                     key        function        argument */
 	//{ HYPKEY,                       XK_p,      spawn,          {.v = dmenucmd } },
 	{ HYPKEY,                       XK_Return, spawn,          {.v = termcmd } },
-	{ SUPKEY,                       XK_Return, spawn,          {.v = bashruncmd } },
-	{ SUPKEY|HYPKEY|ALTKEY,         XK_l, spawn,               {.v = lockcmd } },
+	{ SUPKEY,                       XK_Return, spawn,          {.v = launchercmd } },
+	{ SUPKEY|ALTKEY,                XK_l, spawn,               {.v = lockcmd } },
 	//{ HYPKEY,                       XK_b,      togglebar,      {0} },
 	{ HYPKEY,                       XK_j,      focusstack,     {.i = +1 } },
 	{ HYPKEY,                       XK_k,      focusstack,     {.i = -1 } },
@@ -135,7 +135,7 @@ static Key keys[] = {
 	{ HYPKEY,                       XK_period, focusmon,       {.i = +1 } },
 	//{ HYPKEY|ShiftMask,             XK_comma,  tagmon,         {.i = -1 } },
 	//{ HYPKEY|ShiftMask,             XK_period, tagmon,         {.i = +1 } },
-	{ HYPKEY|SUPKEY,             XK_comma,  tagAndFocusMon, {.i = -1 } },
+	{ HYPKEY|SUPKEY,             XK_minus,  tagAndFocusMon, {.i = -1 } },
 	{ HYPKEY|SUPKEY,             XK_period, tagAndFocusMon, {.i = +1 } },
 	{ HYPKEY,                       XK_o,      viewNext,       {.ui = 0 } },
 	{ HYPKEY,                       XK_e,      viewNext,       {.ui = 1 } },

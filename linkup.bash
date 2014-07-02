@@ -67,6 +67,8 @@ function mkSundries() {
     mkdir -p $HOME/dl # my default download directory
     mkdir -p $HOME/vsvr
     mkdir -p $HOME/tmp
+    mkdir -p $HOME/lscripts
+    mklink $dfDir/dwmlaunch $HOME/lscripts/dwmlaunch
 }
 
 #######################################
