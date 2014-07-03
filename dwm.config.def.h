@@ -117,9 +117,9 @@ static Key keys[] = {
 	//{ HYPKEY,                       XK_b,      togglebar,      {0} },
 	{ HYPKEY,                       XK_h,      focusstack,     {.i = +1 } },
 	{ HYPKEY,                       XK_t,      focusstack,     {.i = -1 } },
-	{ HYPKEY|ALTKEY,                XK_d,      incnmaster,     {.i = +1 } }, // num clients in master
+	{ HYPKEY|ALTKEY,                XK_n,      incnmaster,     {.i = +1 } }, // num clients in master
 	{ HYPKEY|ALTKEY,                XK_s,      incnmaster,     {.i = -1 } },
-	{ HYPKEY,                       XK_d,      setmfact,       {.f = -0.05} }, // size of master/slave areas
+	{ HYPKEY,                       XK_n,      setmfact,       {.f = -0.05} }, // size of master/slave areas
 	{ HYPKEY,                       XK_s,      setmfact,       {.f = +0.05} },
 	//{ HYPKEY,                       XK_Return, zoom,           {0} },
 	//{ HYPKEY,                       XK_Tab,    view,           {0} },
@@ -133,14 +133,16 @@ static Key keys[] = {
 	//{ HYPKEY|ShiftMask,             XK_0,      tag,            {.ui = ~0 } },
 	{ HYPKEY,                       XK_m,      focusmon,       {.i = -1 } },
 	{ HYPKEY,                       XK_w,      focusmon,       {.i = +1 } },
-	//{ HYPKEY|ShiftMask,             XK_comma,  tagmon,         {.i = -1 } },
-	//{ HYPKEY|ShiftMask,             XK_period, tagmon,         {.i = +1 } },
-	{ HYPKEY|ALTKEY,                XK_m,      tagAndFocusMon, {.i = -1 } },
-	{ HYPKEY|ALTKEY,                XK_w,      tagAndFocusMon, {.i = +1 } },
-	{ HYPKEY,                       XK_b,      viewNext,       {.ui = 0 } },
-	{ HYPKEY,                       XK_v,      viewNext,       {.ui = 1 } },
-	{ HYPKEY|ALTKEY,                XK_b,      tagAndViewNext, {.ui = 0 } },
-	{ HYPKEY|ALTKEY,                XK_v,      tagAndViewNext, {.ui = 1 } },
+	{ HYPKEY|ALTKEY,                XK_m,      tagmon,         {.i = -1 } },
+	{ HYPKEY|ALTKEY,                XK_w,      tagmon,         {.i = +1 } },
+	//{ HYPKEY|ALTKEY,                XK_m,      tagAndFocusMon, {.i = -1 } },
+	//{ HYPKEY|ALTKEY,                XK_w,      tagAndFocusMon, {.i = +1 } },
+	{ HYPKEY,                       XK_v,      viewNext,       {.ui = 0 } },
+	{ HYPKEY,                       XK_z,      viewNext,       {.ui = 1 } },
+	//{ HYPKEY|ALTKEY,                XK_v,      tagAndViewNext, {.ui = 0 } },
+	//{ HYPKEY|ALTKEY,                XK_z,      tagAndViewNext, {.ui = 1 } },
+	{ HYPKEY|ALTKEY,                XK_v,             tagNext, {.ui = 0 } },
+	{ HYPKEY|ALTKEY,                XK_z,             tagNext, {.ui = 1 } },
 	//TAGKEYS(                        XK_1,                      0)
 	//TAGKEYS(                        XK_2,                      1)
 	//TAGKEYS(                        XK_3,                      2)
