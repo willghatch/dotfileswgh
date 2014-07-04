@@ -11,7 +11,7 @@ export MANPATH=/usr/share/man:/usr/local/man:/usr/local/share/man:/usr/X11R6/man
 #alias t="mpcl toggle"
 
 ####### Editing
-alias em="emacs -nw "
+alias em="emacs -nw -l $HOME/dotfileswgh/emacs/def.el"
 
 
 ####### Unix tools, mostly coloring
