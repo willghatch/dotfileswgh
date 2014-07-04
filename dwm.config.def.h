@@ -121,7 +121,7 @@ static Key keys[] = {
 	{ HYPKEY|ALTKEY,                XK_s,      incnmaster,     {.i = -1 } },
 	{ HYPKEY,                       XK_n,      setmfact,       {.f = -0.05} }, // size of master/slave areas
 	{ HYPKEY,                       XK_s,      setmfact,       {.f = +0.05} },
-	//{ HYPKEY,                       XK_Return, zoom,           {0} },
+	{ HYPKEY,                       XK_b, zoom,           {0} }, //toggle between master area
 	//{ HYPKEY,                       XK_Tab,    view,           {0} },
 	{ HYPKEY,                       XK_c,      killclient,     {0} },
 	{ HYPKEY,                       XK_space,  setlayout,      {.v = &layouts[0]} }, // tile
