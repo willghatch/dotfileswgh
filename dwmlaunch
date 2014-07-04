@@ -3,7 +3,7 @@
 # script to launch stuff from dwm, so I can keep a local config of which actual programs to launch without
 # changing my global config and tracking that...
 
-terminal="lxterminal"
+terminal="xfce4-terminal --disable-server"
 lockscreen="lockscreen.sh"
 launcher="bashrun"
 
