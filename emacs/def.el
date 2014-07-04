@@ -20,6 +20,8 @@
 
 ;(require 'undo-tree) ; ELPA package
 
+(defun royalrainbow () (interactive)
+  (load-file "~/dotfileswgh/emacs/wghconf-rainbow-delimiters.el"))
 
 
 ;; backup settings

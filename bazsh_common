@@ -12,6 +12,7 @@ export MANPATH=/usr/share/man:/usr/local/man:/usr/local/share/man:/usr/X11R6/man
 
 ####### Editing
 alias em="emacs -nw -l $HOME/dotfileswgh/emacs/def.el"
+alias emm="emacs -l $HOME/dotfileswgh/emacs/def.el"
 
 
 ####### Unix tools, mostly coloring
