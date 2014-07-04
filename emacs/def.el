@@ -7,22 +7,38 @@
 (let ((default-directory "~/dotfileswgh/emacs"))
       (normal-top-level-add-subdirs-to-load-path))
 
+;; Load borrowed funcion file
+(load-file "~/dotfileswgh/emacs/borrowed.el")
 
 ;; General options
 (global-linum-mode) ; add line numbers
 (setq vc-follow-symlinks t) ; Don't prompt to follow symlinks of version-controlled files
-;(load-file "~/.emacs.d/packaging.el") ; Load repository list -- I don't think I want normal sessions to do that
+(setq tab-width 4) ; how many spaces for tab DISPLAY
+(setq-default indent-tabs-mode nil) ; use spaces, not tabs
+(setq tab-stop-list (number-sequence 4 120 4)) ; setting tab expansion by setting stops
+;(set-tab-stop-width 4) ; borrowed func to change tab stop list based on width
+(defun set-indent-auto (indent-p)
+  "Set whether to indent when you hit enter"
+  (interactive)
+  (if indent-p
+      (global-set-key (kbd "RET") 'newline-and-indent)
+    (global-set-key (kbd "RET") 'newline)))
+(set-indent-auto t)
+
+
 
 ;;;;;;;;;;;;;;;;; External Package Load
 
 ;; Emacs VI Layer - avail from ELPA
 (load-file "~/dotfileswgh/emacs/wghconf-evil.el")
 
-;(require 'undo-tree) ; ELPA package
+;(require 'undo-tree) ; ELPA package used by evil
 
 (defun royalrainbow () (interactive)
   (load-file "~/dotfileswgh/emacs/wghconf-rainbow-delimiters.el"))
 
+(defun packaging-load ()
+  (load-file "~/dotfileswgh/emacs/wghconf-package.el"))
 
 ;; backup settings
 (setq
