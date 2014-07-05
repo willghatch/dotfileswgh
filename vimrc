@@ -56,6 +56,7 @@ filetype plugin on
 """"""""""""""""""""""""""" Key mappings
 inoremap jj <esc>
 inoremap <C-@> _
+inoremap <C-h> <esc>
 
 
 
