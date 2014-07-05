@@ -24,6 +24,7 @@
       (global-set-key (kbd "RET") 'newline-and-indent)
     (global-set-key (kbd "RET") 'newline)))
 (set-indent-auto t)
+(defun setwrap () (interactive) (toggle-truncate-lines)) ; easier to type for a common function
 
 
 
