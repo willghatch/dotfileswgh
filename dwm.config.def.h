@@ -127,7 +127,7 @@ static Key keys[] = {
 	{ HYPKEY,                       XK_space,  setlayout,      {.v = &layouts[0]} }, // tile
 	{ HYPKEY|ALTKEY,                XK_f,      setlayout,      {.v = &layouts[1]} }, // float
 	{ HYPKEY,                       XK_f,      setlayout,      {.v = &layouts[2]} }, // monocle
-	{ HYPKEY,                       XK_space,  setlayout,      {0} },
+	//{ HYPKEY,                       XK_space,  setlayout,      {0} },
 	{ HYPKEY|CTRLKEY,               XK_f,      togglefloating, {0} },
 	//{ HYPKEY,                       XK_0,      view,           {.ui = ~0 } },
 	//{ HYPKEY|ShiftMask,             XK_0,      tag,            {.ui = ~0 } },
