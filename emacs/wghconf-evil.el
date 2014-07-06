@@ -323,7 +323,7 @@
 ;(define-key evil-visual-state-map "a" evil-outer-text-objects-map)
 ;(define-key evil-visual-state-map "i" evil-inner-text-objects-map)
 ;(define-key evil-visual-state-map [remap evil-repeat] 'undefined)
-;(define-key evil-visual-state-map [escape] 'evil-exit-visual-state)
+(define-key evil-visual-state-map [escape] 'evil-exit-visual-state)
 
 ;;; Operator-Pending state
 
@@ -492,8 +492,6 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; My normal config here...
 
 
-;; State Switching
-(define-key evil-insert-state-map "\C-h" 'evil-normal-state)
 ;; buffer management
 (define-key evil-motion-state-map "gt" 'next-buffer)
 (define-key evil-motion-state-map "gT" 'previous-buffer)
@@ -532,11 +530,11 @@
 (evil-ex-define-cmd "wqa[ll]" 'evil-save-and-quit)
 ;(evil-ex-define-cmd "xa[ll]" "wqall")
 (evil-ex-define-cmd "bd[elete]" 'evil-delete-buffer)
+(evil-ex-define-cmd "ff" 'find-file)
 ;;;;; TODO -- learn more about buffers, windows, and file visiting.
 ;;;;; I want to understand what will happen when I'm closing something
 ;;;;  I might map ex commands k<something> for kill buffer, window...
 ;;;;  the normal emacs way to kill a buffer is kill-buffer, but evil has ev--del--buf...
-
 
 
 

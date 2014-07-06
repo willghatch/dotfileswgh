@@ -57,7 +57,6 @@ filetype plugin on
 inoremap kj <esc>
 inoremap jk <esc>
 inoremap <C-@> _
-inoremap <C-h> <esc>
 nnoremap - :
 
 
