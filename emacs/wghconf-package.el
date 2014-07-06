@@ -1,3 +1,8 @@
+
+(let ((default-directory "~/.emacs.d"))
+      (normal-top-level-add-subdirs-to-load-path))
+
+
 (require 'package)
 (setq package-archives '(("gnu" . "http://elpa.gnu.org/packages/")
                          ("marmalade" . "http://marmalade-repo.org/packages/")
