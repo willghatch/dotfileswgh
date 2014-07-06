@@ -30,15 +30,17 @@
 
 ;;;;;;;;;;;;;;;;; External Package Load
 
-;; Emacs VI Layer - avail from ELPA
+;; Emacs VI Layer - avail from ELPA as evil
+;; note that the following file also pulls in key-chord (in elpa)
 (load-file "~/dotfileswgh/emacs/wghconf-evil.el")
+
 
 ;(require 'undo-tree) ; ELPA package used by evil
 
 (defun royalrainbow () (interactive)
   (load-file "~/dotfileswgh/emacs/wghconf-rainbow-delimiters.el"))
 
-(defun packaging-load ()
+(defun packaging-load () (interactive)
   (load-file "~/dotfileswgh/emacs/wghconf-package.el"))
 
 ;; backup settings

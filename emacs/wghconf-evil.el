@@ -10,6 +10,7 @@
 (setcdr evil-insert-state-map nil)
 (setcdr evil-normal-state-map nil)
 (setcdr evil-motion-state-map nil)
+(setcdr evil-ex-commands nil)
 
 
 
@@ -491,15 +492,19 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; My normal config here...
 
 
-
+;; State Switching
 (define-key evil-insert-state-map "\C-h" 'evil-normal-state)
-;; everything in motion state is pulled into normal state
+;; buffer management
 (define-key evil-motion-state-map "gt" 'next-buffer)
 (define-key evil-motion-state-map "gT" 'previous-buffer)
+(define-key evil-motion-state-map "gb" 'switch-to-buffer)
+;; command modes and macros
 (define-key evil-motion-state-map "-" 'evil-ex)
 (define-key evil-motion-state-map "|" 'execute-extended-command)
 (define-key evil-motion-state-map "_" 'eval-expression)
 (define-key evil-motion-state-map "Q" 'call-last-kbd-macro)
+;; Movement
+;; everything in motion state is pulled into normal state
 (define-key evil-motion-state-map "s" 'evil-find-char-to)
 (define-key evil-motion-state-map "S" 'evil-find-char-to-backward)
 (define-key evil-motion-state-map "+" 'evil-repeat-find-char)
@@ -511,9 +516,32 @@
 (define-key evil-motion-state-map "gl" 'evil-scroll-right)
 (define-key evil-motion-state-map "gh" 'evil-scroll-left)
 (define-key evil-motion-state-map "th" 'evil-window-map)
+
+;; Default mode settings
 (setq evil-normal-state-modes (append evil-emacs-state-modes evil-normal-state-modes))
    (setq evil-emacs-state-modes nil)
 
 
+;; ex-style commands
+(evil-ex-define-cmd "w[rite]" 'evil-write)
+(evil-ex-define-cmd "wa[ll]" 'evil-write-all)
+(evil-ex-define-cmd "wn" 'evil-save) ;writes file and changes buffer name to name given
+(evil-ex-define-cmd "q[uit]" 'evil-quit)
+(evil-ex-define-cmd "wq" 'evil-save-and-close)
+(evil-ex-define-cmd "qa[ll]" "quitall")
+(evil-ex-define-cmd "wqa[ll]" 'evil-save-and-quit)
+;(evil-ex-define-cmd "xa[ll]" "wqall")
+(evil-ex-define-cmd "bd[elete]" 'evil-delete-buffer)
+;;;;; TODO -- learn more about buffers, windows, and file visiting.
+;;;;; I want to understand what will happen when I'm closing something
+;;;;  I might map ex commands k<something> for kill buffer, window...
+;;;;  the normal emacs way to kill a buffer is kill-buffer, but evil has ev--del--buf...
 
+
+
+
+;;;; Key chords...
+(require 'key-chord)
+(key-chord-mode 1)
+(key-chord-define evil-insert-state-map (kbd "kj") 'evil-normal-state)
 
