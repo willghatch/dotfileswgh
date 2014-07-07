@@ -5,7 +5,7 @@
 
 
 ;;;; Ace Jump installed here as well...
-(load-file "~/dotfileswgh/emacs/wghconf-ace-jump-mode.el")
+(load-library "wghconf-ace-jump-mode")
 ;;;; and key-chord...
 (require 'key-chord)
 (key-chord-mode 1)
