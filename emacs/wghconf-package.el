@@ -1,4 +1,7 @@
 
+; load local settings first, in case of proxy or something
+(load-file "~/.emacs.local")
+
 (let ((default-directory "~/.emacs.d"))
       (normal-top-level-add-subdirs-to-load-path))
 
