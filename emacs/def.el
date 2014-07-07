@@ -69,6 +69,7 @@
 
 ;; mouse settings
 (xterm-mouse-mode) ; shift-click for normal xterm mouse behavior
+(mouse-wheel-mode)
 (setq inhibit-splash-screen t)
 (setq inhibit-startup-message e)
 
