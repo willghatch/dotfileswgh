@@ -64,3 +64,6 @@
 ;; mouse settings
 (xterm-mouse-mode) ; shift-click for normal xterm mouse behavior
 
+(if (file-exists-p "~/.emacs.local") (load-file "~/.emacs.local") nil)
+
+
