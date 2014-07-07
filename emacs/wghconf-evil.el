@@ -543,6 +543,12 @@
 ;; Joining
 (define-key evil-normal-state-map " j" 'evil-join)
 
+
+
+;; input mode
+(define-key evil-insert-state-map "\C-h" 'delete-backward-char)
+(define-key evil-insert-state-map (kbd "DEL") 'delete-backward-char) ; remap away from the evil-version backspace
+
 ;; Default mode settings
 (setq evil-normal-state-modes (append evil-emacs-state-modes evil-normal-state-modes))
 (setq evil-emacs-state-modes nil)
