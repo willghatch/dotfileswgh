@@ -19,6 +19,9 @@
 (setcdr evil-motion-state-map nil)
 (setcdr evil-ex-commands nil)
 
+;; TODO -- replace this map-killing with
+;;(define-key <keymap> <key> nil)
+;; for every key I don't want.
 
 
 
@@ -512,9 +515,9 @@
 (define-key evil-motion-state-map "Q" 'call-last-kbd-macro)
 ;; Movement
 ;; everything in motion state is pulled into normal state
-(define-key evil-motion-state-map " r" 'ace-jump-word-mode)
-(define-key evil-motion-state-map " c" 'ace-jump-char-mode)
-(define-key evil-motion-state-map " l" 'ace-jump-line-mode)
+(define-key evil-motion-state-map " r" 'evil-ace-jump-word-mode)
+(define-key evil-motion-state-map " c" 'evil-ace-jump-char-mode)
+(define-key evil-motion-state-map " l" 'evil-ace-jump-line-mode)
 (define-key evil-motion-state-map " h" 'scroll-up-command) ; actually, pagedown
 (define-key evil-motion-state-map " t" 'scroll-down-command) ; actually, pagedown
 (define-key evil-motion-state-map "J" 'evil-window-bottom)
