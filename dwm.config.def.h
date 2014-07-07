@@ -109,10 +109,13 @@ static const char *launchercmd[]  = { "dwmlaunch", "launcher", NULL };
 static const char *lockcmd[]  = { "dwmlaunch", "lockscreen", NULL };
 
 static Key keys[] = {
+  /////////// Maybe I should add or change to left handed movement.  Since I'm not doing anything with the left hand now, that might be good.
 	/* modifier                     key        function        argument */
 	//{ HYPKEY,                       XK_p,      spawn,          {.v = dmenucmd } },
 	{ HYPKEY,                       XK_Return, spawn,          {.v = termcmd } },
 	{ SUPKEY,                       XK_Return, spawn,          {.v = launchercmd } },
+	{ HYPKEY,                       XK_p,      spawn,          {.v = termcmd } },
+	{ SUPKEY,                       XK_p,      spawn,          {.v = launchercmd } },
 	{ SUPKEY|ALTKEY,                XK_l, spawn,               {.v = lockcmd } },
 	//{ HYPKEY,                       XK_b,      togglebar,      {0} },
 	{ HYPKEY,                       XK_h,      focusstack,     {.i = +1 } },
