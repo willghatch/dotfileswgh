@@ -4,6 +4,13 @@
 (evil-mode 1)
 
 
+;;;; Ace Jump installed here as well...
+(require 'ace-jump-mode)
+;;;; and key-chord...
+(require 'key-chord)
+(key-chord-mode 1)
+
+
 ;;; First, blow up maps so they don't map things like t/T and
 ;;; insert mode stuff
 
@@ -491,7 +498,8 @@
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; My normal config here...
 
-
+;; Normal state switch!
+(key-chord-define evil-insert-state-map (kbd "kj") 'evil-normal-state)
 ;; buffer management
 (define-key evil-motion-state-map "gt" 'next-buffer)
 (define-key evil-motion-state-map "gT" 'previous-buffer)
@@ -503,6 +511,7 @@
 (define-key evil-motion-state-map "Q" 'call-last-kbd-macro)
 ;; Movement
 ;; everything in motion state is pulled into normal state
+(define-key evil-motion-state-map " " 'ace-jump-mode)
 (define-key evil-motion-state-map "s" 'evil-find-char-to)
 (define-key evil-motion-state-map "S" 'evil-find-char-to-backward)
 (define-key evil-motion-state-map "+" 'evil-repeat-find-char)
@@ -537,9 +546,4 @@
 ;;;;  the normal emacs way to kill a buffer is kill-buffer, but evil has ev--del--buf...
 
 
-
-;;;; Key chords...
-(require 'key-chord)
-(key-chord-mode 1)
-(key-chord-define evil-insert-state-map (kbd "kj") 'evil-normal-state)
 
