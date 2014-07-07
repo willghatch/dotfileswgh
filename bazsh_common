@@ -11,8 +11,8 @@ export MANPATH=/usr/share/man:/usr/local/man:/usr/local/share/man:/usr/X11R6/man
 #alias t="mpcl toggle"
 
 ####### Editing
-alias em="emacs -nw -l $HOME/dotfileswgh/emacs/def.el"
-alias emm="emacs -l $HOME/dotfileswgh/emacs/def.el"
+alias em="emacs -nw -l $HOME/dotfileswgh/emacs/nogui.el"
+alias emx="emacs -l $HOME/dotfileswgh/emacs/xgui"
 alias emp="emacs -nw -l $HOME/dotfileswgh/emacs/wghconf-package.el"
 
 
