@@ -30,16 +30,23 @@
 
 ;;;;;;;;;;;;;;;;; External Package Load
 
+;; elpa packages loaded automatically:
+;; evil
+;; key-chord
+;; ace-jump
+;; undo-tree (auto installed with evil through package.el)
+
 ;; Emacs VI Layer - avail from ELPA as evil
-;; note that the following file also pulls in key-chord (in elpa)
 (load-file "~/dotfileswgh/emacs/wghconf-evil.el")
 
 
 ;(require 'undo-tree) ; ELPA package used by evil
 
+;; This command pulls in rainbow-delimiters (in elpa)
 (defun royalrainbow () (interactive)
   (load-file "~/dotfileswgh/emacs/wghconf-rainbow-delimiters.el"))
 
+;; This command pulls in package.el... the packaging system that comes defauld in emacs 24.
 (defun packaging-load () (interactive)
   (load-file "~/dotfileswgh/emacs/wghconf-package.el"))
 
@@ -52,4 +59,7 @@
    kept-new-versions 6
    kept-old-versions 2
    version-control t)       ; use versioned backups
+
+;; mouse settings
+(xterm-mouse-mode)
 
