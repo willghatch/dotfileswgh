@@ -63,6 +63,8 @@
 
 ;; mouse settings
 (xterm-mouse-mode) ; shift-click for normal xterm mouse behavior
+(setq inhibit-splash-screen t)
+(setq inhibit-startup-message e)
 
 (if (file-exists-p "~/.emacs.local") (load-file "~/.emacs.local") nil)
 
