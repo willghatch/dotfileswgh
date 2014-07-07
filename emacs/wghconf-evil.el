@@ -37,7 +37,7 @@
 (define-key evil-normal-state-map "D" 'evil-delete-line)
 (define-key evil-normal-state-map "i" 'evil-insert)
 (define-key evil-normal-state-map "I" 'evil-insert-line)
-(define-key evil-normal-state-map "J" 'evil-join)
+;(define-key evil-normal-state-map "J" 'evil-join)
 (define-key evil-normal-state-map "m" 'evil-set-marker)
 (define-key evil-normal-state-map "o" 'evil-open-below)
 (define-key evil-normal-state-map "O" 'evil-open-above)
@@ -500,6 +500,7 @@
 
 ;; Normal state switch!
 (key-chord-define evil-insert-state-map (kbd "kj") 'evil-normal-state)
+(key-chord-define evil-replace-state-map (kbd "kj") 'evil-normal-state)
 ;; buffer management
 (define-key evil-motion-state-map "gt" 'next-buffer)
 (define-key evil-motion-state-map "gT" 'previous-buffer)
@@ -511,22 +512,32 @@
 (define-key evil-motion-state-map "Q" 'call-last-kbd-macro)
 ;; Movement
 ;; everything in motion state is pulled into normal state
-(define-key evil-motion-state-map " " 'ace-jump-mode)
-(define-key evil-motion-state-map "s" 'evil-find-char-to)
-(define-key evil-motion-state-map "S" 'evil-find-char-to-backward)
-(define-key evil-motion-state-map "+" 'evil-repeat-find-char)
-(define-key evil-motion-state-map "~" 'evil-repeat-find-char-reverse)
+(define-key evil-motion-state-map " r" 'ace-jump-word-mode)
+(define-key evil-motion-state-map " c" 'ace-jump-char-mode)
+(define-key evil-motion-state-map " l" 'ace-jump-line-mode)
+(define-key evil-motion-state-map " h" 'scroll-up-command) ; actually, pagedown
+(define-key evil-motion-state-map " t" 'scroll-down-command) ; actually, pagedown
+(define-key evil-motion-state-map "J" 'evil-window-bottom)
+(define-key evil-motion-state-map "K" 'evil-window-top)
 (define-key evil-motion-state-map "{" 'backward-sexp)
 (define-key evil-motion-state-map "}" 'forward-sexp)
 (define-key evil-motion-state-map "[" 'backward-list)
 (define-key evil-motion-state-map "]" 'forward-list)
 (define-key evil-motion-state-map "gl" 'evil-scroll-right)
 (define-key evil-motion-state-map "gh" 'evil-scroll-left)
+;; These ones are ripe for removal, since I have both /? and ace-jump...
+(define-key evil-motion-state-map "s" 'evil-find-char-to)
+(define-key evil-motion-state-map "S" 'evil-find-char-to-backward)
+(define-key evil-motion-state-map "+" 'evil-repeat-find-char)
+(define-key evil-motion-state-map "~" 'evil-repeat-find-char-reverse)
+;; Window management
 (define-key evil-motion-state-map "th" 'evil-window-map)
+;; Joining
+(define-key evil-normal-state-map " j" 'evil-join)
 
 ;; Default mode settings
 (setq evil-normal-state-modes (append evil-emacs-state-modes evil-normal-state-modes))
-   (setq evil-emacs-state-modes nil)
+(setq evil-emacs-state-modes nil)
 
 
 ;; ex-style commands

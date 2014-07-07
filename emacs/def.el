@@ -61,5 +61,5 @@
    version-control t)       ; use versioned backups
 
 ;; mouse settings
-(xterm-mouse-mode)
+(xterm-mouse-mode) ; shift-click for normal xterm mouse behavior
 
