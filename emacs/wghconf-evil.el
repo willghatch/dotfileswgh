@@ -518,9 +518,14 @@
 (define-key evil-motion-state-map "Q" 'call-last-kbd-macro)
 ;; Movement
 ;; everything in motion state is pulled into normal state
-(define-key evil-motion-state-map " r" 'evil-ace-jump-word-mode)
-(define-key evil-motion-state-map " c" 'evil-ace-jump-char-mode)
-(define-key evil-motion-state-map " l" 'evil-ace-jump-line-mode)
+(define-key evil-motion-state-map "tr" 'evil-ace-jump-word-mode)
+(define-key evil-motion-state-map "tc" 'evil-ace-jump-char-mode)
+(define-key evil-motion-state-map "tg" 'evil-ace-jump-line-mode)
+;; These ones are ripe for removal, since I have both /? and ace-jump...
+(define-key evil-motion-state-map "tt" 'evil-find-char-to)
+(define-key evil-motion-state-map "tT" 'evil-find-char-to-backward)
+(define-key evil-motion-state-map "+" 'evil-repeat-find-char)
+(define-key evil-motion-state-map "~" 'evil-repeat-find-char-reverse)
 ;;(define-key evil-motion-state-map " h" 'scroll-up-command) ; actually, pagedown
 ;;(define-key evil-motion-state-map " t" 'scroll-down-command) ; actually, pagedown
 (define-key evil-motion-state-map " h" 'scroll-up)
@@ -533,11 +538,6 @@
 (define-key evil-motion-state-map "]" 'forward-list)
 (define-key evil-motion-state-map "gl" 'evil-scroll-right)
 (define-key evil-motion-state-map "gh" 'evil-scroll-left)
-;; These ones are ripe for removal, since I have both /? and ace-jump...
-(define-key evil-motion-state-map "s" 'evil-find-char-to)
-(define-key evil-motion-state-map "S" 'evil-find-char-to-backward)
-(define-key evil-motion-state-map "+" 'evil-repeat-find-char)
-(define-key evil-motion-state-map "~" 'evil-repeat-find-char-reverse)
 ;; Window management
 (define-key evil-motion-state-map "th" 'evil-window-map)
 ;; Joining
