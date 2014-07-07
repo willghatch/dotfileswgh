@@ -70,8 +70,9 @@
 ;; mouse settings
 (xterm-mouse-mode) ; shift-click for normal xterm mouse behavior
 (mouse-wheel-mode)
+(menu-bar-mode -1) ; no menu-bar
 (setq inhibit-splash-screen t)
-(setq inhibit-startup-message e)
+(setq inhibit-startup-message t)
 
 (if (file-exists-p "~/.emacs.local") (load-file "~/.emacs.local") nil)
 
