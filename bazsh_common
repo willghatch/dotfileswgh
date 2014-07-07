@@ -30,7 +30,9 @@ alias cp="cp -a" #archive mode, to preserve timestamps
 
 ####### Miscellaneous
 alias ffx="env GTK2_RC_FILES=$HOME/dotfileswgh/gtkrc-2.0-light firefox"
-alias wb="env GTK2_RC_FILES=$HOME/dotfileswgh/gtkrc-2.0-light dwb"
+alias ffxd="env GTK2_RC_FILES=$HOME/dotfileswgh/gtkrc-2.0-dark firefox"
+alias bbb="env GTK2_RC_FILES=$HOME/dotfileswgh/gtkrc-2.0-light dwb"
+alias bbbd="env GTK2_RC_FILES=$HOME/dotfileswgh/gtkrc-2.0-dark dwb"
 
 
 ################################ Environment Variables ##################################
