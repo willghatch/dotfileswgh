@@ -74,8 +74,8 @@
   (load-library "wghconf-auto-complete"))
 
 ;; mouse settings
-(xterm-mouse-mode) ; shift-click for normal xterm mouse behavior
-(mouse-wheel-mode)
+(if (fboundp 'xterm-mouse-mode) (xterm-mouse-mode) nil) ; shift-click for normal xterm mouse behavior
+(if (fboundp 'mouse-wheel-mode) (mouse-wheel-mode) nil)
 (menu-bar-mode -1) ; no menu-bar
 (setq inhibit-splash-screen t)
 (setq inhibit-startup-message t)
