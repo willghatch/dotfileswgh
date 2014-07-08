@@ -343,28 +343,28 @@
 
 ;;; Insert state
 
-(define-key evil-insert-state-map "\C-k" 'evil-insert-digraph)
-(define-key evil-insert-state-map "\C-o" 'evil-execute-in-normal-state)
-(define-key evil-insert-state-map "\C-r" 'evil-paste-from-register)
-(define-key evil-insert-state-map "\C-y" 'evil-copy-from-above)
-(define-key evil-insert-state-map "\C-e" 'evil-copy-from-below)
-(define-key evil-insert-state-map "\C-n" 'evil-complete-next)
-(define-key evil-insert-state-map "\C-p" 'evil-complete-previous)
-(define-key evil-insert-state-map "\C-x\C-n" 'evil-complete-next-line)
-(define-key evil-insert-state-map "\C-x\C-p" 'evil-complete-previous-line)
-(define-key evil-insert-state-map "\C-t" 'evil-shift-right-line)
-(define-key evil-insert-state-map "\C-d" 'evil-shift-left-line)
-(define-key evil-insert-state-map [remap delete-backward-char] 'evil-delete-backward-char-and-join)
-(define-key evil-insert-state-map [delete] 'delete-char)
-(define-key evil-insert-state-map [remap newline] 'evil-ret)
-(define-key evil-insert-state-map [remap newline-and-indent] 'evil-ret-and-indent)
-(define-key evil-insert-state-map [escape] 'evil-normal-state)
-(define-key evil-insert-state-map
-  (read-kbd-macro evil-toggle-key) 'evil-emacs-state)
+;(define-key evil-insert-state-map "\C-k" 'evil-insert-digraph)
+;(define-key evil-insert-state-map "\C-o" 'evil-execute-in-normal-state)
+;(define-key evil-insert-state-map "\C-r" 'evil-paste-from-register)
+;(define-key evil-insert-state-map "\C-y" 'evil-copy-from-above)
+;(define-key evil-insert-state-map "\C-e" 'evil-copy-from-below)
+;(define-key evil-insert-state-map "\C-n" 'evil-complete-next)
+;(define-key evil-insert-state-map "\C-p" 'evil-complete-previous)
+;(define-key evil-insert-state-map "\C-x\C-n" 'evil-complete-next-line)
+;(define-key evil-insert-state-map "\C-x\C-p" 'evil-complete-previous-line)
+;(define-key evil-insert-state-map "\C-t" 'evil-shift-right-line)
+;(define-key evil-insert-state-map "\C-d" 'evil-shift-left-line)
+;(define-key evil-insert-state-map [remap delete-backward-char] 'evil-delete-backward-char-and-join)
+;(define-key evil-insert-state-map [delete] 'delete-char)
+;(define-key evil-insert-state-map [remap newline] 'evil-ret)
+;(define-key evil-insert-state-map [remap newline-and-indent] 'evil-ret-and-indent)
+;(define-key evil-insert-state-map [escape] 'evil-normal-state)
+;(define-key evil-insert-state-map
+  ;(read-kbd-macro evil-toggle-key) 'evil-emacs-state)
 
-(if evil-want-C-w-delete
-    (define-key evil-insert-state-map "\C-w" 'evil-delete-backward-word)
-  (define-key evil-insert-state-map "\C-w" 'evil-window-map))
+;(if evil-want-C-w-delete
+;    (define-key evil-insert-state-map "\C-w" 'evil-delete-backward-word)
+;  (define-key evil-insert-state-map "\C-w" 'evil-window-map))
 
 ;;; Replace state
 
@@ -548,7 +548,7 @@
 
 
 ;; input mode
-(define-key evil-insert-state-map "\C-h" 'delete-backward-char)
+;(define-key evil-insert-state-map "\C-h" 'delete-backward-char) ; Be more unix-like... but clobber help?
 (define-key evil-insert-state-map (kbd "DEL") 'delete-backward-char) ; remap away from the evil-version backspace
 
 ;; Default mode settings
