@@ -57,6 +57,10 @@
 (defun packaging-load () (interactive)
   (load-library "wghconf-package"))
 
+;; This will pull in the slime package
+(defun slimereq () (interactive)
+  (load-library "wghconf-slime"))
+
 ;; backup settings
 (setq
    backup-by-copying t      ; don't clobber symlinks

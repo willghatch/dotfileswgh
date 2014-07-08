@@ -41,7 +41,7 @@
 (define-key evil-normal-state-map "i" 'evil-insert)
 (define-key evil-normal-state-map "I" 'evil-insert-line)
 ;(define-key evil-normal-state-map "J" 'evil-join)
-(define-key evil-normal-state-map "m" 'evil-set-marker)
+;(define-key evil-normal-state-map "m" 'evil-set-marker)
 (define-key evil-normal-state-map "o" 'evil-open-below)
 (define-key evil-normal-state-map "O" 'evil-open-above)
 (define-key evil-normal-state-map "p" 'evil-paste-after)
@@ -517,6 +517,7 @@
 (define-key evil-motion-state-map "_" 'eval-expression)
 (define-key evil-motion-state-map "Q" 'call-last-kbd-macro)
 ;; Movement
+(define-key evil-normal-state-map "mm" 'evil-set-marker) ;;;;;;;;;; m will be my prefix for mode-specific bindings
 ;; everything in motion state is pulled into normal state
 (define-key evil-motion-state-map "tr" 'evil-ace-jump-word-mode)
 (define-key evil-motion-state-map "tc" 'evil-ace-jump-char-mode)
