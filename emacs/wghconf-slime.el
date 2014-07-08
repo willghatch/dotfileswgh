@@ -8,8 +8,9 @@
 ;; key mapping
 (defun slime-set-mykeys ()
   (define-key evil-normal-state-map "mh" 'slime-documentation-lookup)
-  (define-key evil-insert-state-map "\t" 'slime-complete-symbol)
+  (local-set-key "\t" 'slime-complete-symbol)
   )
+(add-hook 'slime-mode-hook 'slime-set-mykeys t) ; locally add my keys
   
 
 (slime)

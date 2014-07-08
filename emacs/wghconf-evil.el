@@ -508,9 +508,10 @@
 (define-key evil-motion-state-map "gt" 'next-buffer)
 (define-key evil-motion-state-map "gT" 'previous-buffer)
 (define-key evil-motion-state-map "gb" 'switch-to-buffer)
+(define-key evil-motion-state-map "gk" 'kill-buffer)
 (define-key evil-window-map "n" 'evil-window-next)
 (define-key evil-window-map "p" 'evil-window-prev)
-(define-key evil-window-map "w" 'evil-window-new)
+;(define-key evil-window-map "w" 'evil-window-new) ; this makes a new buffer called new... I don't think I like that
 ;; command modes and macros
 (define-key evil-motion-state-map "-" 'evil-ex)
 (define-key evil-motion-state-map "|" 'execute-extended-command)

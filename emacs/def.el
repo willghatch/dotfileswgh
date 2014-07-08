@@ -8,6 +8,16 @@
       (normal-top-level-add-subdirs-to-load-path))
 (setq load-path (cons "~/dotfileswgh/emacs" load-path))
 
+;; backup settings
+(setq
+   backup-by-copying t      ; don't clobber symlinks
+   backup-directory-alist
+    '(("." . "~/.emacsbak"))    ; don't litter my fs tree
+   delete-old-versions t
+   kept-new-versions 6
+   kept-old-versions 2
+   version-control t)       ; use versioned backups
+
 ;; Load borrowed funcion file
 (load-file "~/dotfileswgh/emacs/borrowed.el")
 
@@ -45,31 +55,26 @@
 
 ;; Emacs VI Layer - avail from ELPA as evil
 (load-library "wghconf-evil")
-
-
 ;(require 'undo-tree) ; ELPA package used by evil
 
-;; This command pulls in rainbow-delimiters (in elpa)
+(require 'ido) ; comes standard with emacs
+(ido-mode 1)
+
 (defun royalrainbow () (interactive)
+  "pull in rainbow-delimiters (from elpa) with my config"
   (load-library "wghconf-rainbow-delimiters"))
 
-;; This command pulls in package.el... the packaging system that comes defauld in emacs 24.
-(defun packaging-load () (interactive)
+(defun mypkg () (interactive)
+  "This command pulls in package.el... the packaging system that comes default in emacs 24."
   (load-library "wghconf-package"))
 
-;; This will pull in the slime package
-(defun slimereq () (interactive)
+(defun myslime () (interactive)
+  "pulls in slime (in elpa) and my config"
   (load-library "wghconf-slime"))
 
-;; backup settings
-(setq
-   backup-by-copying t      ; don't clobber symlinks
-   backup-directory-alist
-    '(("." . "~/.emacsbak"))    ; don't litter my fs tree
-   delete-old-versions t
-   kept-new-versions 6
-   kept-old-versions 2
-   version-control t)       ; use versioned backups
+(defun myac () (interactive)
+  "pulls in auto-complete package (in elpa) with my config"
+  (load-library "wghconf-auto-complete"))
 
 ;; mouse settings
 (xterm-mouse-mode) ; shift-click for normal xterm mouse behavior
@@ -77,6 +82,12 @@
 (menu-bar-mode -1) ; no menu-bar
 (setq inhibit-splash-screen t)
 (setq inhibit-startup-message t)
+
+(defun a () (interactive)
+  "A function to set up things I want in every buffer, in case for some reason they don't work
+      LIKE LINUM MODE!!!"
+  (linum-mode 1)
+  )
 
 (if (file-exists-p "~/.emacs.local") (load-file "~/.emacs.local") nil)
 
