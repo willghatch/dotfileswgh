@@ -60,13 +60,10 @@
 (require 'ido) ; comes standard with emacs
 (ido-mode 1)
 
-(defun royalrainbow () (interactive)
+(defun myrd () (interactive)
   "pull in rainbow-delimiters (from elpa) with my config"
   (load-library "wghconf-rainbow-delimiters"))
 
-(defun mypkg () (interactive)
-  "This command pulls in package.el... the packaging system that comes default in emacs 24."
-  (load-library "wghconf-package"))
 
 (defun myslime () (interactive)
   "pulls in slime (in elpa) and my config"
@@ -88,6 +85,8 @@
       LIKE LINUM MODE!!!"
   (linum-mode 1)
   )
+
+(load-library "wghconf-package") ; load packaging config
 
 (if (file-exists-p "~/.emacs.local") (load-file "~/.emacs.local") nil)
 
