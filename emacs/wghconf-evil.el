@@ -578,7 +578,7 @@
 
 
 ;; Mouse keys...
-(global-set-key [mouse-4] (lambda () (interactive) (scroll-down-line 4)))
-(global-set-key [mouse-5] (lambda () (interactive) (scroll-up-line 4)))
+(global-set-key [mouse-4] (lambda () (interactive) (scroll-down 4)))
+(global-set-key [mouse-5] (lambda () (interactive) (scroll-up 4)))
 
 
