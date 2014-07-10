@@ -551,6 +551,8 @@
 ;; input mode
 ;(define-key evil-insert-state-map "\C-h" 'delete-backward-char) ; Be more unix-like... but clobber help?
 (define-key evil-insert-state-map (kbd "DEL") 'delete-backward-char) ; remap away from the evil-version backspace
+(define-key evil-insert-state-map "\C-n" 'evil-complete-next)
+(define-key evil-insert-state-map "\C-p" 'evil-complete-previous)
 
 ;; Default mode settings
 (setq evil-normal-state-modes (append evil-emacs-state-modes evil-normal-state-modes))
@@ -567,6 +569,7 @@
 (evil-ex-define-cmd "wqa[ll]" 'evil-save-and-quit)
 ;(evil-ex-define-cmd "xa[ll]" "wqall")
 (evil-ex-define-cmd "bd[elete]" 'evil-delete-buffer)
+(evil-ex-define-cmd "s[ubstitute]" 'evil-ex-substitute)
 (evil-ex-define-cmd "ff" 'find-file)
 ;;;;; TODO -- learn more about buffers, windows, and file visiting.
 ;;;;; I want to understand what will happen when I'm closing something
