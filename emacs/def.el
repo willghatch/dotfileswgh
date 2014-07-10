@@ -18,6 +18,10 @@
    kept-old-versions 2
    version-control t)       ; use versioned backups
 
+;; mouse settings
+(if (fboundp 'xterm-mouse-mode) (xterm-mouse-mode) nil) ; shift-click for normal xterm mouse behavior
+(if (fboundp 'mouse-wheel-mode) (mouse-wheel-mode) nil)
+
 ;; Load borrowed funcion file
 (load-file "~/dotfileswgh/emacs/borrowed.el")
 
@@ -73,9 +77,6 @@
   "pulls in auto-complete package (in elpa) with my config"
   (load-library "wghconf-auto-complete"))
 
-;; mouse settings
-(if (fboundp 'xterm-mouse-mode) (xterm-mouse-mode) nil) ; shift-click for normal xterm mouse behavior
-(if (fboundp 'mouse-wheel-mode) (mouse-wheel-mode) nil)
 (menu-bar-mode -1) ; no menu-bar
 (setq inhibit-splash-screen t)
 (setq inhibit-startup-message t)

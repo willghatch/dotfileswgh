@@ -577,4 +577,8 @@
 ;;;;  the normal emacs way to kill a buffer is kill-buffer, but evil has ev--del--buf...
 
 
+;; Mouse keys...
+(global-set-key [mouse-4] (lambda () (interactive) (scroll-down-line 4)))
+(global-set-key [mouse-5] (lambda () (interactive) (scroll-up-line 4)))
+
 
