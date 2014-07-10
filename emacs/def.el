@@ -38,6 +38,7 @@
 (setq-default indent-tabs-mode nil) ; use spaces, not tabs
 (setq tab-stop-list (number-sequence 4 120 4)) ; setting tab expansion by setting stops
 ;(set-tab-stop-width 4) ; borrowed func to change tab stop list based on width
+(column-number-mode) ;turn on column numbers in mode line
 (defun set-indent-auto (indent-p)
   "Set whether to indent when you hit enter"
   (interactive)
