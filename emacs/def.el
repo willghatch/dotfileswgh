@@ -89,6 +89,8 @@
   )
 
 (load-library "wghconf-package") ; load packaging config
+(setq custom-file "~/dotfileswgh/emacs/custom-file.el")
+(load custom-file)
 
 (if (file-exists-p "~/.emacs.local") (load-file "~/.emacs.local") nil)
 
