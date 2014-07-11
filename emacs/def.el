@@ -89,6 +89,7 @@
   )
 
 (load-library "wghconf-package") ; load packaging config
+(load-library "wghconf-modeline") ; load mode line config
 (setq custom-file "~/dotfileswgh/emacs/custom-file.el")
 (load custom-file)
 
