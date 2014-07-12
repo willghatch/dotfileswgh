@@ -501,6 +501,12 @@
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; My normal config here...
 
+;; function aliases
+(defalias 'er 'eval-region)
+(defalias 'eb 'eval-buffer)
+(defalias 'shr 'shell-command-on-region)
+
+
 ;; Normal state switch!
 (key-chord-define evil-insert-state-map (kbd "kj") 'evil-normal-state)
 (key-chord-define evil-replace-state-map (kbd "kj") 'evil-normal-state)
@@ -598,11 +604,19 @@
 (evil-ex-define-cmd "q[uit]" 'evil-quit)
 (evil-ex-define-cmd "wq" 'evil-save-and-close)
 (evil-ex-define-cmd "qa[ll]" "quitall")
+(evil-ex-define-cmd "quita[ll]" 'evil-quit-all)
 (evil-ex-define-cmd "wqa[ll]" 'evil-save-and-quit)
 ;(evil-ex-define-cmd "xa[ll]" "wqall")
 (evil-ex-define-cmd "bd[elete]" 'evil-delete-buffer)
 (evil-ex-define-cmd "s[ubstitute]" 'evil-ex-substitute)
+;(evil-ex-define-cmd "!" 'evil-shell-command)
 (evil-ex-define-cmd "ff" 'find-file)
+
+
+(defun ish (cmd) (interactive (list (read-shell-command "$ ")))
+  (insert-string (shell-command-to-string cmd)))
+
+
 ;;;;; TODO -- learn more about buffers, windows, and file visiting.
 ;;;;; I want to understand what will happen when I'm closing something
 ;;;;  I might map ex commands k<something> for kill buffer, window...
