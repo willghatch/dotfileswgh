@@ -78,6 +78,10 @@
   "pulls in auto-complete package (in elpa) with my config"
   (load-library "wghconf-auto-complete"))
 
+(defun mycomp () (interactive)
+  "pulls in company package (in elpa) with my config"
+  (load-library "wghconf-company"))
+
 (menu-bar-mode -1) ; no menu-bar
 (setq inhibit-splash-screen t)
 (setq inhibit-startup-message t)
@@ -92,6 +96,8 @@
 (load-library "wghconf-modeline") ; load mode line config
 (setq custom-file "~/dotfileswgh/emacs/custom-file.el")
 (load custom-file)
+
+(setq echo-keystrokes 0.01) ; echo keystrokes faster than default 1s
 
 (if (file-exists-p "~/.emacs.local") (load-file "~/.emacs.local") nil)
 
