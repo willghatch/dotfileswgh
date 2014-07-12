@@ -93,6 +93,7 @@
        '(:eval (propertize (format-time-string "%H:%M")
                            'face 'font-lock-type-face))
        " %Z %@ %e" ; coding system, whether the default dir is remote, mem full
+       "%]%["
        " %-" ; dashes to end
        
        ))
