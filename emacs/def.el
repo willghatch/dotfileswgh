@@ -23,7 +23,7 @@
 (if (fboundp 'mouse-wheel-mode) (mouse-wheel-mode) nil)
 
 ;; Load borrowed funcion file
-(load-file "~/dotfileswgh/emacs/borrowed.el")
+(load-library "borrowed")
 
 ;; General options
 (require 'linum)
