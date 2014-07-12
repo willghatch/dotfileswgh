@@ -31,6 +31,11 @@
     (((background light)) (:foreground "black" :background "yellow")))
   "emacs state marker face")
 
+(defface wevil-operator-face
+  '((((background dark)) (:foreground "black" :background "yellow"))
+    (((background light)) (:foreground "black" :background "yellow")))
+  "operator state marker face")
+
 (defface wevil-bufname-face
   '((((background dark)) (:foreground "magenta" :bold t))
     (((background light)) (:foreground "magenta" :bold t)))
@@ -54,8 +59,6 @@
       (list
        ;; Evil state
        '(:eval (cond
-                ((eq evil-state 'impossible)
-                 (propertize "IMPOSS" 'face 'wevil-emacs-face))
                 ((eq evil-state 'visual)
                  (propertize "< VI >" 'face 'wevil-visual-face))
                 ((eq evil-state 'normal)
@@ -68,6 +71,8 @@
                  (propertize "<REPL>" 'face 'wevil-replace-face))
                 ((eq evil-state 'emacs)
                  (propertize "<EMCS>" 'face 'wevil-emacs-face))
+                ((eq evil-state 'operator)
+                 (propertize "<OPER>" 'face 'wevil-operator-face))
                 (t (propertize "WHAT STATE??" 'face 'wevil-emacs-face))))
 
        '(:eval (propertize " %b " 'face 'wevil-bufname-face))
@@ -87,28 +92,28 @@
        ;; add the time, with the date and the emacs uptime in the tooltip
        '(:eval (propertize (format-time-string "%H:%M")
                            'face 'font-lock-type-face))
-       " %-"
+       " %Z %@ %e" ; coding system, whether the default dir is remote, mem full
+       " %-" ; dashes to end
        
        ))
 
 (setq-default header-line-format
               (list
-       ;; the full file name
-       '(:eval (propertize (buffer-file-name) 'face 'font-lock-keyword-face))
-
-       " [ "
+       "["
        ;; was this buffer modified since the last save?
        '(:eval (when (buffer-modified-p)
                  (propertize "DIRTY" 'face 'wevil-dirty-face)))
 
        ;; is this buffer read-only?
        '(:eval (when buffer-read-only
-                 (concat " "  (propertize " RO "
-                                          'face 'wevil-ro-face))))
+                 ((propertize " RO " 'face 'wevil-ro-face))))
        "] "
+       ;; the full file name
+       '(:eval (propertize (buffer-file-name) 'face 'font-lock-keyword-face))
+
 
        ;; the current major mode for the buffer.
-       "["
+       " ["
 
        '(:eval (propertize "%m" 'face 'font-lock-string-face))
 

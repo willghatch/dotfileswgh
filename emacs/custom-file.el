@@ -16,7 +16,7 @@
  '(evil-ex-substitute-matches ((t (:background "color-52"))))
  '(font-lock-function-name-face ((t (:foreground "color-46"))))
  '(fringe ((t (:background "color-21" :foreground "brightcyan"))))
- '(header-line ((t (:inherit mode-line :background "color-235" :foreground "color-21"))))
+ '(header-line ((t (:inherit mode-line))))
  '(highlight ((t (:background "darkseagreen2" :foreground "color-21"))))
  '(lazy-highlight ((t (:background "paleturquoise" :foreground "black"))))
  '(match ((t (:background "yellow1" :foreground "color-17"))))
