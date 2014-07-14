@@ -546,17 +546,23 @@
 (define-key evil-motion-state-map "g#" 'evil-search-unbounded-word-backward) ; /<word under point
 (define-key evil-motion-state-map "g*" 'evil-search-unbounded-word-forward) ; ?<word under point
 (define-key evil-motion-state-map "gv" 'evil-visual-restore) ; re-highlight region
+(define-key evil-motion-state-map "gn" 'evil-next-match)
+(define-key evil-motion-state-map "gN" 'evil-previous-match)
 ;; these bookmarks are persistent... and a little more serious than I was thinking
 ;(define-key evil-motion-state-map "gq" 'bookmark-set)
 ;(define-key evil-motion-state-map "gQ" 'bookmark-delete)
 ;(define-key evil-motion-state-map "ga" 'bookmark-jump)
 ;(define-key evil-motion-state-map "gA" 'bookmark-bmenu-list)
+(define-key evil-motion-state-map "gr" 'evil-ace-jump-word-mode)
+(define-key evil-motion-state-map "gc" 'evil-ace-jump-char-mode)
+(define-key evil-motion-state-map "gf" 'evil-ace-jump-line-mode)
+
 
 ; t map
 (define-key evil-motion-state-map "th" 'evil-window-map)
-(define-key evil-motion-state-map "tr" 'evil-ace-jump-word-mode)
-(define-key evil-motion-state-map "tc" 'evil-ace-jump-char-mode)
-(define-key evil-motion-state-map "tg" 'evil-ace-jump-line-mode)
+;(define-key evil-motion-state-map "tr" 'evil-ace-jump-word-mode)
+;(define-key evil-motion-state-map "tc" 'evil-ace-jump-char-mode)
+;(define-key evil-motion-state-map "tg" 'evil-ace-jump-line-mode)
 ;; These ones are ripe for removal, since I have both /? and ace-jump...
 (define-key evil-motion-state-map "tt" 'evil-find-char-to)
 (define-key evil-motion-state-map "tT" 'evil-find-char-to-backward)

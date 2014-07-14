@@ -19,6 +19,7 @@
  '(fringe ((t (:background "color-21" :foreground "brightcyan"))))
  '(header-line ((t (:inherit mode-line))))
  '(highlight ((t (:background "darkseagreen2" :foreground "color-21"))))
+ '(isearch-fail ((t (:background "red"))))
  '(lazy-highlight ((t (:background "paleturquoise" :foreground "black"))))
  '(match ((t (:background "yellow1" :foreground "color-17"))))
  '(minibuffer-prompt ((t (:foreground "brightmagenta"))))
