@@ -15,6 +15,7 @@
  '(evil-ex-lazy-highlight ((t (:inherit lazy-highlight :background "color-17" :foreground "color-190"))))
  '(evil-ex-substitute-matches ((t (:background "color-52"))))
  '(font-lock-function-name-face ((t (:foreground "color-46"))))
+ '(font-lock-string-face ((t (:foreground "color-165"))))
  '(fringe ((t (:background "color-21" :foreground "brightcyan"))))
  '(header-line ((t (:inherit mode-line))))
  '(highlight ((t (:background "darkseagreen2" :foreground "color-21"))))
