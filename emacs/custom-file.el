@@ -21,6 +21,7 @@
  '(highlight ((t (:background "darkseagreen2" :foreground "color-21"))))
  '(isearch-fail ((t (:background "red"))))
  '(lazy-highlight ((t (:background "paleturquoise" :foreground "black"))))
+ '(linum ((t (:inherit mode-line :foreground "brightcyan"))))
  '(match ((t (:background "yellow1" :foreground "color-17"))))
  '(minibuffer-prompt ((t (:foreground "brightmagenta"))))
  '(mode-line ((t (:background "color-235" :foreground "color-38" :box (:line-width -1 :style released-button)))))

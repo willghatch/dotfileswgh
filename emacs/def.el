@@ -27,9 +27,7 @@
 
 ;; General options
 (require 'linum)
-(setq linum-format "%4d\u2502") ; four digit number plus bar
-(set-face-foreground 'linum "#ffff00")
-;(set-face-background 'linum "#ffff00")
+(setq linum-format "%4d") ; four digit number
 (linum-mode 1)
 (global-linum-mode 1) ; add line numbers
 (add-hook 'find-file-hook (lambda () (linum-mode 1))) ; USE LINE NUMBERS ON EVERYTHING GOSH DARN IT!
