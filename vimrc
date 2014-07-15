@@ -56,8 +56,19 @@ filetype plugin on
 """"""""""""""""""""""""""" Key mappings
 inoremap kj <esc>
 inoremap jk <esc>
-inoremap <C-@> _
 nnoremap - :
+
+" window keys
+nmap th <C-w>
+nmap thn <C-w>w
+nmap thp <C-w>W
+
+" TODO - gb -> switch buffer, gq -> kill buffer
+nmap tt t
+nmap tT T
+nmap <Space>h <PageDown>
+nmap <Space>t <PageUp>
+
 
 
 
