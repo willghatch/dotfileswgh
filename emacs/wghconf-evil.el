@@ -504,6 +504,7 @@
 ;; function aliases
 (defalias 'er 'eval-region)
 (defalias 'eb 'eval-buffer)
+(defalias 'ee 'eval-expression)
 (defalias 'shr 'shell-command-on-region)
 
 
