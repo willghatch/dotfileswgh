@@ -17,6 +17,9 @@
    kept-new-versions 6
    kept-old-versions 2
    version-control t)       ; use versioned backups
+(setq auto-save-file-name-transforms '((".*" "~/.automacs/\\1" t))) ; auto-saves (## files) here
+(make-directory "~/.bakmacs/" t)
+(make-directory "~/.automacs/" t)
 
 ;; mouse settings
 (if (fboundp 'xterm-mouse-mode) (xterm-mouse-mode) nil) ; shift-click for normal xterm mouse behavior
