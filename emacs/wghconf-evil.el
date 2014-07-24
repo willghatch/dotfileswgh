@@ -506,6 +506,7 @@
 (defalias 'eb 'eval-buffer)
 (defalias 'ee 'eval-expression)
 (defalias 'shr 'shell-command-on-region)
+(defalias 'trunc 'toggle-truncate-lines)
 
 
 ;; Normal state switch!
