@@ -2,53 +2,43 @@
 ;; first define some faces for the mode line stuff, especially
 ;; for evil states
 (defface wevil-normal-face
-  '((((background dark)) (:foreground "black" :background "cyan"))
-    (((background light)) (:foreground "black" :background "cyan")))
+  '((t (:foreground "black" :background "cyan")))
   "normal state marker face")
 
 (defface wevil-motion-face
-  '((((background dark)) (:foreground "black" :background "blue"))
-    (((background light)) (:foreground "black" :background "blue")))
+  '((t (:foreground "black" :background "blue")))
   "motion state marker face")
 
 (defface wevil-insert-face
-  '((((background dark)) (:foreground "black" :background "magenta"))
-    (((background light)) (:foreground "black" :background "magenta")))
+  '((t (:foreground "black" :background "magenta")))
   "insert state marker face")
 
 (defface wevil-replace-face
-  '((((background dark)) (:foreground "black" :background "red"))
-    (((background light)) (:foreground "black" :background "red")))
+  '((t (:foreground "black" :background "red")))
   "replace state marker face")
 
 (defface wevil-visual-face
-  '((((background dark)) (:foreground "black" :background "brightcyan"))
-    (((background light)) (:foreground "black" :background "brightcyan")))
+  '((t (:foreground "black" :background "brightcyan")))
   "visual state marker face")
 
 (defface wevil-emacs-face
-  '((((background dark)) (:foreground "black" :background "yellow"))
-    (((background light)) (:foreground "black" :background "yellow")))
+  '((t (:foreground "black" :background "yellow")))
   "emacs state marker face")
 
 (defface wevil-operator-face
-  '((((background dark)) (:foreground "black" :background "yellow"))
-    (((background light)) (:foreground "black" :background "yellow")))
+  '((t (:foreground "black" :background "yellow")))
   "operator state marker face")
 
 (defface wevil-bufname-face
-  '((((background dark)) (:foreground "magenta" :bold t))
-    (((background light)) (:foreground "magenta" :bold t)))
+  '((t (:foreground "magenta" :bold t)))
   "face for buffer name")
 
 (defface wevil-dirty-face
-  '((((background dark)) (:foreground "color52" :background "red" :bold t))
-    (((background light)) (:foreground "color52" :background "red" :bold t)))
+  '((t (:foreground "#5f0000" :background "red" :bold t)))
   "buffer dirty (unsaved) face")
 
 (defface wevil-ro-face
-  '((((background dark)) (:foreground "black" :background "brightyellow" :bold t))
-    (((background light)) (:foreground "black" :background "brightyellow" :bold t)))
+  '((t (:foreground "black" :background "brightyellow" :bold t)))
   "read only tag face")
 
 
