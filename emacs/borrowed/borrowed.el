@@ -31,3 +31,18 @@
                  ((equal prefix '(16)) "%A, %d %B %Y"))))
     (insert (format-time-string format))))
 
+
+;; adapted from ergoemacs site
+(defun color-hex-syntax ()
+  "Syntax color hex color spec such as 「#ff1100」 in current buffer."
+  (interactive)
+  (font-lock-add-keywords
+   nil
+   '(("#[abcdef[:digit:]]\\{6\\}"
+      (0 (put-text-property
+          (match-beginning 0)
+          (match-end 0)
+          'face (list :background (match-string-no-properties 0)))))))
+  (font-lock-fontify-buffer))
+
+
