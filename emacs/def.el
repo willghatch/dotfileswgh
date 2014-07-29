@@ -34,12 +34,13 @@
 (linum-mode 1)
 (global-linum-mode 1) ; add line numbers
 (add-hook 'find-file-hook (lambda () (linum-mode 1))) ; USE LINE NUMBERS ON EVERYTHING GOSH DARN IT!
+(column-number-mode) ;turn on column numbers in mode line
 (setq vc-follow-symlinks t) ; Don't prompt to follow symlinks of version-controlled files
 (setq tab-width 4) ; how many spaces for tab DISPLAY
 (setq-default indent-tabs-mode nil) ; use spaces, not tabs
 (setq tab-stop-list (number-sequence 4 120 4)) ; setting tab expansion by setting stops
 ;(set-tab-stop-width 4) ; borrowed func to change tab stop list based on width
-(column-number-mode) ;turn on column numbers in mode line
+;(setq-default indent-line-function 'tab-to-tab-stop) ; just go to the tab stops that are 4 spaces apart...
 (defun set-indent-auto (indent-p)
   "Set whether to indent when you hit enter"
   (interactive)
