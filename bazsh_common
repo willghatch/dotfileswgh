@@ -1,3 +1,6 @@
+#!/bin/bash
+# This should never be run... but I'm putting the shabang so that editors will
+# recognize it...
 
 export HROOT=$HOME/hroot
 PATH=$HOME/bin:$HOME/lscripts:$HOME/vscripts:$HOME/wghsrv_scripts:$HOME/.cabal/bin:$HROOT/bin:$HROOT/usr/bin:$HROOT/usr/local/bin:$PATH:/usr/bin:/bin:/usr/local/bin:/sbin:/usr/sbin:/usr/local/sbin
@@ -33,6 +36,8 @@ alias ffx="env GTK2_RC_FILES=$HOME/dotfileswgh/gtkrc-2.0-light firefox"
 alias ffxd="env GTK2_RC_FILES=$HOME/dotfileswgh/gtkrc-2.0-dark firefox"
 alias bbb="env GTK2_RC_FILES=$HOME/dotfileswgh/gtkrc-2.0-light dwb"
 alias bbbd="env GTK2_RC_FILES=$HOME/dotfileswgh/gtkrc-2.0-dark dwb"
+
+alias gka="gitk --all"
 
 
 ################################ Environment Variables ##################################
