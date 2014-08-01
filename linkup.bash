@@ -63,6 +63,7 @@ function mkSundries() {
 # Make sundry directories and files so things (especially vim) don't complain
 # and stuff that I just like to be there in general
     touch $HOME/.vimrc.local
+    touch $HOME/.tmux.conf.local
     mkdir -p $HOME/.vimtmp
     mkdir -p $HOME/dl # my default download directory
     mkdir -p $HOME/vsvr
