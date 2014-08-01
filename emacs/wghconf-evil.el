@@ -618,7 +618,7 @@
 (evil-ex-define-cmd "bd[elete]" 'evil-delete-buffer)
 (evil-ex-define-cmd "s[ubstitute]" 'evil-ex-substitute)
 ;(evil-ex-define-cmd "!" 'evil-shell-command)
-(evil-ex-define-cmd "ff" 'find-file)
+(evil-ex-define-cmd "ff" 'ido-find-file)
 
 
 (defun ish (cmd) (interactive (list (read-shell-command "$ ")))
