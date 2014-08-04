@@ -571,10 +571,12 @@
 
 ;; command modes and macros
 (define-key evil-motion-state-map "-" 'evil-ex)
-(define-key evil-motion-state-map "|" 'execute-extended-command)
+;(define-key evil-motion-state-map "|" 'execute-extended-command)
+(define-key evil-motion-state-map "|" 'smex)
 (define-key evil-motion-state-map "_" 'eval-expression)
 (define-key evil-motion-state-map "Q" 'call-last-kbd-macro)
 ;; Movement
+(define-key evil-normal-state-map "tm" 'evil-set-marker) ; put this under t so m will be completely free for mode-specific once I implement that
 (define-key evil-normal-state-map "mm" 'evil-set-marker) ;;;;;;;;;; m will be my prefix for mode-specific bindings
 ;; everything in motion state is pulled into normal state
 (define-key evil-motion-state-map "+" 'evil-repeat-find-char)
@@ -583,14 +585,20 @@
 ;;(define-key evil-motion-state-map " t" 'scroll-down-command) ; actually, pagedown
 (define-key evil-motion-state-map " h" 'scroll-up)
 (define-key evil-motion-state-map " t" 'scroll-down)
+(define-key evil-motion-state-map " j" 'scroll-up)
+(define-key evil-motion-state-map " k" 'scroll-down)
 (define-key evil-motion-state-map "J" 'evil-window-bottom)
 (define-key evil-motion-state-map "K" 'evil-window-top)
 (define-key evil-motion-state-map "{" 'backward-sexp)
 (define-key evil-motion-state-map "}" 'forward-sexp)
 (define-key evil-motion-state-map "[" 'backward-list)
 (define-key evil-motion-state-map "]" 'forward-list)
+
 ;; Joining
-(define-key evil-normal-state-map " j" 'evil-join)
+;; TODO -- make a better mapping for this.  I should make my prefixes be mnemonic or something...
+;;         for instance, g<key> is mostly navigation... t... mosty has window stuff in th... space is mostly one handed
+;;         navigation aside from this one
+(define-key evil-normal-state-map " J" 'evil-join)
 
 
 
