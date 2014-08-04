@@ -9,4 +9,5 @@
 (package-install 'rainbow-delimiters)
 (package-install 'company)
 (package-install 'ag)
+(package-install 'smex)
 
