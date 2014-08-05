@@ -100,6 +100,9 @@
 
 (setq echo-keystrokes 0.01) ; echo keystrokes faster than default 1s
 
+(setq c-default-style "k&r"
+      c-basic-offset 4)
+
 (if (file-exists-p "~/.emacs.local") (load-file "~/.emacs.local") nil)
 
 
