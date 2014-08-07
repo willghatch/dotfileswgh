@@ -576,8 +576,10 @@
 ;; s map
 (define-key evil-normal-state-map "ss" 'exil-substitute)
 (define-key evil-normal-state-map "sS" 'exil-change-whole-line)
-(define-key evil-normal-state-map "sr" 'shell-command-on-region)
+(define-key evil-visual-state-map "sh" 'shell-command-on-region)
 (define-key evil-normal-state-map "sh" 'shell-command)
+(define-key evil-normal-state-map "s)" 'eval-last-sexp)
+(define-key evil-visual-state-map "s)" 'eval-region)
 
 
 ;; command modes and macros
