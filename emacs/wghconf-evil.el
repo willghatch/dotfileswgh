@@ -6,6 +6,7 @@
 
 ;;;; Ace Jump installed here as well...
 (load-library "wghconf-ace-jump-mode")
+(load-library "wghconf-xclip")
 ;;;; and key-chord...
 (require 'key-chord)
 (key-chord-mode 1)
@@ -529,6 +530,8 @@
 (define-key evil-normal-state-map "gu" 'evil-downcase)
 (define-key evil-normal-state-map "gU" 'evil-upcase)
 (define-key evil-normal-state-map "g~" 'evil-invert-case)
+(define-key evil-normal-state-map "gy" 'xcopy)
+(define-key evil-normal-state-map "gp" 'xpaste)
 (define-key evil-motion-state-map "gd" 'evil-goto-definition)
 (define-key evil-motion-state-map "ge" 'evil-backward-word-end)
 (define-key evil-motion-state-map "gE" 'evil-backward-WORD-end)

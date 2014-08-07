@@ -10,4 +10,5 @@
 (package-install 'company)
 (package-install 'ag)
 (package-install 'smex)
+(package-install 'xclip)
 
