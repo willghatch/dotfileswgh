@@ -65,13 +65,14 @@ NC="\e[m"               # Color Reset
 export PS1="\[$(tput bold)\]\[$(tput setaf 6)\]\A \[$(tput setaf 7)\][\[$(tput setaf 2)\]\u\[$(tput setaf 7)\]@\[$(tput setaf 4)\]\h\[$(tput setaf 7)\]] \[$(tput setaf 4)\]\w \[$(tput setaf 7)\]\\$\[$(tput sgr0)\] "
 
 
-
-if [ -f ~/.wgh_shell_local ]; then
-      . ~/.wgh_shell_local
+if [ -f $DOTFILESLOCALDIR/bazsh ]
+then
+    source $DOTFILESLOCALDIR/bazsh
 fi
 
-if [ -f ~/.bashrc.local ]; then
-      . ~/.bashrc.local
+if [ -f $DOTFILESLOCALDIR/bashrc ]
+then
+    source $dotlocaldir/bashrc
 fi
 
 

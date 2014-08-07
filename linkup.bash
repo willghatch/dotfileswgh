@@ -62,14 +62,13 @@ function linkConfigSubdirs() {
 function mkSundries() {
 # Make sundry directories and files so things (especially vim) don't complain
 # and stuff that I just like to be there in general
-    touch $HOME/.vimrc.local
-    touch $HOME/.tmux.conf.local
-    mkdir -p $HOME/.vimtmp
+    mkdir -p $HOME/.dotlocal
+    touch $HOME/.dotlocal/vimrc
+    mkdir -p $HOME/.dotlocal/vimtmp
     mkdir -p $HOME/dl # my default download directory
     mkdir -p $HOME/vsvr
     mkdir -p $HOME/tmp
     mkdir -p $HOME/lscripts
-    mklink $dfDir/dwmlaunch $HOME/lscripts/dwmlaunch
 }
 
 #######################################

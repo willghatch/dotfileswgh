@@ -8,9 +8,9 @@ lockscreen="lockscreen.sh"
 launcher="bashrun"
 
 
-if [ -f $HOME/.dwmlaunch.local ]
+if [ -f $DOTFILESLOCALDIR/dwmlaunchrc ]
 then
-    source $HOME/.dwmlaunch.local
+    source $DOTFILESLOCALDIR/dwmlaunchrc
 fi
 
 

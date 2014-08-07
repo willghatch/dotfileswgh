@@ -103,6 +103,6 @@
 (setq c-default-style "k&r"
       c-basic-offset 4)
 
-(if (file-exists-p "~/.emacs.local") (load-file "~/.emacs.local") nil)
+(if (file-exists-p "~/.dotlocal/emacs") (load-file "~/.dotlocal/emacs") nil)
 
 

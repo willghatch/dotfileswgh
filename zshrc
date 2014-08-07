@@ -40,15 +40,14 @@ PS1_batt_state="\$(batt_state.bash)"
 PS1="${PS1_time} ${PS1_user_host} ${PS1_dir} ${PS1_cmd_stat}${PS1_end}"
 
 
-
-if [ -f ~/.wgh_shell_local ]
+if [ -f $DOTFILESLOCALDIR/bazsh ]
 then
-    source ~/.wgh_shell_local
+    source $DOTFILESLOCALDIR/bazsh
 fi
 
-if [ -f ~/.zshrc.local ]
+if [ -f $DOTFILESLOCALDIR/zshrc ]
 then
-    source ~/.zshrc.local
+    source $DOTFILESLOCALDIR/zshrc
 fi
 
 if [ -x ~/vscripts/motd.sh ]
