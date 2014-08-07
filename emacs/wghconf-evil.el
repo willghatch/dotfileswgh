@@ -572,6 +572,13 @@
 (define-key evil-motion-state-map "tt" 'evil-find-char-to)
 (define-key evil-motion-state-map "tT" 'evil-find-char-to-backward)
 
+;; s map
+(define-key evil-normal-state-map "ss" 'exil-substitute)
+(define-key evil-normal-state-map "sS" 'exil-change-whole-line)
+(define-key evil-normal-state-map "sr" 'shell-command-on-region)
+(define-key evil-normal-state-map "sh" 'shell-command)
+
+
 ;; command modes and macros
 (define-key evil-motion-state-map "-" 'evil-ex)
 ;(define-key evil-motion-state-map "|" 'execute-extended-command)
