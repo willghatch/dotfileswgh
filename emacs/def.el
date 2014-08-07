@@ -11,15 +11,14 @@
 ;; backup settings
 (setq
    backup-by-copying t      ; don't clobber symlinks
-   backup-directory-alist
-    '(("." . "~/.bakmacs"))    ; don't litter my fs tree
+   backup-directory-alist '(("." . "~/.dotlocal/bakmacs"))    ; don't litter my fs tree
    delete-old-versions t
-   kept-new-versions 6
-   kept-old-versions 2
+   kept-new-versions 8
+   kept-old-versions 4
    version-control t)       ; use versioned backups
-(setq auto-save-file-name-transforms '((".*" "~/.automacs/\\1" t))) ; auto-saves (## files) here
-(make-directory "~/.bakmacs/" t)
-(make-directory "~/.automacs/" t)
+(setq auto-save-file-name-transforms '((".*" "~/.dotlocal/automacs/\\1" t))) ; auto-saves (## files) here
+(make-directory "~/.dotlocal/bakmacs/" t)
+(make-directory "~/.dotlocal/automacs/" t)
 
 ;; mouse settings
 (if (fboundp 'xterm-mouse-mode) (xterm-mouse-mode) nil) ; shift-click for normal xterm mouse behavior
