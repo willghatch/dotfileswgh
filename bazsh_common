@@ -3,7 +3,7 @@
 # recognize it...
 
 export HROOT=$HOME/hroot
-PATH=$HOME/bin:$HOME/lscripts:$HOME/vscripts:$HOME/wghsrv_scripts:$HOME/.cabal/bin:$HROOT/bin:$HROOT/usr/bin:$HROOT/usr/local/bin:$PATH:/usr/bin:/bin:/usr/local/bin:/sbin:/usr/sbin:/usr/local/sbin
+PATH=$HOME/bin:$HOME/lscripts:$HOME/vscripts:$HOME/wghsrv_scripts:$HOME/.cabal/bin:$HROOT/bin:$HROOT/usr/bin:$HROOT/usr/local/bin:$PATH:/usr/bin:/bin:/usr/local/bin:/sbin:/usr/sbin:/usr/local/sbin:$HOME/dotfileswgh/commands
 export MANPATH=/usr/share/man:/usr/local/man:/usr/local/share/man:/usr/X11R6/man:/opt/man:$HROOT/usr/share/man:$HROOT/share/man
 
 ################################################  ALIASES ############################### 
