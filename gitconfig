@@ -3,3 +3,6 @@
 	name = William G Hatch
 [core]
 	editor = vim
+
+[push]
+	default = simple
