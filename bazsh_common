@@ -45,6 +45,7 @@ alias grurp="git remote update && git rebase && git push"
 alias tm="tmux"
 alias tma="tmux attach-session -t"
 alias tmad="tmux attach-session -d -t"
+alias tml="tmux list-sessions"
 alias tmr="tmux rename-session"
 alias tmrw="tmux rename-window"
 alias tmd="tmux detach"
@@ -52,8 +53,10 @@ function tmn()
 {
     if test -n "$TMUX"
     then
+        pushd ~
         TMUX="" tmux new-session -d -s $@
         tmux switch-client -t $@
+        popd
     else
         tmux new-session -s $@
     fi
