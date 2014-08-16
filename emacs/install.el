@@ -4,6 +4,8 @@
 (package-refresh-contents)
 
 (package-install 'evil)
+(package-install 'evil-args)
+(package-install 'evil-surround)
 (package-install 'key-chord)
 (package-install 'ace-jump-mode)
 (package-install 'rainbow-delimiters)

@@ -94,6 +94,7 @@
 
 (load-library "wghconf-package") ; load packaging config
 (load-library "wghconf-modeline") ; load mode line config
+(require 'smex)
 (setq custom-file "~/dotfileswgh/emacs/custom-file.el")
 (load custom-file)
 
@@ -101,6 +102,10 @@
 
 (setq c-default-style "k&r"
       c-basic-offset 4)
+
+(global-set-key (kbd "M-h") 'help-command)
+(if (fboundp 'smex)
+    (global-set-key (kbd "M-x") 'smex))
 
 (if (file-exists-p "~/.dotlocal/emacs") (load-file "~/.dotlocal/emacs") nil)
 

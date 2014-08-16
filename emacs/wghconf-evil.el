@@ -11,6 +11,17 @@
 (require 'key-chord)
 (key-chord-mode 1)
 
+(setq evil-overriding-maps nil
+      evil-intercept-maps nil)
+(require 'evil-args)
+(require 'evil-surround)
+(global-evil-surround-mode 1)
+
+(defun backward-symbol (n)
+  "this doesn't work right..."
+  (interactive "p")
+  (forward-word (- n)))
+
 
 ;;; First, blow up maps so they don't map things like t/T and
 ;;; insert mode stuff
@@ -509,6 +520,9 @@
 (defalias 'shr 'shell-command-on-region)
 (defalias 'trunc 'toggle-truncate-lines)
 
+;; More text objects!
+(define-key evil-inner-text-objects-map "a" 'evil-inner-arg)
+(define-key evil-outer-text-objects-map "a" 'evil-outer-arg)
 
 ;; Normal state switch!
 (key-chord-define evil-insert-state-map (kbd "kj") 'evil-normal-state)
@@ -574,8 +588,12 @@
 (define-key evil-motion-state-map "tT" 'evil-find-char-to-backward)
 
 ;; s map
-(define-key evil-normal-state-map "ss" 'exil-substitute)
-(define-key evil-normal-state-map "sS" 'exil-change-whole-line)
+;(define-key evil-normal-state-map "ss" 'evil-substitute)
+;(define-key evil-normal-state-map "sS" 'evil-change-whole-line)
+(evil-define-key 'visual evil-surround-mode-map "s" nil)
+(evil-define-key 'visual evil-surround-mode-map "S" nil)
+(define-key evil-visual-state-map "ss" 'evil-surround-region)
+(define-key evil-visual-state-map "sS" 'evil-Surround-region)
 (define-key evil-visual-state-map "sh" 'shell-command-on-region)
 (define-key evil-normal-state-map "sh" 'shell-command)
 (define-key evil-normal-state-map "s)" 'eval-last-sexp)
@@ -600,6 +618,8 @@
 (define-key evil-motion-state-map " t" 'scroll-down)
 (define-key evil-motion-state-map " j" 'scroll-up)
 (define-key evil-motion-state-map " k" 'scroll-down)
+(define-key evil-motion-state-map " o" 'forward-symbol)
+(define-key evil-motion-state-map " eo" 'backward-symbol)
 (define-key evil-motion-state-map "J" 'evil-window-bottom)
 (define-key evil-motion-state-map "K" 'evil-window-top)
 (define-key evil-motion-state-map "{" 'backward-sexp)
@@ -616,7 +636,7 @@
 
 
 ;; input mode
-;(define-key evil-insert-state-map "\C-h" 'delete-backward-char) ; Be more unix-like... but clobber help?
+(define-key evil-insert-state-map "\C-h" 'delete-backward-char) ; Be more unix-like... I have help on M-h
 (define-key evil-insert-state-map (kbd "DEL") 'delete-backward-char) ; remap away from the evil-version backspace
 (define-key evil-insert-state-map "\M-n" 'evil-complete-next)
 (define-key evil-insert-state-map "\M-p" 'evil-complete-previous)
@@ -639,7 +659,18 @@
 (evil-ex-define-cmd "bd[elete]" 'evil-delete-buffer)
 (evil-ex-define-cmd "s[ubstitute]" 'evil-ex-substitute)
 ;(evil-ex-define-cmd "!" 'evil-shell-command)
-(evil-ex-define-cmd "ff" 'ido-find-file)
+(setq ido-enable-flex-matching t
+      ido-everywhere t)
+(defun ido-ffap-no ()
+  (interactive)
+  (setq ido-use-filename-at-point nil)
+  (call-interactively 'ido-find-file))
+(defun ido-ffap-yes ()
+  (interactive)
+  (setq ido-use-filename-at-point 'guess)
+  (call-interactively 'ido-find-file))
+(evil-ex-define-cmd "ff" 'ido-ffap-yes)
+(evil-ex-define-cmd "f" 'ido-ffap-no)
 
 
 (defun ish (cmd) (interactive (list (read-shell-command "$ ")))
