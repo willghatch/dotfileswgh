@@ -82,6 +82,9 @@
   "pulls in company package (in elpa) with my config"
   (load-library "wghconf-company"))
 
+(defun nop () (interactive)
+  (+ 0 0))
+
 (menu-bar-mode -1) ; no menu-bar
 (setq inhibit-splash-screen t)
 (setq inhibit-startup-message t)

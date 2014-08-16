@@ -137,13 +137,13 @@
 (define-key evil-window-map "v" 'evil-window-vsplit)
 ;(define-key evil-window-map "w" 'evil-window-next)
 ;(define-key evil-window-map "W" 'evil-window-prev)
-(define-key evil-window-map "+" 'evil-window-increase-height)
-(define-key evil-window-map "-" 'evil-window-decrease-height)
-(define-key evil-window-map "_" 'evil-window-set-height)
-(define-key evil-window-map "<" 'evil-window-decrease-width)
-(define-key evil-window-map ">" 'evil-window-increase-width)
+;(define-key evil-window-map "+" 'evil-window-increase-height)
+;(define-key evil-window-map "-" 'evil-window-decrease-height)
+;(define-key evil-window-map "_" 'evil-window-set-height)
+;(define-key evil-window-map "<" 'evil-window-decrease-width)
+;(define-key evil-window-map ">" 'evil-window-increase-width)
 (define-key evil-window-map "=" 'balance-windows)
-(define-key evil-window-map "|" 'evil-window-set-width)
+;(define-key evil-window-map "|" 'evil-window-set-width)
 (define-key evil-window-map "\C-b" 'evil-window-bottom-right)
 (define-key evil-window-map "\C-c" 'evil-window-delete)
 (define-key evil-window-map "\C-H" 'evil-window-move-far-left)
@@ -513,6 +513,27 @@
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; My normal config here...
 
+(evil-define-state window
+  "Window management state"
+  :tag " <W> "
+  :supress-keymap t)
+
+(define-key evil-window-map (kbd "RET") 'evil-normal-state)
+(define-key evil-window-map [return] 'evil-normal-state)
+(define-key evil-window-map "e" 'evil-window-state)
+(define-key evil-window-map "n" 'evil-window-next)
+(define-key evil-window-map "p" 'evil-window-prev)
+(define-key evil-window-map "c" 'delete-window)
+;(define-key evil-window-map "w" 'evil-window-new) ; this makes a new buffer called new... I don't think I like that
+(define-key evil-window-map "K" 'evil-window-increase-height)
+(define-key evil-window-map "J" 'evil-window-decrease-height)
+(define-key evil-window-map "H" 'evil-window-decrease-width)
+(define-key evil-window-map "L" 'evil-window-increase-width)
+
+(set-keymap-parent evil-window-state-map evil-window-map)
+
+
+
 ;; function aliases
 (defalias 'er 'eval-region)
 (defalias 'eb 'eval-buffer)
@@ -527,11 +548,6 @@
 ;; Normal state switch!
 (key-chord-define evil-insert-state-map (kbd "kj") 'evil-normal-state)
 (key-chord-define evil-replace-state-map (kbd "kj") 'evil-normal-state)
-;; buffer management
-(define-key evil-window-map "n" 'evil-window-next)
-(define-key evil-window-map "p" 'evil-window-prev)
-(define-key evil-window-map "c" 'delete-window)
-;(define-key evil-window-map "w" 'evil-window-new) ; this makes a new buffer called new... I don't think I like that
 
 ; g map
 (define-key evil-motion-state-map "gt" 'next-buffer)
@@ -687,5 +703,4 @@
 ;; Mouse keys...
 ;(global-set-key [mouse-4] (lambda () (interactive) (scroll-down 4)))
 ;(global-set-key [mouse-5] (lambda () (interactive) (scroll-up 4)))
-
 
