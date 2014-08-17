@@ -105,6 +105,7 @@
 
 (setq c-default-style "k&r"
       c-basic-offset 4)
+(setq org-startup-folded nil)
 
 (global-set-key (kbd "M-h") 'help-command)
 (if (fboundp 'smex)
