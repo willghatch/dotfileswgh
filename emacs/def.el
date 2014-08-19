@@ -33,7 +33,7 @@
 (linum-mode 1)
 (global-linum-mode 1) ; add line numbers
 (add-hook 'find-file-hook (lambda () (linum-mode 1))) ; USE LINE NUMBERS ON EVERYTHING GOSH DARN IT!
-(column-number-mode) ;turn on column numbers in mode line
+;(column-number-mode) ;turn on column numbers in mode line
 (setq vc-follow-symlinks t) ; Don't prompt to follow symlinks of version-controlled files
 (setq tab-width 4) ; how many spaces for tab DISPLAY
 (setq-default indent-tabs-mode nil) ; use spaces, not tabs

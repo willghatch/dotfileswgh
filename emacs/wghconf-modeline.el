@@ -113,3 +113,9 @@
        minor-mode-alist  ;; list of minor modes
        " %-" ;; fill with '-'
        ))
+
+
+(mapcar (lambda (b) (progn
+                      (set-buffer b)
+                      (setq mode-line-format (default-value 'mode-line-format))))
+        (buffer-list))
