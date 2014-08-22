@@ -1,18 +1,14 @@
 
-# Lines configured by zsh-newuser-install
-HISTFILE=~/.histfile
+HISTFILE=~/.zsh.history
 HISTSIZE=1000
 SAVEHIST=1000
 bindkey -e
-# End of lines configured by zsh-newuser-install
-# The following lines were added by compinstall
 zstyle :compinstall filename '$HOME/.zshrc'
+zstyle ':completion:*'  matcher-list 'm:{a-z}={A-Z}'
 
 autoload -Uz compinit
 compinit
-# End of lines added by compinstall
-#
-#
+
 
 autoload -U colors && colors
 
