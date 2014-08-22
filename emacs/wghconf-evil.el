@@ -11,8 +11,10 @@
 (require 'key-chord)
 (key-chord-mode 1)
 
-(setq evil-overriding-maps nil
-      evil-intercept-maps nil)
+;; the following isn't working...
+;(setq-default evil-overriding-maps nil
+;              evil-intercept-maps nil)
+
 (require 'evil-args)
 (require 'evil-surround)
 (global-evil-surround-mode 1)

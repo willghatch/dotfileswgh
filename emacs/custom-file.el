@@ -3,7 +3,9 @@
  ;; If you edit it by hand, you could mess it up, so be careful.
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
- '(bmkp-last-as-first-bookmark-file "~/.emacs.d/bookmarks"))
+ '(bmkp-last-as-first-bookmark-file "~/.emacs.d/bookmarks")
+ '(evil-overriding-maps nil)
+ '(evil-intercept-maps nil))
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
@@ -22,6 +24,10 @@
  '(lazy-highlight ((t (:background "#0087ff" :foreground "#000000"))))
  '(linum ((t (:inherit mode-line :foreground "#00ffff"))))
  '(match ((t (:background "#cdcd00" :foreground "#00005f"))))
+ '(minibuffer-prompt ((t (:foreground "#ff00ff"))))
+ '(mode-line ((t (:background "#262626" :foreground "#00afd7" :box (:line-width -1 :style released-button)))))
+ '(mode-line-inactive ((t (:inherit mode-line :background "#262626" :foreground "#008787" :box (:line-width -1 :color "#303030") :weight light))))
+ '(next-error ((t (:inherit region :foreground "#00cd00"))))
  '(outline-1 ((t (:foreground "#ff00ff"))))
  '(outline-2 ((t (:foreground "#cd00cd"))))
  '(outline-3 ((t (:foreground "#ff0000"))))
@@ -31,19 +37,14 @@
  '(outline-7 ((t (:foreground "#00ffff"))))
  '(outline-8 ((t (:foreground "#5c5cff"))))
  '(rainbow-delimiters-depth-1-face ((t (:foreground "#ff00ff"))))
- '(rainbow-delimiters-depth-7-face ((t (:foreground "#cd00cd"))))
- '(rainbow-delimiters-depth-3-face ((t (:foreground "#ff0000"))))
- '(rainbow-delimiters-depth-8-face ((t (:foreground "#d75f00"))))
- '(rainbow-delimiters-depth-5-face ((t (:foreground "#d7ff00"))))
- '(rainbow-delimiters-depth-9-face ((t (:foreground "#00ff00"))))
  '(rainbow-delimiters-depth-2-face ((t (:foreground "#00ffff"))))
- '(rainbow-delimiters-depth-5-face ((t (:foreground "#00cdcd"))))
+ '(rainbow-delimiters-depth-3-face ((t (:foreground "#ff0000"))))
+ '(rainbow-delimiters-depth-5-face ((t (:foreground "#d7ff00"))))
  '(rainbow-delimiters-depth-6-face ((t (:foreground "#5c5cff"))))
+ '(rainbow-delimiters-depth-7-face ((t (:foreground "#cd00cd"))))
+ '(rainbow-delimiters-depth-8-face ((t (:foreground "#d75f00"))))
+ '(rainbow-delimiters-depth-9-face ((t (:foreground "#00ff00"))))
  '(rainbow-delimiters-unmatched-face ((t (:background "#5f0000"))))
- '(minibuffer-prompt ((t (:foreground "#ff00ff"))))
- '(mode-line ((t (:background "#262626" :foreground "#00afd7" :box (:line-width -1 :style released-button)))))
- '(mode-line-inactive ((t (:inherit mode-line :background "#262626" :foreground "#008787" :box (:line-width -1 :color "#303030") :weight light))))
- '(next-error ((t (:inherit region :foreground "#00cd00"))))
  '(region ((t (:background "#0000d7" :foreground "#ff00ff"))))
  '(secondary-selection ((t (:background "#cdcd00" :foreground "#005f00"))))
  '(tool-bar ((t (:foreground "#00ff00" :box (:line-width 1 :style released-button))))))
