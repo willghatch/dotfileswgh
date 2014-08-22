@@ -4,7 +4,35 @@ HISTSIZE=1000
 SAVEHIST=1000
 bindkey -e
 zstyle :compinstall filename '$HOME/.zshrc'
+# smart-case...ish
 zstyle ':completion:*'  matcher-list 'm:{a-z}={A-Z}'
+
+# format all messages not formatted in bold prefixed with ----
+zstyle ':completion:*' format '%B---- %d%b'
+# format descriptions (notice the vt100 escapes)
+zstyle ':completion:*:descriptions'    format $'%{\e[0;31m%}completing %B%d%b%{\e[0m%}'
+# bold and underline normal messages
+zstyle ':completion:*:messages' format '%B%U---- %d%u%b'
+# format in bold red error messages
+zstyle ':completion:*:warnings' format "%B$fg[red]%}---- no match for: $fg[white]%d%b"
+# Put completion into groups
+zstyle ':completion:*' group-name ''
+
+# activate approximate completion, but only after regular completion (_complete)
+zstyle ':completion:::::' completer _complete _approximate
+# limit to 2 errors
+zstyle ':completion:*:approximate:*' max-errors 2
+# or to have a better heuristic, by allowing one error per 3 character typed
+# zstyle ':completion:*:approximate:*' max-errors 'reply=( $(( ($#PREFIX+$#SUFFIX)/3 )) numeric )'
+
+# let's complete known hosts and hosts from ssh's known_hosts file
+#mybasehosts="examplehost.exampledomain.net"
+#myhosts=($((
+#( [ -r $HOME/.ssh/known_hosts ] && awk '{print $1}' $HOME/.ssh/known_hosts | tr , '\n');\
+#echo $mybasehost; ) | sort -u) )
+
+#zstyle ':completion:*' hosts $myhosts
+
 
 autoload -Uz compinit
 compinit
