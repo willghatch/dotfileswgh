@@ -1,11 +1,13 @@
-
+#!/usr/bin/zsh
 HISTFILE=~/.zsh.history
 HISTSIZE=1000
 SAVEHIST=1000
 bindkey -e
 zstyle :compinstall filename '$HOME/.zshrc'
-# smart-case...ish
-zstyle ':completion:*'  matcher-list 'm:{a-z}={A-Z}'
+# smart-case...ish...
+#zstyle ':completion:*'  matcher-list 'm:{a-z}={A-Z}'
+# smart-case...ish... and match numbers without using L3-shift (my layout has numbers on AltGr+these letters), and -/_
+zstyle ':completion:*'  matcher-list 'm:{a-z}={A-Z} m:{b,m,w,v,h,t,n,g,c,r,-}={0,1,2,3,4,5,6,7,8,9,_} l:|=* r:|=*'
 
 # format all messages not formatted in bold prefixed with ----
 zstyle ':completion:*' format '%B---- %d%b'
@@ -33,6 +35,8 @@ zstyle ':completion:*:approximate:*' max-errors 2
 
 #zstyle ':completion:*' hosts $myhosts
 
+# add partial completion highlighting
+zstyle -e ':completion:*:default' list-colors 'reply=("${PREFIX:+=(#bi)($PREFIX:t)(?)*==36=01;31}:${(s.:.)LS_COLORS}")'
 
 autoload -Uz compinit
 compinit
