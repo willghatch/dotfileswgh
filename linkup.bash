@@ -14,6 +14,7 @@ dotfiles=(
     tmux.conf
     muttrc
     makepkg.conf
+    inputrc
 )
 
 function die() {
