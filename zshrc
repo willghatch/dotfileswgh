@@ -67,6 +67,7 @@ PS1_batt_state="\$(batt_state.bash)"
 #'
 PS1="${PS1_time} ${PS1_user_host} ${PS1_dir} ${PS1_cmd_stat}${PS1_end}"
 
+source $DOTFILESDIR/zshkeys
 
 if [ -f $DOTFILESLOCALDIR/bazsh ]
 then

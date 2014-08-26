@@ -1,0 +1,25 @@
+#!/usr/bin/zsh
+
+# nuke viins map, replacing it with the contents of the emacs map
+bindkey -A emacs viins
+
+# escapes for command mode
+bindkey -M viins 'jk' vi-cmd-mode
+bindkey -M viins 'kj' vi-cmd-mode
+
+
+function zle-line-init zle-keymap-select {
+    RPS1="${${KEYMAP/vicmd/[CMD]}/(main|viins)/[INS]}"
+    RPS2=$RPS1
+    zle reset-prompt
+}
+zle -N zle-line-init
+zle -N zle-keymap-select
+
+
+# use viins, which is now emacs-y, but has an out to vicmd mode
+bindkey -v
+
+
+# todo -- opp.zsh adds surround functionality, and some plugins by tarao add more still (and have emacs counterparts that I need to check out)
+
