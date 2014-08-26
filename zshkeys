@@ -9,12 +9,23 @@ bindkey -M viins 'kj' vi-cmd-mode
 
 
 function zle-line-init zle-keymap-select {
-    RPS1="${${KEYMAP/vicmd/[CMD]}/(main|viins)/[INS]}"
+
+    RPS1="${${KEYMAP/vicmd/CMD}/(main|viins)/INS}"
+    echo hello
+    if [ "$RPS1" = "CMD" ]
+    then
+        RPS1="%F{cyan}[CMD]"
+    elif [ "$RPS1" = "INS" ]
+    then
+        RPS1="%F{magenta}[INS]"
+    fi
     RPS2=$RPS1
     zle reset-prompt
 }
-zle -N zle-line-init
-zle -N zle-keymap-select
+
+# this is bugging me for now, because it adds extra newlines
+#zle -N zle-line-init
+#zle -N zle-keymap-select
 
 
 # use viins, which is now emacs-y, but has an out to vicmd mode
