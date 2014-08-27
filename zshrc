@@ -70,13 +70,13 @@ PS1="${PS1_time} ${PS1_user_host} ${PS1_dir} ${PS1_cmd_stat}${PS1_end}"
 
 
 source $DOTFILESDIR/zshkeys
-oppzsh=$DOTFILESDIR/external/opp.zsh/opp.zsh
+oppzsh=$DOTFILESDIR/external/zsh/opp.zsh/opp.zsh
 if [ -f "$oppzsh" ]
 then
     source $oppzsh
 fi
-sourceIfExists $DOTFILESDIR/external/opp.zsh/opp/textobj-between.zsh
-surrzsh=$DOTFILESDIR/external/opp.zsh/opp/surround.zsh
+sourceIfExists $DOTFILESDIR/external/zsh/opp.zsh/opp/textobj-between.zsh
+surrzsh=$DOTFILESDIR/external/zsh/opp.zsh/opp/surround.zsh
 if [ -f "$surrzsh" ]
 then
     source $surrzsh
