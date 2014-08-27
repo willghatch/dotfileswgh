@@ -1,0 +1,3 @@
+[submodule "external/opp.zsh"]
+	path = external/opp.zsh
+	url = https://github.com/hchbaw/opp.zsh.git
