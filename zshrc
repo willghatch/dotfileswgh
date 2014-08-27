@@ -56,9 +56,6 @@ then
     source $bazsh_common
 fi
 
-# Highlighter plugin config
-ZSH_HIGHLIGHT_HIGHLIGHTERS=(main brackets pattern cursor)
-
 PS1_time='%F{cyan}%T'
 PS1_user_host='%F{green}[%B%n%b%F{yellow}@%B%m%b%F{green}]'
 PS1_dir='%F{blue}%B%~'
@@ -96,11 +93,18 @@ if [ -f "$tf" ]
 then
     source $tf
 fi
+
+# Highlighter plugin config
+ZSH_HIGHLIGHT_HIGHLIGHTERS=(main brackets pattern cursor)
 tf=$DOTFILESDIR/external/zsh/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh
 if [ -f "$tf" ]
 then
     source $tf
 fi
+ZSH_HIGHLIGHT_STYLES[globbing]="fg=blue,bold"
+
+
+
 tf=$DOTFILESDIR/external/zsh/zsh-history-substring-search/zsh-history-substring-search.zsh
 if [ -f "$tf" ]
 then
