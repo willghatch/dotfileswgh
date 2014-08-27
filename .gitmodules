@@ -1,3 +1,9 @@
 [submodule "external/zsh/opp.zsh"]
 	path = external/zsh/opp.zsh
 	url = https://github.com/hchbaw/opp.zsh.git
+[submodule "external/zsh/zsh-syntax-highlighting"]
+	path = external/zsh/zsh-syntax-highlighting
+	url = https://github.com/zsh-users/zsh-syntax-highlighting.git
+[submodule "external/zsh/zsh-history-substring-search"]
+	path = external/zsh/zsh-history-substring-search
+	url = https://github.com/zsh-users/zsh-history-substring-search.git

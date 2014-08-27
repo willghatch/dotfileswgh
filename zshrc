@@ -69,7 +69,8 @@ PS1="${PS1_time} ${PS1_user_host} ${PS1_dir} ${PS1_cmd_stat}${PS1_end}"
 
 
 
-source $DOTFILESDIR/zshkeys
+source $DOTFILESDIR/zsh/zshkeys-pre
+
 tf=$DOTFILESDIR/external/zsh/opp.zsh/opp.zsh
 if [ -f "$tf" ]
 then
@@ -90,6 +91,18 @@ if [ -f "$tf" ]
 then
     source $tf
 fi
+tf=$DOTFILESDIR/external/zsh/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh
+if [ -f "$tf" ]
+then
+    source $tf
+fi
+tf=$DOTFILESDIR/external/zsh/zsh-history-substring-search/zsh-history-substring-search.zsh
+if [ -f "$tf" ]
+then
+    source $tf
+fi
+
+source $DOTFILESDIR/zsh/zshkeys-post
 
 tf=$DOTFILESLOCALDIR/bazsh
 if [ -f "$tf" ]
