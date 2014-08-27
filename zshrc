@@ -7,7 +7,9 @@ zstyle :compinstall filename '$HOME/.zshrc'
 # smart-case...ish...
 #zstyle ':completion:*'  matcher-list 'm:{a-z}={A-Z}'
 # smart-case...ish... and match numbers without using L3-shift (my layout has numbers on AltGr+these letters), and -/_
-zstyle ':completion:*'  matcher-list 'm:{a-z}={A-Z} m:{b,m,w,v,h,t,n,g,c,r,-}={0,1,2,3,4,5,6,7,8,9,_} l:|=* r:|=*'
+#zstyle ':completion:*'  matcher-list 'm:{a-z}={A-Z} m:{b,m,w,v,h,t,n,g,c,r,-}={0,1,2,3,4,5,6,7,8,9,_} l:|=* r:|=*'
+# for now, don't match in the middle, just on the left...
+zstyle ':completion:*'  matcher-list 'm:{a-z}={A-Z} m:{b,m,w,v,h,t,n,g,c,r,-}={0,1,2,3,4,5,6,7,8,9,_}'
 
 # format all messages not formatted in bold prefixed with ----
 zstyle ':completion:*' format '%B---- %d%b'
