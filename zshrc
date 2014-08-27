@@ -70,21 +70,37 @@ PS1="${PS1_time} ${PS1_user_host} ${PS1_dir} ${PS1_cmd_stat}${PS1_end}"
 
 
 source $DOTFILESDIR/zshkeys
-oppzsh=$DOTFILESDIR/external/zsh/opp.zsh/opp.zsh
-if [ -f "$oppzsh" ]
+tf=$DOTFILESDIR/external/zsh/opp.zsh/opp.zsh
+if [ -f "$tf" ]
 then
-    source $oppzsh
+    source $tf
 fi
-sourceIfExists $DOTFILESDIR/external/zsh/opp.zsh/opp/textobj-between.zsh
-surrzsh=$DOTFILESDIR/external/zsh/opp.zsh/opp/surround.zsh
-if [ -f "$surrzsh" ]
+tf=$DOTFILESDIR/external/zsh/opp.zsh/opp/textobj-between.zsh
+if [ -f "$tf" ]
 then
-    source $surrzsh
+    source $tf
+fi
+tf=$DOTFILESDIR/external/zsh/opp.zsh/opp/surround.zsh
+if [ -f "$tf" ]
+then
+    source $tf
+fi
+tf=$DOTFILESDIR/external/zsh/zle_vi_visual.zsh
+if [ -f "$tf" ]
+then
+    source $tf
 fi
 
-
-sourceIfExists $DOTFILESLOCALDIR/bazsh
-sourceIfExists $DOTFILESLOCALDIR/zshrc
+tf=$DOTFILESLOCALDIR/bazsh
+if [ -f "$tf" ]
+then
+    source $tf
+fi
+tf=$DOTFILESLOCALDIR/zshrc
+if [ -f "$tf" ]
+then
+    source $tf
+fi
 
 if [ -x ~/vscripts/motd.sh ]
 then
