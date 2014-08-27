@@ -65,14 +65,8 @@ NC="\e[m"               # Color Reset
 export PS1="\[$(tput bold)\]\[$(tput setaf 6)\]\A \[$(tput setaf 7)\][\[$(tput setaf 2)\]\u\[$(tput setaf 7)\]@\[$(tput setaf 4)\]\h\[$(tput setaf 7)\]] \[$(tput setaf 4)\]\w \[$(tput setaf 7)\]\\$\[$(tput sgr0)\] "
 
 
-if [ -f $DOTFILESLOCALDIR/bazsh ]
-then
-    source $DOTFILESLOCALDIR/bazsh
-fi
+sourceIfExists $DOTFILESLOCALDIR/bazsh
 
-if [ -f $DOTFILESLOCALDIR/bashrc ]
-then
-    source $dotlocaldir/bashrc
-fi
+sourceIfExists $dotlocaldir/bashrc
 
 

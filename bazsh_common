@@ -120,6 +120,19 @@ xmlless()
     xmllint --format $@ | less
 }
 
+# for sourcing
+sourceIfExists()
+{
+    for f in $@
+    do
+        if [ -f $f ]
+        then
+            source $f
+        fi
+    done
+
+}
+
 
 ####### Add shell completion #######
 
