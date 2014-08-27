@@ -54,6 +54,9 @@ then
     source $bazsh_common
 fi
 
+# Highlighter plugin config
+ZSH_HIGHLIGHT_HIGHLIGHTERS=(main brackets pattern cursor)
+
 PS1_time='%F{cyan}%T'
 PS1_user_host='%F{green}[%B%n%b%F{yellow}@%B%m%b%F{green}]'
 PS1_dir='%F{blue}%B%~'
