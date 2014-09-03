@@ -18,6 +18,8 @@
 (require 'evil-args)
 (require 'evil-surround)
 (global-evil-surround-mode 1)
+(require 'evil-little-word)
+(require 'evil-textobj-between)
 
 (defun backward-symbol (n)
   "this doesn't work right..."
