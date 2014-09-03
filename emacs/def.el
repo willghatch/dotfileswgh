@@ -6,6 +6,8 @@
       (normal-top-level-add-subdirs-to-load-path))
 (let ((default-directory "~/dotfileswgh/emacs"))
       (normal-top-level-add-subdirs-to-load-path))
+(let ((default-directory "~/dotfileswgh/external/emacs"))
+      (normal-top-level-add-subdirs-to-load-path))
 (setq load-path (cons "~/dotfileswgh/emacs" load-path))
 
 ;; backup settings

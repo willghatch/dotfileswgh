@@ -7,3 +7,6 @@
 [submodule "external/zsh/zsh-history-substring-search"]
 	path = external/zsh/zsh-history-substring-search
 	url = https://github.com/zsh-users/zsh-history-substring-search.git
+[submodule "external/emacs/tarao-evil-plugins"]
+	path = external/emacs/tarao-evil-plugins
+	url = https://github.com/tarao/evil-plugins.git
