@@ -10,3 +10,6 @@
 [submodule "external/emacs/tarao-evil-plugins"]
 	path = external/emacs/tarao-evil-plugins
 	url = https://github.com/tarao/evil-plugins.git
+[submodule "external/emacs/yasnippet"]
+	path = external/emacs/yasnippet
+	url = https://github.com/capitaomorte/yasnippet.git
