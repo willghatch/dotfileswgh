@@ -7,7 +7,12 @@
 (define-key yas-minor-mode-map (kbd "<tab>") nil)
 (define-key yas-minor-mode-map (kbd "TAB") nil)
 (define-key yas-minor-mode-map (kbd "C-s") 'yas-expand)
-;(define-key yas-minor-mode-map (kbd "C-m") 'yas-next-field-or-maybe-expand) ;Bad -- C-m is enter...
+
+(setcdr yas-keymap nil) ; keymap when expansion is active
+(define-key yas-keymap (kbd "C-d") yas-skip-and-clear-or-delete-char)
+(define-key yas-keymap (kbd "C-g") yas-abort-snippet)
+(define-key yas-keymap (kbd "C-b") yas-prev-field)
+(define-key yas-keymap (kbd "C-f") yas-next-field-or-maybe-expand)
 
 (yas-global-mode 1)
 
