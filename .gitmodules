@@ -13,3 +13,6 @@
 [submodule "external/emacs/yasnippet"]
 	path = external/emacs/yasnippet
 	url = https://github.com/capitaomorte/yasnippet.git
+[submodule "external/zsh/wd"]
+	path = external/zsh/wd
+	url = https://github.com/mfaerevaag/wd.git
