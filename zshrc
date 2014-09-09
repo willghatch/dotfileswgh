@@ -3,6 +3,15 @@ HISTFILE=~/.zsh.history
 HISTSIZE=1000
 SAVEHIST=1000
 bindkey -e
+
+bazsh_common=$HOME/dotfileswgh/bazsh_common
+if [ -f $bazsh_common ]
+then
+    source $bazsh_common
+fi
+
+fpath=($DOTFILESDIR/zsh/wd $fpath)
+
 zstyle :compinstall filename '$HOME/.zshrc'
 # smart-case...ish...
 #zstyle ':completion:*'  matcher-list 'm:{a-z}={A-Z}'
@@ -50,11 +59,6 @@ setopt PROMPT_SUBST
 
 umask 077
 
-bazsh_common=$HOME/dotfileswgh/bazsh_common
-if [ -f $bazsh_common ]
-then
-    source $bazsh_common
-fi
 
 PS1_time='%F{cyan}%T'
 PS1_user_host='%F{green}[%B%n%b%F{yellow}@%B%m%b%F{green}]'
@@ -72,6 +76,10 @@ PS1="${PS1_time} ${PS1_user_host} ${PS1_dir} ${PS1_cmd_stat}${PS1_end}"
 
 
 source $DOTFILESDIR/zsh/zshkeys-pre
+
+wd() {
+    source $DOTFILESDIR/external/zsh/wd/wd.sh
+}
 
 tf=$DOTFILESDIR/external/zsh/opp.zsh/opp.zsh
 if [ -f "$tf" ]
