@@ -10,7 +10,7 @@ then
     source $bazsh_common
 fi
 
-fpath=($DOTFILESDIR/zsh/wd $fpath)
+fpath=($DOTFILESDIR/external/zsh/wd $fpath)
 
 zstyle :compinstall filename '$HOME/.zshrc'
 # smart-case...ish...
