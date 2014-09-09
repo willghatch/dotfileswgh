@@ -4,6 +4,7 @@
 (setq yas-snippet-dirs
       (cons "~/dotfileswgh/emacs/snippets" yas-snippet-dirs))
 
+(global-set-key (kbd "C-s") nil) ; unset this key so yas doesn't fall back to search annoyingly
 (define-key yas-minor-mode-map (kbd "<tab>") nil)
 (define-key yas-minor-mode-map (kbd "TAB") nil)
 (define-key yas-minor-mode-map (kbd "C-s") 'yas-expand)
