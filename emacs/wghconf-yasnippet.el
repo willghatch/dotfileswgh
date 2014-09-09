@@ -7,7 +7,7 @@
 (define-key yas-minor-mode-map (kbd "<tab>") nil)
 (define-key yas-minor-mode-map (kbd "TAB") nil)
 (define-key yas-minor-mode-map (kbd "C-s") 'yas-expand)
-(define-key yas-minor-mode-map (kbd "C-m") 'yas-next-field-or-maybe-expand)
+;(define-key yas-minor-mode-map (kbd "C-m") 'yas-next-field-or-maybe-expand) ;Bad -- C-m is enter...
 
 (yas-global-mode 1)
 
