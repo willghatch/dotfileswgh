@@ -1,0 +1,4 @@
+# name: insert date
+# key: idate
+# --
+`(call-interactively 'insert-date)`

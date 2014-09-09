@@ -1,0 +1,5 @@
+# name: insert datetime
+# key: idatet
+# --
+`(let ((current-prefix-arg '(4)))
+      (insert-date current-prefix-arg))`
