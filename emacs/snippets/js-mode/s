@@ -1,0 +1,4 @@
+# -*- mode: snippet -*-
+#name : jquery selection
+# --
+$("$1")$0
