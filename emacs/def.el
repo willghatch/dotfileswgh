@@ -71,10 +71,6 @@
   "pull in rainbow-delimiters (from elpa) with my config"
   (load-library "wghconf-rainbow-delimiters"))
 
-(defun mysnip () (interactive)
-  "pull in my yasnippet config"
-  (load-library "wghconf-yasnippet"))
-(mysnip)
 
 (defun myslime () (interactive)
   "pulls in slime (in elpa) and my config"
@@ -103,7 +99,9 @@
 
 (load-library "wghconf-package") ; load packaging config
 (load-library "wghconf-modeline") ; load mode line config
-(load-library "wghconf-mode-hooks") ; load mode line config
+(load-library "wghconf-yasnippet")
+(load-library "wghconf-org-mode")
+(load-library "wghconf-mode-hooks")
 (require 'smex)
 (setq custom-file "~/dotfileswgh/emacs/custom-file.el")
 (load custom-file)
