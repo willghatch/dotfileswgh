@@ -42,6 +42,8 @@ alias bbbd="env GTK2_RC_FILES=$HOME/dotfileswgh/gtkrc-2.0-dark dwb"
 alias gka="gitk --all"
 alias grurp="git remote update && git rebase && git push"
 
+alias wdl="wd ls"
+
 alias tm="tmux"
 alias tma="tmux attach-session -t"
 alias tmad="tmux attach-session -d -t"
