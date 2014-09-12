@@ -1,9 +1,7 @@
 
 (require 'yasnippet)
 
-(setq yas-snippet-dirs
-      (cons "~/.dotlocal/yasnippets" 
-            (cons "~/dotfileswgh/emacs/yasnippets" yas-snippet-dirs)))
+(setq yas-snippet-dirs '("~/dotfileswgh/emacs/yasnippets" "~/.dotlocal/yasnippets"))
 
 (defun yas-insert-with-region ()
   (interactive )
