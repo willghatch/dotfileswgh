@@ -1,8 +1,8 @@
 # -*- mode: snippet; require-final-newline: nil -*-
-# name: tag multiline
-# key: tm
+# name: tag multiline dblquotes
+# key: tdm
 # binding: direct-keybinding
 # --
-<${1:div} ${2:${3:id}='$4' ${5:${6:class}='$7' ${8:${9:style}='$10'}}}>
+<${1:div} ${2:${3:id}="$4" ${5:${6:class}="$7" ${8:${9:style}="$10"}}}>
   `yas-selected-text`$11
 </$1>$0
