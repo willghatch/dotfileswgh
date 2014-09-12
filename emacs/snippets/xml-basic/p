@@ -1,0 +1,6 @@
+# -*- mode: snippet; require-final-newline: nil -*-
+# name: prop 
+# key: p
+# binding: direct-keybinding
+# --
+$1='$2'$0

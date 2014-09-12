@@ -1,0 +1,6 @@
+# -*- mode: snippet; require-final-newline: nil -*-
+# name: tag single
+# key: ts
+# binding: direct-keybinding
+# --
+<$1 ${2:attr} />$0

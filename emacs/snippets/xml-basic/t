@@ -1,0 +1,6 @@
+# -*- mode: snippet; require-final-newline: nil -*-
+# name: tag
+# key: t
+# binding: direct-keybinding
+# --
+<$1 ${2:attr}>`yas-selected-text`$3</$1>$0

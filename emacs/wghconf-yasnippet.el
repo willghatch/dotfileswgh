@@ -4,6 +4,11 @@
 (setq yas-snippet-dirs
       (cons "~/dotfileswgh/emacs/snippets" yas-snippet-dirs))
 
+(defun yas-insert-with-region ()
+  (interactive )
+  (evil-insert-state 1)
+  (yas-insert-snippet))
+
 (global-set-key (kbd "C-s") nil) ; unset this key so yas doesn't fall back to search annoyingly
 (define-key yas-minor-mode-map (kbd "<tab>") nil)
 (define-key yas-minor-mode-map (kbd "TAB") nil)
