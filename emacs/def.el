@@ -103,6 +103,8 @@
 (load-library "wghconf-org-mode")
 (load-library "wghconf-mode-hooks")
 (require 'smex)
+(require 'yafolding)
+(yafolding-mode 1)
 (setq custom-file "~/dotfileswgh/emacs/custom-file.el")
 (load custom-file)
 

@@ -13,4 +13,5 @@
 (package-install 'ag)
 (package-install 'smex)
 (package-install 'xclip)
+(package-install 'yafolding)
 

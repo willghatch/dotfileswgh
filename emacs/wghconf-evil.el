@@ -641,6 +641,8 @@
 (define-key evil-motion-state-map " k" 'scroll-down)
 (define-key evil-motion-state-map " o" 'forward-symbol)
 (define-key evil-motion-state-map " eo" 'backward-symbol)
+(define-key evil-motion-state-map " f" 'yafolding-toggle-element)
+(define-key evil-motion-state-map "  f" 'yafolding-toggle-all)
 (define-key evil-motion-state-map "J" 'evil-window-bottom)
 (define-key evil-motion-state-map "K" 'evil-window-top)
 (define-key evil-motion-state-map "{" 'backward-sexp)
