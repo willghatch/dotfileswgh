@@ -10,6 +10,12 @@
       (normal-top-level-add-subdirs-to-load-path))
 (setq load-path (cons "~/dotfileswgh/emacs" load-path))
 
+;; compile settings
+(setq load-prefer-newer t)
+(require 'auto-compile)
+(auto-compile-on-load-mode 1)
+(auto-compile-on-save-mode 1)
+
 ;; backup settings
 (setq
    backup-by-copying t      ; don't clobber symlinks
