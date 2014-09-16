@@ -81,6 +81,8 @@ wd() {
     source $DOTFILESDIR/external/zsh/wd/wd.sh
 }
 
+sourceIfExists $DOTFILESDIR/zsh/abbreviations.zsh
+
 tf=$DOTFILESDIR/external/zsh/opp.zsh/opp.zsh
 if [ -f "$tf" ]
 then

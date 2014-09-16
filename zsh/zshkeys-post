@@ -1,4 +1,6 @@
 # include history substring search commands
 bindkey -M emacs '^P' history-substring-search-up
 bindkey -M emacs '^N' history-substring-search-down
+# TODO - figure out what to do with ^s ^q flow control nonsense...
+bindkey -M emacs '^s' magic-abbrev-expand
 
