@@ -59,6 +59,7 @@ setopt PROMPT_SUBST
 
 umask 077
 
+setopt noflowcontrol
 
 PS1_time='%F{cyan}%T'
 PS1_user_host='%F{green}[%B%n%b%F{yellow}@%B%m%b%F{green}]'
