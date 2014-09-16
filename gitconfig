@@ -6,3 +6,5 @@
 
 [push]
 #	default = simple
+[core]
+	excludesfile = ~/dotfileswgh/gitignore_global
