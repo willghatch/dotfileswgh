@@ -4,15 +4,16 @@
 (package-refresh-contents)
 
 (package-install 'evil)
-(package-install 'evil-args)
-(package-install 'evil-surround)
 (package-install 'key-chord)
-(package-install 'ace-jump-mode)
-(package-install 'rainbow-delimiters)
+(package-install 'auto-compile)
+(package-install 'evil-surround)
+(package-install 'yafolding)
 (package-install 'company)
+
+(package-install 'evil-args)
+(package-install 'rainbow-delimiters)
+(package-install 'ace-jump-mode)
+
+(package-install 'xclip)
 (package-install 'ag)
 (package-install 'smex)
-(package-install 'xclip)
-(package-install 'yafolding)
-(package-install 'auto-compile)
-
