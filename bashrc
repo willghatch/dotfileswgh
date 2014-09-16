@@ -20,6 +20,14 @@ fi
 
 umask 077
 
+# Turn off TTY "start" and "stop" commands in all interactive shells.
+# They default to C-q and C-s, Bash uses C-s to do a forward history search.
+stty start ''
+stty stop  ''
+stty -ixon # disable XON/XOFF flow control
+stty ixoff # enable sending (to app) of start/stop characters
+stty ixany # let any character restart output, not only start character
+
 # Color definitions (taken from Color Bash Prompt HowTo).
 # Some colors might look different of some terminals.
 # For example, I see 'Bold Red' as 'orange' on my screen,
