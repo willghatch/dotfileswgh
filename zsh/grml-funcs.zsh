@@ -18,28 +18,36 @@
 
 
 # just type '...' to get '../..'
-#rationalise-dot() {
-#local MATCH
-#if [[ $LBUFFER =~ '(^|/| | |'$'\n''|\||;|&)\.\.$' ]]; then
-#  LBUFFER+=/
-#  zle self-insert
-#  zle self-insert
-#else
-#  zle self-insert
-#fi
-#}
-#zle -N rationalise-dot
-#bindkey . rationalise-dot
-## without this, typing a . aborts incremental history search
-#bindkey -M isearch . self-insert
+rationalise-dot() {
+local MATCH
+if [[ $LBUFFER =~ '(^|/| | |'$'\n''|\||;|&)\.\.$' ]]; then
+  LBUFFER+=/
+  zle self-insert
+  zle self-insert
+else
+  zle self-insert
+fi
+}
+zle -N rationalise-dot
+bindkey . rationalise-dot
+# without this, typing a . aborts incremental history search
+bindkey -M isearch . self-insert
 
 ## get top 10 shell commands:
-#alias top10='print -l ${(o)history%% *} | uniq -c | sort -nr | head -n 10'
+alias top10commands='print -l ${(o)history%% *} | uniq -c | sort -nr | head -n 10'
 
 ## Handy functions for use with the (e::) globbing qualifier (like nt)
-#contains() { grep -q "$*" $REPLY }
-#sameas() { diff -q "$*" $REPLY &>/dev/null }
-#ot () { [[ $REPLY -ot ${~1} ]] }
+# use like this:
+# ls *(e:'nt /foo/bar':) # list all files newer than /foo/bar
+contains() { grep -q "$*" $REPLY } # contains pattern
+sameas() { diff -q "$*" $REPLY &>/dev/null } # same as file
+ot () { [[ $REPLY -ot ${~1} ]] } # older than
+nt() {
+    if [[ -n $1 ]] ; then
+        local NTREF=${~1}
+    fi
+    [[ $REPLY -nt $NTREF ]]
+} # newer than
 
 ## get_ic() - queries imap servers for capabilities; real simple. no imaps
 #ic_get() {
@@ -55,18 +63,20 @@
 #}
 
 ## List all occurrences of programm in current PATH
-#plap() {
-#    emulate -L zsh
-#    if [[ $# = 0 ]] ; then
-#        echo "Usage:    $0 program"
-#        echo "Example:  $0 zsh"
-#        echo "Lists all occurrences of program in the current PATH."
-#    else
-#        ls -l ${^path}/*$1*(*N)
-#    fi
-#}
+# grml calls it plap
+whiches() {
+    emulate -L zsh
+    if [[ $# = 0 ]] ; then
+        echo "Usage:    $0 program"
+        echo "Example:  $0 zsh"
+        echo "Lists all occurrences of program in the current PATH."
+    else
+        ls -l ${^path}/*$1*(*N)
+    fi
+}
 
 ## Find out which libs define a symbol
+########## This is broken -- but is a cool idea
 #lcheck() {
 #    if [[ -n "$1" ]] ; then
 #        nm -go /usr/lib/lib*.a 2>/dev/null | grep ":[[:xdigit:]]\{8\} . .*$1"
@@ -94,6 +104,7 @@
 #}
 
 ## Memory overview
+# This doesn't seem useful...
 #memusage() {
 #    ps aux | awk '{if (NR > 1) print $5;
 #                   if (NR > 2) print "+"}
@@ -101,15 +112,15 @@
 #}
 
 ## print hex value of a number
-#hex() {
-#    emulate -L zsh
-#    if [[ -n "$1" ]]; then
-#        printf "%x\n" $1
-#    else
-#        print 'Usage: hex <number-to-convert>'
-#        return 1
-#    fi
-#}
+hex() {
+    emulate -L zsh
+    if [[ -n "$1" ]]; then
+        printf "%x\n" $1
+    else
+        print 'Usage: hex <number-to-convert>'
+        return 1
+    fi
+}
 
 
 ## associate types and extensions (be aware with perl scripts and anwanted behaviour!)
