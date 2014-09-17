@@ -127,3 +127,6 @@
 (if (file-exists-p "~/.dotlocal/emacs") (load-file "~/.dotlocal/emacs") nil)
 
 
+(print (format "start time: %f" (time-to-seconds (time-subtract (current-time) before-init-time))))
+
+
