@@ -597,6 +597,9 @@
 (define-key evil-motion-state-map "gc" 'evil-ace-jump-char-mode)
 (define-key evil-motion-state-map "gf" 'evil-ace-jump-line-mode)
 
+;(define-key evil-motion-state-map "go" 'nop) ; TODO - make object movement map for uncommon ones (paragraph, etc)
+(define-key evil-motion-state-map "gob" 'nop) ; TODO - make another map that is the same but for going backwards
+
 
 ; t map
 (define-key evil-motion-state-map "th" 'evil-window-map)
