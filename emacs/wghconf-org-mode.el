@@ -6,7 +6,9 @@
             (define-key evil-normal-state-local-map "ms" 'org-cycle) ;cycle fold
             (define-key evil-normal-state-local-map "mt" 'org-shifttab) ;global cycle fold
             (define-key evil-normal-state-local-map "mi" 'org-insert-heading)
+            (define-key evil-normal-state-local-map "mh" 'org-mark-element)
             (define-key org-mode-map (kbd "TAB") nil)
+            (define-key org-mode-map (kbd "M-h") nil)
             ))
 
 
