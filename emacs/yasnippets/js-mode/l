@@ -1,0 +1,5 @@
+# -*- mode: snippet -*-
+#name : lambda
+#key: l
+# --
+function(${1:x}){${2:return $1}}$0
