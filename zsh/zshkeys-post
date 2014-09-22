@@ -8,4 +8,6 @@ bindkey -M emacs '^s' magic-abbrev-expand
 bindkey -M emacs '^i' wgh-complete
 # ^[[Z should be backtab...
 bindkey -M emacs '^[[Z' wgh-complete-anywhere
+bindkey -M emacs '^[ng' wgh-complete-gnu
+bindkey -M emacs '^[ne' wgh-expand
 
