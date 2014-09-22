@@ -102,6 +102,7 @@ wd() {
 }
 
 sourceIfExists $DOTFILESDIR/zsh/abbreviations.zsh
+sourceIfExists $DOTFILESDIR/bazsh/grml-funcs.sh
 
 tf=$DOTFILESDIR/zsh/grml-funcs.zsh
 if [ -f "$tf" ]

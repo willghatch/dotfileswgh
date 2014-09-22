@@ -10,4 +10,5 @@ bindkey -M emacs '^i' wgh-complete
 bindkey -M emacs '^[[Z' wgh-complete-anywhere
 bindkey -M emacs '^[ng' wgh-complete-gnu
 bindkey -M emacs '^[ne' wgh-expand
+bindkey -M emacs '^[nh' wgh-complete-history
 

@@ -58,6 +58,9 @@ function __zs-completers-gnu(){
 function __zs-completers-expand(){
     zstyle ':completion:::::' completer _expand_word _expand_alias
 }
+function __zs-completers-history(){
+    zstyle ':completion:::::' completer _history
+}
 __zs-completers-std # call immediately -- it's my default
 
 
@@ -87,6 +90,12 @@ function wgh-expand(){
     __zs-completers-std
 }
 zle -N wgh-expand
+function wgh-complete-history(){
+    __zs-completers-history
+    zle complete-word
+    __zs-completers-std
+}
+zle -N wgh-complete-history
 
 autoload -Uz compinit
 compinit
