@@ -5,6 +5,10 @@
             (define-key evil-motion-state-local-map "m" 'my-buffer-menu-mode-map)
             (set-keymap-parent 'my-buffer-menu-mode-map Buffer-menu-mode-map)))
 
+(add-hook 'python-mode-hook
+          (lambda ()
+            (electric-indent-mode -1)
+            ))
 
 ;; TODO -- these are default values that I should deal with now
 ;evil-overriding-maps
