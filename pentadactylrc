@@ -1,0 +1,23 @@
+"1.1
+
+loadplugins '\.(js|penta)$'
+group user
+
+map -count -modes=i jk <Esc>
+map -count -modes=i kj <Esc>
+
+map -count -modes=n -ex w tabnext
+map -count -modes=n -ex b tabprevious
+" switch f to open a new tab and F to load in current
+map -count -builtin -modes=n f F
+map -count -builtin -modes=n F f
+"map -count -builtin -modes=n <Space>h <PageDown>
+"map -count -builtin -modes=n <Space>t <PageUp>
+
+" keep the menu bars, address bar...
+set guioptions=bCrsmT
+" Use text-edit-mode rather than input mode
+set noinsertmode
+
+" vim: set ft=pentadactyl:
+

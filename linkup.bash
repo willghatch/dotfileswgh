@@ -15,6 +15,7 @@ dotfiles=(
     muttrc
     makepkg.conf
     inputrc
+    pentadactylrc
 )
 
 function die() {
