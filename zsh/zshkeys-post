@@ -12,3 +12,6 @@ bindkey -M emacs '^[ng' wgh-complete-gnu
 bindkey -M emacs '^[ne' wgh-expand
 bindkey -M emacs '^[nh' wgh-complete-history
 
+bindkey -M vicmd 'md' inPlaceMkDirs
+bindkey -M vicmd 'g2' jump_after_first_word
+

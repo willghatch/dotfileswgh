@@ -211,7 +211,7 @@ function jump_after_first_word() {
 zle -N jump_after_first_word
 
 #f5# Create directory under cursor or the selected area
-inplaceMkDirs() {
+inPlaceMkDirs() {
     # Press ctrl-xM to create the directory under the cursor or the selected area.
     # To select an area press ctrl-@ or ctrl-space and use the cursor.
     # Use case: you type "mv abc ~/testa/testb/testc/" and remember that the
@@ -242,7 +242,7 @@ inplaceMkDirs() {
         zle end-of-line
     fi
 }
-zle -N inplaceMkDirs
+zle -N inPlaceMkDirs
 
 
 # grep for running process, like: 'any vim'
