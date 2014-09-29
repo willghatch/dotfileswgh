@@ -1,3 +1,4 @@
+#!/bin/bash
 # If not running interactively, don't do anything
 [ -z "$PS1" ] && return
 
@@ -12,7 +13,7 @@ if [ -f /etc/bash.bashrc ]; then
       . /etc/bash.bashrc   # --> Read /etc/bash.bashrc, if present.
 fi
 
-bazsh_common=~/dotfileswgh/bazsh_common
+bazsh_common=~/dotfileswgh/bazsh/common.sh
 if [ -f $bazsh_common ]; then
       . $bazsh_common
 fi

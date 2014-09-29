@@ -4,7 +4,7 @@ HISTSIZE=1000
 SAVEHIST=1000
 bindkey -e
 
-bazsh_common=$HOME/dotfileswgh/bazsh_common
+bazsh_common=$HOME/dotfileswgh/bazsh/common.sh
 if [ -f $bazsh_common ]
 then
     source $bazsh_common

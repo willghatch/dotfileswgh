@@ -158,7 +158,7 @@ fi
 
 if [ $(uname) = FreeBSD ]
 then
-    source $HOME/.bazsh_bsd
+    source $DOTFILESDIR/bazsh/bsd.sh
 fi
 
 ######## Add private stuff #######
