@@ -8,19 +8,43 @@ map -count -modes=i kj <Esc>
 
 map -count -modes=n -ex w tabnext
 map -count -modes=n -ex b tabprevious
+" go to buffer -- was on b, which I switched to be tabp
+map -count -modes=n -builtin gb b
+map -count -modes=n -ex gm bmarks
+
+" this is somewhat heretical, but I don't want a to be for bookmarks...
+map -count -modes=n -builtin a i
+
 " switch f to open a new tab and F to load in current
 map -count -builtin -modes=n f F
 map -count -builtin -modes=n F f
+
+" switch yanks -- now capital is for current URL, lowercase is selection or current word
+map -count -builtin -modes=n y Y
+map -count -builtin -modes=n Y y
+
 map -count -builtin -modes=n <Space> <Nop>
 map -count -builtin -modes=n <Space>h <PageDown>
 map -count -builtin -modes=n <Space>t <PageUp>
 map -count -builtin -modes=n <Space>j 20j
 map -count -builtin -modes=n <Space>k 20k
 
+" s-map -- make ss do what S did - search in new tab
+map -builtin -modes=n s <Nop>
+map -builtin -modes=n ss S
+map -builtin -modes=n S s
+map -builtin -modes=n sm m
+map -builtin -modes=n sh :!
+map -modes=n -ex sa bmark
+
+map -builtin -modes=n,v,c <C-g> <Esc>
+
 " keep the menu bars, address bar...
 set guioptions=bCrsmT
 " Use text-edit-mode rather than input mode
 set noinsertmode
 
-" vim: set ft=pentadactyl:
+map -builtin -modes=n -- - :
+" zoom in/out is still on zi/zo
 
+" vim: set ft=pentadactyl:
