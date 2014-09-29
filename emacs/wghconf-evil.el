@@ -609,6 +609,7 @@
 ;; These ones are ripe for removal, since I have both /? and ace-jump...
 (define-key evil-motion-state-map "tt" 'evil-find-char-to)
 (define-key evil-motion-state-map "tT" 'evil-find-char-to-backward)
+(define-key evil-motion-state-map "T" 'evil-find-char-to-backward)
 
 ;; s map
 ;(define-key evil-normal-state-map "ss" 'evil-substitute)
