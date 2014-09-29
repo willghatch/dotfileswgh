@@ -622,6 +622,7 @@
 (define-key evil-normal-state-map "s)" 'eval-last-sexp)
 (define-key evil-visual-state-map "s)" 'eval-region)
 (define-key evil-visual-state-map (kbd "C-s") 'yas-insert-with-region)
+(define-key evil-normal-state-map "sm" 'evil-set-marker)
 
 
 ;; command modes and macros
