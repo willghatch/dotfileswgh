@@ -11,8 +11,11 @@ map -count -modes=n -ex b tabprevious
 " switch f to open a new tab and F to load in current
 map -count -builtin -modes=n f F
 map -count -builtin -modes=n F f
-"map -count -builtin -modes=n <Space>h <PageDown>
-"map -count -builtin -modes=n <Space>t <PageUp>
+map -count -builtin -modes=n <Space> <Nop>
+map -count -builtin -modes=n <Space>h <PageDown>
+map -count -builtin -modes=n <Space>t <PageUp>
+map -count -builtin -modes=n <Space>j 20j
+map -count -builtin -modes=n <Space>k 20k
 
 " keep the menu bars, address bar...
 set guioptions=bCrsmT
