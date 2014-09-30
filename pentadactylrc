@@ -47,6 +47,8 @@ map -builtin -modes=n t <Nop>
 map -builtin -modes=n tt t 
 " tab switch
 map -builtin -modes=n tb b 
+map -builtin -modes=n tg :tgroup-switch 
+map -builtin -modes=n tn :tgroup-new  
 
 map -builtin -modes=n,v,c <C-g> <Esc>
 
@@ -67,5 +69,7 @@ set hintkeys='aoeuhtnsidpgcrmk'
 "source ~/dotfileswgh/pentadactyl.user.css
 highlight -append Hint font:2em; font-weight:bold; color: #55ffff; background-color: #102030; font-family: Courier, monospace;
 highlight -append Hint[active] font:2em; font-weight:bold; color: #000000; background-color: #55ffff; font-family: Courier, monospace;
+
+set runtimepath+="~/dotfileswgh/external/pentadactyl/"
 
 " vim: set ft=pentadactyl:
