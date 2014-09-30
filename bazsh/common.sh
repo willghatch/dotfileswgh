@@ -111,7 +111,6 @@ function volume()
 
 
 # to keep myself from killing my crontab...
-
 crontab()
 {
     if [ -z $1 ]
@@ -128,6 +127,18 @@ crontab()
 xmlless()
 {
     xmllint --format $@ | less
+}
+
+# seconds since epoch
+epoch()
+{
+    if [ -n "$1" ]
+    then
+        date -d "$1" +%s
+    else
+        date +%s
+    fi
+    
 }
 
 # for sourcing
