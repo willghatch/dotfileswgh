@@ -23,6 +23,7 @@ export MANWIDTH=${MANWIDTH:-80}
 alias em="TERM=xterm-256color emacs -nw -l $HOME/dotfileswgh/emacs/nogui.el"
 alias emx="emacs -l $HOME/dotfileswgh/emacs/xgui"
 alias emp="TERM=xterm-256color emacs -nw -l $HOME/dotfileswgh/emacs/wghconf-package.el"
+alias v="vim"
 
 
 ####### Unix tools, mostly coloring
