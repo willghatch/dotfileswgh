@@ -56,5 +56,6 @@ set hintkeys='aoeuhtnsidpgcrmk'
 
 
 "source ~/dotfileswgh/pentadactyl.user.css
+highlight -append Hint font:2em; font-weight:bold; color: magenta; background-color: #102030; font-family: Courier, monospace;
 
 " vim: set ft=pentadactyl:
