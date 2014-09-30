@@ -131,7 +131,7 @@
 (define-key evil-window-map "l" 'evil-window-right)
 (define-key evil-window-map "L" 'evil-window-move-far-right)
 ;(define-key evil-window-map "n" 'evil-window-new)
-(define-key evil-window-map "o" 'delete-other-windows)
+;(define-key evil-window-map "o" 'delete-other-windows)
 (define-key evil-window-map "p" 'evil-window-mru)
 (define-key evil-window-map "r" 'evil-window-rotate-downwards)
 (define-key evil-window-map "R" 'evil-window-rotate-upwards)
@@ -533,6 +533,7 @@
 (define-key evil-window-map "J" 'evil-window-decrease-height)
 (define-key evil-window-map "H" 'evil-window-decrease-width)
 (define-key evil-window-map "L" 'evil-window-increase-width)
+(define-key evil-window-map "f" 'delete-other-windows)
 
 (set-keymap-parent evil-window-state-map evil-window-map)
 
