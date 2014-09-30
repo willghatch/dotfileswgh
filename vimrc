@@ -68,10 +68,16 @@ nmap tt t
 nmap tT T
 nmap <Space>h <PageDown>
 nmap <Space>t <PageUp>
+nmap <Space>j <PageDown>
+nmap <Space>k <PageUp>
 imap <C-g> <esc>
 nmap <C-g> <esc>
 vmap <C-g> <esc>
 
+nmap sm m
+nmap ss s
+nmap sh :!
+vmap sh :!
 
 
 
