@@ -49,4 +49,12 @@ set noinsertmode
 map -builtin -modes=n -- - :
 " zoom in/out is still on zi/zo
 
+set hintkeys='aoeuhtnsidpgcrmk'
+" do not require <CR> when in hints mode
+"set followhints=0
+"set hinttimeout=0
+
+
+"source ~/dotfileswgh/pentadactyl.user.css
+
 " vim: set ft=pentadactyl:
