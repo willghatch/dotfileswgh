@@ -29,8 +29,8 @@ set backspace=indent,eol,start
 "set insertmode     " make vim modeless!  I might check this out later...
 
 set backup    " Make backup files
-silent !mkdir ~/.dotlocal > /dev/null 2>&1
-silent !mkdir ~/.dotlocal/vimtmp > /dev/null 2>&1
+"silent !mkdir ~/.dotlocal > /dev/null 2>&1
+"silent !mkdir ~/.dotlocal/vimtmp > /dev/null 2>&1
 set backupdir=~/.dotlocal/vimtmp   " Directory for backup files
 set directory=~/.dotlocal/vimtmp   " Directory for swap files
 
