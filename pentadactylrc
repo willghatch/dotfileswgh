@@ -30,6 +30,9 @@ map -count -builtin -modes=n <Space>h <PageDown>
 map -count -builtin -modes=n <Space>t <PageUp>
 map -count -builtin -modes=n <Space>j 20j
 map -count -builtin -modes=n <Space>k 20k
+" These are half-page scrollers
+map -count -builtin -modes=n J <C-d>
+map -count -builtin -modes=n K <C-u>
 
 " s-map -- make ss do what S did - search in new tab
 map -builtin -modes=n s <Nop>
@@ -39,10 +42,16 @@ map -builtin -modes=n sm m
 map -builtin -modes=n sh :!
 map -modes=n -ex sa bmark
 
+" t-map
+map -builtin -modes=n t <Nop> 
+map -builtin -modes=n tt t 
+" tab switch
+map -builtin -modes=n tb b 
+
 map -builtin -modes=n,v,c <C-g> <Esc>
 
 " keep the menu bars, address bar...
-set guioptions=bCrsmT
+set guioptions=bCrsT
 " Use text-edit-mode rather than input mode
 set noinsertmode
 
@@ -56,6 +65,7 @@ set hintkeys='aoeuhtnsidpgcrmk'
 
 
 "source ~/dotfileswgh/pentadactyl.user.css
-highlight -append Hint font:2em; font-weight:bold; color: magenta; background-color: #102030; font-family: Courier, monospace;
+highlight -append Hint font:2em; font-weight:bold; color: #55ffff; background-color: #102030; font-family: Courier, monospace;
+highlight -append Hint[active] font:2em; font-weight:bold; color: #000000; background-color: #55ffff; font-family: Courier, monospace;
 
 " vim: set ft=pentadactyl:
