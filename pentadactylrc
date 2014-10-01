@@ -47,8 +47,13 @@ map -builtin -modes=n t <Nop>
 map -builtin -modes=n tt t 
 " tab switch
 map -builtin -modes=n tb b 
-map -builtin -modes=n tg :tgroup-switch 
-map -builtin -modes=n tn :tgroup-new  
+map -builtin -modes=n tgs :tgroup-switch 
+map -builtin -modes=n tgn :tgroup-new 
+map -builtin -modes=n tgd :tgroup-delete 
+map -builtin -modes=n tgm :tgroup-move 
+map -builtin -modes=n tgg :tgroup-get 
+map -builtin -modes=n tgo :tgroup-open 
+map -builtin -modes=n tgt :tgroup-title 
 
 map -builtin -modes=n,v,c <C-g> <Esc>
 
