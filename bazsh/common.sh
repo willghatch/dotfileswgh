@@ -20,9 +20,9 @@ export MANWIDTH=${MANWIDTH:-80}
 #alias t="mpcl toggle"
 
 ####### Editing
-alias em="TERM=xterm-256color emacs -nw -l $HOME/dotfileswgh/emacs/nogui.el"
-alias emx="emacs -l $HOME/dotfileswgh/emacs/xgui"
-alias emp="TERM=xterm-256color emacs -nw -l $HOME/dotfileswgh/emacs/wghconf-package.el"
+alias em="TERM=xterm-256color emacs -nw -l $DOTFILESDIR/emacs/nogui.el"
+alias emx="emacs -l $DOTFILESDIR/emacs/xgui"
+alias emp="TERM=xterm-256color emacs -nw -l $DOTFILESDIR/emacs/wghconf-package.el"
 alias v="vim"
 
 
@@ -39,10 +39,10 @@ alias cp="cp -a" #archive mode, to preserve timestamps
 
 
 ####### Miscellaneous
-alias ffx="env GTK2_RC_FILES=$HOME/dotfileswgh/gtkrc-2.0-light firefox"
-alias ffxd="env GTK2_RC_FILES=$HOME/dotfileswgh/gtkrc-2.0-dark firefox"
-alias bbb="env GTK2_RC_FILES=$HOME/dotfileswgh/gtkrc-2.0-light dwb"
-alias bbbd="env GTK2_RC_FILES=$HOME/dotfileswgh/gtkrc-2.0-dark dwb"
+alias ffx="env GTK2_RC_FILES=$DOTFILESDIR/gtkrc-2.0-light firefox"
+alias ffxd="env GTK2_RC_FILES=$DOTFILESDIR/gtkrc-2.0-dark firefox"
+alias bbb="env GTK2_RC_FILES=$DOTFILESDIR/gtkrc-2.0-light dwb"
+alias bbbd="env GTK2_RC_FILES=$DOTFILESDIR/gtkrc-2.0-dark dwb"
 
 alias gka="gitk --all"
 alias gru="git remote update"
