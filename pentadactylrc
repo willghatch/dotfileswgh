@@ -43,7 +43,7 @@ map -builtin -modes=n sh :!
 map -modes=n -ex sa bmark
 
 " t-map
-map -builtin -modes=n t <Nop> 
+map -builtin -modes=n t <Nop>
 map -builtin -modes=n tt t 
 " tab switch
 map -builtin -modes=n tb b 
