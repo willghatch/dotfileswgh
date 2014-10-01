@@ -60,7 +60,7 @@ map -builtin -modes=n,v,c <C-g> <Esc>
 " keep the menu bars, address bar...
 set guioptions=bCrsT
 " Use text-edit-mode rather than input mode
-set noinsertmode
+"set noinsertmode
 
 map -builtin -modes=n -- - :
 " zoom in/out is still on zi/zo
