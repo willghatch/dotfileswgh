@@ -21,6 +21,10 @@ set sidescrolloff=5 " Auto-scroll L/R to keep context in view
 set textwidth=0  " set 80 character width
 set colorcolumn=+80 " Color column 80
 
+" complete only up to where possibilities diverge, and list options (ex prompt)
+set wildmenu
+set wildmode=list:longest,full
+
 "set smartcase    " ignore case in searches unless an uppercase is used.
 set backspace=indent,eol,start
 "set background=dark  " Tell vim the background will be dark so it will set a good color scheme
