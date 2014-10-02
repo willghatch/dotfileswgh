@@ -1,4 +1,8 @@
 ! Comments in this file use the ! character
+! one important comment -- I likely will have to add a line to read
+! this file to window manager startup files...
+! the command is:
+! xrdb $PATH_TO_THIS_FILE
 xterm*termName: xterm-256color
 XTerm*metaSendsEscape: true
 Xterm*saveLines: 4096
