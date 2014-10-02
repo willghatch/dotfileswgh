@@ -559,7 +559,7 @@
 (define-key evil-motion-state-map "gT" 'previous-buffer)
 (define-key evil-motion-state-map "gb" 'evil-backward-arg)
 (define-key evil-motion-state-map "gw" 'evil-forward-arg)
-(define-key evil-motion-state-map "gq" 'kill-buffer)
+;(define-key evil-motion-state-map "gq" 'kill-buffer)
 (define-key evil-normal-state-map "g&" 'evil-ex-repeat-global-substitute)
 (define-key evil-normal-state-map "gi" 'evil-insert-resume) ; insert mode at ins. mode cursor point
 ;(define-key evil-normal-state-map "gJ" 'evil-join-whitespace)
@@ -613,6 +613,7 @@
 (define-key evil-motion-state-map "tT" 'evil-find-char-to-backward)
 (define-key evil-motion-state-map "T" 'evil-find-char-to-backward)
 (define-key evil-motion-state-map "tb" 'switch-to-buffer)
+(define-key evil-motion-state-map "tq" 'kill-buffer)
 
 ;; s map
 ;(define-key evil-normal-state-map "ss" 'evil-substitute)
