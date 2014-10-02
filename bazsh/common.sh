@@ -29,6 +29,7 @@ alias v="vim"
 ####### Unix tools, mostly coloring
 alias ls="ls --color=auto"
 alias d="ls --color=auto"
+alias lg="ls | grep -i"
 alias ll="ls --color=auto -aF"
 alias lls="ls --color=auto -laFh"
 alias di="ls --color=auto -laFh"
