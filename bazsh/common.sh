@@ -33,7 +33,6 @@ alias ll="ls --color=auto -aF"
 alias lls="ls --color=auto -laFh"
 alias di="ls --color=auto -laFh"
 alias pg="less"
-alias xterm="xterm -fg white -bg black"
 alias textprint="lp -o cpi=15 -o lpi=9 -o page-top=72 -o page-right=72 -o page-left=72 -o page-bottom=72 "
 alias cp="cp -a" #archive mode, to preserve timestamps
 
