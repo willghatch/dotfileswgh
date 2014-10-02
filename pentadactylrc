@@ -38,24 +38,24 @@ map -builtin -modes=n S s
 map -builtin -modes=n sm m
 map -builtin -modes=n sh :!
 map -modes=n -ex stm bmark
-map -modes=n -builtin stk :bmark -keyword 
-map -modes=n -builtin stt :bmark -tag  
+map -modes=n -builtin stk :bmark -keyword<Space>
+map -modes=n -builtin stt :bmark -tag<Space>
 
 " t-map
 map -builtin -modes=n t <Nop>
-map -builtin -modes=n tt t 
+map -builtin -modes=n tt t
 " tab switch
-map -builtin -modes=n tb b 
-map -builtin -modes=n tgs :tgroup-switch 
-map -builtin -modes=n tgn :tgroup-new 
-map -builtin -modes=n tgd :tgroup-delete 
-map -builtin -modes=n tgm :tgroup-move 
-map -builtin -modes=n tgg :tgroup-get 
-map -builtin -modes=n tgo :tgroup-open 
-map -builtin -modes=n tgt :tgroup-title 
+map -builtin -modes=n tb b
+map -builtin -modes=n tgs :tgroup-switch<Space>
+map -builtin -modes=n tgn :tgroup-new<Space>
+map -builtin -modes=n tgd :tgroup-delete<Space>
+map -builtin -modes=n tgm :tgroup-move<Space>
+map -builtin -modes=n tgg :tgroup-get<Space>
+map -builtin -modes=n tgo :tgroup-open<Space>
+map -builtin -modes=n tgt :tgroup-title<Space>
 map -modes=n -ex tmm bmarks
-map -modes=n -builtin tmk :bmarks -keyword 
-map -modes=n -builtin tmt :bmarks -tags  
+map -modes=n -builtin tmk :bmarks -keyword<Space>
+map -modes=n -builtin tmt :bmarks -tags<Space>
 
 map -builtin -modes=n,v,c <C-g> <Esc>
 
