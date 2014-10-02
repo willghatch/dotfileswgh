@@ -41,6 +41,8 @@ map -modes=n -ex stm bmark
 map -modes=n -builtin stk :bmark -keyword<Space>
 map -modes=n -builtin stt :bmark -tags<Space>
 
+map -modes=n -builtin sp :emenu File.Save Page As…
+
 " t-map
 map -builtin -modes=n t <Nop>
 map -builtin -modes=n tt t
