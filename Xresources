@@ -1,0 +1,8 @@
+! Comments in this file use the ! character
+xterm*termName: xterm-256color
+XTerm*metaSendsEscape: true
+Xterm*saveLines: 4096
+
+XTerm*reverseVideo: on
+
+xterm*faceName: Monospace:size=10:antialias=false

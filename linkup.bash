@@ -16,6 +16,7 @@ dotfiles=(
     makepkg.conf
     inputrc
     pentadactylrc
+    Xresources
 )
 
 function die() {
