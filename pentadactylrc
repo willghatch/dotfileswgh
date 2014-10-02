@@ -8,9 +8,6 @@ map -count -modes=i kj <Esc>
 
 map -count -modes=n -ex w tabnext
 map -count -modes=n -ex b tabprevious
-" go to buffer -- was on b, which I switched to be tabp
-map -count -modes=n -builtin gb b
-map -count -modes=n -ex gm bmarks
 
 " this is somewhat heretical, but I don't want a to be for bookmarks...
 map -count -modes=n -builtin a i
@@ -40,7 +37,9 @@ map -builtin -modes=n ss S
 map -builtin -modes=n S s
 map -builtin -modes=n sm m
 map -builtin -modes=n sh :!
-map -modes=n -ex sa bmark
+map -modes=n -ex stm bmark
+map -modes=n -builtin stk :bmark -keyword 
+map -modes=n -builtin stt :bmark -tag  
 
 " t-map
 map -builtin -modes=n t <Nop>
@@ -54,6 +53,9 @@ map -builtin -modes=n tgm :tgroup-move
 map -builtin -modes=n tgg :tgroup-get 
 map -builtin -modes=n tgo :tgroup-open 
 map -builtin -modes=n tgt :tgroup-title 
+map -modes=n -ex tmm bmarks
+map -modes=n -builtin tmk :bmarks -keyword 
+map -modes=n -builtin tmt :bmarks -tags  
 
 map -builtin -modes=n,v,c <C-g> <Esc>
 
