@@ -155,6 +155,41 @@ sourceIfExists()
 
 }
 
+# for web development
+cpost()
+{
+    if [ -z "$1" ]
+    then
+        echo "convenient curl wrapper for posting"
+        echo "usage: $0 <url> [var val] [var val] ... [- <curl options>]"
+        return
+    else
+        url=$1
+        shift
+        variables=""
+        while [ -n "$1" ]
+        do
+            if [ "$1" = "-" ]
+            then
+                shift
+                break
+            else
+                varval="$1=$2"
+                shift
+                shift
+                if [ -z "$hasVars" ]
+                then
+                    variables="$varval"
+                else
+                    variables="$variables&$varval"
+                fi
+                hasVars="--data"
+            fi
+        done
+        curl --request POST $url "$hasVars" "$variables" $@
+    fi
+}
+
 
 ####### Add shell completion #######
 
