@@ -75,7 +75,7 @@ set hintkeys='aoeuhtnsidpgcrmk'
 "set hinttimeout=0
 
 
-"source $DOTFILESDIR/pentadactyl.user.css
+source $DOTFILESDIR/pentadactyl.css
 highlight -append Hint font:2em; font-weight:bold; color: #55ffff; background-color: #102030; font-family: Courier, monospace;
 highlight -append Hint[active] font:2em; font-weight:bold; color: #000000; background-color: #55ffff; font-family: Courier, monospace;
 
