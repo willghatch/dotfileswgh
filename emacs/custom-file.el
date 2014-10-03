@@ -36,6 +36,7 @@
  '(outline-6 ((t (:foreground "#00ff00"))))
  '(outline-7 ((t (:foreground "#00ffff"))))
  '(outline-8 ((t (:foreground "#5c5cff"))))
+ '(org-hide ((t (:foreground "#151515"))))
  '(rainbow-delimiters-depth-1-face ((t (:foreground "#ff00ff"))))
  '(rainbow-delimiters-depth-2-face ((t (:foreground "#00ffff"))))
  '(rainbow-delimiters-depth-3-face ((t (:foreground "#ff0000"))))
