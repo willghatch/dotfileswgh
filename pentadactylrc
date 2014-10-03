@@ -63,6 +63,8 @@ map -builtin -modes=n,v,c <C-g> <Esc>
 
 " C-S-u toggles modes in the "Color toggle" extension
 map -builtin -modes=n sb <C-S-u>
+" Launch dev console
+map -builtin -modes=n sc <C-S-k>
 
 " keep the menu bars, address bar...
 set guioptions=bCrsT
