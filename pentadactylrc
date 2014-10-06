@@ -15,6 +15,10 @@ map -count -modes=n -builtin a i
 " switch f to open a new tab and F to load in current
 map -count -builtin -modes=n f F
 map -count -builtin -modes=n F f
+" view source -- the default uses the same window and reloads the page, which I dislike...
+" make the default be external editor, capital with firefox native view source.
+map -count -builtin -modes=n gf gF
+map -count -builtin -modes=n gF <C-v><C-u>
 
 " switch yanks -- now capital is for current URL, lowercase is selection or current word
 map -count -builtin -modes=n y Y
@@ -65,6 +69,10 @@ map -builtin -modes=n,v,c <C-g> <Esc>
 map -builtin -modes=n sb <C-S-u>
 " Launch dev console
 map -builtin -modes=n sc <C-S-k>
+
+" menu mode
+map -builtin -modes=menu j <Down>
+map -builtin -modes=menu k <Up>
 
 " keep the menu bars, address bar...
 set guioptions=bCrsT
