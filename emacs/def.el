@@ -73,11 +73,6 @@
 (require 'ido) ; comes standard with emacs
 (ido-mode 1)
 
-(defun myrd () (interactive)
-  "pull in rainbow-delimiters (from elpa) with my config"
-  (load-library "wghconf-rainbow-delimiters"))
-
-
 (defun myslime () (interactive)
   "pulls in slime (in elpa) and my config"
   (load-library "wghconf-slime"))
@@ -110,7 +105,10 @@
 (load-library "wghconf-mode-hooks")
 (require 'smex)
 (require 'yafolding)
+(require 'rainbow-delimiters)
 (yafolding-mode 1)
+(add-hook 'after-init-hook #'global-flycheck-mode)
+(add-hook 'prog-mode-hook #'rainbow-delimiters-mode)
 (setq custom-file "~/dotfileswgh/emacs/custom-file.el")
 (load custom-file)
 

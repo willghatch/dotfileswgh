@@ -17,4 +17,5 @@
 (ignore-errors (package-install 'xclip))
 (ignore-errors (package-install 'ag))
 (ignore-errors (package-install 'smex))
+(ignore-errors (package-install 'flycheck))
 
