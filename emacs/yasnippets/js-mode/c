@@ -1,0 +1,9 @@
+# -*- mode: snippet -*-
+#name : class
+#key: c
+# --
+function ${1:MyClass}(${2:${3:arg1}${4:, ${5:arg2}${6:, ${7:arg3}}}}){
+    var self = Object.create($1.prototype);
+    ${3:$(if (string= "" yas-text) "" (concat "self." yas-text " = " yas-text ";\n" (make-string (current-indentation) ?\ )))}${5:$(if (string= "" yas-text) "" (concat "self." yas-text " = " yas-text ";\n" (make-string (current-indentation) ?\ )))}${7:$(if (string= "" yas-text) "" (concat "self." yas-text " = " yas-text ";\n" (make-string (current-indentation) ?\ )))}$0
+    return self;
+}

@@ -1,0 +1,9 @@
+# -*- mode: snippet -*-
+#name : var class
+#key: vc
+# --
+var ${1:MyClass} = function(${2:arg}){
+    var self = Object.create($1.prototype);
+    ${3:$(if (string= "" yas-text) "" (concat "self." yas-text " = " yas-text ";\n" (make-string (current-indentation) ?\ )))}${5:$(if (string= "" yas-text) "" (concat "self." yas-text " = " yas-text ";\n" (make-string (current-indentation) ?\ )))}${7:$(if (string= "" yas-text) "" (concat "self." yas-text " = " yas-text ";\n" (make-string (current-indentation) ?\ )))}$0
+    return self;
+}
