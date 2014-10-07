@@ -674,6 +674,7 @@
 (define-key evil-insert-state-map (kbd "DEL") 'delete-backward-char) ; remap away from the evil-version backspace
 (define-key evil-insert-state-map "\M-n" 'evil-complete-next)
 (define-key evil-insert-state-map "\M-p" 'evil-complete-previous)
+(define-key evil-insert-state-map "\C-v" #'quoted-insert) ; more vim-like
 
 ;; Default mode settings
 (setq evil-normal-state-modes (append evil-emacs-state-modes evil-normal-state-modes))
