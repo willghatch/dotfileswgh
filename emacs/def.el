@@ -37,10 +37,9 @@
 
 ;; General options
 (require 'linum)
-(setq linum-format "%4d") ; four digit number
-(linum-mode 1)
 (global-linum-mode 1) ; add line numbers
-(add-hook 'find-file-hook (lambda () (linum-mode 1))) ; USE LINE NUMBERS ON EVERYTHING GOSH DARN IT!
+(setq linum-format "%4d") ; four digit number
+;(add-hook 'find-file-hook (lambda () (linum-mode 1))) ; USE LINE NUMBERS ON EVERYTHING GOSH DARN IT!
 ;(column-number-mode) ;turn on column numbers in mode line
 (setq vc-follow-symlinks t) ; Don't prompt to follow symlinks of version-controlled files
 (setq tab-width 4) ; how many spaces for tab DISPLAY
@@ -70,6 +69,9 @@
 (load-library "wghconf-evil")
 ;(require 'undo-tree) ; ELPA package used by evil
 
+(require 'fill-column-indicator)
+(setq-default fci-rule-color "#153040")
+(fci-mode 1) ; this only activates it in *scratch*, my mode hooks add it to others
 (require 'ido) ; comes standard with emacs
 (ido-mode 1)
 
