@@ -9,6 +9,10 @@
           (lambda ()
             (electric-indent-mode -1)
             ))
+(add-hook 'js-mode-hook
+          (lambda ()
+            (load-library "wghconf-js")
+            ))
 
 ;; TODO -- these are default values that I should deal with now
 ;evil-overriding-maps
