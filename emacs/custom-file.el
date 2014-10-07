@@ -19,6 +19,8 @@
  '(font-lock-function-name-face ((t (:foreground "#00ff00"))))
  '(font-lock-string-face ((t (:foreground "#d700ff"))))
  '(fringe ((t (:background "#0000ff" :foreground "#00ffff"))))
+ '(hc-trailing-whitespace ((t (:background "#202020"))))
+ '(hc-tab ((t (:background "#100000"))))
  '(header-line ((t (:inherit mode-line))))
  '(highlight ((t (:background "#005f00" :foreground "#0000ff"))))
  '(isearch-fail ((t (:background "#cd0000"))))

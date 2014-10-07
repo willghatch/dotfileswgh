@@ -5,6 +5,11 @@
             (define-key evil-motion-state-local-map "m" 'my-buffer-menu-mode-map)
             (set-keymap-parent 'my-buffer-menu-mode-map Buffer-menu-mode-map)))
 
+(add-hook 'prog-mode-hook
+          (lambda ()
+            (hc-toggle-highlight-tabs)
+            (hc-toggle-highlight-trailing-whitespace)
+            ))
 (add-hook 'python-mode-hook
           (lambda ()
             (electric-indent-mode -1)

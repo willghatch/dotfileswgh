@@ -19,4 +19,5 @@
 (ignore-errors (package-install 'smex))
 (ignore-errors (package-install 'flycheck))
 (ignore-errors (package-install 'fill-column-indicator))
+(ignore-errors (package-install 'highlight-chars))
 
