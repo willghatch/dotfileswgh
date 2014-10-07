@@ -110,7 +110,6 @@
 (require 'rainbow-delimiters)
 (yafolding-mode 1)
 (global-flycheck-mode 1)
-(add-hook 'prog-mode-hook #'rainbow-delimiters-mode)
 (setq custom-file "~/dotfileswgh/emacs/custom-file.el")
 (load custom-file)
 

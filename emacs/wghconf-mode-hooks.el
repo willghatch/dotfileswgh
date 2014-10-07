@@ -9,6 +9,7 @@
           (lambda ()
             (hc-toggle-highlight-tabs)
             (hc-toggle-highlight-trailing-whitespace)
+            (rainbow-delimiters-mode-enable)
             ))
 (add-hook 'python-mode-hook
           (lambda ()
