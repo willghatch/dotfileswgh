@@ -1,0 +1,5 @@
+# -*- mode: snippet -*-
+#name : reduce
+#key: r
+# --
+reduce(${1:function(${2:old,new}){${3:return old+new}}}, ${4:0})$0

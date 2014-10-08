@@ -1,0 +1,5 @@
+# -*- mode: snippet -*-
+#name : map
+#key: m
+# --
+map(${1:function(${2:x}){${3:return $2}}})$0
