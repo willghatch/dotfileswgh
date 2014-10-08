@@ -1,0 +1,9 @@
+#!/bin/sh
+
+while read daemon
+do
+    emacsclient -e '(kill-emacs)' -s $daemon
+done </tmp/premacs
+
+rm /tmp/premacs
+

@@ -1,0 +1,5 @@
+#!/bin/sh
+
+premacs-kill-unused
+premacs-init
+
