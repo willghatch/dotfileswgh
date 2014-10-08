@@ -16,3 +16,9 @@
 (add-hook 'window-configuration-change-hook 'auto-fci-mode)
 (add-hook 'window-setup-hook 'auto-fci-mode)
 
+; advise fci-put-overlays-region with fci-delete-overlays-region for line
+(defadvice fci-put-overlays-region (after fci-not-current-line activate)
+  "Don't put column rule on current line."
+  (fci-delete-overlays-region (line-beginning-position 0) (line-beginning-position 1)))
+
+

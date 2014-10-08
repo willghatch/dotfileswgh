@@ -5,6 +5,7 @@
             (define-key evil-motion-state-local-map "m" 'my-buffer-menu-mode-map)
             (set-keymap-parent 'my-buffer-menu-mode-map Buffer-menu-mode-map)))
 
+(add-hook 'text-mode-hook #'flyspell-mode)
 (add-hook 'prog-mode-hook
           (lambda ()
             ;; These two highlighters kill the formatting of
@@ -12,6 +13,7 @@
             (hc-toggle-highlight-tabs)
             (hc-toggle-highlight-trailing-whitespace)
             (rainbow-delimiters-mode-enable)
+            (flyspell-prog-mode)
             ))
 (add-hook 'python-mode-hook
           (lambda ()
@@ -24,6 +26,14 @@
 
 (defun add-to-hooks (fun hooklist)
   (mapcar (lambda (hook) (add-hook hook fun)) hooklist))
+
+(add-to-hooks #'mycomp '(js-mode-hook
+                         emacs-lisp-mode-hook
+                         shell-script-mode-hook
+                         php-mode-hook
+                         nxml-mode-hook
+                         html-mode-hook
+                         ))
 
 
 ;; TODO -- these are default values that I should deal with now

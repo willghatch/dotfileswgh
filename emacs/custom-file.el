@@ -26,7 +26,7 @@
  '(highlight ((t (:background "#005f00" :foreground "#0000ff"))))
  '(isearch-fail ((t (:background "#cd0000"))))
  '(lazy-highlight ((t (:background "#0087ff" :foreground "#000000"))))
- '(linum ((t (:inherit mode-line :foreground "#00ffff"))))
+ '(linum ((t (:inherit mode-line :foreground "#00ffff" :underline nil :weight normal))))
  '(match ((t (:background "#cdcd00" :foreground "#00005f"))))
  '(minibuffer-prompt ((t (:foreground "#ff00ff"))))
  '(mode-line ((t (:background "#262626" :foreground "#00afd7"))))
