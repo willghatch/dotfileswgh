@@ -71,9 +71,6 @@
 (load-library "wghconf-evil")
 ;(require 'undo-tree) ; ELPA package used by evil
 
-(require 'fill-column-indicator)
-(setq-default fci-rule-color "#153040")
-(fci-mode 1) ; this only activates it in *scratch*, my mode hooks add it to others
 (require 'ido) ; comes standard with emacs
 (ido-mode 1)
 
@@ -106,6 +103,7 @@
 (load-library "wghconf-modeline") ; load mode line config
 (load-library "wghconf-yasnippet")
 (load-library "wghconf-org-mode")
+(load-library "wghconf-fci-mode")
 (load-library "wghconf-mode-hooks")
 (require 'smex)
 (require 'yafolding)

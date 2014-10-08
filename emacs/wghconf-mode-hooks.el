@@ -23,7 +23,6 @@
 (defun add-to-hooks (fun hooklist)
   (mapcar (lambda (hook) (add-hook hook fun)) hooklist))
 
-(add-to-hooks (lambda () (fci-mode 1)) '(prog-mode-hook text-mode-hook))
 
 ;; TODO -- these are default values that I should deal with now
 ;evil-overriding-maps
