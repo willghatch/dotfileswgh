@@ -1,0 +1,9 @@
+#!/bin/sh
+
+# script to pre-launch emacs daemons to speed up start time
+
+premacs-new &
+premacs-new
+
+echo "premacs ready!"
+

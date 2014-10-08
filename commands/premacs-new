@@ -1,0 +1,7 @@
+#!/bin/sh
+
+# start up new emacs daemon
+
+newId=$RANDOM
+emacs -l $DOTFILESDIR/emacs/def.el --daemon=premacs$newId && \
+echo premacs$newId >> /tmp/premacs

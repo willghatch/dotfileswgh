@@ -1,0 +1,31 @@
+#!/bin/sh
+
+premaxf=/tmp/premacs
+preUse=/tmp/premacs-in-use
+daemon="none"
+
+if [ ! -f $premaxf ]
+then
+    echo "premacs not set up 2>&1"
+    exit 37
+fi
+
+mv $premaxf $preUse
+while read line
+do
+      if [ "none" = "$daemon" ]
+      then
+          daemon=$line
+      else
+          echo $line >> $premaxf
+      fi
+done <$preUse
+
+# tidy up files and spawn new daemon
+rm $preUse
+premacs-new >/dev/null 2>&1 &
+
+emacsclient -s $daemon $@
+emacsclient -e '(kill-emacs)' -s $daemon
+
+
