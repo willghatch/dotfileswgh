@@ -20,7 +20,8 @@ export MANWIDTH=${MANWIDTH:-80}
 #alias t="mpcl toggle"
 
 ####### Editing
-alias em="TERM=xterm-256color emacs -nw -l $DOTFILESDIR/emacs/nogui.el"
+#alias em="TERM=xterm-256color emacs -nw -l $DOTFILESDIR/emacs/nogui.el"
+alias e="TERM=xterm-256color premacs-use -t"
 alias emx="emacs -l $DOTFILESDIR/emacs/xgui"
 alias emp="TERM=xterm-256color emacs -nw -l $DOTFILESDIR/emacs/wghconf-package.el"
 alias v="vim"
@@ -79,6 +80,7 @@ export XDG_DOWNLOAD_DIR="$HOME/dl"
 
 
 export EDITOR=vim
+export VISUAL="TERM=xterm-256color premacs-use -t"
 export XTERM=xterm
 export PAGER=less
 export TERMEM=lxterminal
