@@ -12,15 +12,16 @@
  ;; If you edit it by hand, you could mess it up, so be careful.
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
+ '(default ((t (:inherit nil :stipple nil :background "#000000" :foreground "#a0a0a0" :inverse-video nil :box nil :strike-through nil :overline nil :underline nil :slant normal :weight normal :height 99 :width normal :foundry "unknown" :family "DejaVu Sans Mono"))))
  '(bold-italic ((t (:foreground "#00ff5f" :slant italic :weight bold))))
  '(custom-comment-tag ((t (:foreground "#0087ff"))))
  '(evil-ex-lazy-highlight ((t (:inherit lazy-highlight :background "#00005f" :foreground "#ff0000"))))
  '(evil-ex-substitute-matches ((t (:background "#5f0000"))))
  '(font-lock-function-name-face ((t (:foreground "#00ff00"))))
  '(font-lock-string-face ((t (:foreground "#d700ff"))))
- '(fringe ((t (:background "#0000ff" :foreground "#00ffff"))))
- '(hc-trailing-whitespace ((t (:background "#202020"))))
+ '(fringe ((t (:foreground "#00ffff"))))
  '(hc-tab ((t (:background "#100000"))))
+ '(hc-trailing-whitespace ((t (:background "#202020"))))
  '(header-line ((t (:inherit mode-line))))
  '(highlight ((t (:background "#005f00" :foreground "#0000ff"))))
  '(isearch-fail ((t (:background "#cd0000"))))
@@ -28,7 +29,7 @@
  '(linum ((t (:inherit mode-line :foreground "#00ffff"))))
  '(match ((t (:background "#cdcd00" :foreground "#00005f"))))
  '(minibuffer-prompt ((t (:foreground "#ff00ff"))))
- '(mode-line ((t (:background "#262626" :foreground "#00afd7" :box (:line-width -1 :style released-button)))))
+ '(mode-line ((t (:background "#262626" :foreground "#00afd7"))))
  '(mode-line-inactive ((t (:inherit mode-line :background "#262626" :foreground "#008787" :box (:line-width -1 :color "#303030") :weight light))))
  '(next-error ((t (:inherit region :foreground "#00cd00"))))
  '(org-hide ((t (:foreground "#252525"))))
