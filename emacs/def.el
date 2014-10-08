@@ -38,6 +38,8 @@
 ;; General options
 (require 'linum)
 (global-linum-mode 1) ; add line numbers
+(require 'hlinum)
+(hlinum-activate)
 (setq linum-format "%4d") ; four digit number
 ;(add-hook 'find-file-hook (lambda () (linum-mode 1))) ; USE LINE NUMBERS ON EVERYTHING GOSH DARN IT!
 ;(column-number-mode) ;turn on column numbers in mode line
