@@ -4,12 +4,11 @@ set text_flowed=yes
 
 # source aliases
 
-source ~/dotfileswgh_pri/mutt/rc
+source ~/dotfileswgh/pri/mutt/rc
 
 
 macro index Ag '<change-folder>imaps://imap.gmail.com<enter>'
 macro index Ay '<change-folder>imaps://imap.mail.yahoo.com<enter>'
-macro index Ac '<change-folder>imaps://mail.ldschurch.org<enter>'
 macro index Al "<change-folder>/var/spool/mail/$USER<enter>"
 
 set header_cache=~/.mutt/cache/headers

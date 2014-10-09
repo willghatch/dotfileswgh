@@ -212,7 +212,7 @@ then
 fi
 
 ######## Add private stuff #######
-bazsh_common_pri=$HOME/dotfileswgh_pri/bazsh_common
+bazsh_common_pri=$DOTFILESDIR/pri/bazsh_common
 if [ -f $bazsh_common_pri ]
 then
     source $bazsh_common_pri
