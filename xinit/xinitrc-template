@@ -10,7 +10,7 @@ unclutter -idle 5 &
 xscreensaver -no-splash &
 stopTouchpadClick.sh &
 xmodmap ~/.Xmodmap
-xrdb ~/.Xrdb
+xrdb ~/.Xresources
 
 
 exec awesome
