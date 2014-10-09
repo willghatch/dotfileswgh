@@ -23,12 +23,13 @@
 (define-key company-active-map (kbd "M-n") nil)
 (define-key company-active-map (kbd "M-p") nil)
 (define-key company-active-map (kbd "C-n") 'company-select-next)
-(define-key company-active-map (kbd "C-p") 'company-select-next)
+(define-key company-active-map (kbd "C-p") 'company-select-previous)
 (define-key company-active-map (kbd "C-h") nil)
 (define-key company-active-map (kbd "C-d") 'company-show-doc-buffer)
 
 (setq company-frontends '(company-preview-frontend company-pseudo-tooltip-wgh-frontend company-echo-metadata-frontend))
 
 (setq company-minimum-prefix-length 2)
+(setq company-idle-delay 0.1)
 
 
