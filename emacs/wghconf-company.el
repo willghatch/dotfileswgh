@@ -30,6 +30,6 @@
 (setq company-frontends '(company-preview-frontend company-pseudo-tooltip-wgh-frontend company-echo-metadata-frontend))
 
 (setq company-minimum-prefix-length 2)
-(setq company-idle-delay 0.1)
+(setq company-idle-delay 0.4)
 
 
