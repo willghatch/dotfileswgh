@@ -71,8 +71,8 @@ map -builtin -modes=n sb <C-S-u>
 map -builtin -modes=n sc <C-S-k>
 
 " menu mode
-map -builtin -modes=menu j <Down>
-map -builtin -modes=menu k <Up>
+"map -builtin -modes=menu j <Down>
+"map -builtin -modes=menu k <Up>
 
 " keep the menu bars, address bar...
 set guioptions=bCrsT
