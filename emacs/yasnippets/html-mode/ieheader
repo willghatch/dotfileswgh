@@ -1,0 +1,8 @@
+# -*- mode: snippet; require-final-newline: nil -*-
+# name: ie header
+# key: ihead
+# --
+<!doctype html>
+<head>
+<meta http-equiv="x-ua-compatible" content="IE=Edge"/>
+</head>
