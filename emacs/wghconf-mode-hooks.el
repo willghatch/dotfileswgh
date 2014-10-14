@@ -5,7 +5,7 @@
             (define-key evil-motion-state-local-map "m" 'my-buffer-menu-mode-map)
             (set-keymap-parent 'my-buffer-menu-mode-map Buffer-menu-mode-map)))
 
-(add-hook 'text-mode-hook #'flyspell-mode)
+;(add-hook 'text-mode-hook #'flyspell-mode)
 (add-hook 'prog-mode-hook
           (lambda ()
             ;; These two highlighters kill the formatting of
