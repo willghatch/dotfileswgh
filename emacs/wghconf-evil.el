@@ -545,6 +545,8 @@
 (defalias 'ee 'eval-expression)
 (defalias 'shr 'shell-command-on-region)
 (defalias 'trunc 'toggle-truncate-lines)
+(defalias 'sc 'flyspell-mode)
+(defalias 'fc 'flycheck-mode)
 
 ;; More text objects!
 (define-key evil-inner-text-objects-map "a" 'evil-inner-arg)
