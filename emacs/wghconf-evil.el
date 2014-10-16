@@ -630,7 +630,8 @@
 (define-key evil-visual-state-map "s)" 'eval-region)
 (define-key evil-visual-state-map (kbd "C-s") 'yas-insert-with-region)
 (define-key evil-normal-state-map "sm" 'evil-set-marker)
-(define-key evil-motion-state-map "se" 'smex)
+(define-key evil-insert-state-map (kbd "M-c") 'smex)
+(define-key evil-motion-state-map (kbd "M-c") 'smex)
 (define-key evil-motion-state-map "sx" 'eval-expression)
 
 
