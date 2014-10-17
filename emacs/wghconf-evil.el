@@ -548,6 +548,10 @@
       (call-interactively 'evil-window-decrease-height))))
 (define-key evil-window-map "f" 'delete-other-windows)
 (define-key evil-window-map "a" 'switch-to-buffer)
+;; Space will be for layout concerns
+(define-key evil-window-map " f" 'delete-other-windows)
+(define-key evil-window-map " u" 'winner-undo)
+(define-key evil-window-map " r" 'winner-redo)
 
 (set-keymap-parent evil-window-state-map evil-window-map)
 (define-key evil-window-state-map "m" 'evil-normal-state)

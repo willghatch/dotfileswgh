@@ -105,6 +105,7 @@
 (load-library "wghconf-org-mode")
 (load-library "wghconf-fci-mode")
 (load-library "wghconf-mode-hooks")
+(winner-mode 1)
 (require 'smex)
 (require 'yafolding)
 (require 'rainbow-delimiters)
