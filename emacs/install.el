@@ -23,4 +23,5 @@
 (ignore-errors (package-install 'fill-column-indicator))
 (ignore-errors (package-install 'highlight-chars))
 (ignore-errors (package-install 'hlinum))
+(ignore-errors (package-install 'elisp-slime-nav))
 

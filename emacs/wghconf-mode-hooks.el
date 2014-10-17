@@ -20,6 +20,13 @@
             (load-library "wghconf-js")
             ))
 
+(add-hook 'emacs-lisp-mode-hook
+          (lambda ()
+            (define-key evil-motion-state-local-map "gdd" 'elisp-slime-nav-find-elisp-thing-at-point)
+            (define-key evil-motion-state-local-map "gdp" 'pop-tag-mark)
+            (define-key evil-motion-state-local-map "gD" 'elisp-slime-nav-describe-elisp-thing-at-point)
+            ))
+
 (defun add-to-hooks (fun hooklist)
   (mapcar (lambda (hook) (add-hook hook fun)) hooklist))
 
