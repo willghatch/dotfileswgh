@@ -17,6 +17,8 @@
 (ignore-errors (package-install 'xclip))
 (ignore-errors (package-install 'ag))
 (ignore-errors (package-install 'smex))
+(ignore-errors (package-install 'helm))
+(ignore-errors (package-install 'helm-swoop))
 (ignore-errors (package-install 'flycheck))
 (ignore-errors (package-install 'fill-column-indicator))
 (ignore-errors (package-install 'highlight-chars))
