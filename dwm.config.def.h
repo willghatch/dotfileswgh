@@ -116,15 +116,16 @@ static Key keys[] = {
 	{ HYPKEY,                       XK_r,      spawn,          {.v = launchercmd } },
 	//{ HYPKEY,                       XK_p,      spawn,          {.v = termcmd } },
 	//{ SUPKEY,                       XK_p,      spawn,          {.v = launchercmd } },
-	{ SUPKEY|ALTKEY,                XK_l, spawn,               {.v = lockcmd } },
+	{ HYPKEY,                       XK_q, spawn,               {.v = lockcmd } },
 	//{ HYPKEY,                       XK_b,      togglebar,      {0} },
-	{ HYPKEY,                       XK_n,      focusstack,     {.i = +1 } },
-	//{ HYPKEY,                       XK_t,      focusstack,     {.i = -1 } },
-	//{ HYPKEY|ALTKEY,                XK_n,      incnmaster,     {.i = +1 } }, // num clients in master
-	//{ HYPKEY|ALTKEY,                XK_s,      incnmaster,     {.i = -1 } },
+	{ HYPKEY,                       XK_j,      focusstack,     {.i = +1 } },
+	{ HYPKEY,                       XK_k,      focusstack,     {.i = -1 } },
+	//{ HYPKEY|ALTKEY,                XK_j,      zoom,           {0} }, //toggle between master area
+	{ HYPKEY|ALTKEY,                XK_h,      incnmaster,     {.i = +1 } }, // num clients in master
+	{ HYPKEY|ALTKEY,                XK_l,      incnmaster,     {.i = -1 } },
 	{ HYPKEY,                       XK_h,      setmfact,       {.f = -0.05} }, // size of master/slave areas
 	{ HYPKEY,                       XK_l,      setmfact,       {.f = +0.05} },
-	//{ HYPKEY,                       XK_b, zoom,           {0} }, //toggle between master area
+	{ HYPKEY,                       XK_x,      zoom,           {0} }, //toggle between master area
 	//{ HYPKEY,                       XK_Tab,    view,           {0} },
 	{ HYPKEY,                       XK_c,      killclient,     {0} },
 	{ HYPKEY,                       XK_space,  setlayout,      {.v = &layouts[0]} }, // tile
@@ -134,10 +135,10 @@ static Key keys[] = {
 	{ HYPKEY|CTRLKEY,               XK_f,      togglefloating, {0} },
 	//{ HYPKEY,                       XK_0,      view,           {.ui = ~0 } },
 	//{ HYPKEY|ShiftMask,             XK_0,      tag,            {.ui = ~0 } },
-	//{ HYPKEY,                       XK_m,      focusmon,       {.i = -1 } },
-	{ HYPKEY,                       XK_s,      focusmon,       {.i = +1 } },
-	//{ HYPKEY|ALTKEY,                XK_m,      tagmon,         {.i = -1 } },
-	{ HYPKEY|ALTKEY,                XK_s,      tagmon,         {.i = +1 } },
+	{ HYPKEY,                       XK_p,      focusmon,       {.i = -1 } },
+	{ HYPKEY,                       XK_n,      focusmon,       {.i = +1 } },
+	{ HYPKEY|ALTKEY,                XK_p,      tagmon,         {.i = -1 } },
+	{ HYPKEY|ALTKEY,                XK_n,      tagmon,         {.i = +1 } },
 	//{ HYPKEY|ALTKEY,                XK_m,      tagAndFocusMon, {.i = -1 } },
 	//{ HYPKEY|ALTKEY,                XK_w,      tagAndFocusMon, {.i = +1 } },
 	{ HYPKEY,                       XK_b,      viewNext,       {.ui = 0 } },
