@@ -8,10 +8,7 @@
 ;(add-hook 'text-mode-hook #'flyspell-mode)
 (add-hook 'prog-mode-hook
           (lambda ()
-            ;; These two highlighters kill the formatting of
-            ;; list-faces-display... and I don't know why
-            (hc-toggle-highlight-tabs)
-            (hc-toggle-highlight-trailing-whitespace)
+            (whitespace)
             (rainbow-delimiters-mode-enable)
             ))
 (add-hook 'python-mode-hook

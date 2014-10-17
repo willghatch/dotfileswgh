@@ -99,6 +99,13 @@
   (linum-mode 1)
   )
 
+(defun whitespace ()
+  (interactive)
+  ;; These two highlighters kill the formatting of
+  ;; list-faces-display... and I don't know why
+  (hc-toggle-highlight-tabs)
+  (hc-toggle-highlight-trailing-whitespace))
+
 (load-library "wghconf-package") ; load packaging config
 (load-library "wghconf-modeline") ; load mode line config
 (load-library "wghconf-yasnippet")
