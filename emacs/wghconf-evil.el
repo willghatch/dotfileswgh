@@ -703,6 +703,8 @@
 (define-key evil-insert-state-map "\M-p" 'evil-complete-previous)
 (define-key evil-insert-state-map "\C-v" #'quoted-insert) ; more vim-like
 
+(global-set-key (kbd "C-\\") 'evil-execute-in-normal-state)
+
 ;; Default mode settings
 (setq evil-normal-state-modes (append evil-emacs-state-modes evil-normal-state-modes))
 (setq evil-emacs-state-modes nil)
