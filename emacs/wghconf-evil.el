@@ -697,8 +697,6 @@
 
 
 ;; input mode
-(define-key evil-insert-state-map "\M-h" 'help-command) ; Be more unix-like... I have help on M-h
-(define-key evil-insert-state-map "\C-h" 'delete-backward-char) ; Be more unix-like... I have help on M-h
 (define-key evil-insert-state-map (kbd "DEL") 'delete-backward-char) ; remap away from the evil-version backspace
 (define-key evil-insert-state-map "\M-n" 'evil-complete-next)
 (define-key evil-insert-state-map "\M-p" 'evil-complete-previous)

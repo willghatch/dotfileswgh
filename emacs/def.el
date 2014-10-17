@@ -126,7 +126,6 @@
       c-basic-offset 4)
 (setq org-startup-folded nil)
 
-(global-set-key (kbd "M-h") 'help-command)
 (if (fboundp 'smex)
     (global-set-key (kbd "M-x") 'smex))
 
