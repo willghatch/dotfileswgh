@@ -524,18 +524,33 @@
 
 (define-key evil-window-map (kbd "RET") 'evil-normal-state)
 (define-key evil-window-map [return] 'evil-normal-state)
-(define-key evil-window-map "e" 'evil-window-state)
-(define-key evil-window-map "n" 'evil-window-next)
-(define-key evil-window-map "p" 'evil-window-prev)
+(define-key evil-window-map "m" 'evil-window-state)
+
+
+(define-key evil-window-map "j" 'evil-window-next)
+(define-key evil-window-map "k" 'evil-window-prev)
 (define-key evil-window-map "c" 'delete-window)
-;(define-key evil-window-map "w" 'evil-window-new) ; this makes a new buffer called new... I don't think I like that
-(define-key evil-window-map "K" 'evil-window-increase-height)
-(define-key evil-window-map "J" 'evil-window-decrease-height)
-(define-key evil-window-map "H" 'evil-window-decrease-width)
-(define-key evil-window-map "L" 'evil-window-increase-width)
+(define-key evil-window-map "h"
+  (lambda () (interactive)
+    (let ((current-prefix-arg '(5)))
+      (call-interactively 'evil-window-decrease-width))))
+(define-key evil-window-map "l"
+  (lambda () (interactive)
+    (let ((current-prefix-arg '(5)))
+      (call-interactively 'evil-window-increase-width))))
+(define-key evil-window-map "H"
+  (lambda () (interactive)
+    (let ((current-prefix-arg '(5)))
+      (call-interactively 'evil-window-increase-height))))
+(define-key evil-window-map "L"
+  (lambda () (interactive)
+    (let ((current-prefix-arg '(5)))
+      (call-interactively 'evil-window-decrease-height))))
 (define-key evil-window-map "f" 'delete-other-windows)
+(define-key evil-window-map "a" 'switch-to-buffer)
 
 (set-keymap-parent evil-window-state-map evil-window-map)
+(define-key evil-window-state-map "m" 'evil-normal-state)
 
 
 
