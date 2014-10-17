@@ -24,4 +24,5 @@
 (ignore-errors (package-install 'highlight-chars))
 (ignore-errors (package-install 'hlinum))
 (ignore-errors (package-install 'elisp-slime-nav))
+(ignore-errors (package-install 'projectile))
 

@@ -637,6 +637,7 @@
 (define-key evil-motion-state-map "T" 'evil-find-char-to-backward)
 (define-key evil-motion-state-map "tb" 'switch-to-buffer)
 (define-key evil-motion-state-map "tq" 'kill-buffer)
+(define-key evil-motion-state-map "tp" 'projectile-command-map)
 
 ;; s map
 ;(define-key evil-normal-state-map "ss" 'evil-substitute)
@@ -663,7 +664,6 @@
 (define-key evil-motion-state-map "_" 'eval-expression)
 (define-key evil-motion-state-map "Q" 'call-last-kbd-macro)
 ;; Movement
-(define-key evil-normal-state-map "tm" 'evil-set-marker) ; put this under t so m will be completely free for mode-specific once I implement that
 (define-key evil-normal-state-map "mm" 'evil-set-marker) ;;;;;;;;;; m will be my prefix for mode-specific bindings
 ;; everything in motion state is pulled into normal state
 (define-key evil-motion-state-map "+" 'evil-repeat-find-char)

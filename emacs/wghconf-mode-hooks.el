@@ -10,6 +10,7 @@
           (lambda ()
             (whitespace)
             (rainbow-delimiters-mode-enable)
+            (projectile-mode 1)
             ))
 (add-hook 'python-mode-hook
           (lambda ()
