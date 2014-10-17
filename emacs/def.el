@@ -110,7 +110,6 @@
 (require 'yafolding)
 (require 'rainbow-delimiters)
 (yafolding-mode 1)
-(global-flycheck-mode 1)
 (setq custom-file "~/dotfileswgh/emacs/custom-file.el")
 (load custom-file)
 

@@ -565,6 +565,7 @@
 (defalias 'shr 'shell-command-on-region)
 (defalias 'trunc 'toggle-truncate-lines)
 (defalias 'sc 'flyspell-mode)
+(defalias 'sc-prog 'flyspell-prog-mode)
 (defalias 'fc 'flycheck-mode)
 
 ;; More text objects!

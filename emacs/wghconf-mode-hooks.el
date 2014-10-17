@@ -13,7 +13,6 @@
             (hc-toggle-highlight-tabs)
             (hc-toggle-highlight-trailing-whitespace)
             (rainbow-delimiters-mode-enable)
-            (flyspell-prog-mode)
             ))
 (add-hook 'python-mode-hook
           (lambda ()
