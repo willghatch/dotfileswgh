@@ -1,0 +1,37 @@
+So many programs have windowing functions!  But they all have different keys and paradaigms!
+
+This file represents my efforts to find a set of keys to unify my windowing experience.
+I find that windowing systems often have levels.  For my purposes I will assume that generally there are up to three (and if there are more I either don't want to deal with it, or I'll wrap it in some further abstraction).  Taking a window manager as the main example, L1 is the window level (smallest), L2 is workspace/tag/whatever, that you can swap the whole screen out for another, and L3 is the monitor level -- although with larger monitors it may be convenient to define monitor splits that act as a top level.  Some of this I have, in my mind, built around what my current windowing systems do (though some I find limiting, and only use due to external (*cough* work) constraints), and some I have planned around what I would like to eventually use -- whether I will find such a window manager or have to build it myself will be seen later.
+This may be revised significantly after I finish my coming keyboard layout, but probably not much -- I've tried to go more by mnemonic or by similar functionality to familiar programs (ex jk and wb from vim) rather than key positioning.
+Second level functions will be accessed... somehow, depending on the exact program.  Maybe adding shift for the window manager, or just another key preceding whatever.
+
+Key Function
+jk  L1 focus
+(2) L1 move
+wb  L2 focus
+(2) L2 move
+np  L3 focus
+(2) L3 move
+aoei - pull/send by name, goto by name for L1-3 -- these I'm not sure how I want to do yet, because support for these types of operations are often so spotty, and I'm not sure of my ideal way to do it yet.  They are more useful for L1 and L2.
+a   L1 pull by name
+(2) L1 push to named L2
+e   L2 goto by name
+hl  L1 quick resize (a more thorough resize should be in some sort of mode... though set layouts would be more efficient)
+(2) maybe the secondary function can resize L3, supposing large enough monitors for virtual L3 splits
+f   maximize (fullscreen)
+(2) float mode, or maybe a key to a secondary command for toggling float state locally or globally, or other layout concerns
+spc tile -- window manager layout concern... maybe this one will be more general later
+g   (generate) new L2 - ex new workspace, new tmux window...
+(2) kill L2 (genocide?)
+sv  L1 split (horizontal and vertical)
+:-  run command (both : and - for now...)
+c   close (akin to control-C)
+r   run (for window manager, a run prompt (bashrun!), though if my WM later supports choosing what kind of split I do, maybe rv/rs will do that
+m   mode - if I'm in a window mode, get out of it
+q   lock
+(2) quit - kill window manager
+ret launch terminal in window manager -- though this could be in s/v... for now I'll leave it as return
+t   reserved for possible extended commands/secondary level
+
+
+unused - d,z,u,tab,bspc,x,y...
