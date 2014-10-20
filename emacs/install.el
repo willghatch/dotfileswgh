@@ -12,6 +12,7 @@
 
 (ignore-errors (package-install 'evil-args))
 (ignore-errors (package-install 'rainbow-delimiters))
+(ignore-errors (package-install 'smartparens))
 (ignore-errors (package-install 'ace-jump-mode))
 
 (ignore-errors (package-install 'xclip))

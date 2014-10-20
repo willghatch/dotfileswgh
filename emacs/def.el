@@ -116,6 +116,7 @@
 (require 'smex)
 (require 'yafolding)
 (require 'rainbow-delimiters)
+(show-smartparens-global-mode 1)
 (yafolding-mode 1)
 (setq custom-file "~/dotfileswgh/emacs/custom-file.el")
 (load custom-file)

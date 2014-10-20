@@ -6,7 +6,9 @@
  '(bmkp-last-as-first-bookmark-file "~/.emacs.d/bookmarks")
  '(evil-intercept-maps nil)
  '(evil-overriding-maps nil)
- '(fill-column 80))
+ '(fill-column 80)
+ '(sp-highlight-pair-overlay nil)
+ '(sp-show-pair-from-inside t))
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
@@ -58,4 +60,5 @@
  '(rainbow-delimiters-unmatched-face ((t (:background "#5f0000"))))
  '(region ((t (:background "#0000d7" :foreground "#ff00ff"))))
  '(secondary-selection ((t (:background "#cdcd00" :foreground "#005f00"))))
+ '(sp-show-pair-match-face ((t (:background "#363636" :foreground "#00ff66"))))
  '(tool-bar ((t (:foreground "#00ff00" :box (:line-width 1 :style released-button))))))

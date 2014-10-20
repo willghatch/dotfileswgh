@@ -638,6 +638,8 @@
 (define-key evil-motion-state-map "tb" 'switch-to-buffer)
 (define-key evil-motion-state-map "tq" 'kill-buffer)
 (define-key evil-motion-state-map "tp" 'projectile-command-map)
+;; "ts" will stand for "toggle setting"
+(define-key evil-motion-state-map "tsp" 'smartparens-mode)
 
 ;; s map
 ;(define-key evil-normal-state-map "ss" 'evil-substitute)
