@@ -242,7 +242,7 @@ def mode_default():
     #binder.bind( "7", [ "select-window", "-t :7" ], use_prefix = True )
     #binder.bind( "8", [ "select-window", "-t :8" ], use_prefix = True )
     #binder.bind( "9", [ "select-window", "-t :9" ], use_prefix = True )
-    #binder.bind( ":", [ "command-prompt" ], use_prefix = True )
+    binder.bind( ":", [ "command-prompt" ], use_prefix = True )
     #binder.bind( ";", [ "last-pane" ], use_prefix = True )
     #binder.bind( "=", [ "choose-buffer" ], use_prefix = True )
     #binder.bind( "?", [ "list-keys" ], use_prefix = True )
@@ -630,7 +630,7 @@ class Binder( object ):
     def set_colors( self, colors ):
 
         for name, value in colors.iteritems():
-            self.extra_commands.append( [ "set-option", "-g", name, value ] )
+            self.extra_commands.append( [ "set-option", "-q", "-g", name, value ] )
 
 
     #------------------------------------------------------------------------
