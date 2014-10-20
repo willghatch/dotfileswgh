@@ -33,21 +33,21 @@ python = "python2.7"
 tmux = "tmux"
 
 command_mode_colors = {
-    "pane-active-border-bg": "colour16",
-    "pane-active-border-fg": "colour127",
-    "pane-border-bg": "colour16",
-    "pane-border-fg": "colour127",
-    "status-bg": "colour127",
-    "status-fg": "colour225",
+    "pane-active-border-bg": "black",
+    "pane-active-border-fg": "magenta",
+    "pane-border-bg": "black",
+    "pane-border-fg": "magenta",
+    "status-bg": "magenta",
+    "status-fg": "white",
 }
 
 insert_mode_colors = {
-    "pane-active-border-bg": "colour16",
-    "pane-active-border-fg": "colour24",
-    "pane-border-bg": "colour16",
-    "pane-border-fg": "colour24",
-    "status-bg": "colour24",
-    "status-fg": "colour230",
+    "pane-active-border-bg": "black",
+    "pane-active-border-fg": "blue",
+    "pane-border-bg": "black",
+    "pane-border-fg": "blue",
+    "status-bg": "blue",
+    "status-fg": "white",
 }
 
 
