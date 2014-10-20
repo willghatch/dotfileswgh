@@ -73,6 +73,7 @@
 
 (require 'ido) ; comes standard with emacs
 (ido-mode 1)
+(flx-ido-mode 1)
 
 (defun myslime () (interactive)
   "pulls in slime (in elpa) and my config"

@@ -26,4 +26,5 @@
 (ignore-errors (package-install 'hlinum))
 (ignore-errors (package-install 'elisp-slime-nav))
 (ignore-errors (package-install 'projectile))
+(ignore-errors (package-install 'flx-ido))
 
