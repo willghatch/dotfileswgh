@@ -183,11 +183,8 @@ def mode_command():
     #binder.bind( "M-0", [ "select-window", "-t", ":10" ] )
 #
     ## Vim-like bindings:
-    binder.bind( "a", [ "run-shell", python + ' ' + modality + mc + ' insert -p command' ] )
     #binder.bind( "h", [ "select-pane", "-L" ] )
     #binder.bind( "H", [ "resize-pane", "-L", "1" ] )
-    binder.bind( "i", [ "run-shell", python + ' ' + modality + mc + ' insert -p command' ] )
-    binder.bind( "m", [ "run-shell", python + ' ' + modality + mc + ' insert -p command' ] )
     #binder.bind( "j", [ "select-pane", "-D" ] )
     #binder.bind( "J", [ "resize-pane", "-D", "1" ] )
     #binder.bind( "k", [ "select-pane", "-U" ] )
@@ -202,6 +199,12 @@ def mode_command():
     #binder.bind( "Right", [ "select-pane", "-R" ] )
     #binder.bind( "Up", [ "select-pane", "-U" ] )
     ##binder.bind( "C-6", [ "select-window", "-l" ] )
+
+    # Go back to insert mode
+    binder.bind( "a", [ "run-shell", python + ' ' + modality + mc + ' insert -p command' ] )
+    binder.bind( "i", [ "run-shell", python + ' ' + modality + mc + ' insert -p command' ] )
+    #binder.bind( "m", [ "run-shell", python + ' ' + modality + mc + ' insert -p command' ], use_prefix = True )
+    binder.bind( "m", [ "run-shell", python + ' ' + modality + mc + ' insert -p command' ] )
 
     if use_mode_colors:
         binder.set_colors( command_mode_colors )
@@ -307,20 +310,29 @@ def mode_default():
     binder.bind( "l", [ "resize-pane", "-R", "5" ], use_prefix = True ) # Needs repeat (-r)
     binder.bind( "H", [ "resize-pane", "-U", "5" ], use_prefix = True ) # Needs repeat (-r)
     binder.bind( "L", [ "resize-pane", "-D", "5" ], use_prefix = True ) # Needs repeat (-r)
+
+    binder.bind( "Space", [ "select-layout", "main-vertical" ], use_prefix = True )
+    binder.bind( "u", [ "next-layout" ], use_prefix = True )
+
     # L2
     binder.bind( "w", [ "next-window" ], use_prefix = True )
     binder.bind( "b", [ "previous-window" ], use_prefix = True )
+    binder.bind( "W", [ "join-pane", "-h", "-t", ":+1" ], use_prefix = True ) # join pane with next window
+    binder.bind( "B", [ "join-pane", "-h", "-t", ":-1" ], use_prefix = True ) # join pane with prev window
     binder.bind( "g", [ "new-window" ], use_prefix = True )
     # L3
     binder.bind( "p", [ "switch-client", "-p" ], use_prefix = True )
     binder.bind( "n", [ "switch-client", "-n" ], use_prefix = True )
 
+    binder.bind( "a", [ "split-window", "-h", "zsh -i -t", " \\; ", "send-keys", "tmux join-pane -s " ], use_prefix = True )
+    binder.bind( "o", [ "command-prompt", "find-window '%%'" ], use_prefix = True )
     binder.bind( "e", [ "split-window", "-v", "zsh -i -t", " \\; ", "send-keys", "tmux switch-client -t " ], use_prefix = True )
     #binder.bind( "G", [ "command-prompt", "-p", "window name: ", "new-window -n %%" ], use_prefix = True )
     #binder.bind( "r", [ "command-prompt", "-p", "window name: rename-window %%" ], use_prefix = True )
     #binder.bind( "R", [ "command-prompt", "-p", "session name: rename-session %%" ], use_prefix = True )
     binder.bind( "y", [ "copy-mode" ], use_prefix = True )
     #bind-key y copy-mode
+
 
     return binder
 
