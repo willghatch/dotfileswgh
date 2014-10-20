@@ -4,6 +4,14 @@
 (evil-mode 1)
 
 
+(evil-define-command wevil-quit ()
+  "Close buffer, primarily"
+  (kill-buffer))
+(evil-define-command wevil-save-and-quit ()
+  "Close buffer, primarily"
+  (save-buffer)
+  (kill-buffer))
+
 ;;;; Ace Jump installed here as well...
 (load-library "wghconf-ace-jump-mode")
 (load-library "wghconf-xclip")
@@ -689,6 +697,7 @@
 (define-key evil-motion-state-map " /" 'helm-swoop)
 (define-key evil-motion-state-map "  /" 'helm-multi-swoop-all)
 (define-key evil-motion-state-map "   /" 'helm-multi-swoop)
+(define-key evil-motion-state-map " w" 'save-buffer)
 (define-key evil-motion-state-map "J" 'evil-window-bottom)
 (define-key evil-motion-state-map "K" 'evil-window-top)
 (define-key evil-motion-state-map "{" 'backward-sexp)
@@ -721,8 +730,8 @@
 (evil-ex-define-cmd "w[rite]" 'evil-write)
 (evil-ex-define-cmd "wa[ll]" 'evil-write-all)
 (evil-ex-define-cmd "wn" 'evil-save) ;writes file and changes buffer name to name given
-(evil-ex-define-cmd "q[uit]" 'evil-quit)
-(evil-ex-define-cmd "wq" 'evil-save-and-close)
+(evil-ex-define-cmd "q[uit]" 'wevil-quit)
+(evil-ex-define-cmd "wq" 'wevil-save-and-quit)
 (evil-ex-define-cmd "qa[ll]" "quitall")
 (evil-ex-define-cmd "quita[ll]" 'evil-quit-all)
 (evil-ex-define-cmd "wqa[ll]" 'evil-save-and-quit)
@@ -734,12 +743,12 @@
       ido-everywhere t)
 (defun ido-ffap-no ()
   (interactive)
-  (setq ido-use-filename-at-point nil)
-  (call-interactively 'ido-find-file))
+  (let ((ido-use-filename-at-point nil))
+    (call-interactively 'ido-find-file)))
 (defun ido-ffap-yes ()
   (interactive)
-  (setq ido-use-filename-at-point 'guess)
-  (call-interactively 'ido-find-file))
+  (let ((ido-use-filename-at-point 'guess))
+    (call-interactively 'ido-find-file)))
 (evil-ex-define-cmd "ff" 'ido-ffap-yes)
 (evil-ex-define-cmd "f" 'ido-ffap-no)
 
