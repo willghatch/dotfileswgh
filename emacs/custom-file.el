@@ -14,7 +14,7 @@
  ;; If you edit it by hand, you could mess it up, so be careful.
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
- '(default ((t (:inherit nil :stipple nil :background "#000000" :foreground "#909090" :inverse-video nil :box nil :strike-through nil :overline nil :underline nil :slant normal :weight normal :height 99 :width normal :foundry "unknown" :family "DejaVu Sans Mono"))))
+ '(default ((t (:inherit nil :stipple nil :background "#050505" :foreground "#909090" :inverse-video nil :box nil :strike-through nil :overline nil :underline nil :slant normal :weight normal :height 99 :width normal :foundry "unknown" :family "DejaVu Sans Mono"))))
  '(bold-italic ((t (:foreground "#00ff5f" :slant italic :weight bold))))
  '(custom-comment-tag ((t (:foreground "#0087ff"))))
  '(evil-ex-lazy-highlight ((t (:inherit lazy-highlight :background "#00005f" :foreground "#ff0000"))))
@@ -34,7 +34,7 @@
  '(font-lock-preprocessor-face ((t (:foreground "#bf4030"))))
  '(font-lock-regexp-grouping-backslash ((t (:foreground "#8f4f5f"))))
  '(font-lock-regexp-grouping-construct ((t (:foreground "#8f4f8f"))))
- '(font-lock-string-face ((t (:foreground "#9400d3"))))
+ '(font-lock-string-face ((t (:foreground "#a420c3"))))
  '(font-lock-type-face ((t (:foreground "#d700ff"))))
  '(font-lock-variable-name-face ((t (:foreground "#7fffd4"))))
  '(font-lock-warning-face ((t (:foreground "#ffb90f"))))
