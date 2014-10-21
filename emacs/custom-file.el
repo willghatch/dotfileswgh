@@ -26,7 +26,7 @@
  '(font-lock-function-name-face ((t (:foreground "#00ff00"))))
  '(font-lock-string-face ((t (:foreground "#d700ff"))))
  '(fringe ((t (:foreground "#00ffff"))))
- '(hc-tab ((t (:background "#100000"))))
+ '(hc-tab ((t (:background "#202020"))))
  '(hc-trailing-whitespace ((t (:background "#202020"))))
  '(helm-selection ((t (:foreground "#000000" :background "#50f0b0"))))
  '(helm-selection-line ((t (:foreground "#000000" :background "#90b090"))))
