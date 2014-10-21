@@ -650,6 +650,7 @@
 ;; "ts" will stand for "toggle setting"
 (define-key evil-motion-state-map "tsp" 'smartparens-mode)
 (define-key evil-motion-state-map "tsw" 'whitespace)
+(define-key evil-motion-state-map "tsc" 'color-hex-syntax)
 (define-key evil-motion-state-map "tst" 'toggle-truncate-lines)
 (define-key evil-motion-state-map "tsf" 'flycheck-mode)
 (define-key evil-motion-state-map "tss" 'flyspell-mode)
