@@ -100,7 +100,7 @@
                  ((propertize " RO " 'face 'wevil-ro-face))))
        "] "
        ;; the full file name
-       '(:eval (propertize (buffer-file-name) 'face 'font-lock-keyword-face))
+       '(:eval (propertize (buffer-file-name) 'face 'font-lock-preprocessor-face))
 
 
        ;; the current major mode for the buffer.
