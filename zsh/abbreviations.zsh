@@ -21,6 +21,7 @@ abbreviations=(
     "tfgv" "| fgrep -v "
     "ag"   "agrep "
     "tag"  "| agrep "
+    "ta"   "| ag "
     "p"    "$PAGER "
     "tp"   "| $PAGER "
     "h"    "head "
@@ -31,8 +32,8 @@ abbreviations=(
     "ts"   "| sort "
     "v"    "${VISUAL:-${EDITOR}} "
     "tv"   "| ${VISUAL:-${EDITOR}} "
-    "c"    "wc "
-    "tc"   "| wc "
+    "tc"   "| cut "
+    "tu"   "| uniq "
     "tx"   "| xargs "
 )
 
