@@ -20,10 +20,10 @@ export MANWIDTH=${MANWIDTH:-80}
 #alias t="mpcl toggle"
 
 ####### Editing
-alias eml="TERM=xterm-256color emacs -nw -l $DOTFILESDIR/emacs/nogui.el"
+alias eml="TERM=xterm-256color emacs -nw -l $DOTFILESDIR/emacs/def"
 alias e="TERM=xterm-256color premacs-use -t"
 alias ex="premacs-use -c"
-alias emx="emacs -l $DOTFILESDIR/emacs/xgui"
+alias emx="emacs -l $DOTFILESDIR/emacs/def"
 alias emp="TERM=xterm-256color emacs -nw -l $DOTFILESDIR/emacs/wghconf-package.el"
 alias v="vim"
 
