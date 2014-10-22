@@ -51,6 +51,8 @@
  '(helm-selection-line ((t (:foreground "#000000" :background "#90b090"))))
  '(header-line ((t (:inherit mode-line))))
  '(highlight ((t (:background "#005f00" :foreground "#0000ff"))))
+ '(ido-first-match ((t (:foreground "#fd0060"))))
+ '(ido-subdir ((t (:foreground "#3050f0"))))
  '(isearch-fail ((t (:background "#cd0000"))))
  '(lazy-highlight ((t (:background "#0087ff" :foreground "#000000"))))
  '(linum ((t (:inherit mode-line :foreground "#309f9f" :underline nil :weight normal))))
