@@ -83,7 +83,7 @@ typeset -U path cdpath fpath manpath
 PS1_time='%F{cyan}%T'
 PS1_user_host='%F{green}[%B%n%b%F{yellow}@%B%m%b%F{green}]'
 PS1_dir='%F{blue}%B%~'
-PS1_cmd_stat='%b%F{cyan}<%F{red}%?%F{cyan}>'
+PS1_cmd_stat='%b%F{cyan}<%(?,%F{green}%?,%F{red}%?)%F{cyan}>'
 PS1_end='%F{default}
 %# '
 PS1_batt_state="\$(batt_state.bash)" 
