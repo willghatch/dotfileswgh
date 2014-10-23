@@ -206,6 +206,8 @@ then
     source /usr/share/git/completion/git-prompt.sh
 fi
 
+source $DOTFILESDIR/bazsh/grml-funcs.sh
+
 if [ $(uname) = FreeBSD ]
 then
     source $DOTFILESDIR/bazsh/bsd.sh
