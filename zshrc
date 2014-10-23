@@ -2,7 +2,7 @@
 
 source $HOME/dotfileswgh/bazsh/common.sh
 source $DOTFILESDIR/zsh/setopt.zsh
-fpath=($DOTFILESDIR/external/zsh/wd $fpath)
+fpath=($DOTFILESDIR/external/zsh/wd $fpath $HROOT/build/zsh-completions/src)
 source $DOTFILESDIR/zsh/completion.zsh
 source $DOTFILESDIR/zsh/prompt.zsh
 source $DOTFILESDIR/zsh/keys-pre.zsh
