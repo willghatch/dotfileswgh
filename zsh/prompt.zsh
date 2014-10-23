@@ -27,15 +27,24 @@ zle-line-init zle-keymap-select() {
     if [ "$VIMODE" = "opp" ]
     then
         VIMODE="O"
+    elif [ "$VIMODE" = "vivis" ]
+    then
+        VIMODE="V"
     fi
     if [ "$VIMODE" = "N" ]
     then
-        VIMODE="%K{blue}%F{black}$VIMODE%k"
+        VIMODE="%K{cyan}%F{black}$VIMODE%k"
     elif [ "$VIMODE" = "I" ]
     then
         VIMODE="%K{magenta}%F{black}$VIMODE%k"
-    else
+    elif [ "$VIMODE" = "O" ]
+    then
         VIMODE="%K{yellow}%F{black}$VIMODE%k"
+    elif [ "$VIMODE" = "V" ]
+    then
+        VIMODE="%K{green}%F{black}$VIMODE%k"
+    else
+        VIMODE="%K{white}%F{black}$VIMODE%k"
     fi
     PS1="${PS1_time} ${PS1_user_host} ${PS1_git_branch} ${PS1_dir} ${PS1_cmd_stat}${PS1_endl}${PS1_vi_state}${PS1_end}"
     zle reset-prompt

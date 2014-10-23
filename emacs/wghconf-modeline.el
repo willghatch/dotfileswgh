@@ -18,11 +18,11 @@
   "replace state marker face")
 
 (defface wevil-visual-face
-  '((t (:foreground "black" :background "brightcyan")))
+  '((t (:foreground "black" :background "green")))
   "visual state marker face")
 
 (defface wevil-emacs-face
-  '((t (:foreground "black" :background "yellow")))
+  '((t (:foreground "black" :background "white")))
   "emacs state marker face")
 
 (defface wevil-operator-face
