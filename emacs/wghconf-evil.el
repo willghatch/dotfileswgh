@@ -560,6 +560,8 @@
 (define-key evil-window-map " f" 'delete-other-windows)
 (define-key evil-window-map " u" 'winner-undo)
 (define-key evil-window-map " r" 'winner-redo)
+(define-key evil-window-map "w" 'next-buffer-no-star)
+(define-key evil-window-map "b" 'prev-buffer-no-star)
 
 (set-keymap-parent evil-window-state-map evil-window-map)
 (define-key evil-window-state-map "m" 'evil-normal-state)

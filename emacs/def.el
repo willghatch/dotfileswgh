@@ -107,6 +107,23 @@
   (hc-toggle-highlight-tabs)
   (hc-toggle-highlight-trailing-whitespace))
 
+(defun np-buffer-no-star (next-buffer-func)
+  "Cycle buffers ignoring ** buffers.  If it circles back to the first buffer
+it calls the next function one more time."
+  (let ((cbuf (buffer-name)))
+    (funcall next-buffer-func)
+    (while (and (string= "*" (substring (buffer-name) 0 1))
+                (not (string= cbuf (buffer-name))))
+      (funcall next-buffer-func))
+    (when (string= cbuf (buffer-name))
+      (funcall next-buffer-func))))
+(defun next-buffer-no-star ()
+  (interactive)
+  (np-buffer-no-star 'next-buffer))
+(defun prev-buffer-no-star ()
+  (interactive)
+  (np-buffer-no-star 'previous-buffer))
+
 (load-library "wghconf-package") ; load packaging config
 (load-library "wghconf-modeline") ; load mode line config
 (load-library "wghconf-yasnippet")
