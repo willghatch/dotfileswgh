@@ -1,3 +1,4 @@
+(add-to-list 'auto-mode-alist '("\\.zsh\\'" . shell-script-mode))
 
 (add-hook 'Buffer-menu-mode-hook
           (lambda ()
