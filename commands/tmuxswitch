@@ -1,8 +1,0 @@
-#!/bin/bash
-
-if [ $# = 0 ]
-then
-    tmux switch-client -l
-else
-    tmux switch-client -t $1
-fi

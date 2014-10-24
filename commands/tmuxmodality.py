@@ -222,7 +222,7 @@ def mode_default():
     #binder.bind( "C-b", [ "send-prefix" ], use_prefix = True )
     #binder.bind( "C-o", [ "rotate-window" ], use_prefix = True )
     #binder.bind( "C-z", [ "suspend-client" ], use_prefix = True )
-    binder.bind( "Space", [ "next-layout" ], use_prefix = True )
+    #binder.bind( "Space", [ "next-layout" ], use_prefix = True )
     #binder.bind( "!", [ "break-pane" ], use_prefix = True )
     #binder.bind( "'", [ "split-window" ], use_prefix = True )
     #binder.bind( "#", [ "list-buffers" ], use_prefix = True )
