@@ -6,13 +6,13 @@ SAVEHIST=1000
 
 autoload -U colors && colors
 
-setopt PROMPT_SUBST
 
 umask 077
 
 # no c-s/c-q output freezing
 setopt noflowcontrol
-
+# allow expansion in prompts
+setopt prompt_subst
 # this is default, but set for share_history
 setopt append_history
 # import new commands from the history file also in other zsh-session
