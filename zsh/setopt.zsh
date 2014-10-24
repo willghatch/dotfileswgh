@@ -1,3 +1,5 @@
+mkdir -p ~/.dotlocal/zsh/
+HISTFILE=~/.dotlocal/zsh/history
 HISTFILE=~/.zsh.history
 HISTSIZE=1000
 SAVEHIST=1000
@@ -65,3 +67,23 @@ REPORTTIME=5
 #watch=(notme root)
 # automatically remove duplicates from these arrays
 typeset -U path cdpath fpath manpath
+
+
+
+
+# make help (m-h) be more helpful
+unalias run-help
+autoload run-help
+
+# make hooking possible
+autoload -U add-zsh-hook
+#add-zsh-hook [-dD] <hook> <function>
+#hook is one of chpwd, periodic, precmd, preexec, zshaddhistory, zshexit, or zsh_directory_name
+
+# recent directory list
+# use with cdr command
+autoload -Uz chpwd_recent_dirs cdr
+add-zsh-hook chpwd chpwd_recent_dirs
+mkdir -p ~/.dotlocal/zsh/recent-dirs
+zstyle ':chpwd:*' recent-dirs-file ~/.dotlocal/zsh/recent-dirs/rd-${TTY##*/} +
+
