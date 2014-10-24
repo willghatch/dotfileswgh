@@ -8,10 +8,8 @@
   (evil-insert-state 1)
   (yas-insert-snippet))
 
-(global-set-key (kbd "C-s") nil) ; unset this key so yas doesn't fall back to search annoyingly
 (define-key yas-minor-mode-map (kbd "<tab>") nil)
 (define-key yas-minor-mode-map (kbd "TAB") nil)
-(define-key yas-minor-mode-map (kbd "C-s") 'yas-expand)
 
 (setcdr yas-keymap nil) ; keymap when expansion is active
 (define-key yas-keymap (kbd "C-d") 'yas-skip-and-clear-or-delete-char)

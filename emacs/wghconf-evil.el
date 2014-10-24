@@ -718,9 +718,24 @@
 
 ;; input mode
 (define-key evil-insert-state-map (kbd "DEL") 'delete-backward-char) ; remap away from the evil-version backspace
-(define-key evil-insert-state-map "\M-n" 'evil-complete-next)
-(define-key evil-insert-state-map "\M-p" 'evil-complete-previous)
 (define-key evil-insert-state-map "\C-v" #'quoted-insert) ; more vim-like
+
+(define-prefix-command 'completer-map)
+(define-key evil-insert-state-map "\M-h" 'completer-map)
+(define-key completer-map "h" 'hippie-expand)
+(define-key completer-map "\M-h" 'hippie-expand)
+(define-key completer-map "n" 'evil-complete-next)
+(define-key completer-map "\M-n" 'evil-complete-next)
+(define-key completer-map "p" 'evil-complete-previous)
+(define-key completer-map "\M-p" 'evil-complete-previous)
+(define-key completer-map "f" 'he-expand-file-name)
+(define-key completer-map "l" 'he-expand-lisp-symbol)
+(define-key completer-map "s" 'yas-expand)
+(define-key completer-map "\M-s" 'yas-expand)
+(define-key evil-insert-state-map (kbd "TAB") 'company-complete-common-wgh)
+;; put indentation on something...
+(define-key completer-map (kbd "TAB") 'indent-for-tab-command)
+(define-key evil-insert-state-map (kbd "<backtab>") 'indent-for-tab-command)
 
 (global-set-key (kbd "C-\\") 'evil-execute-in-normal-state)
 

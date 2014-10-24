@@ -130,6 +130,7 @@ it calls the next function one more time."
 (load-library "wghconf-org-mode")
 (load-library "wghconf-fci-mode")
 (load-library "wghconf-mode-hooks")
+(load-library "wghconf-hippie-expand")
 (winner-mode 1)
 (require 'smex)
 (require 'yafolding)

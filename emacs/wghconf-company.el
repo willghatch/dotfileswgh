@@ -26,6 +26,9 @@
 (define-key company-active-map (kbd "C-p") 'company-select-previous)
 (define-key company-active-map (kbd "C-h") nil)
 (define-key company-active-map (kbd "C-d") 'company-show-doc-buffer)
+(define-key company-active-map (kbd "RET") nil)
+(define-key company-active-map (kbd "<return>") nil)
+(key-chord-define company-active-map (kbd "gc") 'company-complete-selection)
 
 (setq company-frontends '(company-preview-frontend company-pseudo-tooltip-wgh-frontend company-echo-metadata-frontend))
 
