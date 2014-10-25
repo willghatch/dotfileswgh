@@ -1,8 +1,4 @@
-
-autoload -U colors && colors
-
-
-umask 077
+# options that should be mostly pretty agreeable
 
 # no c-s/c-q output freezing
 setopt noflowcontrol
@@ -53,18 +49,10 @@ setopt noshwordsplit
 # don't error out when unset parameters are used
 setopt unset
 
-
-# mailchecks
-#MAILCHECK=30
-# report about cpu-/system-/user-time of command if running longer than this
-REPORTTIME=5
 # watch for everyone but me and root
 #watch=(notme root)
 # automatically remove duplicates from these arrays
 typeset -U path cdpath fpath manpath
-
-
-
 
 # make help (m-h) be more helpful
 unalias run-help

@@ -12,9 +12,8 @@ zstyle :compinstall filename $COMPINSTALL_FILE
 function __zs-std(){
     # match on the left
     # smart-case...ish... and match numbers without using L3-shift (my layout has numbers on AltGr+these letters), and -/_
-    zstyle ':completion:*'  matcher-list 'm:{a-z}={A-Z} m:{b,m,w,v,h,t,n,g,c,r,-}={0,1,2,3,4,5,6,7,8,9,_}'
+    zstyle ':completion:*'  matcher-list 'm:{a-z-}={A-Z_} '
     zstyle ':completion:::::' completer _complete _approximate
-
 
     # format all messages not formatted in bold prefixed with ----
     zstyle ':completion:*' format '%B---- %d%b'
@@ -52,7 +51,7 @@ __zs-std # call this one immediately as it's the default
 
 function __zs-matcher-anywhere(){
     # match anywhere in the potential completion
-    zstyle ':completion:*'  matcher-list 'm:{a-z}={A-Z} m:{b,m,w,v,h,t,n,g,c,r,-}={0,1,2,3,4,5,6,7,8,9,_} l:|=* r:|=*'
+    zstyle ':completion:*'  matcher-list 'm:{a-z-}={A-Z_} m:{b,m,w,v,h,t,n,g,c,r}={0,1,2,3,4,5,6,7,8,9} l:|=* r:|=*'
 }
 function __zs-completers-gnu(){
     zstyle ':completion:::::' completer _complete _gnu_generic

@@ -12,6 +12,8 @@ export MANPATH=/usr/share/man:/usr/local/man:/usr/local/share/man:/usr/X11R6/man
 ## Use a default width of 80 for manpages for more convenient reading
 export MANWIDTH=${MANWIDTH:-80}
 
+umask 077 # privacy as a default
+
 ################################################  ALIASES ############################### 
 
 

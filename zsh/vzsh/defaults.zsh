@@ -1,6 +1,10 @@
 # Default settings for necessary vzsh and zsh variables and some needed functions
 # user-defined variables are all left alone
 
+
+if [[ -z "$VZSH_REMAP_KEYS_P" ]]; then
+    VZSH_REMAP_KEYS_P='true'
+fi
 if [[ -z "$VZSH_CACHE" ]]; then
     VZSH_CACHE=$HOME/.cache/vzsh
 fi
@@ -27,6 +31,12 @@ if [[ -z "$VZSH_RECENT_DIRS_DIR" ]]; then
 fi
 if [[ ! -d $VZSH_RECENT_DIRS_DIR ]]; then
     mkdir -p $VZSH_RECENT_DIRS_DIR
+fi
+# mailchecks
+#MAILCHECK=30
+# report about cpu-/system-/user-time of command if running longer than this
+if [[ -z "$REPORTTIME" ]]; then
+    REPORTTIME=5
 fi
 
 if [[ -z "$ZLE_LINE_INIT_FUNCS" ]]; then
@@ -57,4 +67,6 @@ run-help-help(){
     help-help
 }
 zle -N run-help-help
+
+autoload -U colors && colors
 

@@ -1,3 +1,5 @@
+# provides useful key mapping functions, and a better keymap
+
 if [[ -z "$HELP_KEY" ]]; then
     HELP_KEY=''
 fi
@@ -48,60 +50,62 @@ run-help-keys(){
 }
 zle -N run-help-keys
 
-# nuke viins map, replacing it with the contents of the emacs map
-bindkey -A emacs viins
 
-# escapes for command mode
-bindkey -M viins 'jk' vi-cmd-mode
-bindkey -M viins 'kj' vi-cmd-mode
+if [ "$VZSH_REMAP_KEYS_P" = "true" ]; then
+    # nuke viins map, replacing it with the contents of the emacs map
+    bindkey -A emacs viins
 
-# use viins, which is now emacs-y, but has an out to vicmd mode
-bindkey -v
+    # escapes for command mode
+    bindkey -M viins 'jk' vi-cmd-mode
+    bindkey -M viins 'kj' vi-cmd-mode
 
-# include history substring search commands
-bindkey -M emacs '^P' history-substring-search-up
-bindkey -M emacs '^N' history-substring-search-down
+    # use viins, which is now emacs-y, but has an out to vicmd mode
+    bindkey -v
 
-# completion
-define-prefix-command completionkey
-bindkey-to-prefix-map completionkey g complete-gnu
-bindkey-to-prefix-map completionkey e complete-expand
-bindkey-to-prefix-map completionkey n complete-history
-bindkey-to-prefix-map completionkey N complete-history-anywhere
-bindkey-to-prefix-map completionkey m complete-maximal
-bindkey-to-prefix-map completionkey M complete-maximal-anywhere
-bindkey-to-prefix-map completionkey s snippet-expand-key
-bindkey-to-prefix-map completionkey t complete-tmux
-bindkey-to-prefix-map completionkey p insert-last-typed-word
-bindkey-to-prefix-map completionkey d insert-datestamp
-bindkey -r emacs '^[h'
-bindkey -M emacs '^[h' completionkey
-# ^i is tab
-bindkey -M emacs '^i' complete-std
-# ^[[Z is backtab...
-bindkey -M emacs '^[[Z' complete-std-anywhere
+    # include history substring search commands
+    bindkey -M emacs '^P' history-substring-search-up
+    bindkey -M emacs '^N' history-substring-search-down
 
-bindkey -M vicmd 'md' inPlaceMkDirs
-bindkey -M vicmd 'g2' jump_after_first_word
+    # completion
+    define-prefix-command completionkey
+    bindkey-to-prefix-map completionkey g complete-gnu
+    bindkey-to-prefix-map completionkey e complete-expand
+    bindkey-to-prefix-map completionkey n complete-history
+    bindkey-to-prefix-map completionkey N complete-history-anywhere
+    bindkey-to-prefix-map completionkey m complete-maximal
+    bindkey-to-prefix-map completionkey M complete-maximal-anywhere
+    bindkey-to-prefix-map completionkey s snippet-expand-key
+    bindkey-to-prefix-map completionkey t complete-tmux
+    bindkey-to-prefix-map completionkey p insert-last-typed-word
+    bindkey-to-prefix-map completionkey d insert-datestamp
+    bindkey -r emacs '^[h'
+    bindkey -M emacs '^[h' completionkey
+    # ^i is tab
+    bindkey -M emacs '^i' complete-std
+    # ^[[Z is backtab...
+    bindkey -M emacs '^[[Z' complete-std-anywhere
 
-bindToMaps '^[c' execute-named-cmd $(bindkey -l)
+    bindkey -M vicmd 'md' inPlaceMkDirs
+    bindkey -M vicmd 'g2' jump_after_first_word
 
-# Help
-bindkey -r emacs '^h'
-for m in $(bindkey -l)
-do
-    bindkey -r $m '^h' 2>/dev/null
-done
-define-prefix-command helpkey
-bindkey-to-prefix-map helpkey g run-help-glob
-bindkey-to-prefix-map helpkey b run-help-keys
-bindkey-to-prefix-map helpkey s run-help-list-snippets
-bindkey-to-prefix-map helpkey c run-help # this pulls up man pages
-bindkey-to-prefix-map helpkey h run-help-help
-bindToMaps "$HELP_KEY" helpkey $(bindkey -l)
+    bindToMaps '^[c' execute-named-cmd $(bindkey -l)
 
-bindkey -M emacs . rationalise-dot
-# without this, typing a . aborts incremental history search
-bindkey -M isearch . self-insert
+    # Help
+    bindkey -r emacs '^h'
+    for m in $(bindkey -l)
+    do
+        bindkey -r $m '^h' 2>/dev/null
+    done
+    define-prefix-command helpkey
+    bindkey-to-prefix-map helpkey g run-help-glob
+    bindkey-to-prefix-map helpkey b run-help-keys
+    bindkey-to-prefix-map helpkey s run-help-list-snippets
+    bindkey-to-prefix-map helpkey c run-help # this pulls up man pages
+    bindkey-to-prefix-map helpkey h run-help-help
+    bindToMaps "$HELP_KEY" helpkey $(bindkey -l)
 
+    bindkey -M emacs . rationalise-dot
+    # without this, typing a . aborts incremental history search
+    bindkey -M isearch . self-insert
 
+fi

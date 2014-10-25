@@ -1,3 +1,5 @@
+# Prompt setup.  TODO - look at zsh's built in prompt theme framework
+
 PS1_time='%F{cyan}%T'
 HOSTCOLOR="%F{yellow}"
 PS1_user_host='%F{green}[%B%n%b${HOSTCOLOR}@%B%m%b%F{green}]'
@@ -38,7 +40,14 @@ update-prompt() {
     else
         VIMODE="%K{white}%F{black}$VIMODE%k"
     fi
-    PS1="${PS1_time} ${PS1_user_host} ${PS1_git_branch} ${PS1_dir} ${PS1_cmd_stat}${PS1_endl}${PS1_vi_state}${PS1_hist}${PS1_end}"
+
+    # if the user has set up something custom, use it
+    if [[ -n "$VZSH_PS1_UPDATE_FUNC" ]]; then
+        $VZSH_PS1_UPDATE_FUNC
+    else
+        PS1="${PS1_time} ${PS1_user_host} ${PS1_git_branch} ${PS1_dir} ${PS1_cmd_stat}${PS1_endl}${PS1_vi_state}${PS1_hist}${PS1_end}"
+    fi
+
     zle reset-prompt
 }
 

@@ -9,7 +9,6 @@
     # learn about it
 #### TODO -- look at help_zle_parse_keybindings() -- it may be emacs-like key help
 #### TODO -- look at how the 'key' assoc. array is used (binds eg. home/delete/arrows to terminfo sequences)
-#### TODO -- look at grml H-Glob function
 #### TODO -- look at grml ssl-cert junk
 #### TODO -- look at grml simple-extract
 #### TODO -- go through all the commented out stuff and give it more consideration -- I stuck it in
