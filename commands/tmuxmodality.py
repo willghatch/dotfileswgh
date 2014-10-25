@@ -333,6 +333,7 @@ def mode_default():
     binder.bind( "y", [ "copy-mode" ], use_prefix = True )
     #bind-key y copy-mode
 
+    binder.bind( "C-h", [ "split-window", "-v", "sh -i -t", " \\; ", "send-keys", "tmux list-keys \| less\\n" ], use_prefix = True )
 
     return binder
 
