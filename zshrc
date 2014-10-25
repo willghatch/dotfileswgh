@@ -2,7 +2,7 @@
 
 source $HOME/dotfileswgh/bazsh/common.sh
 
-VZSH_HOME=$HOME/dotfileswgh/zsh/vzsh
+VZSH_HOME=$HOME/dotfileswgh/external/zsh/vzsh
 completer_default_setup(){
     zstyle ':completion:*'  matcher-list 'm:{a-z}={A-Z} m:{b,m,w,v,h,t,n,g,c,r,-}={0,1,2,3,4,5,6,7,8,9,_}'
 }

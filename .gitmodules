@@ -16,3 +16,6 @@
 [submodule "external/zsh/wd"]
 	path = external/zsh/wd
 	url = https://github.com/mfaerevaag/wd.git
+[submodule "external/zsh/vzsh"]
+	path = external/zsh/vzsh
+	url = https://github.com/willghatch/vzsh.git
