@@ -49,8 +49,12 @@ alias bbb="env GTK2_RC_FILES=$DOTFILESDIR/gtkrc-2.0-light dwb"
 alias bbbd="env GTK2_RC_FILES=$DOTFILESDIR/gtkrc-2.0-dark dwb"
 
 alias gka="gitk --all"
+alias gits="git status"
 alias gru="git remote update"
 alias greb="git rebase"
+grebi(){
+    git rebase -i HEAD~${1}
+}
 alias gch="git checkout"
 alias gchb="git checkout --branch"
 alias grurp="git remote update && git rebase && git push"
