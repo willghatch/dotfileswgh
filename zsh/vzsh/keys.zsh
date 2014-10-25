@@ -1,12 +1,6 @@
-HELP_KEY=''
-
-help-help(){
-    echo "TODO - put help here" | $PAGER
-}
-run-help-help(){
-    help-help
-}
-zle -N run-help-help
+if [[ -z "$HELP_KEY" ]]; then
+    HELP_KEY=''
+fi
 
 bindToMaps(){
     # bindToMaps key cmd map1 map2 ...
@@ -44,6 +38,15 @@ define-prefix-command(){
     bindkey-to-prefix-map '$mapname' $HELP_KEY 'run-help-keys-${mapname}'
     "
 }
+
+help-keys() {
+    local keys="$(bindkey -LM $CUR_KEYMAP)"
+    echo "keys for $CUR_KEYMAP:\n$keys" | $PAGER
+}
+run-help-keys(){
+    help-keys
+}
+zle -N run-help-keys
 
 # nuke viins map, replacing it with the contents of the emacs map
 bindkey -A emacs viins

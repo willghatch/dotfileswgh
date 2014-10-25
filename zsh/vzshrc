@@ -1,0 +1,22 @@
+#!/usr/bin/env zsh
+
+# Configuration example (and default) for vzsh
+
+#VZSH_HOME=$HOME/.config/vzsh
+VZSH_HOME=$HOME/dotfileswgh/zsh/vzsh
+
+###### COMPLETION
+# COMPLETER_DEFAULT_SETUP # command to run before each completer
+# mk-completer
+
+# TODO - list all necessary options and functions here
+
+
+
+source $VZSH_HOME/defaults.zsh
+source $VZSH_HOME/setopt.zsh
+source $VZSH_HOME/snippets.zsh
+source $VZSH_HOME/completion.zsh
+source $VZSH_HOME/grml-funcs.zsh
+source $VZSH_HOME/prompt.zsh
+source $VZSH_HOME/keys.zsh

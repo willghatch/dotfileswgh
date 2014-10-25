@@ -1,8 +1,3 @@
-mkdir -p ~/.dotlocal/zsh/
-HISTFILE=~/.dotlocal/zsh/history
-HISTFILE=~/.zsh.history
-HISTSIZE=1000
-SAVEHIST=1000
 
 autoload -U colors && colors
 
@@ -87,6 +82,5 @@ autoload -U add-zsh-hook
 # use with cdr command
 autoload -Uz chpwd_recent_dirs cdr
 add-zsh-hook chpwd chpwd_recent_dirs
-mkdir -p ~/.dotlocal/zsh/recent-dirs
-zstyle ':chpwd:*' recent-dirs-file ~/.dotlocal/zsh/recent-dirs/rd-${TTY##*/} +
+zstyle ':chpwd:*' recent-dirs-file $VZSH_RECENT_DIRS_DIR/rd-${TTY##*/} +
 

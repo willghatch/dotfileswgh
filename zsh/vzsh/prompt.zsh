@@ -7,8 +7,6 @@ PS1_hist='%F{yellow}%h'
 PS1_end='%F{default}%# '
 PS1_endl='
 '
-PS1_batt_state="\$(batt_state.bash)"
-CUR_KEYMAP="main"
 PS1_vi_state="\$VIMODE"
 getGitBranchForPrompt() {
     branch=$(git branch 2>/dev/null | fgrep '*')
@@ -24,7 +22,7 @@ getGitBranchForPrompt() {
 PS1_git_branch="\$(getGitBranchForPrompt)"
 
 update-prompt() {
-    local VIMODE=$KEYMAP
+    local VIMODE=$CUR_KEYMAP
     if [[ "$VIMODE" = "viins" || "$VIMODE" = "emacs" || "$VIMODE" = "main" ]]
     then
         VIMODE="%K{magenta}%F{black}I%k"
@@ -44,12 +42,6 @@ update-prompt() {
     zle reset-prompt
 }
 
-zle-line-init(){
-    update-prompt
-}
-zle-keymap-select(){
-    CUR_KEYMAP=$KEYMAP
-    update-prompt
-}
-zle -N zle-keymap-select
-zle -N zle-line-init
+ZLE_LINE_INIT_FUNCS=( $ZLE_LINE_INIT_FUNCS update-prompt )
+ZLE_KEYMAP_SELECT_FUNCS=( $ZLE_KEYMAP_SELECT_FUNCS update-prompt )
+

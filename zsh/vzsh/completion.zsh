@@ -1,6 +1,6 @@
 #!/usr/bin/env zsh
 
-zstyle :compinstall filename '$HOME/.zshrc'
+zstyle :compinstall filename $COMPINSTALL_FILE
 
 ############### NOTE here -
 # I don't think I really understand the right way to configure zsh completers, but I'm sick of trying
@@ -43,9 +43,9 @@ function __zs-std(){
     # add partial completion highlighting
     zstyle -e ':completion:*:default' list-colors 'reply=("${PREFIX:+=(#bi)($PREFIX:t)(?)*==36=01;31}:${(s.:.)LS_COLORS}")'
 
-    if [[ -n "$COMPLETER_DEFAULT_FUNC" ]]
+    if [[ -n "$COMPLETER_DEFAULT_SETUP" ]]
     then
-        $COMPLETER_DEFAULT_FUNC
+        $COMPLETER_DEFAULT_SETUP
     fi
 }
 __zs-std # call this one immediately as it's the default
