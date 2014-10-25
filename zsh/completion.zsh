@@ -58,11 +58,11 @@ function __zs-completers-expand(){
 function __zs-completers-history(){
     zstyle ':completion:::::' completer _history
 }
-function __zs-completers-screen(){
-    zstyle ':completion:::::' completer _complete_screen_display
+function __zs-completers-tmux(){
+    zstyle ':completion:::::' completer _complete_tmux_display
 }
 function __zs-completers-maximal(){
-    zstyle ':completion:::::' completer _oldlist _expand _complete _files _ignored _history _complete_screen_display _gnu_generic _prefix _match _approximate
+    zstyle ':completion:::::' completer _oldlist _expand _complete _files _ignored _history _complete_tmux_display _gnu_generic _prefix _match _approximate
 }
 # _all_matches _approximate _complete _correct _expand _expand_alias _extensions
 # _history _ignored _list _match _menu _oldlist _prefix _user_expand
@@ -112,12 +112,12 @@ function wgh-complete-history-anywhere(){
     __zs-std
 }
 zle -N wgh-complete-history-anywhere
-function wgh-complete-screen(){
-    __zs-completers-screen
+function wgh-complete-tmux(){
+    __zs-completers-tmux
     zle complete-word
     __zs-std
 }
-zle -N wgh-complete-screen
+zle -N wgh-complete-tmux
 function wgh-complete-maximal(){
     __zs-completers-maximal
     zle complete-word

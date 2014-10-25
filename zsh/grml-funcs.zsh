@@ -1,6 +1,7 @@
 #!/usr/bin/env zsh
 
 # a bunch of stuff scraped from grml zshrc, because I wanted to use some but not all of it
+# Licence: GPL V2
 
 #### TODO --- check out grml's accept-line() function and related stuff
 #### TODO --- check out grml's interactive comments and how they work...
@@ -29,9 +30,6 @@ else
 fi
 }
 zle -N rationalise-dot
-bindkey . rationalise-dot
-# without this, typing a . aborts incremental history search
-bindkey -M isearch . self-insert
 
 ## get top 10 shell commands:
 alias top10commands='print -l ${(o)history%% *} | uniq -c | sort -nr | head -n 10'
@@ -371,7 +369,7 @@ insert-last-typed-word() { zle insert-last-word -- 0 -1 }
 zle -N insert-last-typed-word
 
 
-_complete_screen_display() {
+_complete_tmux_display() {
     [[ "$TERM" != "screen" && -z "$TMUX" ]] && return 1
 
     local TMPFILE=$(mktemp)

@@ -8,7 +8,7 @@ source $DOTFILESDIR/zsh/prompt.zsh
 wd() {
     source $DOTFILESDIR/external/zsh/wd/wd.sh
 }
-source $DOTFILESDIR/zsh/abbreviations.zsh
+source $DOTFILESDIR/zsh/snippets.zsh
 source $DOTFILESDIR/zsh/grml-funcs.zsh
 source $DOTFILESDIR/zsh/funcs.zsh
 

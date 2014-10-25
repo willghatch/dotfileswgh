@@ -55,12 +55,9 @@ bindkey -M viins 'kj' vi-cmd-mode
 # use viins, which is now emacs-y, but has an out to vicmd mode
 bindkey -v
 
-
 # include history substring search commands
 bindkey -M emacs '^P' history-substring-search-up
 bindkey -M emacs '^N' history-substring-search-down
-# TODO - figure out what to do with ^s ^q flow control nonsense...
-bindkey -M emacs '^s' magic-abbrev-expand
 
 # completion
 define-prefix-command completionkey
@@ -68,8 +65,8 @@ bindkey-to-prefix-map completionkey g wgh-complete-gnu
 bindkey-to-prefix-map completionkey e wgh-expand
 bindkey-to-prefix-map completionkey n wgh-complete-history
 bindkey-to-prefix-map completionkey N wgh-complete-history-anywhere
-bindkey-to-prefix-map completionkey s magic-abbrev-expand
-bindkey-to-prefix-map completionkey t wgh-complete-screen
+bindkey-to-prefix-map completionkey s snippet-expand
+bindkey-to-prefix-map completionkey t wgh-complete-tmux
 bindkey-to-prefix-map completionkey p insert-last-typed-word
 bindkey-to-prefix-map completionkey d insert-datestamp
 bindkey-to-prefix-map completionkey m wgh-complete-maximal
@@ -78,13 +75,13 @@ bindkey -r emacs '^[h'
 bindkey -M emacs '^[h' completionkey
 # ^i is tab
 bindkey -M emacs '^i' wgh-complete
-# ^[[Z should be backtab...
+# ^[[Z is backtab...
 bindkey -M emacs '^[[Z' wgh-complete-anywhere
 
 bindkey -M vicmd 'md' inPlaceMkDirs
 bindkey -M vicmd 'g2' jump_after_first_word
 
-bindkey -M emacs '^[c' execute-named-cmd
+bindToMaps '^[c' execute-named-cmd $(bindkey -l)
 
 # Help
 bindkey -r emacs '^h'
@@ -95,13 +92,13 @@ done
 define-prefix-command helpkey
 bindkey-to-prefix-map helpkey g run-help-glob
 bindkey-to-prefix-map helpkey b run-help-keys
-bindkey-to-prefix-map helpkey a run-help-show-abbrev
-bindkey-to-prefix-map helpkey c run-help
+bindkey-to-prefix-map helpkey s run-help-list-snippets
+bindkey-to-prefix-map helpkey c run-help # this pulls up man pages
 bindkey-to-prefix-map helpkey h run-help-help
 bindToMaps "$HELP_KEY" helpkey $(bindkey -l)
-#bindToMaps '^ha' run-help-show-abbrev $(bindkey -l)
-#bindToMaps '^hg' run-help-glob $(bindkey -l)
-#bindToMaps '^hb' run-help-keys $(bindkey -l)
 
+bindkey -M emacs . rationalise-dot
+# without this, typing a . aborts incremental history search
+bindkey -M isearch . self-insert
 
 
