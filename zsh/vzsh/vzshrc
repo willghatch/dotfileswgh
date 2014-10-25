@@ -2,8 +2,9 @@
 
 # Configuration example (and default) for vzsh
 
-#VZSH_HOME=$HOME/.config/vzsh
-VZSH_HOME=$HOME/dotfileswgh/zsh/vzsh
+if [[ -z "$VZSH_HOME" ]]; then
+    VZSH_HOME=$HOME/.config/vzsh
+fi
 
 
 

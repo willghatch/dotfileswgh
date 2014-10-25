@@ -2,12 +2,13 @@
 
 source $HOME/dotfileswgh/bazsh/common.sh
 
+VZSH_HOME=$HOME/dotfileswgh/zsh/vzsh
 completer_default_setup(){
     zstyle ':completion:*'  matcher-list 'm:{a-z}={A-Z} m:{b,m,w,v,h,t,n,g,c,r,-}={0,1,2,3,4,5,6,7,8,9,_}'
 }
 COMPLETER_DEFAULT_SETUP=completer_default_setup
 
-source $DOTFILESDIR/zsh/vzshrc
+source $VZSH_HOME/vzshrc
 fpath=($DOTFILESDIR/external/zsh/wd $fpath $HROOT/build/zsh-completions/src)
 wd() {
     source $DOTFILESDIR/external/zsh/wd/wd.sh

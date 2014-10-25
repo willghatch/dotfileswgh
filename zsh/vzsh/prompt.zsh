@@ -1,8 +1,8 @@
 # Prompt setup.  TODO - look at zsh's built in prompt theme framework
 
 PS1_time='%F{cyan}%T'
-HOSTCOLOR="%F{yellow}"
-PS1_user_host='%F{green}[%B%n%b${HOSTCOLOR}@%B%m%b%F{green}]'
+PS1_hostcolor="%F{yellow}"
+PS1_user_host='%F{green}[%B%n%b${PS1_hostcolor}@%B%m%b%F{green}]'
 PS1_dir='%F{blue}%B%~'
 PS1_cmd_stat='%b%F{cyan}<%(?,%F{green}%?,%F{red}%?)%F{cyan}>'
 PS1_hist='%F{yellow}%h'
