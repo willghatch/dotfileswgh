@@ -42,6 +42,11 @@ function __zs-std(){
 
     # add partial completion highlighting
     zstyle -e ':completion:*:default' list-colors 'reply=("${PREFIX:+=(#bi)($PREFIX:t)(?)*==36=01;31}:${(s.:.)LS_COLORS}")'
+
+    if [[ -n "$COMPLETER_DEFAULT_FUNC" ]]
+    then
+        $COMPLETER_DEFAULT_FUNC
+    fi
 }
 __zs-std # call this one immediately as it's the default
 

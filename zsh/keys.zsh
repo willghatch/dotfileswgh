@@ -74,9 +74,9 @@ bindkey-to-prefix-map completionkey d insert-datestamp
 bindkey -r emacs '^[h'
 bindkey -M emacs '^[h' completionkey
 # ^i is tab
-bindkey -M emacs '^i' wgh-complete
+bindkey -M emacs '^i' complete-std
 # ^[[Z is backtab...
-bindkey -M emacs '^[[Z' wgh-complete-anywhere
+bindkey -M emacs '^[[Z' complete-std-anywhere
 
 bindkey -M vicmd 'md' inPlaceMkDirs
 bindkey -M vicmd 'g2' jump_after_first_word
