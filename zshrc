@@ -5,7 +5,6 @@ source $DOTFILESDIR/zsh/setopt.zsh
 fpath=($DOTFILESDIR/external/zsh/wd $fpath $HROOT/build/zsh-completions/src)
 source $DOTFILESDIR/zsh/completion.zsh
 source $DOTFILESDIR/zsh/prompt.zsh
-source $DOTFILESDIR/zsh/keys-pre.zsh
 wd() {
     source $DOTFILESDIR/external/zsh/wd/wd.sh
 }
@@ -40,7 +39,7 @@ then
     source $tf
 fi
 
-source $DOTFILESDIR/zsh/keys-post.zsh
+source $DOTFILESDIR/zsh/keys.zsh
 
 tf=$DOTFILESLOCALDIR/bazsh
 if [ -f "$tf" ]
