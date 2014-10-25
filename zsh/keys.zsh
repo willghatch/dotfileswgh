@@ -61,16 +61,16 @@ bindkey -M emacs '^N' history-substring-search-down
 
 # completion
 define-prefix-command completionkey
-bindkey-to-prefix-map completionkey g wgh-complete-gnu
-bindkey-to-prefix-map completionkey e wgh-expand
-bindkey-to-prefix-map completionkey n wgh-complete-history
-bindkey-to-prefix-map completionkey N wgh-complete-history-anywhere
+bindkey-to-prefix-map completionkey g complete-gnu
+bindkey-to-prefix-map completionkey e complete-expand
+bindkey-to-prefix-map completionkey n complete-history
+bindkey-to-prefix-map completionkey N complete-history-anywhere
 bindkey-to-prefix-map completionkey s snippet-expand
-bindkey-to-prefix-map completionkey t wgh-complete-tmux
+bindkey-to-prefix-map completionkey t complete-tmux
 bindkey-to-prefix-map completionkey p insert-last-typed-word
 bindkey-to-prefix-map completionkey d insert-datestamp
-bindkey-to-prefix-map completionkey m wgh-complete-maximal
-bindkey-to-prefix-map completionkey M wgh-complete-maximal-anywhere
+bindkey-to-prefix-map completionkey m complete-maximal
+bindkey-to-prefix-map completionkey M complete-maximal-anywhere
 bindkey -r emacs '^[h'
 bindkey -M emacs '^[h' completionkey
 # ^i is tab

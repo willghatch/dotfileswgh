@@ -72,65 +72,27 @@ function __zs-completers-maximal(){
 # to figure out before... maybe I'll look into that more later.
 
 
+function mk-completer(){
+    # mk-completer <config-func> <new-func-name>
+    eval "
+        function $2(){
+            $1
+            zle complete-word
+            __zs-std
+        }
+    "
+    zle -N $2
+}
 
-function wgh-complete(){
-    __zs-std
-    zle complete-word
-}
-zle -N wgh-complete
-
-function wgh-complete-anywhere(){
-    __zs-matcher-anywhere
-    zle complete-word
-    __zs-std
-}
-zle -N wgh-complete-anywhere
-
-function wgh-complete-gnu(){
-    __zs-completers-gnu
-    zle complete-word
-    __zs-std
-}
-zle -N wgh-complete-gnu
-
-function wgh-expand(){
-    __zs-completers-expand
-    zle complete-word
-    __zs-std
-}
-zle -N wgh-expand
-function wgh-complete-history(){
-    __zs-completers-history
-    zle complete-word
-    __zs-std
-}
-zle -N wgh-complete-history
-function wgh-complete-history-anywhere(){
-    __zs-completers-history
-    __zs-matcher-anywhere
-    zle complete-word
-    __zs-std
-}
-zle -N wgh-complete-history-anywhere
-function wgh-complete-tmux(){
-    __zs-completers-tmux
-    zle complete-word
-    __zs-std
-}
-zle -N wgh-complete-tmux
-function wgh-complete-maximal(){
-    __zs-completers-maximal
-    zle complete-word
-    __zs-std
-}
-zle -N wgh-complete-maximal
-function wgh-complete-maximal-anywhere(){
-    __zs-completers-maximal
-    __zs-matcher-anywhere
-    zle complete-word
-    __zs-std
-}
-zle -N wgh-complete-maximal-anywhere
+mk-completer __zs-std complete-std
+mk-completer __zs-matcher-anywhere complete-std-anywhere
+mk-completer __zs-completers-gnu complete-gnu
+mk-completer __zs-completers-expand complete-expand
+mk-completer __zs-completers-history complete-history
+mk-completer __zs-completers-history-anywhere complete-history-anywhere
+mk-completer __zs-completers-tmux complete-tmux
+mk-completer __zs-completers-maximal complete-maximal
+mk-completer __zs-completers-maximal-anywhere complete-maximal-anywhere
 
 autoload -Uz compinit
 compinit
