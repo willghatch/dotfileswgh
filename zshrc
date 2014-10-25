@@ -84,7 +84,18 @@ bindToMaps '^[c' execute-named-cmd $(bindkey -l)
 bindkey -r viins '\e'
 bindkey -M viins 'jk' vi-cmd-mode
 bindkey -M viins 'kj' vi-cmd-mode
-
+define-prefix-command spacemap
+bindkey -M viins '^[ ' spacemap
+bindkey-to-prefix-map spacemap '' zaw
+bindkey-to-prefix-map spacemap "r" zaw-history
+bindkey-to-prefix-map spacemap "t" zaw-tmux
+bindkey-to-prefix-map spacemap "a" zaw-ack
+bindkey-to-prefix-map spacemap "f" zaw-git-files
+bindkey-to-prefix-map spacemap "s" zaw-git-status
+bindkey-to-prefix-map spacemap "o" zaw-open-file
+bindkey-to-prefix-map spacemap "p" zaw-process
+# enable smart-case, ^$ for begin/end, and ! to ignore the next word
+zstyle ':filter-select' extended-search yes
 
 tf=$DOTFILESLOCALDIR/bazsh
 if [ -f "$tf" ]
