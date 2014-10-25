@@ -48,3 +48,11 @@ magic-abbrev-expand() {
 
 zle -N magic-abbrev-expand
 
+help-show-abbrev(){
+    zle -M "$(print "Available abbreviations for expansion:"; print -a -C 2 ${(kv)abbreviations})"
+}
+run-help-show-abbrev(){
+    help-show-abbrev
+}
+zle -N run-help-show-abbrev
+

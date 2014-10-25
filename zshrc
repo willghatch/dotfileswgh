@@ -11,6 +11,7 @@ wd() {
 }
 source $DOTFILESDIR/zsh/abbreviations.zsh
 source $DOTFILESDIR/zsh/grml-funcs.zsh
+source $DOTFILESDIR/zsh/funcs.zsh
 
 tf=$DOTFILESDIR/external/zsh/opp.zsh/opp.zsh
 if [ -f "$tf" ]

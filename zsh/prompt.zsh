@@ -3,11 +3,12 @@ HOSTCOLOR="%F{yellow}"
 PS1_user_host='%F{green}[%B%n%b${HOSTCOLOR}@%B%m%b%F{green}]'
 PS1_dir='%F{blue}%B%~'
 PS1_cmd_stat='%b%F{cyan}<%(?,%F{green}%?,%F{red}%?)%F{cyan}>'
+PS1_hist='%F{yellow}%h'
 PS1_end='%F{default}%# '
 PS1_endl='
 '
 PS1_batt_state="\$(batt_state.bash)"
-VIMODE="I"
+CUR_KEYMAP="main"
 PS1_vi_state="\$VIMODE"
 getGitBranchForPrompt() {
     branch=$(git branch 2>/dev/null | fgrep '*')
@@ -22,32 +23,33 @@ getGitBranchForPrompt() {
 }
 PS1_git_branch="\$(getGitBranchForPrompt)"
 
-zle-line-init zle-keymap-select() {
-    VIMODE="${${KEYMAP/vicmd/N}/(main|viins)/I}"
-    if [ "$VIMODE" = "opp" ]
+update-prompt() {
+    local VIMODE=$KEYMAP
+    if [[ "$VIMODE" = "viins" || "$VIMODE" = "emacs" || "$VIMODE" = "main" ]]
     then
-        VIMODE="O"
-    elif [ "$VIMODE" = "vivis" ]
+        VIMODE="%K{magenta}%F{black}I%k"
+    elif [[ "$VIMODE" = "vicmd" ]]
     then
-        VIMODE="V"
-    fi
-    if [ "$VIMODE" = "N" ]
+        VIMODE="%K{blue}%F{black}O%k"
+    elif [[ "$VIMODE" = "opp" ]]
     then
-        VIMODE="%K{cyan}%F{black}$VIMODE%k"
-    elif [ "$VIMODE" = "I" ]
+        VIMODE="%K{yellow}%F{black}O%k"
+    elif [[ "$VIMODE" = "vivis" || "$VIMODE" = "vivli" ]]
     then
-        VIMODE="%K{magenta}%F{black}$VIMODE%k"
-    elif [ "$VIMODE" = "O" ]
-    then
-        VIMODE="%K{yellow}%F{black}$VIMODE%k"
-    elif [ "$VIMODE" = "V" ]
-    then
-        VIMODE="%K{green}%F{black}$VIMODE%k"
+        VIMODE="%K{green}%F{black}V%k"
     else
         VIMODE="%K{white}%F{black}$VIMODE%k"
     fi
-    PS1="${PS1_time} ${PS1_user_host} ${PS1_git_branch} ${PS1_dir} ${PS1_cmd_stat}${PS1_endl}${PS1_vi_state}${PS1_end}"
+    PS1="${PS1_time} ${PS1_user_host} ${PS1_git_branch} ${PS1_dir} ${PS1_cmd_stat}${PS1_endl}${PS1_vi_state}${PS1_hist}${PS1_end}"
     zle reset-prompt
+}
+
+zle-line-init(){
+    update-prompt
+}
+zle-keymap-select(){
+    CUR_KEYMAP=$KEYMAP
+    update-prompt
 }
 zle -N zle-keymap-select
 zle -N zle-line-init

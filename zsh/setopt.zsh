@@ -74,6 +74,9 @@ typeset -U path cdpath fpath manpath
 # make help (m-h) be more helpful
 unalias run-help
 autoload run-help
+autoload run-help-git
+autoload run-help-svn
+autoload run-help-svk
 
 # make hooking possible
 autoload -U add-zsh-hook
