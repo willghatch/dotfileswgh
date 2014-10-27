@@ -1,24 +1,9 @@
-[submodule "external/zsh/opp.zsh"]
-	path = external/zsh/opp.zsh
-	url = https://github.com/hchbaw/opp.zsh.git
-[submodule "external/zsh/zsh-syntax-highlighting"]
-	path = external/zsh/zsh-syntax-highlighting
-	url = https://github.com/zsh-users/zsh-syntax-highlighting.git
-[submodule "external/zsh/zsh-history-substring-search"]
-	path = external/zsh/zsh-history-substring-search
-	url = https://github.com/zsh-users/zsh-history-substring-search.git
 [submodule "external/emacs/tarao-evil-plugins"]
 	path = external/emacs/tarao-evil-plugins
 	url = https://github.com/tarao/evil-plugins.git
 [submodule "external/emacs/yasnippet"]
 	path = external/emacs/yasnippet
 	url = https://github.com/capitaomorte/yasnippet.git
-[submodule "external/zsh/wd"]
-	path = external/zsh/wd
-	url = https://github.com/mfaerevaag/wd.git
-[submodule "external/zsh/vzsh"]
-	path = external/zsh/vzsh
-	url = https://github.com/willghatch/vzsh.git
 [submodule "external/zsh/antigen"]
 	path = external/zsh/antigen
 	url = https://github.com/zsh-users/antigen.git
