@@ -296,47 +296,6 @@
 (define-key evil-motion-state-map
   (read-kbd-macro evil-toggle-key) 'evil-emacs-state)
 
-;; text objects
-;(define-key evil-outer-text-objects-map "w" 'evil-a-word)
-;(define-key evil-outer-text-objects-map "W" 'evil-a-WORD)
-;(define-key evil-outer-text-objects-map "s" 'evil-a-sentence)
-;(define-key evil-outer-text-objects-map "p" 'evil-a-paragraph)
-;(define-key evil-outer-text-objects-map "b" 'evil-a-paren)
-;(define-key evil-outer-text-objects-map "(" 'evil-a-paren)
-;(define-key evil-outer-text-objects-map ")" 'evil-a-paren)
-;(define-key evil-outer-text-objects-map "[" 'evil-a-bracket)
-;(define-key evil-outer-text-objects-map "]" 'evil-a-bracket)
-;(define-key evil-outer-text-objects-map "B" 'evil-a-curly)
-;(define-key evil-outer-text-objects-map "{" 'evil-a-curly)
-;(define-key evil-outer-text-objects-map "}" 'evil-a-curly)
-;(define-key evil-outer-text-objects-map "<" 'evil-an-angle)
-;(define-key evil-outer-text-objects-map ">" 'evil-an-angle)
-;(define-key evil-outer-text-objects-map "'" 'evil-a-single-quote)
-;(define-key evil-outer-text-objects-map "\"" 'evil-a-double-quote)
-;(define-key evil-outer-text-objects-map "`" 'evil-a-back-quote)
-;(define-key evil-outer-text-objects-map "t" 'evil-a-tag)
-;(define-key evil-outer-text-objects-map "o" 'evil-a-symbol)
-;(define-key evil-inner-text-objects-map "w" 'evil-inner-word)
-;(define-key evil-inner-text-objects-map "W" 'evil-inner-WORD)
-;(define-key evil-inner-text-objects-map "s" 'evil-inner-sentence)
-;(define-key evil-inner-text-objects-map "p" 'evil-inner-paragraph)
-;(define-key evil-inner-text-objects-map "b" 'evil-inner-paren)
-;(define-key evil-inner-text-objects-map "(" 'evil-inner-paren)
-;(define-key evil-inner-text-objects-map ")" 'evil-inner-paren)
-;(define-key evil-inner-text-objects-map "[" 'evil-inner-bracket)
-;(define-key evil-inner-text-objects-map "]" 'evil-inner-bracket)
-;(define-key evil-inner-text-objects-map "B" 'evil-inner-curly)
-;(define-key evil-inner-text-objects-map "{" 'evil-inner-curly)
-;(define-key evil-inner-text-objects-map "}" 'evil-inner-curly)
-;(define-key evil-inner-text-objects-map "<" 'evil-inner-angle)
-;(define-key evil-inner-text-objects-map ">" 'evil-inner-angle)
-;(define-key evil-inner-text-objects-map "'" 'evil-inner-single-quote)
-;(define-key evil-inner-text-objects-map "\"" 'evil-inner-double-quote)
-;(define-key evil-inner-text-objects-map "`" 'evil-inner-back-quote)
-;(define-key evil-inner-text-objects-map "t" 'evil-inner-tag)
-;(define-key evil-inner-text-objects-map "o" 'evil-inner-symbol)
-;(define-key evil-motion-state-map "gn" 'evil-next-match)
-;(define-key evil-motion-state-map "gN" 'evil-previous-match)
 ;
 ;(when evil-want-C-i-jump
 ;  (define-key evil-motion-state-map (kbd "C-i") 'evil-jump-forward))
@@ -344,26 +303,8 @@
 ;(when evil-want-C-u-scroll
 ;  (define-key evil-motion-state-map (kbd "C-u") 'evil-scroll-up))
 ;
-;;; Visual state
-;
-;(define-key evil-visual-state-map "A" 'evil-append)
-;(define-key evil-visual-state-map "I" 'evil-insert)
-;(define-key evil-visual-state-map "o" 'exchange-point-and-mark)
-;(define-key evil-visual-state-map "O" 'evil-visual-exchange-corners)
-;(define-key evil-visual-state-map "R" 'evil-change)
-;(define-key evil-visual-state-map "u" 'evil-downcase)
-;(define-key evil-visual-state-map "U" 'evil-upcase)
-;(define-key evil-visual-state-map "z=" 'ispell-word)
-;(define-key evil-visual-state-map "a" evil-outer-text-objects-map)
-;(define-key evil-visual-state-map "i" evil-inner-text-objects-map)
-;(define-key evil-visual-state-map [remap evil-repeat] 'undefined)
 (define-key evil-visual-state-map [escape] 'evil-exit-visual-state)
 
-;;; Operator-Pending state
-
-;(define-key evil-operator-state-map "a" evil-outer-text-objects-map)
-;(define-key evil-operator-state-map "i" evil-inner-text-objects-map)
-;; (define-key evil-operator-state-map [escape] 'keyboard-quit)
 
 ;;; Insert state
 
@@ -487,41 +428,6 @@
 ;;; search command line
 ;(define-key evil-ex-search-keymap "\d" #'evil-ex-delete-backward-char)
 ;
-;;; ex command line
-;(define-key evil-ex-completion-map "\d" #'evil-ex-delete-backward-char)
-;(define-key evil-ex-completion-map "\t" #'evil-ex-completion)
-;(define-key evil-ex-completion-map [tab] #'evil-ex-completion)
-;(define-key evil-ex-completion-map "\C-a" 'evil-ex-completion)
-;(define-key evil-ex-completion-map "\C-b" 'move-beginning-of-line)
-;(define-key evil-ex-completion-map "\C-c" 'abort-recursive-edit)
-;(define-key evil-ex-completion-map "\C-d" 'evil-ex-completion)
-;(define-key evil-ex-completion-map "\C-g" 'abort-recursive-edit)
-;(define-key evil-ex-completion-map "\C-k" 'evil-insert-digraph)
-;(define-key evil-ex-completion-map "\C-l" 'evil-ex-completion)
-;(define-key evil-ex-completion-map "\C-p" #'next-complete-history-element)
-;(define-key evil-ex-completion-map "\C-r" 'evil-paste-from-register)
-;(define-key evil-ex-completion-map "\C-n" #'next-complete-history-element)
-;(define-key evil-ex-completion-map "\C-u" 'evil-delete-whole-line)
-;(define-key evil-ex-completion-map "\C-v" #'quoted-insert)
-;(define-key evil-ex-completion-map "\C-w" 'backward-kill-word)
-;(define-key evil-ex-completion-map [escape] 'abort-recursive-edit)
-;(define-key evil-ex-completion-map [S-left] 'backward-word)
-;(define-key evil-ex-completion-map [S-right] 'forward-word)
-;(define-key evil-ex-completion-map [up] 'previous-complete-history-element)
-;(define-key evil-ex-completion-map [down] 'next-complete-history-element)
-;(define-key evil-ex-completion-map [prior] 'previous-history-element)
-;(define-key evil-ex-completion-map [next] 'next-history-element)
-;(define-key evil-ex-completion-map [return] 'exit-minibuffer)
-;(define-key evil-ex-completion-map (kbd "RET") 'exit-minibuffer)
-;
-;;; evil-read-key
-;(define-key evil-read-key-map (kbd "ESC") #'keyboard-quit)
-;(define-key evil-read-key-map (kbd "C-]") #'keyboard-quit)
-;(define-key evil-read-key-map (kbd "C-q") #'evil-read-quoted-char)
-;(define-key evil-read-key-map (kbd "C-v") #'evil-read-quoted-char)
-;(define-key evil-read-key-map (kbd "C-k") #'evil-read-digraph-char)
-;(define-key evil-read-key-map "\r" "\n")
-;
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; My normal config here...
 
@@ -556,6 +462,7 @@
       (call-interactively 'evil-window-decrease-height))))
 (define-key evil-window-map "f" 'delete-other-windows)
 (define-key evil-window-map "a" 'switch-to-buffer)
+(define-key evil-window-map "q" 'kill-buffer)
 ;; Space will be for layout concerns
 (define-key evil-window-map " f" 'delete-other-windows)
 (define-key evil-window-map " u" 'winner-undo)
@@ -639,15 +546,8 @@
 
 ; t map
 (define-key evil-motion-state-map "th" 'evil-window-map)
-;(define-key evil-motion-state-map "tr" 'evil-ace-jump-word-mode)
-;(define-key evil-motion-state-map "tc" 'evil-ace-jump-char-mode)
-;(define-key evil-motion-state-map "tg" 'evil-ace-jump-line-mode)
-;; These ones are ripe for removal, since I have both /? and ace-jump...
 (define-key evil-motion-state-map "tt" 'evil-find-char-to)
-(define-key evil-motion-state-map "tT" 'evil-find-char-to-backward)
 (define-key evil-motion-state-map "T" 'evil-find-char-to-backward)
-(define-key evil-motion-state-map "tb" 'switch-to-buffer)
-(define-key evil-motion-state-map "tq" 'kill-buffer)
 (define-key evil-motion-state-map "tp" 'projectile-command-map)
 ;; "ts" will stand for "toggle setting"
 (define-key evil-motion-state-map "tsp" 'smartparens-mode)
@@ -688,8 +588,6 @@
 ;; everything in motion state is pulled into normal state
 (define-key evil-motion-state-map "+" 'evil-repeat-find-char)
 (define-key evil-motion-state-map "~" 'evil-repeat-find-char-reverse)
-;;(define-key evil-motion-state-map " h" 'scroll-up-command) ; actually, pagedown
-;;(define-key evil-motion-state-map " t" 'scroll-down-command) ; actually, pagedown
 (define-key evil-motion-state-map " h" 'scroll-up)
 (define-key evil-motion-state-map " t" 'scroll-down)
 (define-key evil-motion-state-map " j" 'scroll-up)
@@ -730,7 +628,9 @@
 (define-key completer-map "p" 'evil-complete-previous)
 (define-key completer-map "\M-p" 'evil-complete-previous)
 (define-key completer-map "f" 'he-expand-file-name)
+(define-key completer-map "\M-f" 'he-expand-file-name)
 (define-key completer-map "l" 'he-expand-lisp-symbol)
+(define-key completer-map "\M-l" 'he-expand-lisp-symbol)
 (define-key completer-map "s" 'yas-expand)
 (define-key completer-map "\M-s" 'yas-expand)
 (define-key evil-insert-state-map (kbd "TAB") 'company-complete-common-wgh)
@@ -774,12 +674,6 @@
 
 (defun ish (cmd) (interactive (list (read-shell-command "$ ")))
   (insert-string (shell-command-to-string cmd)))
-
-
-;;;;; TODO -- learn more about buffers, windows, and file visiting.
-;;;;; I want to understand what will happen when I'm closing something
-;;;;  I might map ex commands k<something> for kill buffer, window...
-;;;;  the normal emacs way to kill a buffer is kill-buffer, but evil has ev--del--buf...
 
 
 ;; Mouse keys...
