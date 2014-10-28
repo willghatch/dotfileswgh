@@ -149,6 +149,8 @@ it calls the next function one more time."
 (if (fboundp 'smex)
     (global-set-key (kbd "M-x") 'smex))
 
+(global-auto-revert-mode t) ; auto-reload files when they change on disk
+
 (if (file-exists-p "~/.dotlocal/emacs") (load-file "~/.dotlocal/emacs") nil)
 
 
