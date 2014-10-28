@@ -27,8 +27,10 @@ source $HOME/dotfileswgh/bazsh/common.sh
 
 if [[ -d ~/vzsh ]]; then
     antigen bundle ~/vzsh --no-local-clone
+    antigen bundle ~/vzsh zaw-sources --no-local-clone
 else
     antigen bundle https://github.com/willghatch/vzsh.git
+    antigen bundle https://github.com/willghatch/vzsh.git zaw-sources
 fi
 
 #antigen theme vzsh
