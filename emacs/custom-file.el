@@ -16,6 +16,7 @@
  ;; If there is more than one, they won't work right.
  '(default ((t (:inherit nil :stipple nil :background "#050505" :foreground "#909090" :inverse-video nil :box nil :strike-through nil :overline nil :underline nil :slant normal :weight normal :height 99 :width normal :foundry "unknown" :family "DejaVu Sans Mono"))))
  '(bold-italic ((t (:foreground "#00ff5f" :slant italic :weight bold))))
+ '(col-highlight ((t (:background "#000035"))))
  '(custom-comment-tag ((t (:foreground "#0087ff"))))
  '(diff-added ((t (:background "#001500"))))
  '(diff-changed ((t (:background "#202000"))))
@@ -51,6 +52,7 @@
  '(helm-selection ((t (:foreground "#000000" :background "#50f0b0"))))
  '(helm-selection-line ((t (:foreground "#000000" :background "#90b090"))))
  '(highlight ((t (:background "#005f00" :foreground "#0000ff"))))
+ '(hl-line ((t (:background "#000035"))))
  '(ido-first-match ((t (:foreground "#fd0060"))))
  '(ido-subdir ((t (:foreground "#3050f0"))))
  '(isearch-fail ((t (:background "#cd0000"))))
