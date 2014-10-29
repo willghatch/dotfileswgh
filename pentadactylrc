@@ -87,11 +87,11 @@ set hintkeys='aoeuhtnsidpgcrmk'
 "set followhints=0
 "set hinttimeout=0
 
-
-source $DOTFILESDIR/pentadactyl.css
 highlight -append Hint font:2em; font-weight:bold; color: #55ffff; background-color: #102030; font-family: Courier, monospace;
 highlight -append Hint[active] font:2em; font-weight:bold; color: #000000; background-color: #55ffff; font-family: Courier, monospace;
 
 set runtimepath+="$DOTFILESDIR/external/pentadactyl/"
+
+source $DOTFILESDIR/pentadactylrc.usercss
 
 " vim: set ft=pentadactyl:
