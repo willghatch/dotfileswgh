@@ -1,10 +1,6 @@
 #!/usr/bin/zsh
 
 
-completer_default_setup(){
-    zstyle ':completion:*'  matcher-list 'm:{a-z}={A-Z} m:{b,m,w,v,h,t,n,g,c,r,-}={0,1,2,3,4,5,6,7,8,9,_}'
-}
-COMPLETER_DEFAULT_SETUP=completer_default_setup
 VZSH_REMAP_KEYS_P=true
 
 ZSH_HIGHLIGHT_HIGHLIGHTERS=(main brackets pattern cursor)
@@ -36,6 +32,13 @@ fi
 #antigen theme vzsh
 
 antigen apply
+
+VZSH_MATCHER_STR='m:{a-z-}={A-Z_} m:{b,m,w,v,h,t,n,g,c,r}={0,1,2,3,4,5,6,7,8,9}'
+VZSH_ANYWHERE_MATCHER_STR='m:{a-z-}={A-Z_} m:{b,m,w,v,h,t,n,g,c,r}={0,1,2,3,4,5,6,7,8,9} l:|=* r:|=*'
+zstyle ':completion:*'  matcher-list $VZSH_MATCHER_STR
+zstyle ':completion:vzsh-completion-std-anywhere:*'  matcher-list $VZSH_ANYWHERE_MATCHER_STR
+zstyle ':completion:vzsh-completion-history-anywhere:*'  matcher-list $VZSH_ANYWHERE_MATCHER_STR
+zstyle ':completion:vzsh-completion-maximal-anywhere:*'  matcher-list $VZSH_ANYWHERE_MATCHER_STR
 
 fpath=($fpath $HROOT/build/zsh-completions/src)
 
