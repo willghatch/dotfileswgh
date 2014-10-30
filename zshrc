@@ -9,7 +9,6 @@ source $HOME/dotfileswgh/external/zsh/antigen/antigen.zsh
 antigen use oh-my-zsh
 antigen bundles <<EOBUNDLES
     git
-    zsh-users/zaw
     zsh-users/zsh-history-substring-search
     https://github.com/hchbaw/opp.zsh.git
     # TODO - get opp's sub-pieces working (surround, between)
@@ -29,6 +28,7 @@ else
     #antigen bundle https://github.com/willghatch/vzsh.git zaw-sources
 fi
 
+antigen bundle zsh-users/zaw
 #antigen theme vzsh
 
 antigen apply
