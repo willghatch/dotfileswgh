@@ -600,6 +600,7 @@
 (define-key evil-motion-state-map "  /" 'helm-multi-swoop-all)
 (define-key evil-motion-state-map "   /" 'helm-multi-swoop)
 (define-key evil-motion-state-map " w" 'save-buffer)
+(define-key evil-motion-state-map " -" 'helm-M-x)
 (define-key evil-motion-state-map "J" 'evil-window-bottom)
 (define-key evil-motion-state-map "K" 'evil-window-top)
 (define-key evil-motion-state-map "{" 'backward-sexp)
@@ -618,6 +619,15 @@
 ;; input mode
 (define-key evil-insert-state-map (kbd "DEL") 'delete-backward-char) ; remap away from the evil-version backspace
 (define-key evil-insert-state-map "\C-v" #'quoted-insert) ; more vim-like
+
+;; helm map to match what I've got going in zsh with zaw...
+(define-prefix-command 'meta-space-map)
+(global-set-key (kbd "M-SPC") 'meta-space-map)
+(define-key meta-space-map " " 'helm-helm-commands)
+(define-key meta-space-map (kbd "RET") 'helm-helm-commands)
+(define-key meta-space-map "c" 'helm-M-x)
+(define-key meta-space-map "p" 'helm-browse-project)
+(define-key meta-space-map "g" 'helm-do-grep)
 
 (define-prefix-command 'completer-map)
 (define-key evil-insert-state-map "\M-h" 'completer-map)
