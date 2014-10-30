@@ -1,0 +1,4 @@
+
+source $DOTFILESDIR/usercss/firefox-about.css
+source $DOTFILESDIR/usercss/google-solarized.css
+source $DOTFILESDIR/usercss/wikipedia-dark.css
