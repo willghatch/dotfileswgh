@@ -6,9 +6,6 @@ group user
 map -count -modes=i jk <Esc>
 map -count -modes=i kj <Esc>
 
-map -count -modes=n -ex w tabnext
-map -count -modes=n -ex b tabprevious
-
 " this is somewhat heretical, but I don't want a to be for bookmarks...
 map -count -modes=n -builtin a i
 
@@ -51,7 +48,17 @@ map -modes=n -builtin sp :emenu File.Save Page As…
 map -builtin -modes=n t <Nop>
 map -builtin -modes=n tt t
 " tab switch
-map -builtin -modes=n tb b
+map -count -modes=n -ex w tabnext
+map -count -modes=n -ex b tabprevious
+" goto buffer (L2-style window) by name
+map -builtin -modes=n tha b
+map -count -modes=n -ex thj tabnext
+map -count -modes=n -ex thk tabprevious
+" <U0060> is backtick
+map -builtin -modes=n thb <C-S-U0060>
+map -builtin -modes=n thw <C-U0060>
+map -builtin -modes=n the :tgroup-switch<Space>
+
 map -builtin -modes=n tgs :tgroup-switch<Space>
 map -builtin -modes=n tgn :tgroup-new<Space>
 map -builtin -modes=n tgd :tgroup-delete<Space>
