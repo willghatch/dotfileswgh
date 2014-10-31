@@ -62,6 +62,10 @@ alias gch="git checkout"
 alias gchb="git checkout --branch"
 alias grurp="git remote update && git rebase && git push"
 
+alias hloc="locate --database $HOME/.cache/hloc.db"
+alias hupdb="updatedb --output $HOME/.cache/hloc.db --database-root $HOME --require-visibility no --add-prunepaths $HOME/.snapshot"
+export LOCATE_PATH=$HOME/.cache/hloc.db
+
 alias wdl="wd ls"
 
 alias tm="tmux"
