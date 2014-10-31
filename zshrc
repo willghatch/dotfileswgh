@@ -10,10 +10,10 @@ antigen use oh-my-zsh
 antigen bundles <<EOBUNDLES
     git
     zsh-users/zsh-history-substring-search
-    https://github.com/hchbaw/opp.zsh.git
+    hchbaw/opp.zsh.git
     # TODO - get opp's sub-pieces working (surround, between)
-    #https://github.com/hchbaw/auto-fu.zsh.git
-    https://github.com/alfredodeza/zsh-plugins.git vi #vi visual
+    #hchbaw/auto-fu.zsh.git
+    alfredodeza/zsh-plugins.git vi #vi visual
     wd
     zsh-users/zsh-syntax-highlighting
 EOBUNDLES
@@ -24,11 +24,12 @@ if [[ -d ~/vzsh ]]; then
     antigen bundle ~/vzsh --no-local-clone
     #antigen bundle ~/vzsh zaw-sources --no-local-clone
 else
-    antigen bundle https://github.com/willghatch/vzsh.git
-    #antigen bundle https://github.com/willghatch/vzsh.git zaw-sources
+    antigen bundle willghatch/vzsh.git
+    #antigen bundle willghatch/vzsh.git zaw-sources
 fi
 
 antigen bundle zsh-users/zaw
+antigen bundle willghatch/vzsh.git zaw-sources
 #antigen theme vzsh
 
 antigen apply
