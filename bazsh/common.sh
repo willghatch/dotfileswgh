@@ -43,6 +43,9 @@ alias cp="cp -a" #archive mode, to preserve timestamps
 alias ag="ag --color-match '1;36'"
 alias ags="ag --color-match '1;36' --smart-case"
 
+# parallel make
+export NUMCPUS=$(grep -c '^processor' /proc/cpuinfo)
+alias pmake="time nice make -j$NUMCPUS --load-average=$NUMCPUS"
 
 ####### Miscellaneous
 alias ffx="env GTK2_RC_FILES=$DOTFILESDIR/gtkrc-2.0-light firefox"
