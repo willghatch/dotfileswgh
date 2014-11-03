@@ -5,7 +5,7 @@
 export HROOT=$HOME/hroot
 export DOTFILESDIR=$HOME/dotfileswgh
 export DOTFILESLOCALDIR=$HOME/.dotlocal
-PATH=$HOME/bin:$HOME/lscripts:$HOME/vscripts:$HOME/wghsrv_scripts:$HOME/.cabal/bin:$HROOT/bin:$HROOT/usr/bin:$HROOT/usr/local/bin:$PATH:/usr/bin:/bin:/usr/local/bin:/sbin:/usr/sbin:/usr/local/sbin:$DOTFILESDIR/commands
+PATH=$HOME/bin:$HOME/lscripts:$HOME/vscripts:$HOME/wghsrv_scripts:$DOTFILESDIR/commands:$HOME/.cabal/bin:$HROOT/bin:$HROOT/usr/bin:$HROOT/usr/local/bin:$PATH:/usr/bin:/bin:/usr/local/bin:/sbin:/usr/sbin:/usr/local/sbin
 export MANPATH=/usr/share/man:/usr/local/man:/usr/local/share/man:/usr/X11R6/man:/opt/man:$HROOT/usr/share/man:$HROOT/share/man
 
 
