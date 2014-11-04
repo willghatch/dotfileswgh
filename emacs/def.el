@@ -40,7 +40,17 @@
 (global-linum-mode 1) ; add line numbers
 (require 'hlinum)
 (hlinum-activate)
-(setq linum-format "%4d") ; four digit number
+
+(add-hook 'linum-before-numbering-hook
+          (lambda ()
+            (setq-local linum-format-fmt
+                        (let ((w (max 2 (length (number-to-string
+                                          (count-lines (point-min) (point-max)))))))
+                          (concat "%" (number-to-string w) "d")))))
+(defun linum-format-func (line)
+   (propertize (format linum-format-fmt line) 'face 'linum))
+(setq linum-format 'linum-format-func)
+
 ;(add-hook 'find-file-hook (lambda () (linum-mode 1))) ; USE LINE NUMBERS ON EVERYTHING GOSH DARN IT!
 ;(column-number-mode) ;turn on column numbers in mode line
 (setq vc-follow-symlinks t) ; Don't prompt to follow symlinks of version-controlled files
