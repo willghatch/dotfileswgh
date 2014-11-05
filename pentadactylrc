@@ -50,6 +50,12 @@ map -builtin -modes=n tt t
 " tab switch
 map -count -modes=n -ex w tabnext
 map -count -modes=n -ex b tabprevious
+" make c kill tabs instead of d
+map -builtin -modes=n c d
+map -builtin -modes=n C D
+" c is normally a noop... so... do nothing now with d
+map -builtin -modes=n d c
+map -builtin -modes=n D C
 " goto buffer (L2-style window) by name
 map -builtin -modes=n tha b
 map -count -modes=n -ex thj tabnext
