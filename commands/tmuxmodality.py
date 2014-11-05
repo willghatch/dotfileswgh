@@ -310,6 +310,7 @@ def mode_default():
     binder.bind( "l", [ "resize-pane", "-R", "5" ], use_prefix = True ) # Needs repeat (-r)
     binder.bind( "H", [ "resize-pane", "-U", "5" ], use_prefix = True ) # Needs repeat (-r)
     binder.bind( "L", [ "resize-pane", "-D", "5" ], use_prefix = True ) # Needs repeat (-r)
+    binder.bind( "c", [ "kill-pane" ], use_prefix = True )
 
     binder.bind( "Space", [ "select-layout", "main-vertical" ], use_prefix = True )
     binder.bind( "u", [ "next-layout" ], use_prefix = True )
