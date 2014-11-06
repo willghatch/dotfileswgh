@@ -1,0 +1,50 @@
+#!/bin/bash
+
+# script to launch stuff from dwm, so I can keep a local config of which actual programs to launch without
+# changing my global config and tracking that...
+
+function scmd(){
+    if [ -z "$(eval echo \$$1)" ]; then
+        cmd=$1
+        shift
+        eval "$cmd=\"$@\""
+    fi
+}
+
+scmd terminal "konsole"
+scmd lockscreen "lockscreen.sh"
+scmd launcher "bashrun"
+scmd calendar "xterm-pager cal $(date +%Y)"
+scmd sysmonitor "xterm -e htop"
+scmd mixer "xterm -e alsamixer"
+scmd volup "amixer -q sset Master 5%+"
+scmd voldown "amixer -q sset Master 5%-"
+scmd volmute "amixer -q sset Master toggle"
+scmd volupS "amixer -q sset Master 5%+"
+scmd voldownS "amixer -q sset Master 5%-"
+scmd volmuteS "amixer -q sset Master toggle"
+scmd ledmon "ledmon"
+
+function xterm-pager(){
+    if [ -z "$1" ]; then
+        echo "usage: $0 <cmd>"
+    fi
+
+    file="/tmp/xterm-pager.tmp"
+    eval $@ > $file
+    xterm -e $PAGER $file
+    rm $file
+}
+
+if [ -f $DOTFILESLOCALDIR/dwmlaunchrc ]
+then
+    source $DOTFILESLOCALDIR/dwmlaunchrc
+fi
+
+
+if [ -z "$(eval 'echo \$$1')" ]; then
+    echo 1>&2 "$0 cammand not found: $1"
+fi
+
+exec $(eval "\$$1")
+
