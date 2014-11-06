@@ -42,9 +42,9 @@ function xterm-pager(){
     rm $file
 }
 
-if [ -f $DOTFILESLOCALDIR/dwmlaunchrc ]
+if [ -f $DOTFILESLOCALDIR/vlaunchrc ]
 then
-    source $DOTFILESLOCALDIR/dwmlaunchrc
+    source $DOTFILESLOCALDIR/vlaunchrc
 fi
 
 

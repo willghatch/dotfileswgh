@@ -104,9 +104,9 @@ static const Layout layouts[] = {
 
 /* commands */
 static const char *dmenucmd[] = { "dmenu_run", "-fn", font, "-nb", normbgcolor, "-nf", normfgcolor, "-sb", selbgcolor, "-sf", selfgcolor, NULL };
-static const char *termcmd[]  = { "dwmlaunch", "terminal", NULL };
-static const char *launchercmd[]  = { "dwmlaunch", "launcher", NULL };
-static const char *lockcmd[]  = { "dwmlaunch", "lockscreen", NULL };
+static const char *termcmd[]  = { "vlaunch", "terminal", NULL };
+static const char *launchercmd[]  = { "vlaunch", "launcher", NULL };
+static const char *lockcmd[]  = { "vlaunch", "lockscreen", NULL };
 
 static Key keys[] = {
   /////////// Maybe I should add or change to left handed movement.  Since I'm not doing anything with the left hand now, that might be good.
