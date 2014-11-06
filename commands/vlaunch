@@ -30,6 +30,8 @@ scmd volupS "amixer -q sset Master 5%+"
 scmd voldownS "amixer -q sset Master 5%-"
 scmd volmuteS "amixer -q sset Master toggle"
 scmd ledmon "ledmon"
+scmd tray "stalonetray -i 12 --window-type normal --window-strut none \
+           --background black --icon-gravity NE"
 
 function xterm-pager(){
     if [ -z "$1" ]; then
