@@ -12,14 +12,20 @@ function scmd(){
 }
 
 scmd terminal "konsole"
-scmd lockscreen "lockscreen.sh"
+scmd lockscreen "xscreensaver-command -lock"
 scmd launcher "bashrun"
 scmd calendar "xterm-pager cal $(date +%Y)"
 scmd sysmonitor "xterm -e htop"
 scmd mixer "xterm -e alsamixer"
-scmd volup "amixer -q sset Master 5%+"
-scmd voldown "amixer -q sset Master 5%-"
-scmd volmute "amixer -q sset Master toggle"
+if which pamixer >/dev/null 2>&1; then
+    scmd volup "pamixer --increase 5"
+    scmd voldown "pamixer --decrease 5"
+    scmd volmute "pamixer --toggle-mute"
+else
+    scmd volup "amixer -q sset Master 5%+"
+    scmd voldown "amixer -q sset Master 5%-"
+    scmd volmute "amixer -q sset Master toggle"
+fi
 scmd volupS "amixer -q sset Master 5%+"
 scmd voldownS "amixer -q sset Master 5%-"
 scmd volmuteS "amixer -q sset Master toggle"

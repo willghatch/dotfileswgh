@@ -13,14 +13,13 @@ import XMonad.Hooks.ManageDocks
 
 
 myKeys = \c -> mkKeymap c $
-    [ ("M2-<Return>", spawn "dwmlaunch terminal")
+    [ ("M2-<Return>", spawn "vlaunch terminal")
     -- just in case I have keyboard issues
-    , ("M4-<Return>", spawn "dwmlaunch terminal")
-    --, ("M2-<Return>", spawn $ terminal c)
-    , ("M2-r", spawn "dwmlaunch launcher")
+    , ("M4-<Return>", spawn "vlaunch terminal")
+    , ("M2-r", spawn "vlaunch launcher")
     -- Resize viewed windows to the correct size
     , ("M2-M1-r", refresh)
-    , ("M2-q", spawn "dwmlaunch lockscreen")
+    , ("M2-q", spawn "vlaunch lockscreen")
     , ("M2-c", kill)
     , ("M2-<Space>", sendMessage NextLayout)
     , ("M2-m", sendMessage ToggleStruts)
@@ -67,6 +66,15 @@ myKeys = \c -> mkKeymap c $
     , ("M2-M1-q", io (exitWith ExitSuccess))
     -- Restart xmonad
     , ("M2-C-q", spawn "xmonad --recompile; xmonad --restart")
+
+    -- sundry
+    , ("M2-. m", spawn "vlaunch volmute")
+    , ("M2-. u", spawn "vlaunch volup")
+    , ("M2-. d", spawn "vlaunch voldown")
+    , ("M2-. v", spawn "vlaunch mixer")
+    , ("M2-. s m", spawn "vlaunch volmuteS")
+    , ("M2-. s u", spawn "vlaunch volupS")
+    , ("M2-. s d", spawn "vlaunch voldownS")
     ]
 
 myManageHook = composeAll
