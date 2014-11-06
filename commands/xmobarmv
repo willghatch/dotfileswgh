@@ -1,0 +1,4 @@
+#!/bin/sh
+
+# xmobar switches to the next screen when it receives SIGUSR1
+killall xmobar -USR1
