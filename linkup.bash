@@ -17,6 +17,7 @@ dotfiles=(
     inputrc
     pentadactylrc
     Xresources
+    xmobarrc
 )
 
 function die() {
