@@ -32,10 +32,14 @@ scmd volmuteS "amixer -q sset Master toggle"
 scmd ledmon "ledmon"
 scmd tray "stalonetray -i 12 --window-type normal --window-strut none \
            --background black --icon-gravity NE"
+scmd xmonadViewConfig "xterm-pager cat $HOME/.xmonad/xmonad.hs"
 
 function xterm-pager(){
     if [ -z "$1" ]; then
         echo "usage: $0 <cmd>"
+    fi
+    if [ -z "$PAGER" ]; then
+        PAGER=less
     fi
 
     file="/tmp/xterm-pager.tmp"

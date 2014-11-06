@@ -75,6 +75,7 @@ myKeys = \c -> mkKeymap c $
     , ("M2-. s m", spawn "vlaunch volmuteS")
     , ("M2-. s u", spawn "vlaunch volupS")
     , ("M2-. s d", spawn "vlaunch voldownS")
+    , ("M2-C-h b", spawn "vlaunch xmonadViewConfig")
     ]
 
 myManageHook = composeAll
