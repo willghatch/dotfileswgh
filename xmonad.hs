@@ -8,9 +8,13 @@ import qualified Data.Map        as M
 import XMonad.Actions.CycleWS
 import XMonad.Hooks.DynamicLog
 import XMonad.Hooks.ManageDocks
+import XMonad.Actions.DynamicWorkspaces
+import XMonad.Prompt
+import XMonad.Actions.DynamicWorkspaceGroups
 
 -- Hackage dependencies: xmonad, xmonad-contrib, xmobar
 
+carryToNamedWs = \xpconf -> withWorkspace xpconf (\ws -> windows $ W.greedyView ws . W.shift ws)
 
 myKeys = \c -> mkKeymap c $
     [ ("M2-<Return>", spawn "vlaunch terminal")
@@ -54,6 +58,11 @@ myKeys = \c -> mkKeymap c $
     , ("M2-b", moveTo Prev HiddenWS)
     , ("M2-M1-w", shiftTo Next HiddenWS)
     , ("M2-M1-b", shiftTo Prev HiddenWS)
+    , ("M2-o o", selectWorkspace defaultXPConfig)
+    , ("M2-o g", addWorkspacePrompt defaultXPConfig)
+    , ("M2-o c", removeEmptyWorkspace)
+    , ("M2-o r", renameWorkspace defaultXPConfig)
+    , ("M2-o M2-o", carryToNamedWs defaultXPConfig)
 
     -- L3
     , ("M2-n", nextScreen)
@@ -62,6 +71,11 @@ myKeys = \c -> mkKeymap c $
     , ("M2-M1-p", shiftPrevScreen)
     , ("M2-C-n", swapNextScreen)
     , ("M2-C-p", swapPrevScreen)
+      -- these groups are like a snapshot of which workspaces are visible now
+    , ("M2-e g", promptWSGroupAdd defaultXPConfig "Name this group: ")
+    , ("M2-e e", promptWSGroupView defaultXPConfig "Go to group: ")
+    , ("M2-e c", promptWSGroupForget defaultXPConfig "Forget group: ")
+
     -- Quit xmonad
     , ("M2-M1-q", io (exitWith ExitSuccess))
     -- Restart xmonad
@@ -92,6 +106,7 @@ myConfig = defaultConfig
     , modMask = mod2Mask
     , keys = myKeys
     , manageHook = myManageHook <+> manageHook defaultConfig
+    , workspaces = [ "scratch", "org", "web", "ax", "win" ]
     }
 
 --main = xmonad $ myConfig
@@ -101,8 +116,18 @@ main = xmonad =<< statusBar myBar myPP toggleStrutsKey myConfig
 -- Command to launch the bar.
 myBar = "xmobar"
 
--- Custom PP, configure it as you like. It determines what is being written to the bar.
-myPP = xmobarPP { ppCurrent = xmobarColor "#429942" "" . wrap "<" ">" }
+-- Pretty Print options for status bar
+myPP = xmobarPP
+    { ppCurrent = xmobarColor "#4299f2" "" . wrap "<" ">"
+    , ppVisible = xmobarColor "#4299f2" ""
+    , ppHiddenNoWindows = xmobarColor "#444444" ""
+    , ppUrgent = xmobarColor "#ff4444" ""
+    , ppSep = " <fc=#999999>|</fc> "
+    , ppTitle = xmobarColor "#00ff00" ""
+    , ppLayout = xmobarColor "#309030" ""
+    --, ppExtras = ... see docs to maybe set this up - but it basically has the
+      -- same stuff that xmobar has... but likely less?
+    }
 
 -- Key binding to toggle the gap for the bar.
 toggleStrutsKey XConfig {XMonad.modMask = modMask} = (modMask .|. controlMask, xK_m)
