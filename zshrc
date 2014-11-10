@@ -92,8 +92,10 @@ bindkey-to-prefix-map spacemap "d" zaw-cdr
 bindkey-to-prefix-map spacemap "f" zaw-functions
 bindkey-to-prefix-map spacemap "w" zaw-widgets
 bindkey-to-prefix-map spacemap "-" zaw-widgets
+# filter-select is the zaw selection mode
 # enable smart-case, ^$ for begin/end, and ! to ignore the next word
 zstyle ':filter-select' extended-search yes
+zstyle ':filter-select' max-lines 15
 
 tf=$DOTFILESLOCALDIR/bazsh
 if [ -f "$tf" ]
