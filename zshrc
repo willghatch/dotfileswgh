@@ -6,7 +6,7 @@ VZSH_REMAP_KEYS_P=true
 ZSH_HIGHLIGHT_HIGHLIGHTERS=(main brackets pattern cursor)
 
 source $HOME/dotfileswgh/external/zsh/antigen/antigen.zsh
-antigen use oh-my-zsh
+#antigen use oh-my-zsh
 antigen bundles <<EOBUNDLES
     git
     zsh-users/zsh-history-substring-search
@@ -14,8 +14,13 @@ antigen bundles <<EOBUNDLES
     # TODO - get opp's sub-pieces working (surround, between)
     #hchbaw/auto-fu.zsh.git
     alfredodeza/zsh-plugins.git vi #vi visual
+    # use the oh-my-zsh version of wd because the upstream does crap like install in ~/bin
     wd
     zsh-users/zsh-syntax-highlighting
+    cabal
+    catimg
+    # the cp plugin provides cpv - rsync based progress-showing cp
+    cp
 EOBUNDLES
 
 source $HOME/dotfileswgh/bazsh/common.sh
@@ -103,6 +108,11 @@ bindkey-to-prefix-map spacemap "f" zaw-git-files
 bindkey-to-prefix-map spacemap "s" zaw-git-status
 bindkey-to-prefix-map spacemap "o" zaw-open-file
 bindkey-to-prefix-map spacemap "p" zaw-process
+bindkey-to-prefix-map spacemap "c" zaw-commands
+bindkey-to-prefix-map spacemap "d" zaw-cdr
+bindkey-to-prefix-map spacemap "f" zaw-functions
+bindkey-to-prefix-map spacemap "w" zaw-widgets
+bindkey-to-prefix-map spacemap "-" zaw-widgets
 # enable smart-case, ^$ for begin/end, and ! to ignore the next word
 zstyle ':filter-select' extended-search yes
 
