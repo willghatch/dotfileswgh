@@ -42,6 +42,7 @@ alias textprint="lp -o cpi=15 -o lpi=9 -o page-top=72 -o page-right=72 -o page-l
 alias cp="cp -a" #archive mode, to preserve timestamps
 alias ag="ag --color-match '1;36'"
 alias ags="ag --color-match '1;36' --smart-case"
+alias pyg="pygmentize -g --" # colored cat, with pygments installed with pip
 
 # parallel make
 export NUMCPUS=$(grep -c '^processor' /proc/cpuinfo)
