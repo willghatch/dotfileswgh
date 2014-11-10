@@ -5,39 +5,16 @@ VZSH_REMAP_KEYS_P=true
 
 ZSH_HIGHLIGHT_HIGHLIGHTERS=(main brackets pattern cursor)
 
-source $HOME/dotfileswgh/external/zsh/antigen/antigen.zsh
-#antigen use oh-my-zsh
-antigen bundles <<EOBUNDLES
-    git
-    zsh-users/zsh-history-substring-search
-    hchbaw/opp.zsh.git
-    # TODO - get opp's sub-pieces working (surround, between)
-    #hchbaw/auto-fu.zsh.git
-    alfredodeza/zsh-plugins.git vi #vi visual
-    # use the oh-my-zsh version of wd because the upstream does crap like install in ~/bin
-    wd
-    zsh-users/zsh-syntax-highlighting
-    cabal
-    catimg
-    # the cp plugin provides cpv - rsync based progress-showing cp
-    cp
-EOBUNDLES
-
 source $HOME/dotfileswgh/bazsh/common.sh
 
-if [[ -d ~/vzsh ]]; then
-    antigen bundle ~/vzsh --no-local-clone
-    #antigen bundle ~/vzsh zaw-sources --no-local-clone
+# if cabal is installed, use antigen-hs, since it's so much faster
+# ... if not, use regular antigen, because it doesn't need Haskell!
+if which cabal 1>/dev/null 2>&1; then
+    ANTIGEN_HS_MY=$DOTFILESDIR/zsh/antigen.conf.hs
+    source $DOTFILESDIR/external/zsh/antigen-hs/init.zsh
 else
-    antigen bundle willghatch/vzsh.git
-    #antigen bundle willghatch/vzsh.git zaw-sources
+    source $DOTFILESDIR/zsh/antigen.conf.zsh
 fi
-
-antigen bundle zsh-users/zaw
-antigen bundle willghatch/vzsh.git zaw-sources
-#antigen theme vzsh
-
-antigen apply
 
 VZSH_MATCHER_STR='m:{a-z-}={A-Z_} m:{b,m,w,v,h,t,n,g,c,r}={0,1,2,3,4,5,6,7,8,9}'
 VZSH_ANYWHERE_MATCHER_STR='m:{a-z-}={A-Z_} m:{b,m,w,v,h,t,n,g,c,r}={0,1,2,3,4,5,6,7,8,9} l:|=* r:|=*'

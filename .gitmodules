@@ -7,3 +7,6 @@
 [submodule "external/zsh/antigen"]
 	path = external/zsh/antigen
 	url = https://github.com/zsh-users/antigen.git
+[submodule "external/zsh/antigen-hs"]
+	path = external/zsh/antigen-hs
+	url = https://github.com/willghatch/antigen-hs.git
