@@ -555,6 +555,7 @@
 (define-key evil-motion-state-map "tsc" 'color-hex-syntax)
 (define-key evil-motion-state-map "tst" 'toggle-truncate-lines)
 (define-key evil-motion-state-map "tsf" 'flycheck-mode)
+(define-key evil-motion-state-map "tsF" 'fci-mode-toggle)
 (define-key evil-motion-state-map "tss" 'flyspell-mode)
 (define-key evil-motion-state-map "tsS" 'flyspell-prog-mode)
 (define-key evil-motion-state-map "tse" 'electric-indent-mode)
