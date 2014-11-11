@@ -1,5 +1,7 @@
 #!/usr/bin/zsh
 
+HISTSIZE=1000
+SAVEHIST=1000
 
 VZSH_REMAP_KEYS_P=true
 
