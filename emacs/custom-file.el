@@ -46,7 +46,7 @@
  '(font-lock-variable-name-face ((t (:foreground "#7fffd4"))))
  '(font-lock-warning-face ((t (:foreground "#ffb90f"))))
  '(fringe ((t (:foreground "#00ffff"))))
- '(hc-tab ((t (:background "#191919"))))
+ '(hc-tab ((t (:background "#000019"))))
  '(hc-trailing-whitespace ((t (:background "#252525"))))
  '(header-line ((t (:inherit mode-line))))
  '(helm-selection ((t (:foreground "#000000" :background "#50f0b0"))))
