@@ -24,6 +24,12 @@ zstyle ':completion:*'  matcher-list $VZSH_MATCHER_STR
 zstyle ':completion:vzsh-completion-std-anywhere:*'  matcher-list $VZSH_ANYWHERE_MATCHER_STR
 zstyle ':completion:vzsh-completion-history-anywhere:*'  matcher-list $VZSH_ANYWHERE_MATCHER_STR
 zstyle ':completion:vzsh-completion-maximal-anywhere:*'  matcher-list $VZSH_ANYWHERE_MATCHER_STR
+# separate man pages by section in completion output
+zstyle ':completion:*' separate-sections true
+# tell what completer is being used, so you can see what's taking a long time
+zstyle ':completion:*' show-completer true
+# prompt between pages of completions -- MUST BE SET TO ALLOW PAGING
+zstyle ':completion:*' list-prompt "%l"
 
 fpath=($fpath $HROOT/build/zsh-completions/src)
 
