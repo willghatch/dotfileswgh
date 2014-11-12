@@ -19,6 +19,7 @@
   (setq company-completing-wgh nil))
 
 (define-key company-active-map (kbd "TAB") 'company-complete-common-wgh)
+(define-key company-active-map (kbd "<backtab>") 'helm-company)
 (define-key company-active-map [tab] 'company-complete-common-wgh)
 (define-key company-active-map (kbd "M-n") nil)
 (define-key company-active-map (kbd "M-p") nil)
