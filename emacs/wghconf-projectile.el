@@ -2,8 +2,8 @@
 (projectile-mode 1)
 (require 'helm-projectile)
 (helm-projectile-on)
-(define-prefix-command 'helm-projectil-map)
-(define-key projectile-command-map "h" helm-projectile-map)
-(define-key helm-projectile-map (kbd "h") helm-projectile)
-(define-key helm-projectile-map (kbd "f") helm-projectile-find-file)
+(define-prefix-command 'helm-projectile-map)
+(define-key projectile-command-map "h" 'helm-projectile-map)
+(define-key helm-projectile-map (kbd "h") 'helm-projectile)
+(define-key helm-projectile-map (kbd "f") 'helm-projectile-find-file)
 
