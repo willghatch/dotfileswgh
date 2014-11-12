@@ -158,8 +158,8 @@
 ;(define-key evil-window-map "|" 'evil-window-set-width)
 (define-key evil-window-map "\C-b" 'evil-window-bottom-right)
 (define-key evil-window-map "\C-c" 'evil-window-delete)
-(define-key evil-window-map "\C-H" 'evil-window-move-far-left)
-(define-key evil-window-map "\C-h" 'evil-window-left)
+;(define-key evil-window-map "\C-H" 'evil-window-move-far-left)
+;(define-key evil-window-map "\C-h" 'evil-window-left)
 (define-key evil-window-map "\C-J" 'evil-window-move-very-bottom)
 (define-key evil-window-map "\C-j" 'evil-window-down)
 (define-key evil-window-map "\C-K" 'evil-window-move-very-top)
@@ -469,6 +469,7 @@
 (define-key evil-window-map " r" 'winner-redo)
 (define-key evil-window-map "w" 'next-buffer-no-star)
 (define-key evil-window-map "b" 'prev-buffer-no-star)
+(define-key evil-window-map "p" 'popwin:keymap)
 
 (set-keymap-parent evil-window-state-map evil-window-map)
 (define-key evil-window-state-map "m" 'evil-normal-state)

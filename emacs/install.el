@@ -26,6 +26,7 @@
 (ignore-errors (package-install 'projectile))
 (ignore-errors (package-install 'flx-ido))
 (ignore-errors (package-install 'expand-region))
+(ignore-errors (package-install 'popwin))
 
 (ignore-errors (package-install 'helm))
 (ignore-errors (package-install 'helm-swoop))
