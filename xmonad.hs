@@ -1,5 +1,7 @@
 
-import XMonad
+import XMonad hiding ((|||))
+import XMonad.Layout.LayoutCombinators ((|||))
+import XMonad.Actions.CycleSelectedLayouts
 import XMonad.Util.EZConfig
 import Data.Monoid
 import System.Exit
@@ -11,6 +13,8 @@ import XMonad.Hooks.ManageDocks
 import XMonad.Actions.DynamicWorkspaces
 import XMonad.Prompt
 import XMonad.Actions.DynamicWorkspaceGroups
+import XMonad.Actions.SwapWorkspaces
+import XMonad.Layout.SimplestFloat
 
 -- Hackage dependencies: xmonad, xmonad-contrib, xmobar
 
@@ -25,7 +29,10 @@ myKeys = \c -> mkKeymap c $
     , ("M2-M1-r", refresh)
     , ("M2-q", spawn "vlaunch lockscreen")
     , ("M2-c", kill)
-    , ("M2-<Space>", sendMessage NextLayout)
+    --, ("M2-<Space>", sendMessage NextLayout)
+    , ("M2-<Space>", cycleThroughLayouts ["Tall", "Mirror Tall"])
+    , ("M2-f", cycleThroughLayouts ["Full"])
+    , ("M2-C-f", cycleThroughLayouts ["SimplestFloat"])
     , ("M2-m", sendMessage ToggleStruts)
     --  Reset the layouts on the current workspace to default
     --, ("M2-S-<Space>", setLayout $ XMonad.layoutHook conf)
@@ -58,6 +65,8 @@ myKeys = \c -> mkKeymap c $
     , ("M2-b", moveTo Prev HiddenWS)
     , ("M2-M1-w", shiftTo Next HiddenWS)
     , ("M2-M1-b", shiftTo Prev HiddenWS)
+    , ("M2-C-w", swapTo Next)
+    , ("M2-C-b", swapTo Prev)
     , ("M2-o o", selectWorkspace defaultXPConfig)
     , ("M2-o g", addWorkspacePrompt defaultXPConfig)
     , ("M2-o c", removeEmptyWorkspace)
@@ -99,6 +108,12 @@ myManageHook = composeAll
    , manageDocks
    ]
 
+myLayoutHook = tiled ||| Mirror tiled ||| Full ||| simplestFloat where
+    tiled = Tall nmaster delta ratio
+    nmaster = 1
+    ratio = 1/2
+    delta = 5/100
+
 myConfig = defaultConfig
     { borderWidth = 2
     , terminal = "xterm"
@@ -108,6 +123,7 @@ myConfig = defaultConfig
     , keys = myKeys
     , manageHook = myManageHook <+> manageHook defaultConfig
     , workspaces = [ "scratch", "org", "web", "ax", "win" ]
+    , layoutHook = myLayoutHook
     }
 
 --main = xmonad $ myConfig
