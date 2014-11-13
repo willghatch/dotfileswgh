@@ -670,6 +670,12 @@
 ;(evil-ex-define-cmd "xa[ll]" "wqall")
 (evil-ex-define-cmd "bd[elete]" 'evil-delete-buffer)
 (evil-ex-define-cmd "s[ubstitute]" 'evil-ex-substitute)
+
+(evil-ex-define-cmd "c[lose]" 'wevil-quit)
+(evil-ex-define-cmd "sc" 'wevil-save-and-quit)
+(evil-ex-define-cmd "ca[ll]" "quitall")
+(evil-ex-define-cmd "sca[ll]" 'evil-save-and-quit)
+
 ;(evil-ex-define-cmd "!" 'evil-shell-command)
 (setq ido-enable-flex-matching t
       ido-everywhere t)
