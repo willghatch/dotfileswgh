@@ -25,7 +25,7 @@ set colorcolumn=+80 " Color column 80
 set wildmenu
 set wildmode=list:longest,full
 
-"set smartcase    " ignore case in searches unless an uppercase is used.
+set smartcase    " ignore case in searches unless an uppercase is used.
 set backspace=indent,eol,start
 "set background=dark  " Tell vim the background will be dark so it will set a good color scheme
 "set cursorcolumn   " Highlight current column
