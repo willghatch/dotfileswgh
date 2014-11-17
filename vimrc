@@ -53,7 +53,7 @@ set confirm    " confirm exit on unsaved files, rather than failing if no ! is u
 set mouse=a     " Allow mouse stuff in all modes
 "set clipboard=unnamedplus      " Use '+' register (X11 clipboard) for yanking/putting. 
                                 "Alternatively, unnamed uses '*', which is the middle click clipboard.
-filetype plugin on
+filetype plugin indent on
 
 """"""""""""""""""""""""""" Key mappings
 inoremap kj <esc>
