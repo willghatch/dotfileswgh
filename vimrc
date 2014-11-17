@@ -1,3 +1,4 @@
+set nocompatible " be improved always
 
 colorscheme elflord
 
@@ -96,7 +97,7 @@ vnoremap gp "+p
 vnoremap gy "+y
 
 
-if filereadable("~/.dotlocal/vimrc")
-    source ~/.dotlocal/vimrc
+if filereadable($HOME . "/.dotlocal/vimrc")
+    source $HOME/.dotlocal/vimrc
 endif
 
