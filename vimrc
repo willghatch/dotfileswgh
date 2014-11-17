@@ -56,8 +56,11 @@ set mouse=a     " Allow mouse stuff in all modes
 filetype plugin indent on
 
 """"""""""""""""""""""""""" Key mappings
-inoremap kj <esc>
-inoremap jk <esc>
+set timeout timeoutlen=10000 ttimeoutlen=200
+set <f13>=jk
+set <f14>=kj
+inoremap <f13> <esc>
+inoremap <f14> <esc>
 nnoremap - :
 
 nnoremap t <nop>
