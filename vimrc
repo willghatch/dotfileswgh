@@ -12,6 +12,7 @@ set tabstop=8    " Width of actual tabs, I think
 set softtabstop=4 " ?
 set shiftwidth=4 " How many spaces to indent on a tab
 set expandtab    " automaticall turn tabs to spaces
+set showcmd      " show prefix keys as they are typed
 
 syntax on     " Do syntax highlighting
 
@@ -58,26 +59,41 @@ inoremap kj <esc>
 inoremap jk <esc>
 nnoremap - :
 
+nnoremap t <nop>
+nnoremap tt t
+nnoremap tT T
 " window keys
-nmap th <C-w>
-nmap thn <C-w>w
-nmap thp <C-w>W
+nnoremap thic :bdelete<CR>
+nnoremap thiac :qa<CR>
+nnoremap this :w<CR>
+nnoremap thias :wall<CR>
+nnoremap thie :wq<CR>
+nnoremap thiae :wqall<CR>
 
-" TODO - gb -> switch buffer, gq -> kill buffer
-nmap tt t
-nmap tT T
-nmap <Space>h <PageDown>
-nmap <Space>t <PageUp>
-nmap <Space>j <PageDown>
-nmap <Space>k <PageUp>
-imap <C-g> <esc>
-nmap <C-g> <esc>
-vmap <C-g> <esc>
+nnoremap thn <C-w>w
+nnoremap thp <C-w>W
+nnoremap thb :bp<CR>
+nnoremap thw :bn<CR>
+nnoremap tha :buffer<space>
+nnoremap thq :bdelete<CR>
 
-nmap sm m
-nmap ss s
-nmap sh :!
-vmap sh :!
+nnoremap <Space>h <PageDown>
+nnoremap <Space>t <PageUp>
+nnoremap <Space>j <PageDown>
+nnoremap <Space>k <PageUp>
+inoremap <C-g> <esc>
+nnoremap <C-g> <esc>
+vnoremap <C-g> <esc>
+cnoremap <C-g> <esc>
+
+nnoremap sm m
+nnoremap ss s
+nnoremap sh :!
+vnoremap sh :!
+
+nnoremap gp "+p
+vnoremap gp "+p
+vnoremap gy "+y
 
 
 if filereadable("~/.dotlocal/vimrc")
