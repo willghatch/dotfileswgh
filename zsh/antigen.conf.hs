@@ -17,10 +17,10 @@ bundles =
   , bundle "robbyrussell/oh-my-zsh plugins/catimg"
   , bundle "robbyrussell/oh-my-zsh plugins/cp"
   , bundle "zsh-users/zsh-syntax-highlighting"
+  , bundle "zsh-users/zaw"
+  , bundle "willghatch/zsh-zaw-extras"
   , bundle "willghatch/zsh-snippets"
   , bundle "willghatch/vzsh"
-  , bundle "zsh-users/zaw"
-  --, bundle "willghatch/vzsh.git zaw-sources"
   -- , developFromFileSystem "/home/foo/bar"
   ]
 

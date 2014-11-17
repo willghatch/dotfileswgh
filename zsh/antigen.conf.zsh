@@ -7,7 +7,9 @@ antigen bundles <<EOBUNDLES
     # TODO - get opp's sub-pieces working (surround, between)
     #hchbaw/auto-fu.zsh.git
     alfredodeza/zsh-plugins.git vi #vi visual
+    zsh-users/zaw
     willghatch/zsh-snippets
+    willghatch/zsh-zaw-extras
     # use the oh-my-zsh version of wd because the upstream does crap like install in ~/bin
     wd
     zsh-users/zsh-syntax-highlighting
@@ -26,8 +28,5 @@ else
     #antigen bundle willghatch/vzsh.git zaw-sources
 fi
 
-antigen bundle zsh-users/zaw
-antigen bundle willghatch/vzsh.git zaw-sources
-#antigen theme vzsh
 
 antigen apply
