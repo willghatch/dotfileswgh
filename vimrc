@@ -40,10 +40,8 @@ set backspace=indent,eol,start
 "set insertmode     " make vim modeless!  I might check this out later...
 
 set backup    " Make backup files
-"silent !mkdir ~/.dotlocal > /dev/null 2>&1
-"silent !mkdir ~/.dotlocal/vimtmp > /dev/null 2>&1
-set backupdir=~/.dotlocal/vimtmp   " Directory for backup files
-set directory=~/.dotlocal/vimtmp   " Directory for swap files
+set backupdir=$DOTFILESLOCALDIR/vimtmp   " Directory for backup files
+set directory=$DOTFILESLOCALDIR/vimtmp   " Directory for swap files
 
 
 """ Command window stuff
@@ -111,7 +109,7 @@ vnoremap gp "+p
 vnoremap gy "+y
 
 
-if filereadable($HOME . "/.dotlocal/vimrc")
-    source $HOME/.dotlocal/vimrc
+if filereadable($DOTFILESLOCALDIR . "/vimrc")
+    source $DOTFILESLOCALDIR/vimrc
 endif
 

@@ -3,7 +3,7 @@ filetype off " required for vundle, supposedly
 
 set rtp+=$DOTFILESDIR/external/vim/Vundle.vim
 
-call vundle#begin()
+call vundle#begin($DOTFILESLOCALDIR . "/vim")
 Plugin 'tpope/vim-rsi'
 Plugin 'tpope/vim-repeat'
 Plugin 'tpope/vim-surround'

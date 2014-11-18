@@ -19,14 +19,14 @@
 ;; backup settings
 (setq
    backup-by-copying t      ; don't clobber symlinks
-   backup-directory-alist '(("." . "~/.dotlocal/bakmacs"))    ; don't litter my fs tree
+   backup-directory-alist '(("." . "~/dotfileswgh/dotlocal/bakmacs"))    ; don't litter my fs tree
    delete-old-versions t
    kept-new-versions 8
    kept-old-versions 4
    version-control t)       ; use versioned backups
-(setq auto-save-file-name-transforms '((".*" "~/.dotlocal/automacs/\\1" t))) ; auto-saves (## files) here
-(make-directory "~/.dotlocal/bakmacs/" t)
-(make-directory "~/.dotlocal/automacs/" t)
+(setq auto-save-file-name-transforms '((".*" "~/dotfileswgh/dotlocal/automacs/\\1" t))) ; auto-saves (## files) here
+(make-directory "~/dotfileswgh/dotlocal/bakmacs/" t)
+(make-directory "~/dotfileswgh/dotlocal/automacs/" t)
 
 ;; mouse settings
 (if (fboundp 'xterm-mouse-mode) (xterm-mouse-mode) nil) ; shift-click for normal xterm mouse behavior
@@ -164,7 +164,7 @@ it calls the next function one more time."
 
 (global-auto-revert-mode t) ; auto-reload files when they change on disk
 
-(if (file-exists-p "~/.dotlocal/emacs") (load-file "~/.dotlocal/emacs") nil)
+(if (file-exists-p "~/dotfileswgh/dotlocal/emacs") (load-file "~/dotfileswgh/dotlocal/emacs") nil)
 
 
 (print (format "start time: %f" (time-to-seconds (time-subtract (current-time) before-init-time))))

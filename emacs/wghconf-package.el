@@ -1,6 +1,6 @@
 
 ; load local settings first, in case of proxy or something
-(ignore-errors (load-file "~/.dotlocal/emacs"))
+(ignore-errors (load-file "~//dotfileswgh/dotlocal/emacs"))
 
 (let ((default-directory "~/.emacs.d"))
       (normal-top-level-add-subdirs-to-load-path))

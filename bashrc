@@ -76,6 +76,6 @@ export PS1="\[$(tput bold)\]\[$(tput setaf 6)\]\A \[$(tput setaf 7)\][\[$(tput s
 
 sourceIfExists $DOTFILESLOCALDIR/bazsh
 
-sourceIfExists $dotlocaldir/bashrc
+sourceIfExists $DOTFILESLOCALDIR/bashrc
 
 
