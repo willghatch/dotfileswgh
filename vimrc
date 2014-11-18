@@ -28,7 +28,10 @@ set colorcolumn=+80 " Color column 80
 set wildmenu
 set wildmode=list:longest,full
 
+set ignorecase   " case insensitive searching
 set smartcase    " ignore case in searches unless an uppercase is used.
+set incsearch    " search incrementally (move cursor to show nearest match)
+set hlsearch     " highlight all results -- turn off temporarily with :nohl
 set backspace=indent,eol,start
 "set background=dark  " Tell vim the background will be dark so it will set a good color scheme
 "set cursorcolumn   " Highlight current column
@@ -81,6 +84,9 @@ nnoremap thb :bp<CR>
 nnoremap thw :bn<CR>
 nnoremap tha :buffer<space>
 nnoremap thq :bdelete<CR>
+
+" toggle highlighting off after search
+nnoremap tsh :nohl<CR>
 
 nnoremap <Space>h <PageDown>
 nnoremap <Space>t <PageUp>
