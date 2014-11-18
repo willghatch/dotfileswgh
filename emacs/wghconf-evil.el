@@ -568,7 +568,8 @@
 (define-key evil-motion-state-map "tss" 'flyspell-mode)
 (define-key evil-motion-state-map "tsS" 'flyspell-prog-mode)
 (define-key evil-motion-state-map "tse" 'electric-indent-mode)
-(define-key evil-motion-state-map "tsr" 'rainbow-delimiters-mode)
+(define-key evil-motion-state-map "tsd" 'rainbow-delimiters-mode)
+(define-key evil-motion-state-map "tsr" 'linum-relative-toggle)
 
 ;; s map
 ;(define-key evil-normal-state-map "ss" 'evil-substitute)

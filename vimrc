@@ -3,6 +3,7 @@ set nocompatible " be improved always
 colorscheme elflord
 
 set number       " Display line numbers
+set relativenumber " Show line numbers relative to current line
 " indenting
 set autoindent   " Use indent from previous line when starting a new line
 set copyindent   " Use tab/space format from previous line, even with expandtab
@@ -87,6 +88,9 @@ nnoremap thq :bdelete<CR>
 
 " toggle highlighting off after search
 nnoremap tsh :nohl<CR>
+nnoremap tsr :set relativenumber!<CR>
+nnoremap tsi :set ignorecase!<CR>
+nnoremap tsa :set autoindent!<CR>
 
 nnoremap <Space>h <PageDown>
 nnoremap <Space>t <PageUp>

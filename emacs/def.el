@@ -40,6 +40,8 @@
 (global-linum-mode 1) ; add line numbers
 (require 'hlinum)
 (hlinum-activate)
+(require 'linum-relative)
+(linum-relative-toggle) ; turn it off as the default
 
 (add-hook 'linum-before-numbering-hook
           (lambda ()
