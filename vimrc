@@ -16,6 +16,7 @@ set shiftwidth=4 " How many spaces to indent on a tab
 set expandtab    " automaticall turn tabs to spaces
 set showcmd      " show prefix keys as they are typed
 set laststatus=2 " always show statusbar
+set hidden       " allow switching from dirty buffers without saving or killing changes
 
 syntax on     " Do syntax highlighting
 
@@ -74,7 +75,7 @@ nnoremap thic :bdelete<CR>
 nnoremap thiac :qa<CR>
 nnoremap this :w<CR>
 nnoremap thias :wall<CR>
-nnoremap thie :wq<CR>
+nnoremap thie :w<CR>:bdelete<CR>
 nnoremap thiae :wqall<CR>
 
 nnoremap thn <C-w>w
