@@ -14,6 +14,7 @@ set softtabstop=4 " ?
 set shiftwidth=4 " How many spaces to indent on a tab
 set expandtab    " automaticall turn tabs to spaces
 set showcmd      " show prefix keys as they are typed
+set laststatus=2 " always show statusbar
 
 syntax on     " Do syntax highlighting
 
@@ -56,7 +57,7 @@ set mouse=a     " Allow mouse stuff in all modes
 filetype plugin indent on
 
 """"""""""""""""""""""""""" Key mappings
-set timeout timeoutlen=10000 ttimeoutlen=200
+set timeout timeoutlen=10000 ttimeoutlen=50
 set <f13>=jk
 set <f14>=kj
 inoremap <f13> <esc>
