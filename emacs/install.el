@@ -7,6 +7,7 @@
 (ignore-errors (package-install 'key-chord))
 (ignore-errors (package-install 'auto-compile))
 (ignore-errors (package-install 'evil-surround))
+(ignore-errors (package-install 'evil-matchit))
 (ignore-errors (package-install 'yafolding))
 (ignore-errors (package-install 'company))
 

@@ -28,6 +28,9 @@
 (global-evil-surround-mode 1)
 (require 'evil-little-word)
 (require 'evil-textobj-between)
+;; TODO - move this stuff to more sensible places...
+(require 'evil-matchit)
+(global-evil-matchit-mode 1)
 
 (defun backward-symbol (n)
   "this doesn't work right..."
