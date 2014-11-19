@@ -86,6 +86,7 @@ nnoremap tha :buffer<space>
 nnoremap thq :bdelete<CR>
 
 " toggle highlighting off after search
+nnoremap tst :set wrap!<CR>
 nnoremap tsh :nohl<CR>
 nnoremap tsr :set relativenumber!<CR>
 nnoremap tsi :set ignorecase!<CR>
