@@ -1,4 +1,7 @@
 set nocompatible
+
+set t_Co=256
+
 filetype off " required for vundle, supposedly
 
 set rtp+=$DOTFILESDIR/external/vim/Vundle.vim
