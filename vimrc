@@ -60,6 +60,9 @@ set mouse=a     " Allow mouse stuff in all modes
 filetype plugin indent on
 
 """"""""""""""""""""""""""" Key mappings
+" map, noremap, etc work in normal, visual+select, operator-pending modes...
+" vmap vnoremap... vork in visual+select
+" n is normal only, o is operator only, x is visual only, s is select only
 set timeout timeoutlen=10000 ttimeoutlen=50
 set <f13>=jk
 set <f14>=kj
@@ -67,19 +70,55 @@ inoremap <f13> <esc>
 inoremap <f14> <esc>
 noremap - :
 
-" map, noremap, etc work in normal, visual+select, operator-pending modes...
-" vmap vnoremap... vork in visual+select
-" n is normal only, o is operator only, x is visual only, s is select only
-noremap ge <nop>
-noremap gee ge
-noremap geE gE
-map gew <Plug>CamelCaseMotion_w
-map geb <Plug>CamelCaseMotion_b
-map geW <Plug>CamelCaseMotion_e
-map geB <Plug>CamelCaseMotion_ge
 
+" o and e maps - o is left/back, e is right/forward
+noremap e <nop>
+noremap o <nop>
+noremap ee e
+noremap oe ge
+noremap eo o
+noremap oo O
+noremap eE E
+noremap oE gE
+noremap ea a
+noremap oE gE
+" ghetto forward/backward arg
+noremap ea f,w
+noremap oa F,;w
+noremap eA :SidewaysRight<cr>
+noremap oA :SidewaysLeft<cr>
+omap aa <Plug>SidewaysArgumentTextobjA
+xmap aa <Plug>SidewaysArgumentTextobjA
+omap ia <Plug>SidewaysArgumentTextobjI
+xmap ia <Plug>SidewaysArgumentTextobjI
+map ew <Plug>CamelCaseMotion_w
+map ow <Plug>CamelCaseMotion_b
+map eW <Plug>CamelCaseMotion_e
+map oW <Plug>CamelCaseMotion_ge
 onoremap ilw <Plug>CamelCaseMotion_iw
 vnoremap ilw <Plug>CamelCaseMotion_iw
+noremap es )
+noremap os (
+noremap ep }
+noremap op {
+noremap eh /
+noremap oh ?
+noremap ef f
+noremap of F
+noremap et t
+noremap ot T
+noremap er ;
+noremap or ,
+noremap en n
+noremap on N
+noremap ol 0
+noremap el $
+noremap oL g0
+noremap eL g$
+noremap eb +
+noremap ob -
+noremap oB ^
+noremap eB _
 
 noremap t <nop>
 noremap tt t
