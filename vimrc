@@ -65,22 +65,25 @@ set <f13>=jk
 set <f14>=kj
 inoremap <f13> <esc>
 inoremap <f14> <esc>
-nnoremap - :
+noremap - :
 
-nnoremap ge <nop>
-nnoremap gee ge
-nnoremap geE gE
-nmap gew <Plug>CamelCaseMotion_w
-nmap geb <Plug>CamelCaseMotion_b
-nmap geW <Plug>CamelCaseMotion_e
-nmap geB <Plug>CamelCaseMotion_ge
+" map, noremap, etc work in normal, visual+select, operator-pending modes...
+" vmap vnoremap... vork in visual+select
+" n is normal only, o is operator only, x is visual only, s is select only
+noremap ge <nop>
+noremap gee ge
+noremap geE gE
+map gew <Plug>CamelCaseMotion_w
+map geb <Plug>CamelCaseMotion_b
+map geW <Plug>CamelCaseMotion_e
+map geB <Plug>CamelCaseMotion_ge
 
 onoremap ilw <Plug>CamelCaseMotion_iw
-xnoremap ilw <Plug>CamelCaseMotion_iw
+vnoremap ilw <Plug>CamelCaseMotion_iw
 
-nnoremap t <nop>
-nnoremap tt t
-nnoremap tT T
+noremap t <nop>
+noremap tt t
+noremap tT T
 " window keys
 nnoremap thic :bdelete<CR>
 nnoremap thiac :qa<CR>
@@ -103,12 +106,12 @@ nnoremap tsr :set relativenumber!<CR>
 nnoremap tsi :set ignorecase!<CR>
 nnoremap tsa :set autoindent!<CR>
 
-nnoremap <Space>h <PageDown>
-nnoremap <Space>t <PageUp>
-nnoremap <Space>j <PageDown>
-nnoremap <Space>k <PageUp>
+noremap <Space>h <PageDown>
+noremap <Space>t <PageUp>
+noremap <Space>j <PageDown>
+noremap <Space>k <PageUp>
 inoremap <C-g> <esc>
-nnoremap <C-g> <esc>
+noremap <C-g> <esc>
 vnoremap <C-g> <esc>
 cnoremap <C-g> <esc>
 
@@ -117,8 +120,7 @@ nnoremap ss s
 nnoremap sh :!
 vnoremap sh :!
 
-nnoremap gp "+p
-vnoremap gp "+p
+noremap gp "+p
 vnoremap gy "+y
 
 
