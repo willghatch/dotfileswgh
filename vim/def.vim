@@ -26,6 +26,7 @@ Plugin 'scrooloose/syntastic'
 Plugin 'pangloss/vim-javascript'
 Plugin 'ervandew/supertab'
 Plugin 'msanders/snipmate.vim'
+Plugin 'camelcasemotion'
 call vundle#end()
 " to run the vundle installer, run :PluginInstall
 

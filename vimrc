@@ -67,6 +67,17 @@ inoremap <f13> <esc>
 inoremap <f14> <esc>
 nnoremap - :
 
+nnoremap ge <nop>
+nnoremap gee ge
+nnoremap geE gE
+nmap gew <Plug>CamelCaseMotion_w
+nmap geb <Plug>CamelCaseMotion_b
+nmap geW <Plug>CamelCaseMotion_e
+nmap geB <Plug>CamelCaseMotion_ge
+
+onoremap ilw <Plug>CamelCaseMotion_iw
+xnoremap ilw <Plug>CamelCaseMotion_iw
+
 nnoremap t <nop>
 nnoremap tt t
 nnoremap tT T
