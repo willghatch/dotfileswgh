@@ -22,7 +22,7 @@ umask 077 # privacy as a default
 #alias t="mpcl toggle"
 
 ####### Editing
-alias eml="TERM=xterm-256color emacs -nw -l $DOTFILESDIR/emacs/def"
+alias em="TERM=xterm-256color emacs -nw -l $DOTFILESDIR/emacs/def"
 alias e="TERM=xterm-256color premacs-use -t"
 alias ex="premacs-use -c"
 alias emx="emacs -l $DOTFILESDIR/emacs/def"
