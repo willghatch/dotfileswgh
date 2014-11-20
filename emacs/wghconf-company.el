@@ -32,6 +32,8 @@
 (define-key company-active-map (kbd "RET") nil)
 (define-key company-active-map (kbd "<return>") nil)
 (key-chord-define company-active-map (kbd "gc") 'company-complete-selection)
+(global-set-key [company-prefix] company-active-map)
+(define-key company-active-map (kbd "C-d b") (lambda () (interactive) (describe-bindings [company-prefix])))
 
 (setq company-frontends '(company-preview-frontend company-pseudo-tooltip-wgh-frontend company-echo-metadata-frontend))
 

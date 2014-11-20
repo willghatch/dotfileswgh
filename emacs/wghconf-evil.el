@@ -765,3 +765,6 @@
 (define-key tty-menu-navigation-map "k" 'tty-menu-prev-item)
 (define-key tty-menu-navigation-map "h" 'tty-menu-prev-menu)
 (define-key tty-menu-navigation-map "l" 'tty-menu-next-menu)
+
+(define-key help-map "\C-h" 'describe-prefix-bindings)
+
