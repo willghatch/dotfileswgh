@@ -111,7 +111,8 @@ noremap er ;
 noremap or ,
 noremap en n
 noremap on N
-noremap ol 0
+noremap ol ^
+noremap o<space>l 0
 noremap el $
 noremap oL g0
 noremap eL g$
