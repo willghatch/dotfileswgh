@@ -603,6 +603,7 @@
 (define-key evil-motion-state-map "tt" 'evil-find-char-to)
 (define-key evil-motion-state-map "T" 'evil-find-char-to-backward)
 (define-key evil-motion-state-map "tp" 'projectile-command-map)
+(define-key evil-motion-state-map "tr" 'evil-use-register)
 ;; "ts" will stand for "toggle setting"
 (define-key evil-motion-state-map "tsp" 'smartparens-mode)
 (define-key evil-motion-state-map "tsw" 'whitespace)
@@ -632,6 +633,9 @@
 (define-key evil-visual-state-map "s)" 'eval-region)
 (define-key evil-visual-state-map (kbd "C-s") 'yas-insert-with-region)
 (define-key evil-normal-state-map "sm" 'evil-set-marker)
+(define-key evil-normal-state-map "sM" 'evil-show-marks)
+(define-key evil-normal-state-map "sg" 'evil-goto-mark)
+(define-key evil-normal-state-map "sG" 'evil-goto-mark-line)
 (define-key evil-insert-state-map (kbd "M-c") 'smex)
 (define-key evil-motion-state-map (kbd "M-c") 'smex)
 (define-key evil-motion-state-map "sx" 'eval-expression)

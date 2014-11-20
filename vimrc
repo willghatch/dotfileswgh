@@ -124,6 +124,7 @@ noremap eB _
 noremap t <nop>
 noremap tt t
 noremap tT T
+noremap tr "
 " window keys
 nnoremap thic :bdelete<CR>
 nnoremap thiac :qa<CR>
@@ -157,6 +158,9 @@ vnoremap <C-g> <esc>
 cnoremap <C-g> <esc>
 
 nnoremap sm m
+nnoremap sM :marks<cr>
+nnoremap sg `
+nnoremap sG '
 nnoremap ss s
 nnoremap sh :!
 vnoremap sh :!
