@@ -11,6 +11,7 @@
           (lambda ()
             (whitespace)
             (rainbow-delimiters-mode-enable)
+            (rainbow-identifiers-mode 1)
             (load-library "wghconf-projectile.el")
             ))
 (add-hook 'python-mode-hook

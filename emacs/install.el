@@ -13,6 +13,8 @@
 
 (ignore-errors (package-install 'evil-args))
 (ignore-errors (package-install 'rainbow-delimiters))
+(ignore-errors (package-install 'rainbow-identifiers))
+(ignore-errors (package-install 'rainbow-mode)) ; for #123456 colors
 (ignore-errors (package-install 'smartparens))
 (ignore-errors (package-install 'ace-jump-mode))
 
