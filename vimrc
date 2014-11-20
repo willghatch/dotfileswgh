@@ -131,6 +131,7 @@ nnoremap this :w<CR>
 nnoremap thias :wall<CR>
 nnoremap thie :w<CR>:bdelete<CR>
 nnoremap thiae :wqall<CR>
+nnoremap thif :e<space>
 
 nnoremap thn <C-w>w
 nnoremap thp <C-w>W

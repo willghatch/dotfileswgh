@@ -474,6 +474,8 @@
 (define-key evil-window-map "ias" 'evil-write-all)
 (define-key evil-window-map "ie" 'wevil-save-and-quit)
 (define-key evil-window-map "iae" 'evil-save-and-quit)
+(define-key evil-window-map "if" 'ido-ffap-no)
+(define-key evil-window-map "iF" 'ido-ffap-yes)
 ;; Space will be for layout concerns
 (define-key evil-window-map " f" 'delete-other-windows)
 (define-key evil-window-map " u" 'winner-undo)
