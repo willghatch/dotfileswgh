@@ -103,6 +103,7 @@
   (+ 0 0))
 
 (menu-bar-mode -1) ; no menu-bar
+(tool-bar-mode -1)
 (setq inhibit-splash-screen t)
 (setq inhibit-startup-message t)
 

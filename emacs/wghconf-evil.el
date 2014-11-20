@@ -610,6 +610,9 @@
 (define-key evil-motion-state-map "tse" 'electric-indent-mode)
 (define-key evil-motion-state-map "tsd" 'rainbow-delimiters-mode)
 (define-key evil-motion-state-map "tsr" 'linum-relative-toggle)
+(define-key evil-motion-state-map "tsM" 'menu-bar-mode)
+(define-key evil-motion-state-map "tsm" '(lambda () (interactive)
+                                           (menu-bar-mode 1) (menu-bar-open)))
 
 ;; s map
 ;(define-key evil-normal-state-map "ss" 'evil-substitute)
@@ -748,3 +751,7 @@
 ;(global-set-key [mouse-4] (lambda () (interactive) (scroll-down 4)))
 ;(global-set-key [mouse-5] (lambda () (interactive) (scroll-up 4)))
 
+(define-key tty-menu-navigation-map "j" 'tty-menu-next-item)
+(define-key tty-menu-navigation-map "k" 'tty-menu-prev-item)
+(define-key tty-menu-navigation-map "h" 'tty-menu-prev-menu)
+(define-key tty-menu-navigation-map "l" 'tty-menu-next-menu)

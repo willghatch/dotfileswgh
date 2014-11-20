@@ -61,6 +61,7 @@
  '(magit-diff-none ((t (:inherit diff-header))))
  '(magit-item-highlight ((t (:background "#232323"))))
  '(match ((t (:background "#cdcd00" :foreground "#00005f"))))
+ '(menu ((t (:background "#003070" :foreground "#70c0ff"))))
  '(minibuffer-prompt ((t (:foreground "#ff00ff"))))
  '(mode-line ((t (:background "#161616" :foreground "#00afd7"))))
  '(mode-line-inactive ((t (:inherit mode-line :background "#161616" :foreground "#008787" :box (:line-width -1 :color "#303030") :weight light))))
