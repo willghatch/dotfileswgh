@@ -671,6 +671,7 @@
 (define-key evil-motion-state-map "}" 'forward-sexp)
 (define-key evil-motion-state-map "[" 'backward-list)
 (define-key evil-motion-state-map "]" 'forward-list)
+(define-key evil-motion-state-map (kbd "C-z") 'suspend-frame)
 
 ;; Joining
 ;; TODO -- make a better mapping for this.  I should make my prefixes be mnemonic or something...
