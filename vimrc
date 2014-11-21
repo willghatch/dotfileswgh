@@ -168,6 +168,7 @@ nnoremap sG '
 nnoremap ss s
 nnoremap sh :!
 vnoremap sh :!
+vnoremap s/ :s/
 
 noremap gp "+p
 vnoremap gy "+y

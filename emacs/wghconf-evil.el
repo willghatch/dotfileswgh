@@ -514,7 +514,7 @@
 (define-key evil-normal-state-map "sh" 'shell-command)
 (define-key evil-normal-state-map "s)" 'eval-last-sexp)
 (define-key evil-visual-state-map "s)" 'eval-region)
-(define-key evil-visual-state-map (kbd "C-s") 'yas-insert-with-region)
+(define-key evil-visual-state-map "s/" (kbd ":s/ ")) ; TODO - fix this...
 (define-key evil-normal-state-map "sm" 'evil-set-marker)
 (define-key evil-normal-state-map "sM" 'evil-show-marks)
 (define-key evil-normal-state-map "sg" 'evil-goto-mark)
@@ -523,6 +523,7 @@
 (define-key evil-motion-state-map (kbd "M-c") 'smex)
 (define-key evil-motion-state-map "sx" 'eval-expression)
 
+(define-key evil-visual-state-map (kbd "C-s") 'yas-insert-with-region)
 
 ;; command modes and macros
 (define-key evil-motion-state-map "-" 'evil-ex)
