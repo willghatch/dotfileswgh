@@ -144,6 +144,7 @@ nnoremap thq :bdelete<CR>
 " toggle highlighting off after search
 nnoremap tst :set wrap!<CR>
 nnoremap tsh :nohl<CR>
+nnoremap tsH :set hlsearch!<CR>
 nnoremap tsr :set relativenumber!<CR>
 nnoremap tsi :set ignorecase!<CR>
 nnoremap tsa :set autoindent!<CR>

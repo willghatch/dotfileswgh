@@ -29,6 +29,8 @@
 (require 'evil-little-word)
 (require 'evil-textobj-between)
 ;; TODO - move this stuff to more sensible places...
+(require 'evil-search-highlight-persist)
+(global-evil-search-highlight-persist 1)
 (require 'evil-matchit)
 (global-evil-matchit-mode 1)
 
@@ -489,9 +491,12 @@
 (define-key evil-motion-state-map "tse" 'electric-indent-mode)
 (define-key evil-motion-state-map "tsd" 'rainbow-delimiters-mode)
 (define-key evil-motion-state-map "tsr" 'linum-relative-toggle)
+(define-key evil-motion-state-map "tsh" 'evil-search-highlight-persist-remove-all)
+(define-key evil-motion-state-map "tsH" 'evil-search-highlight-persist)
 (define-key evil-motion-state-map "tsM" 'menu-bar-mode)
 (define-key evil-motion-state-map "tsm" '(lambda () (interactive)
                                            (menu-bar-mode 1) (menu-bar-open)))
+
 (define-key evil-motion-state-map "tlb" 'list-buffers)
 (define-key evil-motion-state-map "tlm" 'evil-show-marks)
 ;(define-key evil-motion-state-map "tlk" 'list-keymaps) ; TODO - make this function

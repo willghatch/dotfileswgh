@@ -27,6 +27,7 @@
  '(diff-removed ((t (:background "#150000"))))
  '(evil-ex-lazy-highlight ((t (:inherit lazy-highlight :background "#00005f" :foreground "#ff0000"))))
  '(evil-ex-substitute-matches ((t (:background "#5f0000"))))
+ '(evil-search-highlight-persist-highlight-face ((t (:inherit lazy-highlight))))
  '(flycheck-error ((t (:inherit error))))
  '(flycheck-info ((t (:inherit success))))
  '(flycheck-warning ((t (:inherit warning))))
