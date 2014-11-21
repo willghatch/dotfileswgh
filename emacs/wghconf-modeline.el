@@ -38,7 +38,7 @@
   "buffer dirty (unsaved) face")
 
 (defface wevil-ro-face
-  '((t (:foreground "black" :background "brightyellow" :bold t)))
+  '((t (:foreground "black" :background "yellow" :bold t)))
   "read only tag face")
 
 
@@ -85,7 +85,6 @@
        " %Z %@ %e" ; coding system, whether the default dir is remote, mem full
        "%]%["
        " %-" ; dashes to end
-       
        ))
 
 (setq-default header-line-format
@@ -97,10 +96,10 @@
 
        ;; is this buffer read-only?
        '(:eval (when buffer-read-only
-                 ((propertize " RO " 'face 'wevil-ro-face))))
+                 (propertize "RO" 'face 'wevil-ro-face)))
        "] "
        ;; the full file name
-       '(:eval (propertize (buffer-file-name) 'face 'font-lock-preprocessor-face))
+       '(:eval (propertize (or (buffer-file-name) "~NoFile~") 'face 'font-lock-preprocessor-face))
 
 
        ;; the current major mode for the buffer.
