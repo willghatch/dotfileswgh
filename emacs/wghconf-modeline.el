@@ -37,6 +37,10 @@
   '((t (:foreground "#5f0000" :background "red" :bold t)))
   "buffer dirty (unsaved) face")
 
+(defface wevil-dirty-global-face
+  '((t (:foreground "#5f0000" :background "magenta" :bold t)))
+  "face for marker for when any file-visiting buffer is dirty")
+
 (defface wevil-ro-face
   '((t (:foreground "black" :background "yellow" :bold t)))
   "read only tag face")
@@ -93,6 +97,18 @@
        ;; was this buffer modified since the last save?
        '(:eval (when (buffer-modified-p)
                  (propertize "DIRTY" 'face 'wevil-dirty-face)))
+
+       ;; was any buffer modified since the last save?
+       '(:eval (when
+                   (and
+                    (not (buffer-modified-p))
+                    (cl-reduce
+                     (lambda (old buffer)
+                       (or old (with-current-buffer buffer
+                                 (and (buffer-file-name)
+                                      (buffer-modified-p)))))
+                     (buffer-list) :initial-value nil))
+                 (propertize "DB" 'face 'wevil-dirty-global-face)))
 
        ;; is this buffer read-only?
        '(:eval (when buffer-read-only
