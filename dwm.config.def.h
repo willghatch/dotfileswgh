@@ -111,42 +111,42 @@ static const char *lockcmd[]  = { "vlaunch", "lockscreen", NULL };
 static Key keys[] = {
   /////////// Maybe I should add or change to left handed movement.  Since I'm not doing anything with the left hand now, that might be good.
 	/* modifier                     key        function        argument */
-	//{ HYPKEY,                       XK_p,      spawn,          {.v = dmenucmd } },
-	{ HYPKEY,                       XK_Return, spawn,          {.v = termcmd } },
-	{ HYPKEY,                       XK_r,      spawn,          {.v = launchercmd } },
-	//{ HYPKEY,                       XK_p,      spawn,          {.v = termcmd } },
+	//{ SUPKEY,                       XK_p,      spawn,          {.v = dmenucmd } },
+	{ SUPKEY,                       XK_Return, spawn,          {.v = termcmd } },
+	{ SUPKEY,                       XK_r,      spawn,          {.v = launchercmd } },
+	//{ SUPKEY,                       XK_p,      spawn,          {.v = termcmd } },
 	//{ SUPKEY,                       XK_p,      spawn,          {.v = launchercmd } },
-	{ HYPKEY,                       XK_q, spawn,               {.v = lockcmd } },
-	//{ HYPKEY,                       XK_b,      togglebar,      {0} },
-	{ HYPKEY,                       XK_j,      focusstack,     {.i = +1 } },
-	{ HYPKEY,                       XK_k,      focusstack,     {.i = -1 } },
-	//{ HYPKEY|ALTKEY,                XK_j,      zoom,           {0} }, //toggle between master area
-	{ HYPKEY|ALTKEY,                XK_h,      incnmaster,     {.i = +1 } }, // num clients in master
-	{ HYPKEY|ALTKEY,                XK_l,      incnmaster,     {.i = -1 } },
-	{ HYPKEY,                       XK_h,      setmfact,       {.f = -0.05} }, // size of master/slave areas
-	{ HYPKEY,                       XK_l,      setmfact,       {.f = +0.05} },
-	{ HYPKEY,                       XK_x,      zoom,           {0} }, //toggle between master area
-	//{ HYPKEY,                       XK_Tab,    view,           {0} },
-	{ HYPKEY,                       XK_c,      killclient,     {0} },
-	{ HYPKEY,                       XK_space,  setlayout,      {.v = &layouts[0]} }, // tile
-	{ HYPKEY|ALTKEY,                XK_f,      setlayout,      {.v = &layouts[1]} }, // float
-	{ HYPKEY,                       XK_f,      setlayout,      {.v = &layouts[2]} }, // monocle
-	//{ HYPKEY,                       XK_space,  setlayout,      {0} },
-	{ HYPKEY|CTRLKEY,               XK_f,      togglefloating, {0} },
-	//{ HYPKEY,                       XK_0,      view,           {.ui = ~0 } },
-	//{ HYPKEY|ShiftMask,             XK_0,      tag,            {.ui = ~0 } },
-	{ HYPKEY,                       XK_p,      focusmon,       {.i = -1 } },
-	{ HYPKEY,                       XK_n,      focusmon,       {.i = +1 } },
-	{ HYPKEY|ALTKEY,                XK_p,      tagmon,         {.i = -1 } },
-	{ HYPKEY|ALTKEY,                XK_n,      tagmon,         {.i = +1 } },
-	//{ HYPKEY|ALTKEY,                XK_m,      tagAndFocusMon, {.i = -1 } },
-	//{ HYPKEY|ALTKEY,                XK_w,      tagAndFocusMon, {.i = +1 } },
-	{ HYPKEY,                       XK_b,      viewNext,       {.ui = 0 } },
-	{ HYPKEY,                       XK_w,      viewNext,       {.ui = 1 } },
-	//{ HYPKEY|ALTKEY,                XK_v,      tagAndViewNext, {.ui = 0 } },
-	//{ HYPKEY|ALTKEY,                XK_z,      tagAndViewNext, {.ui = 1 } },
-	{ HYPKEY|ALTKEY,                XK_b,             tagNext, {.ui = 0 } },
-	{ HYPKEY|ALTKEY,                XK_w,             tagNext, {.ui = 1 } },
+	{ SUPKEY,                       XK_q, spawn,               {.v = lockcmd } },
+	//{ SUPKEY,                       XK_b,      togglebar,      {0} },
+	{ SUPKEY,                       XK_j,      focusstack,     {.i = +1 } },
+	{ SUPKEY,                       XK_k,      focusstack,     {.i = -1 } },
+	//{ SUPKEY|ALTKEY,                XK_j,      zoom,           {0} }, //toggle between master area
+	{ SUPKEY|ALTKEY,                XK_h,      incnmaster,     {.i = +1 } }, // num clients in master
+	{ SUPKEY|ALTKEY,                XK_l,      incnmaster,     {.i = -1 } },
+	{ SUPKEY,                       XK_h,      setmfact,       {.f = -0.05} }, // size of master/slave areas
+	{ SUPKEY,                       XK_l,      setmfact,       {.f = +0.05} },
+	{ SUPKEY,                       XK_x,      zoom,           {0} }, //toggle between master area
+	//{ SUPKEY,                       XK_Tab,    view,           {0} },
+	{ SUPKEY,                       XK_c,      killclient,     {0} },
+	{ SUPKEY,                       XK_space,  setlayout,      {.v = &layouts[0]} }, // tile
+	{ SUPKEY|ALTKEY,                XK_f,      setlayout,      {.v = &layouts[1]} }, // float
+	{ SUPKEY,                       XK_f,      setlayout,      {.v = &layouts[2]} }, // monocle
+	//{ SUPKEY,                       XK_space,  setlayout,      {0} },
+	{ SUPKEY|CTRLKEY,               XK_f,      togglefloating, {0} },
+	//{ SUPKEY,                       XK_0,      view,           {.ui = ~0 } },
+	//{ SUPKEY|ShiftMask,             XK_0,      tag,            {.ui = ~0 } },
+	{ SUPKEY,                       XK_p,      focusmon,       {.i = -1 } },
+	{ SUPKEY,                       XK_n,      focusmon,       {.i = +1 } },
+	{ SUPKEY|ALTKEY,                XK_p,      tagmon,         {.i = -1 } },
+	{ SUPKEY|ALTKEY,                XK_n,      tagmon,         {.i = +1 } },
+	//{ SUPKEY|ALTKEY,                XK_m,      tagAndFocusMon, {.i = -1 } },
+	//{ SUPKEY|ALTKEY,                XK_w,      tagAndFocusMon, {.i = +1 } },
+	{ SUPKEY,                       XK_b,      viewNext,       {.ui = 0 } },
+	{ SUPKEY,                       XK_w,      viewNext,       {.ui = 1 } },
+	//{ SUPKEY|ALTKEY,                XK_v,      tagAndViewNext, {.ui = 0 } },
+	//{ SUPKEY|ALTKEY,                XK_z,      tagAndViewNext, {.ui = 1 } },
+	{ SUPKEY|ALTKEY,                XK_b,             tagNext, {.ui = 0 } },
+	{ SUPKEY|ALTKEY,                XK_w,             tagNext, {.ui = 1 } },
 	//TAGKEYS(                        XK_1,                      0)
 	//TAGKEYS(                        XK_2,                      1)
 	//TAGKEYS(                        XK_3,                      2)
@@ -156,7 +156,7 @@ static Key keys[] = {
 	//TAGKEYS(                        XK_7,                      6)
 	//TAGKEYS(                        XK_8,                      7)
 	//TAGKEYS(                        XK_9,                      8)
-	{ HYPKEY|ShiftMask,             XK_q,      quit,           {0} },
+	{ SUPKEY|ShiftMask,             XK_q,      quit,           {0} },
 };
 
 /* button definitions */
