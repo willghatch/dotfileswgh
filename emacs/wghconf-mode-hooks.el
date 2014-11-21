@@ -12,7 +12,8 @@
             (whitespace)
             (rainbow-delimiters-mode-enable)
             (rainbow-identifiers-mode 1)
-            (load-library "wghconf-projectile.el")
+            (company-mode 1)
+            (projectile-mode 1)
             ))
 (add-hook 'python-mode-hook
           (lambda ()

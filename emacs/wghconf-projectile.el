@@ -1,5 +1,4 @@
 
-(projectile-mode 1)
 (require 'helm-projectile)
 (helm-projectile-on)
 (define-prefix-command 'helm-projectile-map)

@@ -2,7 +2,6 @@
 ;; settings and extensions to company mode
 
 (require 'company)
-(company-mode 1)
 
 (defvar-local company-completing-wgh nil)
 

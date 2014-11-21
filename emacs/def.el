@@ -95,10 +95,6 @@
   "pulls in auto-complete package (in elpa) with my config"
   (load-library "wghconf-auto-complete"))
 
-(defun mycomp () (interactive)
-  "pulls in company package (in elpa) with my config"
-  (load-library "wghconf-company"))
-
 (defun nop () (interactive)
   (+ 0 0))
 
@@ -137,18 +133,20 @@ it calls the next function one more time."
   (interactive)
   (np-buffer-no-star 'previous-buffer))
 
+(require 'smex)
+(require 'yafolding)
+(require 'rainbow-delimiters)
 (load-library "wghconf-package") ; load packaging config
 (load-library "wghconf-modeline") ; load mode line config
 (load-library "wghconf-yasnippet")
 (load-library "wghconf-org-mode")
 (load-library "wghconf-fci-mode")
 (load-library "wghconf-mode-hooks")
+(load-library "wghconf-company")
 (load-library "wghconf-hippie-expand")
 (load-library "wghconf-popwin")
+(load-library "wghconf-projectile.el")
 (winner-mode 1)
-(require 'smex)
-(require 'yafolding)
-(require 'rainbow-delimiters)
 (show-smartparens-global-mode 1)
 (yafolding-mode 1)
 (setq custom-file "~/dotfileswgh/emacs/custom-file.el")
