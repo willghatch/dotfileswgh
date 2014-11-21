@@ -619,6 +619,11 @@
 (define-key evil-motion-state-map "tsM" 'menu-bar-mode)
 (define-key evil-motion-state-map "tsm" '(lambda () (interactive)
                                            (menu-bar-mode 1) (menu-bar-open)))
+(define-key evil-motion-state-map "tlb" 'list-buffers)
+(define-key evil-motion-state-map "tlm" 'evil-show-marks)
+;(define-key evil-motion-state-map "tlk" 'list-keymaps) ; TODO - make this function
+(define-key evil-motion-state-map "tlc" 'list-colors-display)
+(define-key evil-motion-state-map "tlf" 'list-faces-display)
 
 ;; s map
 ;(define-key evil-normal-state-map "ss" 'evil-substitute)

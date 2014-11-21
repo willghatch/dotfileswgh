@@ -148,6 +148,9 @@ nnoremap tsr :set relativenumber!<CR>
 nnoremap tsi :set ignorecase!<CR>
 nnoremap tsa :set autoindent!<CR>
 
+nnoremap tlb :buffers<CR>
+nnoremap tlm :marks<CR>
+
 noremap <Space>h <PageDown>
 noremap <Space>t <PageUp>
 noremap <Space>j <PageDown>
