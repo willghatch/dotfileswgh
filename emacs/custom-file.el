@@ -7,6 +7,7 @@
  '(evil-intercept-maps nil)
  '(evil-overriding-maps nil)
  '(fill-column 80)
+ '(rainbow-identifiers-faces-to-override (quote (font-lock-variable-name-face)))
  '(sp-highlight-pair-overlay nil)
  '(sp-show-pair-from-inside t))
 (custom-set-faces
