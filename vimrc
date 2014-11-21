@@ -107,8 +107,8 @@ noremap ef f
 noremap of F
 noremap et t
 noremap ot T
-noremap er ;
-noremap or ,
+noremap em ;
+noremap om ,
 noremap en n
 noremap on N
 noremap ol ^
