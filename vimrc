@@ -164,6 +164,8 @@ noremap <Space>h <PageDown>
 noremap <Space>t <PageUp>
 noremap <Space>j <PageDown>
 noremap <Space>k <PageUp>
+nnoremap <Space> v ggVG
+
 inoremap <C-g> <esc>
 noremap <C-g> <esc>
 vnoremap <C-g> <esc>

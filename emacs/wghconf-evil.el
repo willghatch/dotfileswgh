@@ -556,6 +556,7 @@
 (define-key evil-motion-state-map "   /" 'helm-multi-swoop)
 (define-key evil-motion-state-map " -" 'helm-M-x)
 (define-key evil-motion-state-map " &" 'evil-ex-repeat-global-substitute)
+(define-key evil-motion-state-map " v" 'mark-whole-buffer)
 
 ;; Joining
 ;; TODO -- make a better mapping for this.  I should make my prefixes be mnemonic or something...
