@@ -526,9 +526,9 @@
 (define-key evil-visual-state-map (kbd "C-s") 'yas-insert-with-region)
 
 ;; command modes and macros
-(define-key evil-motion-state-map "-" 'evil-ex)
+(define-key evil-motion-state-map "-" 'smex)
 ;(define-key evil-motion-state-map "|" 'execute-extended-command)
-(define-key evil-motion-state-map "|" 'smex)
+(define-key evil-motion-state-map "|" 'eval-expression)
 (define-key evil-motion-state-map "_" 'eval-expression)
 (define-key evil-motion-state-map "Q" 'call-last-kbd-macro)
 ;; Movement

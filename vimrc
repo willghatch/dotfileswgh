@@ -69,7 +69,15 @@ set <f14>=kj
 inoremap <f13> <esc>
 inoremap <f14> <esc>
 noremap - :
-
+inoremap <C-\> <C-o>
+inoremap <M-c> <C-o>:
+inoremap <esc>c <C-o>:
+inoremap <M-x> <C-o>:
+inoremap <esc>x <C-o>:
+noremap <M-c> :
+noremap <esc>c :
+noremap <M-x> :
+noremap <esc>x :
 
 " o and e maps - o is left/back, e is right/forward
 noremap e <nop>
