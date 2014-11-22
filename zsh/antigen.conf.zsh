@@ -4,23 +4,23 @@ source $DOTFILESDIR/external/zsh/antigen/antigen.zsh
 antigen bundles <<EOBUNDLES
     zsh-users/zsh-history-substring-search
     hchbaw/opp.zsh.git
-    # TODO - get opp's sub-pieces working (surround, between)
-    #hchbaw/auto-fu.zsh.git
+    #hchbaw/opp.zsh.git opp
     alfredodeza/zsh-plugins.git vi #vi visual
     zsh-users/zaw
-    willghatch/zsh-snippets
+
     willghatch/zsh-zaw-extras
+    willghatch/zsh-snippets
+    willghatch/vzsh
+
     tarrasch/zsh-colors
     tarrasch/zsh-bd
     tarrasch/zsh-functional
+
     voronkovich/gitignore.plugin.zsh
     jocelynmallon/zshmarks
-    zsh-users/zsh-syntax-highlighting
+    ehamberg/zsh-cabal-completion
     skx/sysadmin-util # adds cool commands (adds to path)
-    cabal
-    catimg
-    # the cp plugin provides cpv - rsync based progress-showing cp
-    cp
+    zsh-users/zsh-syntax-highlighting
 EOBUNDLES
 
 
