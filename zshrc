@@ -9,6 +9,13 @@ ZSH_HIGHLIGHT_HIGHLIGHTERS=(main brackets pattern cursor)
 
 source $HOME/dotfileswgh/bazsh/common.sh
 
+CDR_DIR=/tmp/$USER/cdr
+mkdir -p $CDR_DIR
+autoload -Uz chpwd_recent_dirs cdr
+autoload -U add-zsh-hook
+add-zsh-hook chpwd chpwd_recent_dirs
+zstyle ':chpwd:*' recent-dirs-file $CDR_DIR/recent-dirs
+
 # setup for zshmarks plugin
 BOOKMARKS_FILE=$DOTFILESLOCALDIR/zsh-bookmarks
 alias cb="jump"
