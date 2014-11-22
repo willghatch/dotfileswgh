@@ -9,7 +9,7 @@
 	url = https://github.com/zsh-users/antigen.git
 [submodule "external/zsh/antigen-hs"]
 	path = external/zsh/antigen-hs
-	url = https://github.com/willghatch/antigen-hs.git
+	url = https://github.com/tarrasch/antigen-hs.git
 [submodule "external/vim/Vundle.vim"]
 	path = external/vim/Vundle.vim
 	url = https://github.com/gmarik/Vundle.vim.git
