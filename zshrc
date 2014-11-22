@@ -9,6 +9,10 @@ ZSH_HIGHLIGHT_HIGHLIGHTERS=(main brackets pattern cursor)
 
 source $HOME/dotfileswgh/bazsh/common.sh
 
+# setup for zshmarks plugin
+BOOKMARKS_FILE=$DOTFILESLOCALDIR/zsh-bookmarks
+alias cb="jump"
+
 # if cabal is installed, use antigen-hs, since it's so much faster
 # ... if not, use regular antigen, because it doesn't need Haskell!
 if which cabal 1>/dev/null 2>&1; then

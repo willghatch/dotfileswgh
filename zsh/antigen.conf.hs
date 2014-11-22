@@ -17,8 +17,7 @@ bundles =
   , (bundle "alfredodeza/zsh-plugins.git")
      {sourcingStrategy = filePathsSourcingStrategy ["vi/zle_vi_visual.zsh"]}
   , (bundle "robbyrussell/oh-my-zsh") { sourcingLocations =
-        [ "plugins/wd"
-        , "plugins/cabal"
+        [ "plugins/cabal"
         , "plugins/catimg"
         , "plugins/cp"
         ]}
@@ -27,6 +26,12 @@ bundles =
   , bundle "willghatch/zsh-zaw-extras"
   , bundle "willghatch/zsh-snippets"
   , bundle "willghatch/vzsh"
+  , bundle "tarrasch/zsh-colors"
+  , bundle "tarrasch/zsh-bd"
+  , bundle "tarrasch/zsh-functional"
+  , bundle "voronkovich/gitignore.plugin.zsh"
+  , bundle "jocelynmallon/zshmarks"
+  , bundle "skx/sysadmin-util"
   -- , developFromFileSystem "/home/foo/bar"
   ]
 

@@ -10,9 +10,13 @@ antigen bundles <<EOBUNDLES
     zsh-users/zaw
     willghatch/zsh-snippets
     willghatch/zsh-zaw-extras
-    # use the oh-my-zsh version of wd because the upstream does crap like install in ~/bin
-    wd
+    tarrasch/zsh-colors
+    tarrasch/zsh-bd
+    tarrasch/zsh-functional
+    voronkovich/gitignore.plugin.zsh
+    jocelynmallon/zshmarks
     zsh-users/zsh-syntax-highlighting
+    skx/sysadmin-util # adds cool commands (adds to path)
     cabal
     catimg
     # the cp plugin provides cpv - rsync based progress-showing cp
