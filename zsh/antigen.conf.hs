@@ -20,6 +20,9 @@ bundles =
      {sourcingStrategy = filePathsSourcingStrategy ["vi/zle_vi_visual.zsh"]}
   , bundle "zsh-users/zaw"
   , bundle "willghatch/zsh-zaw-extras"
+
+  , bundle "willghatch/zsh-hooks"
+  , bundle "willghatch/zsh-megaprompt"
   , bundle "willghatch/zsh-snippets"
   , bundle "willghatch/vzsh"
 

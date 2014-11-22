@@ -7,8 +7,10 @@ antigen bundles <<EOBUNDLES
     #hchbaw/opp.zsh.git opp
     alfredodeza/zsh-plugins.git vi #vi visual
     zsh-users/zaw
-
     willghatch/zsh-zaw-extras
+
+    willghatch/zsh-hooks
+    willghatch/zsh-megaprompt
     willghatch/zsh-snippets
     willghatch/vzsh
 
