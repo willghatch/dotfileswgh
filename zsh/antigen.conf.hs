@@ -24,6 +24,7 @@ bundles =
   , bundle "willghatch/zsh-hooks"
   , bundle "willghatch/zsh-megaprompt"
   , bundle "willghatch/zsh-snippets"
+  , bundle "willghatch/zsh-grml-funcs"
   , bundle "willghatch/vzsh"
 
   , bundle "tarrasch/zsh-colors"

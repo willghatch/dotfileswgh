@@ -12,6 +12,7 @@ antigen bundles <<EOBUNDLES
     willghatch/zsh-hooks
     willghatch/zsh-megaprompt
     willghatch/zsh-snippets
+    willghatch/zsh-grml-funcs
     willghatch/vzsh
 
     tarrasch/zsh-colors
