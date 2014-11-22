@@ -146,6 +146,7 @@ it calls the next function one more time."
 (load-library "wghconf-hippie-expand")
 (load-library "wghconf-popwin")
 (load-library "wghconf-projectile.el")
+(load-library "wghconf-scratch-message.el")
 (winner-mode 1)
 (show-smartparens-global-mode 1)
 (yafolding-mode 1)
