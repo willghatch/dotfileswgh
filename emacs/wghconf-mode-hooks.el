@@ -34,13 +34,6 @@
 (defun add-to-hooks (fun hooklist)
   (mapcar (lambda (hook) (add-hook hook fun)) hooklist))
 
-(add-to-hooks #'mycomp '(js-mode-hook
-                         emacs-lisp-mode-hook
-                         shell-script-mode-hook
-                         php-mode-hook
-                         nxml-mode-hook
-                         html-mode-hook
-                         ))
 
 
 ;; TODO -- these are default values that I should deal with now
