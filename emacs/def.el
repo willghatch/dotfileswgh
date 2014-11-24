@@ -1,14 +1,17 @@
 
+(setq package-user-dir (concat (getenv "DOTFILESLOCALDIR") "/emacs.d/elpa"))
 ;; Set up load path for requires
-(let ((default-directory "~/.emacs.d"))
+(let ((default-directory (concat (getenv "DOTFILESLOCALDIR") "/emacs.d")))
+      (normal-top-level-add-subdirs-to-load-path))
+(let ((default-directory (concat (getenv "HOME") "/.emacs.d")))
       (normal-top-level-add-subdirs-to-load-path))
 (let ((default-directory "/usr/share/emacs/site-lisp"))
       (normal-top-level-add-subdirs-to-load-path))
-(let ((default-directory "~/dotfileswgh/emacs"))
+(let ((default-directory (concat (getenv "DOTFILESDIR") "/emacs")))
       (normal-top-level-add-subdirs-to-load-path))
-(let ((default-directory "~/dotfileswgh/external/emacs"))
+(let ((default-directory (concat (getenv "DOTFILESDIR") "/external/emacs")))
       (normal-top-level-add-subdirs-to-load-path))
-(setq load-path (cons "~/dotfileswgh/emacs" load-path))
+(setq load-path (cons (concat (getenv "DOTFILESDIR") "/emacs") load-path))
 
 ;; compile settings
 (setq load-prefer-newer t)
@@ -85,7 +88,9 @@
 
 (require 'ido) ; comes standard with emacs
 (ido-mode 1)
-(flx-ido-mode 1)
+(ignore-errors
+  (require 'flx-ido)
+  (flx-ido-mode 1))
 
 (defun myslime () (interactive)
   "pulls in slime (in elpa) and my config"
@@ -150,7 +155,7 @@ it calls the next function one more time."
 (winner-mode 1)
 (show-smartparens-global-mode 1)
 (yafolding-mode 1)
-(setq custom-file "~/dotfileswgh/emacs/custom-file.el")
+(setq custom-file (concat (getenv "DOTFILESDIR") "/emacs/custom-file.el"))
 (load custom-file)
 
 (setq echo-keystrokes 0.01) ; echo keystrokes faster than default 1s
@@ -164,7 +169,8 @@ it calls the next function one more time."
 
 (global-auto-revert-mode t) ; auto-reload files when they change on disk
 
-(if (file-exists-p "~/dotfileswgh/dotlocal/emacs") (load-file "~/dotfileswgh/dotlocal/emacs") nil)
+(let ((file (concat (getenv "DOTFILESLOCALDIR") "/emacs")))
+  (if (file-exists-p file) (load-file file) nil))
 
 
 (print (format "start time: %f" (time-to-seconds (time-subtract (current-time) before-init-time))))
