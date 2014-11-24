@@ -1,4 +1,7 @@
 
+(setq custom-file (concat (getenv "DOTFILESDIR") "/emacs/custom-file.el"))
+(load custom-file)
+
 (setq package-user-dir (concat (getenv "DOTFILESLOCALDIR") "/emacs.d/elpa"))
 ;; Set up load path for requires
 (let ((default-directory (concat (getenv "DOTFILESLOCALDIR") "/emacs.d")))
@@ -155,8 +158,6 @@ it calls the next function one more time."
 (winner-mode 1)
 (show-smartparens-global-mode 1)
 (yafolding-mode 1)
-(setq custom-file (concat (getenv "DOTFILESDIR") "/emacs/custom-file.el"))
-(load custom-file)
 
 (setq echo-keystrokes 0.01) ; echo keystrokes faster than default 1s
 
