@@ -114,6 +114,10 @@ bindkey-to-prefix-map spacemap "-" zaw-widgets
 zstyle ':filter-select' extended-search yes
 zstyle ':filter-select' max-lines 15
 
+if [[ "$USER" != "wgh" ]]; then
+    MEGAPROMPT_STYLES[username]="%B%F{yellow}"
+fi
+
 tf=$DOTFILESLOCALDIR/bazsh
 if [ -f "$tf" ]
 then
