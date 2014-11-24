@@ -41,8 +41,11 @@ set backspace=indent,eol,start
 "set insertmode     " make vim modeless!  I might check this out later...
 
 set backup    " Make backup files
-set backupdir=$DOTFILESLOCALDIR/vimtmp   " Directory for backup files
-set directory=$DOTFILESLOCALDIR/vimtmp   " Directory for swap files
+if !isdirectory($HOME . "/.cache/vimtmp")
+    call mkdir($HOME . "/.cache/vimtmp", "p")
+endif
+set backupdir=$HOME/.cache/vimtmp   " Directory for backup files
+set directory=$HOME/.cache/vimtmp   " Directory for swap files
 
 
 """ Command window stuff
