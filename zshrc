@@ -28,8 +28,10 @@ autoload -U add-zsh-hook
 add-zsh-hook chpwd chpwd_recent_dirs
 zstyle ':chpwd:*' recent-dirs-file $CDR_DIR/recent-dirs
 
+# zaw bookmark file
+BOOKMARKFILE=~/.cache/zsh/zaw-bookmarks
 # setup for zshmarks plugin
-BOOKMARKS_FILE=$DOTFILESLOCALDIR/zsh-bookmarks
+BOOKMARKS_FILE=~/.cache/zsh/zsh-bookmarks
 alias cb="jump"
 
 # if cabal is installed, use antigen-hs, since it's so much faster
