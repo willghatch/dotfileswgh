@@ -1,4 +1,5 @@
-
+# output the repos to my dotlocal dir
+ADOTDIR=$DOTFILESLOCALDIR/antigen
 source $DOTFILESDIR/external/zsh/antigen/antigen.zsh
 
 antigen bundles <<EOBUNDLES
