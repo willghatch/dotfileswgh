@@ -45,3 +45,10 @@
 (ignore-errors (package-install 'helm-company))
 (ignore-errors (package-install 'helm-descbinds))
 
+
+
+
+(ignore-errors (package-install 'haskell-mode))
+(ignore-errors (package-install 'markdown-mode))
+(ignore-errors (package-install 'slime))
+(ignore-errors (package-install 'lua-mode))
