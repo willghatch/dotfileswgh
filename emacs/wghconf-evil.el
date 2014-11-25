@@ -39,6 +39,7 @@
   (interactive "p")
   (forward-word (- n)))
 
+(defalias 'nop 'ignore) ; returns nil
 
 ;;; First, blow up maps so they don't map things like t/T and
 ;;; insert mode stuff
@@ -388,6 +389,13 @@
 (key-chord-define evil-insert-state-map (kbd "kj") 'evil-normal-state)
 (key-chord-define evil-replace-state-map (kbd "kj") 'evil-normal-state)
 
+; Keys unbound and reserved for future use - bind to nop so they don't input
+(define-key evil-motion-state-map (kbd "RET") 'nop)
+(define-key evil-motion-state-map "S" 'nop)
+(define-key evil-motion-state-map "T" 'nop)
+(define-key evil-motion-state-map "f" 'nop)
+(define-key evil-motion-state-map "F" 'nop)
+
 ; g map
 ;(define-key evil-motion-state-map "gq" 'kill-buffer)
 (define-key evil-normal-state-map "g&" 'evil-ex-repeat-global-substitute)
@@ -471,11 +479,8 @@
 (define-key evil-motion-state-map "eO" 'forward-symbol)
 (define-key evil-motion-state-map "oO" 'backward-symbol)
 
-
 ; t map
 (define-key evil-motion-state-map "th" 'evil-window-map)
-(define-key evil-motion-state-map "tt" 'evil-find-char-to)
-(define-key evil-motion-state-map "T" 'evil-find-char-to-backward)
 (define-key evil-motion-state-map "tp" 'projectile-command-map)
 (define-key evil-motion-state-map "tr" 'evil-use-register)
 ;; "ts" will stand for "toggle setting"
@@ -507,7 +512,7 @@
 ;(define-key evil-normal-state-map "ss" 'evil-substitute)
 ;(define-key evil-normal-state-map "sS" 'evil-change-whole-line)
 (evil-define-key 'visual evil-surround-mode-map "s" nil)
-(evil-define-key 'visual evil-surround-mode-map "S" nil)
+(evil-define-key 'visual evil-surround-mode-map "S" 'nop)
 (define-key evil-visual-state-map "ss" 'evil-surround-region)
 (define-key evil-visual-state-map "sS" 'evil-Surround-region)
 (define-key evil-visual-state-map "sh" 'shell-command-on-region)

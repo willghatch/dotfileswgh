@@ -183,9 +183,11 @@ noremap ob -
 noremap oB ^
 noremap eB _
 
+noremap f <nop>
+noremap F <nop>
 noremap t <nop>
-noremap tt t
-noremap tT T
+noremap T <nop>
+noremap tt <nop>
 noremap tr "
 " window keys
 nnoremap thic :bdelete<CR>
