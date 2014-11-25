@@ -332,7 +332,7 @@ def mode_default():
     #binder.bind( "r", [ "command-prompt", "-p", "window name: rename-window %%" ], use_prefix = True )
     #binder.bind( "R", [ "command-prompt", "-p", "session name: rename-session %%" ], use_prefix = True )
     binder.bind( "y", [ "copy-mode" ], use_prefix = True )
-    #bind-key y copy-mode
+    binder.bind( "P", [ "paste-buffer" ], use_prefix = True )
 
     binder.bind( "C-h", [ "split-window", "-v", "sh -i -t", " \\; ", "send-keys", "tmux list-keys \| less\\n" ], use_prefix = True )
 
