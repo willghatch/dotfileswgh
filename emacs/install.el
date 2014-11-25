@@ -52,3 +52,4 @@
 (ignore-errors (package-install 'markdown-mode))
 (ignore-errors (package-install 'slime))
 (ignore-errors (package-install 'lua-mode))
+(ignore-errors (package-install 'vimrc-mode))
