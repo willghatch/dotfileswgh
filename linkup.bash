@@ -18,6 +18,7 @@ dotfiles=(
     pentadactylrc
     Xresources
     xmobarrc
+    tigrc
 )
 
 function die() {

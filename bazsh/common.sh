@@ -59,6 +59,7 @@ alias bbb="env GTK2_RC_FILES=$DOTFILESDIR/gtkrc-2.0-light dwb"
 alias bbbd="env GTK2_RC_FILES=$DOTFILESDIR/gtkrc-2.0-dark dwb"
 
 alias gka="gitk --all"
+alias gta="tig --all"
 alias gunadd="git reset HEAD"
 alias gits="git status"
 alias gru="git remote update"
