@@ -13,6 +13,10 @@ if [ -f /etc/bash.bashrc ]; then
       . /etc/bash.bashrc   # --> Read /etc/bash.bashrc, if present.
 fi
 
+if [ -f ~/.bazshrc.pre ]; then
+      . ~/.bazshrc.pre
+fi
+
 bazsh_common=~/dotfileswgh/bazsh/common.sh
 if [ -f $bazsh_common ]; then
       . $bazsh_common
@@ -74,7 +78,7 @@ NC="\e[m"               # Color Reset
 export PS1="\[$(tput bold)\]\[$(tput setaf 6)\]\A \[$(tput setaf 7)\][\[$(tput setaf 2)\]\u\[$(tput setaf 7)\]@\[$(tput setaf 4)\]\h\[$(tput setaf 7)\]] \[$(tput setaf 4)\]\w \[$(tput setaf 7)\]\\$\[$(tput sgr0)\] "
 
 
-sourceIfExists $DOTFILESLOCALDIR/bazsh
+sourceIfExists $DOTFILESLOCALDIR/bazshrc
 
 sourceIfExists $DOTFILESLOCALDIR/bashrc
 

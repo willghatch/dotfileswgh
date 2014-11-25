@@ -2,12 +2,14 @@
 # This should never be run... but I'm putting the shabang so that editors will
 # recognize it...
 
-export HROOT=$HOME/hroot
-export DOTFILESDIR=$HOME/dotfileswgh
+if [[ -z "$WGHHOME" ]]; then
+    export WGHHOME=$HOME # I want to be able to reference this, and when it's
+    #not true(IE when I use su), I'll set this elsewhere
+fi
+export HROOT=$WGHHOME/hroot
+export DOTFILESDIR=$WGHHOME/dotfileswgh
 export DOTFILESLOCALDIR=$DOTFILESDIR/dotlocal
-export WGHHOME=$HOME # I want to be able to reference this, and when it's not true
-                     # (IE when I use su), I'll set this elsewhere
-PATH=$HOME/bin:$HOME/lscripts:$HOME/vscripts:$HOME/wghsrv_scripts:$DOTFILESDIR/commands:$HOME/.cabal/bin:$HROOT/bin:$HROOT/usr/bin:$HROOT/usr/local/bin:$PATH:/usr/bin:/bin:/usr/local/bin:/sbin:/usr/sbin:/usr/local/sbin
+PATH=$WGHHOME/bin:$WGHHOME/lscripts:$WGHHOME/vscripts:$WGHHOME/wghsrv_scripts:$DOTFILESDIR/commands:$WGHHOME/.cabal/bin:$HROOT/bin:$HROOT/usr/bin:$HROOT/usr/local/bin:$PATH:/usr/bin:/bin:/usr/local/bin:/sbin:/usr/sbin:/usr/local/sbin
 export MANPATH=/usr/share/man:/usr/local/man:/usr/local/share/man:/usr/X11R6/man:/opt/man:$HROOT/usr/share/man:$HROOT/share/man
 
 

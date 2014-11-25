@@ -1,5 +1,16 @@
 #!/usr/bin/zsh
 
+tf=$HOME/.zshrc.pre
+if [ -f "$tf" ]
+then
+    source $tf
+fi
+tf=$HOME/.bazshrc.pre
+if [ -f "$tf" ]
+then
+    source $tf
+fi
+
 HISTSIZE=1000
 SAVEHIST=1000
 
@@ -8,6 +19,7 @@ VZSH_REMAP_KEYS_P=true
 ZSH_HIGHLIGHT_HIGHLIGHTERS=(main brackets pattern cursor)
 
 source $HOME/dotfileswgh/bazsh/common.sh
+typeset -U PATH
 
 CDR_DIR=/tmp/$USER/cdr
 mkdir -p $CDR_DIR
@@ -118,7 +130,7 @@ if [[ "$USER" != "wgh" ]]; then
     MEGAPROMPT_STYLES[username]="%B%F{yellow}"
 fi
 
-tf=$DOTFILESLOCALDIR/bazsh
+tf=$DOTFILESLOCALDIR/bazshrc
 if [ -f "$tf" ]
 then
     source $tf
