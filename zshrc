@@ -54,6 +54,9 @@ zstyle ':completion:*' show-completer true
 # prompt between pages of completions -- MUST BE SET TO ALLOW PAGING
 zstyle ':completion:*' list-prompt "%l"
 
+# count / as word separators, so I can kill partial paths
+WORDCHARS="${WORDCHARS:s#/#}"
+
 fpath=($fpath $HROOT/build/zsh-completions/src)
 
 if [[ -n "$ZSH_HIGHLIGHT_STYLES" ]]; then
