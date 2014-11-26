@@ -659,3 +659,7 @@
 
 (define-key help-map "\C-h" 'describe-prefix-bindings)
 
+
+;; TEMPORORY - to train myself to use f/t better
+(define-key evil-motion-state-map "h" 'ignore)
+(define-key evil-motion-state-map "l" 'ignore)
