@@ -191,15 +191,16 @@ noremap t <nop>
 noremap T <nop>
 noremap tt <nop>
 noremap tr "
-" window keys
-nnoremap thic :bdelete<CR>
-nnoremap thiac :qa<CR>
-nnoremap this :w<CR>
-nnoremap thias :wall<CR>
-nnoremap thie :w<CR>:bdelete<CR>
-nnoremap thiae :wqall<CR>
-nnoremap thif :e<space>
 
+nnoremap tic :bdelete<CR>
+nnoremap tiac :qa<CR>
+nnoremap tis :w<CR>
+nnoremap tias :wall<CR>
+nnoremap tie :w<CR>:bdelete<CR>
+nnoremap tiae :wqall<CR>
+nnoremap tif :e<space>
+
+" window keys
 nnoremap thn <C-w>w
 nnoremap thp <C-w>W
 nnoremap thb :bp<CR>
