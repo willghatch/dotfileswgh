@@ -29,14 +29,13 @@ add-zsh-hook chpwd chpwd_recent_dirs
 zstyle ':chpwd:*' recent-dirs-file $CDR_DIR/recent-dirs
 
 foreground(){
-    fg
+    local b
+    zle push-line
+    BUFFER="fg"
+    zle accept-line
 }; zle -N foreground
 
 xclip-to-zsh(){
-    local l
-    local r
-    l="$LBUFFER"
-    r="$RBUFFER"
     BUFFER="${LBUFFER}$(xclip -o -selection clipboard)${RBUFFER}"
 }; zle -N xclip-to-zsh
 
