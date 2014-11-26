@@ -1,0 +1,11 @@
+#!/usr/bin/env bash
+
+awkcmd='{print $'"$1"
+shift
+
+for x in $@; do
+    awkcmd=${awkcmd}',$'${x}
+done
+awkcmd=${awkcmd}'}'
+
+awk "$awkcmd" <&0
