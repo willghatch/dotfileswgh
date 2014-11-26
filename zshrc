@@ -28,6 +28,18 @@ autoload -U add-zsh-hook
 add-zsh-hook chpwd chpwd_recent_dirs
 zstyle ':chpwd:*' recent-dirs-file $CDR_DIR/recent-dirs
 
+foreground(){
+    fg
+}; zle -N foreground
+
+xclip-to-zsh(){
+    local l
+    local r
+    l="$LBUFFER"
+    r="$RBUFFER"
+    BUFFER="${LBUFFER}$(xclip -o -selection clipboard)${RBUFFER}"
+}; zle -N xclip-to-zsh
+
 # zaw bookmark file
 BOOKMARKFILE=~/.cache/zsh/zaw-bookmarks
 # setup for zshmarks plugin
@@ -104,6 +116,8 @@ if [[ -n "$ZSH_HIGHLIGHT_STYLES" ]]; then
 fi
 
 
+bindkey -M emacs '^Z' foreground
+bindkey -M vicmd 'gp' xclip-to-zsh
 # include history substring search commands
 bindkey -M emacs '^P' history-substring-search-up
 bindkey -M emacs '^N' history-substring-search-down
