@@ -24,14 +24,6 @@ it calls the next function one more time."
   (np-buffer-no-star 'previous-buffer))
 
 
-(defun myslime () (interactive)
-  "pulls in slime (in elpa) and my config"
-  (load-library "slime-conf"))
-
-(defun myac () (interactive)
-  "pulls in auto-complete package (in elpa) with my config"
-  (load-library "auto-complete-conf"))
-
 (evil-define-command wevil-quit ()
   "Close buffer, primarily"
   (kill-buffer))

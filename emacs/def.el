@@ -117,6 +117,7 @@
  (load-library "fci-mode-conf")
  (load-library "mode-hooks-conf")
  (load-library "company-conf")
+ (load-library "auto-complete-conf")
  (load-library "hippie-expand-conf")
  (load-library "popwin-conf")
  (load-library "projectile-conf")
