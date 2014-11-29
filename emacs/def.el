@@ -38,6 +38,23 @@
 (if (fboundp 'xterm-mouse-mode) (xterm-mouse-mode) nil) ; shift-click for normal xterm mouse behavior
 (if (fboundp 'mouse-wheel-mode) (mouse-wheel-mode) nil)
 
+(require 'evil)
+(evil-mode 1)
+(require 'key-chord)
+(key-chord-mode 1)
+(load-library "wghconf-ace-jump-mode")
+(load-library "wghconf-xclip")
+(require 'evil-args)
+(require 'evil-surround)
+(global-evil-surround-mode 1)
+(require 'evil-little-word)
+(require 'evil-textobj-between)
+(require 'evil-search-highlight-persist)
+(global-evil-search-highlight-persist 1)
+(require 'evil-matchit)
+(global-evil-matchit-mode 1)
+
+(load-library "vfuncs")
 ;; Load borrowed funcion file
 (load-library "borrowed")
 
@@ -91,55 +108,19 @@
 
 (require 'ido) ; comes standard with emacs
 (ido-mode 1)
+(setq ido-enable-flex-matching t
+      ido-everywhere t)
 (ignore-errors
   (require 'flx-ido)
   (flx-ido-mode 1))
 
-(defun myslime () (interactive)
-  "pulls in slime (in elpa) and my config"
-  (load-library "wghconf-slime"))
 
-(defun myac () (interactive)
-  "pulls in auto-complete package (in elpa) with my config"
-  (load-library "wghconf-auto-complete"))
-
-(defun nop () (interactive)
-  (+ 0 0))
 
 (menu-bar-mode -1) ; no menu-bar
 (tool-bar-mode -1)
 (setq inhibit-splash-screen t)
 (setq inhibit-startup-message t)
 
-(defun a () (interactive)
-  "A function to set up things I want in every buffer, in case for some reason they don't work
-      LIKE LINUM MODE!!!"
-  (linum-mode 1)
-  )
-
-(defun whitespace ()
-  (interactive)
-  ;; These two highlighters kill the formatting of
-  ;; list-faces-display... and I don't know why
-  (hc-toggle-highlight-tabs)
-  (hc-toggle-highlight-trailing-whitespace))
-
-(defun np-buffer-no-star (next-buffer-func)
-  "Cycle buffers ignoring ** buffers.  If it circles back to the first buffer
-it calls the next function one more time."
-  (let ((cbuf (buffer-name)))
-    (funcall next-buffer-func)
-    (while (and (string= "*" (substring (buffer-name) 0 1))
-                (not (string= cbuf (buffer-name))))
-      (funcall next-buffer-func))
-    (when (string= cbuf (buffer-name))
-      (funcall next-buffer-func))))
-(defun next-buffer-no-star ()
-  (interactive)
-  (np-buffer-no-star 'next-buffer))
-(defun prev-buffer-no-star ()
-  (interactive)
-  (np-buffer-no-star 'previous-buffer))
 
 (require 'smex)
 (require 'yafolding)

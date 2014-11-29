@@ -1,45 +1,10 @@
 ;;; Evil package configuration
 
-(require 'evil)
-(evil-mode 1)
-
-
-(evil-define-command wevil-quit ()
-  "Close buffer, primarily"
-  (kill-buffer))
-(evil-define-command wevil-save-and-quit ()
-  "Close buffer, primarily"
-  (save-buffer)
-  (kill-buffer))
-
-;;;; Ace Jump installed here as well...
-(load-library "wghconf-ace-jump-mode")
-(load-library "wghconf-xclip")
-;;;; and key-chord...
-(require 'key-chord)
-(key-chord-mode 1)
-
 ;; the following isn't working...
 ;(setq-default evil-overriding-maps nil
 ;              evil-intercept-maps nil)
 
-(require 'evil-args)
-(require 'evil-surround)
-(global-evil-surround-mode 1)
-(require 'evil-little-word)
-(require 'evil-textobj-between)
-;; TODO - move this stuff to more sensible places...
-(require 'evil-search-highlight-persist)
-(global-evil-search-highlight-persist 1)
-(require 'evil-matchit)
-(global-evil-matchit-mode 1)
 
-(defun backward-symbol (n)
-  "this doesn't work right..."
-  (interactive "p")
-  (forward-word (- n)))
-
-(defalias 'nop 'ignore) ; returns nil
 
 ;;; First, blow up maps so they don't map things like t/T and
 ;;; insert mode stuff
@@ -630,23 +595,6 @@
 (evil-ex-define-cmd "sca[ll]" 'evil-save-and-quit)
 
 ;(evil-ex-define-cmd "!" 'evil-shell-command)
-(setq ido-enable-flex-matching t
-      ido-everywhere t)
-(defun ido-ffap-no ()
-  (interactive)
-  (let ((ido-use-filename-at-point nil))
-    (call-interactively 'ido-find-file)))
-(defun ido-ffap-yes ()
-  (interactive)
-  (let ((ido-use-filename-at-point 'guess))
-    (call-interactively 'ido-find-file)))
-(evil-ex-define-cmd "ff" 'ido-ffap-yes)
-(evil-ex-define-cmd "f" 'ido-ffap-no)
-
-
-(defun ish (cmd) (interactive (list (read-shell-command "$ ")))
-  (insert-string (shell-command-to-string cmd)))
-
 
 ;; Mouse keys...
 ;(global-set-key [mouse-4] (lambda () (interactive) (scroll-down 4)))
