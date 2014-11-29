@@ -1,5 +1,5 @@
 
-(load-file "~/dotfileswgh/emacs/wghconf-package.el")
+(load-file "~/dotfileswgh/emacs/package-conf.el")
 
 (package-refresh-contents)
 

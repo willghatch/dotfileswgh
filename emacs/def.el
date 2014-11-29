@@ -42,8 +42,8 @@
 (evil-mode 1)
 (require 'key-chord)
 (key-chord-mode 1)
-(load-library "wghconf-ace-jump-mode")
-(load-library "wghconf-xclip")
+(load-library "ace-jump-mode-conf")
+(load-library "xclip-conf")
 (require 'evil-args)
 (require 'evil-surround)
 (global-evil-surround-mode 1)
@@ -103,7 +103,7 @@
 ;; undo-tree (auto installed with evil through package.el)
 
 ;; Emacs VI Layer - avail from ELPA as evil
-(load-library "wghconf-evil")
+(load-library "keys")
 ;(require 'undo-tree) ; ELPA package used by evil
 
 (require 'ido) ; comes standard with emacs
@@ -125,17 +125,17 @@
 (require 'smex)
 (require 'yafolding)
 (require 'rainbow-delimiters)
-(load-library "wghconf-package") ; load packaging config
-(load-library "wghconf-modeline") ; load mode line config
-(load-library "wghconf-yasnippet")
-(load-library "wghconf-org-mode")
-(load-library "wghconf-fci-mode")
-(load-library "wghconf-mode-hooks")
-(load-library "wghconf-company")
-(load-library "wghconf-hippie-expand")
-(load-library "wghconf-popwin")
-(load-library "wghconf-projectile.el")
-(load-library "wghconf-scratch-message.el")
+(load-library "package-conf") ; load packaging config
+(load-library "modeline-conf") ; load mode line config
+(load-library "yasnippet-conf")
+(load-library "org-mode-conf")
+(load-library "fci-mode-conf")
+(load-library "mode-hooks-conf")
+(load-library "company-conf")
+(load-library "hippie-expand-conf")
+(load-library "popwin-conf")
+(load-library "projectile-conf")
+(load-library "scratch-message")
 (winner-mode 1)
 (show-smartparens-global-mode 1)
 (yafolding-mode 1)

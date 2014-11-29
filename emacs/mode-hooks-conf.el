@@ -21,7 +21,7 @@
             ))
 (add-hook 'js-mode-hook
           (lambda ()
-            (load-library "wghconf-js")
+            (load-library "js-conf")
             ))
 
 (add-hook 'emacs-lisp-mode-hook
