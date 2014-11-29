@@ -110,7 +110,7 @@
 (ido-mode 1)
 (setq ido-enable-flex-matching t
       ido-everywhere t)
-(ignore-errors
+(with-demoted-errors
   (require 'flx-ido)
   (flx-ido-mode 1))
 
