@@ -189,7 +189,6 @@ noremap f <nop>
 noremap F <nop>
 noremap t <nop>
 noremap T <nop>
-noremap tt <nop>
 noremap tr "
 
 nnoremap tic :bdelete<CR>
