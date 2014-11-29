@@ -1,6 +1,6 @@
 
 ; load local settings first, in case of proxy or something
-(with-demoted-errors (load-file "~//dotfileswgh/dotlocal/emacs"))
+(with-demoted-errors "Error: %S" (load-file "~//dotfileswgh/dotlocal/emacs"))
 
 (let ((local-e-d (concat (getenv "DOTFILESLOCALDIR") "/emacs.d")))
   (make-directory local-e-d t)

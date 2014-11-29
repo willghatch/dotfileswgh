@@ -4,7 +4,7 @@
 (package-refresh-contents)
 
 (defun in (package)
-  (with-demoted-errors (package-install package)))
+  (with-demoted-errors "Error installing: %S" (package-install package)))
 
 (in 'evil)
 (in 'key-chord)
