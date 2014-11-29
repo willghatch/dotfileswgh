@@ -200,12 +200,18 @@ nnoremap tiae :wqall<CR>
 nnoremap tif :e<space>
 
 " window keys
-nnoremap thn <C-w>w
-nnoremap thp <C-w>W
+nnoremap ths <C-w>s
+nnoremap thv <C-w>v
+nnoremap thj <C-w>w
+nnoremap thk <C-w>W
 nnoremap thb :bp<CR>
 nnoremap thw :bn<CR>
 nnoremap tha :buffer<space>
-nnoremap thq :bdelete<CR>
+" TODO - port these to emacs if I can ever get elscreen to work
+nnoremap thg :tabnew<cr>
+nnoremap thG :tabclose<cr>
+nnoremap thn gt
+nnoremap thp gT
 
 " toggle highlighting off after search
 nnoremap tst :set wrap!<CR>
