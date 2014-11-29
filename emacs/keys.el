@@ -11,6 +11,23 @@
 (setcdr evil-normal-state-map nil)
 (setcdr evil-motion-state-map nil)
 
+;;; define some short-named functions for the most common types of mappings
+(defun kmap-m (keys func)
+  (define-key evil-motion-state-map keys func))
+(defun kmap-n (keys func)
+  (define-key evil-normal-state-map keys func))
+(defun kmap-i (keys func)
+  (define-key evil-insert-state-map keys func))
+(defun kmap-v (keys func)
+  (define-key evil-visual-state-map keys func))
+(defun kmap-w (keys func)
+  (define-key evil-window-map keys func))
+
+;; for temporary on-the-fly bindings
+(define-prefix-command 'temp-key-map)
+(defun kmap-t (keys func)
+  (define-key temp-key-map keys func))
+
 
 ;;; DEFAULT BINDINGS SECTION
 ;;; these are mostly taken from the default evil config, and just put back in
@@ -337,6 +354,8 @@
 (define-key evil-motion-state-map "oO" 'backward-symbol)
 
 ; t map
+(define-key evil-normal-state-map "tt" 'temp-key-map)
+
 (define-key evil-normal-state-map "tic" 'kill-buffer)
 (define-key evil-normal-state-map "tiC" 'evil-quit-all)
 (define-key evil-normal-state-map "tiac" 'evil-quit-all)
