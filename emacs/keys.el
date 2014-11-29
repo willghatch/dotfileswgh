@@ -239,8 +239,6 @@
 (define-key evil-window-map " f" 'delete-other-windows)
 (define-key evil-window-map " u" 'winner-undo)
 (define-key evil-window-map " r" 'winner-redo)
-(define-key evil-window-map "w" 'next-buffer-no-star)
-(define-key evil-window-map "b" 'prev-buffer-no-star)
 (define-key evil-window-map "p" 'popwin-map)
 (define-key evil-window-map "=" 'balance-windows)
 
@@ -366,6 +364,8 @@
 (define-key evil-normal-state-map "tiae" 'evil-save-and-quit)
 (define-key evil-normal-state-map "tif" 'ido-ffap-no)
 (define-key evil-normal-state-map "tiF" 'ido-ffap-yes)
+(define-key evil-normal-state-map "tiw" 'next-buffer-no-star)
+(define-key evil-normal-state-map "tib" 'prev-buffer-no-star)
 
 (define-key evil-motion-state-map "th" 'evil-window-map)
 (define-key evil-motion-state-map "tp" 'projectile-command-map)

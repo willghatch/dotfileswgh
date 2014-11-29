@@ -198,20 +198,26 @@ nnoremap tias :wall<CR>
 nnoremap tie :w<CR>:bdelete<CR>
 nnoremap tiae :wqall<CR>
 nnoremap tif :e<space>
+nnoremap tib :bp<CR>
+nnoremap tiw :bn<CR>
 
 " window keys
 nnoremap ths <C-w>s
 nnoremap thv <C-w>v
 nnoremap thj <C-w>w
 nnoremap thk <C-w>W
-nnoremap thb :bp<CR>
-nnoremap thw :bn<CR>
+nnoremap th= <C-w>=
+nnoremap thh :vertical resize -5<CR>
+nnoremap thl :vertical resize +5<CR>
+nnoremap thH :resize -5<CR>
+nnoremap thL :resize +5<CR>
 nnoremap tha :buffer<space>
+
 " TODO - port these to emacs if I can ever get elscreen to work
 nnoremap thg :tabnew<cr>
 nnoremap thG :tabclose<cr>
-nnoremap thn gt
-nnoremap thp gT
+nnoremap thw gt
+nnoremap thb gT
 
 " toggle highlighting off after search
 nnoremap tst :set wrap!<CR>
