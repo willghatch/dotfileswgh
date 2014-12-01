@@ -5,6 +5,37 @@ set keymap vi
 set keymap vi-command
 "gg": beginning-of-history
 "G": end-of-history
+# o/e map
+"e":
+"o":
+# readline determines the behavior of vi-char-search based on the last character
+# typed in the binding...
+"ef": vi-char-search
+"eF": vi-char-search
+"of": "eF"
+"et": vi-char-search
+"eT": vi-char-search
+"ot": "eT"
+"e,": vi-char-search
+"e;": vi-char-search
+"om": "e,"
+"em": "e;"
+"oe": vi-end-word
+"ee": vi-end-word
+"ol": beginning-of-line
+"el": end-of-line
+# s map
+"s":
+"sm": vi-set-mark
+"sg": vi-goto-mark
+# t map
+"t":
+"tlf": dump-functions
+"tlv": dump-variables
+"tlm": dump-macros
+
+"q": start-kbd-macro
+"Q": call-last-kbd-macro
 
 set keymap vi-insert
 

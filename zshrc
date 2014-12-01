@@ -121,9 +121,31 @@ bindkey -M vicmd 'gp' xclip-to-zsh
 bindkey -M emacs '^P' history-substring-search-up
 bindkey -M emacs '^N' history-substring-search-down
 bindToMaps '^[c' execute-named-cmd $(bindkey -l)
-bindkey -r viins '\e'
+bindkey -r -M viins '\e'
 bindkey -M viins 'jk' vi-cmd-mode
 bindkey -M viins 'kj' vi-cmd-mode
+# o/e keys
+bindkey -r -M vicmd 'o'
+bindkey -r -M vicmd 'e'
+bindkey -M vicmd 'of' vi-find-prev-char
+bindkey -M vicmd 'ef' vi-find-next-char
+bindkey -M vicmd 'ot' vi-find-prev-char-skip
+bindkey -M vicmd 'et' vi-find-next-char-skip
+bindkey -M vicmd 'om' vi-rev-repeat-find
+bindkey -M vicmd 'em' vi-repeat-find
+bindkey -M vicmd 'oe' vi-forward-word-end # TODO - make a backward version
+bindkey -M vicmd 'ee' vi-forward-word-end
+bindkey -M vicmd 'ol' vi-beginning-of-line
+bindkey -M vicmd 'el' vi-end-of-line
+bindkey -M vicmd 'oo' vi-open-line-above
+bindkey -M vicmd 'eo' vi-open-line-below
+# s map
+bindkey -r -M vicmd 's'
+bindkey -M vicmd 'sm' vi-set-mark
+bindkey -M vicmd 'sg' vi-goto-mark
+bindkey -M vicmd 'sG' vi-goto-mark-line
+bindkey -r -M vicmd 't'
+bindkey -r -M vicmd 'f'
 define-prefix-command spacemap
 bindkey -M viins '^[ ' spacemap
 bindkey-to-prefix-map spacemap '' zaw
