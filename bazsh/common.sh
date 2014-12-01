@@ -120,7 +120,6 @@ export LESS_TERMCAP_ue=$(printf "\e[0m")
 export LESS_TERMCAP_us=$(printf "\e[1;32m")
 
 export GREP_COLOR="1;32"
-export GREP_OPTIONS="--color=auto --exclude-dir=.cvs --exclude-dir=.git --exclude-dir=.hg --exclude-dir=.svn"
 
 
 #################################### Functions ###########################################
