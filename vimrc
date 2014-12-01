@@ -248,6 +248,7 @@ nnoremap sG '
 nnoremap ss s
 nnoremap sh :!
 vnoremap sh :!
+noremap sa :
 vnoremap s/ :s/
 
 noremap gp "+p

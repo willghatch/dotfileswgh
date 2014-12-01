@@ -404,6 +404,7 @@
 (define-key evil-visual-state-map "sS" 'evil-Surround-region)
 (define-key evil-visual-state-map "sh" 'shell-command-on-region)
 (define-key evil-normal-state-map "sh" 'shell-command)
+(define-key evil-motion-state-map "sa" 'evil-ex)
 (define-key evil-normal-state-map "s)" 'eval-last-sexp)
 (define-key evil-visual-state-map "s)" 'eval-region)
 (define-key evil-visual-state-map "s/" (kbd ":s/ ")) ; TODO - fix this...
