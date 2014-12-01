@@ -15,6 +15,7 @@ import XMonad.Prompt
 import XMonad.Actions.DynamicWorkspaceGroups
 import XMonad.Actions.SwapWorkspaces
 import XMonad.Layout.SimplestFloat
+import qualified XMonad.Actions.DynamicWorkspaceOrder as DWO
 
 -- Hackage dependencies: xmonad, xmonad-contrib, xmobar
 
@@ -60,12 +61,12 @@ myKeys = \c -> mkKeymap c $
     --, ("M4-b", prevWS)
     --, ("M4-M1-w", shiftToNext)
     --, ("M4-M1-b", shiftToPrev)
-    , ("M4-w", moveTo Next HiddenWS)
-    , ("M4-b", moveTo Prev HiddenWS)
-    , ("M4-M1-w", shiftTo Next HiddenWS)
-    , ("M4-M1-b", shiftTo Prev HiddenWS)
-    , ("M4-C-w", swapTo Next)
-    , ("M4-C-b", swapTo Prev)
+    , ("M4-w", DWO.moveTo Next HiddenWS)
+    , ("M4-b", DWO.moveTo Prev HiddenWS)
+    , ("M4-M1-w", DWO.shiftTo Next HiddenWS)
+    , ("M4-M1-b", DWO.shiftTo Prev HiddenWS)
+    , ("M4-M2-w", DWO.swapWith Next HiddenWS)
+    , ("M4-M2-b", DWO.swapWith Prev HiddenWS)
     , ("M4-o o", selectWorkspace defaultXPConfig)
     , ("M4-o g", addWorkspacePrompt defaultXPConfig)
     , ("M4-o c", removeEmptyWorkspace)
@@ -143,6 +144,7 @@ myPP = xmobarPP
     , ppLayout = xmobarColor "#309030" ""
     --, ppExtras = ... see docs to maybe set this up - but it basically has the
       -- same stuff that xmobar has... but likely less?
+    , ppSort = DWO.getSortByOrder
     }
 
 -- Key binding to toggle the gap for the bar.
