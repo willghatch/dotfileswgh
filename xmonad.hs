@@ -121,7 +121,7 @@ myConfig = defaultConfig
     , modMask = mod4Mask
     , keys = myKeys
     , manageHook = myManageHook <+> manageHook defaultConfig
-    , workspaces = [ "scratch", "org", "web", "ax", "win" ]
+    , workspaces = [ "a", "o", "e", "u", "i", "d", "h", "t", "n", "s", "p", "g" ]
     , layoutHook = myLayoutHook
     }
 
