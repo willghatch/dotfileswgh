@@ -391,6 +391,7 @@
 
 (define-key evil-motion-state-map "tlb" 'list-buffers)
 (define-key evil-motion-state-map "tlm" 'evil-show-marks)
+(define-key evil-motion-state-map "tlM" 'bookmark-bmenu-list)
 ;(define-key evil-motion-state-map "tlk" 'list-keymaps) ; TODO - make this function
 (define-key evil-motion-state-map "tlc" 'list-colors-display)
 (define-key evil-motion-state-map "tlf" 'list-faces-display)
@@ -409,9 +410,9 @@
 (define-key evil-visual-state-map "s)" 'eval-region)
 (define-key evil-visual-state-map "s/" (kbd ":s/ ")) ; TODO - fix this...
 (define-key evil-normal-state-map "sm" 'evil-set-marker)
-(define-key evil-normal-state-map "sM" 'evil-show-marks)
+(define-key evil-normal-state-map "sM" 'bookmark-set)
 (define-key evil-normal-state-map "sg" 'evil-goto-mark)
-(define-key evil-normal-state-map "sG" 'evil-goto-mark-line)
+(define-key evil-normal-state-map "sG" 'bookmark-jump)
 (define-key evil-insert-state-map (kbd "M-c") 'smex)
 (define-key evil-motion-state-map (kbd "M-c") 'smex)
 (define-key evil-motion-state-map "sx" 'eval-expression)
