@@ -90,10 +90,13 @@ if filereadable($DOTFILESDIR . "/external/vim/Vundle.vim/README.md")
     Plugin 'msanders/snipmate.vim'
     Plugin 'camelcasemotion'
     Plugin 'AndrewRadev/sideways.vim'
+    Plugin 'luochen1990/rainbow'
     call vundle#end()
     " to run the vundle installer, run :PluginInstall
 
     let g:airline#extensions#tabline#enabled = 1
+
+    let g:rainbow_active = 1
 
     filetype plugin indent on
 
