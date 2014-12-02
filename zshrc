@@ -20,6 +20,7 @@ ZSH_HIGHLIGHT_HIGHLIGHTERS=(main brackets pattern cursor)
 
 source $HOME/dotfileswgh/bazsh/common.sh
 typeset -U PATH
+fpath=($fpath $DOTFILESDIR/zsh/completion/)
 
 CDR_DIR=/tmp/$USER/cdr
 mkdir -p $CDR_DIR
@@ -43,7 +44,20 @@ xclip-to-zsh(){
 BOOKMARKFILE=~/.cache/zsh/zaw-bookmarks
 # setup for zshmarks plugin
 BOOKMARKS_FILE=~/.cache/zsh/zsh-bookmarks
-alias cb="jump"
+jd(){
+    if [[ "ls" = "$1" ]]; then
+        showmarks
+    elif [[ "add" = "$1" ]]; then
+        bookmark "$2"
+    else
+        jump "$1"
+    fi
+}
+
+recomp(){
+    compinit
+    compdump
+}
 
 # if cabal is installed, use antigen-hs, since it's so much faster
 # ... if not, use regular antigen, because it doesn't need Haskell!
