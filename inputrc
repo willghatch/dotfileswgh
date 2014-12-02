@@ -24,6 +24,8 @@ set keymap vi-command
 "ee": vi-end-word
 "ol": beginning-of-line
 "el": end-of-line
+"f": "e;"
+"F": "e,"
 # s map
 "s":
 "sm": vi-set-mark

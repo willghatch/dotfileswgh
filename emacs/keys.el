@@ -351,6 +351,9 @@
 (define-key evil-motion-state-map "eO" 'forward-symbol)
 (define-key evil-motion-state-map "oO" 'backward-symbol)
 
+(define-key evil-motion-state-map "f" 'evil-repeat-find-char)
+(define-key evil-motion-state-map "F" 'evil-repeat-find-char-reverse)
+
 ; t map
 (define-key evil-normal-state-map "tt" 'temp-key-map)
 

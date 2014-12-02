@@ -185,8 +185,8 @@ noremap ob -
 noremap oB ^
 noremap eB _
 
-noremap f <nop>
-noremap F <nop>
+noremap f ;
+noremap F ,
 noremap t <nop>
 noremap T <nop>
 noremap tr "

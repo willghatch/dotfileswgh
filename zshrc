@@ -153,13 +153,15 @@ bindkey -M vicmd 'ol' vi-beginning-of-line
 bindkey -M vicmd 'el' vi-end-of-line
 bindkey -M vicmd 'oo' vi-open-line-above
 bindkey -M vicmd 'eo' vi-open-line-below
+
+bindkey -M vicmd 'f' vi-repeat-find
+bindkey -M vicmd 'F' vi-rev-repeat-find
 # s map
 bindkey -r -M vicmd 's'
 bindkey -M vicmd 'sm' vi-set-mark
 bindkey -M vicmd 'sg' vi-goto-mark
 bindkey -M vicmd 'sG' vi-goto-mark-line
 bindkey -r -M vicmd 't'
-bindkey -r -M vicmd 'f'
 define-prefix-command spacemap
 bindkey -M viins '^[ ' spacemap
 bindkey-to-prefix-map spacemap '' zaw
