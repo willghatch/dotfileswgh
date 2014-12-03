@@ -135,8 +135,9 @@ myBar = "xmobar"
 
 -- Pretty Print options for status bar
 myPP = xmobarPP
-    { ppCurrent = xmobarColor "#4299f2" "" . wrap "<" ">"
-    , ppVisible = xmobarColor "#4299f2" ""
+    { ppCurrent = xmobarColor "#22a5ff" ""
+    , ppVisible = xmobarColor "#2050f0" ""
+    , ppHidden = xmobarColor "#8021f9" ""
     , ppHiddenNoWindows = xmobarColor "#444444" ""
     , ppUrgent = xmobarColor "#ff4444" ""
     , ppSep = " <fc=#999999>|</fc> "
