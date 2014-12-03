@@ -357,13 +357,12 @@
 ; t map
 (define-key evil-motion-state-map "tt" 'temp-key-map)
 
-(define-key evil-motion-state-map "tic" 'kill-buffer)
-(define-key evil-motion-state-map "tiC" 'evil-quit-all)
+(define-key evil-motion-state-map "tic" 'kill-buffer-or-quit-emacs)
 (define-key evil-motion-state-map "tiac" 'evil-quit-all)
 (define-key evil-motion-state-map "tis" 'save-buffer)
 (define-key evil-motion-state-map "tiS" 'evil-write-all)
 (define-key evil-motion-state-map "tias" 'evil-write-all)
-(define-key evil-motion-state-map "tie" 'wevil-save-and-quit)
+(define-key evil-motion-state-map "tie" 'save-and-kill-buffer-and-maybe-quit-emacs)
 (define-key evil-motion-state-map "tiae" 'evil-save-and-quit)
 (define-key evil-motion-state-map "tif" 'ido-ffap-no)
 (define-key evil-motion-state-map "tiF" 'ido-ffap-yes)

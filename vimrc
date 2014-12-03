@@ -118,6 +118,19 @@ endif
 
 filetype plugin indent on
 
+""""""""""""""""""""""""""" Functions
+function! NumBuffers()
+    return len(filter(range(1, bufnr('$')), 'buflisted(v:val)'))
+endfunction
+
+function! BufDelOrQuit()
+    if NumBuffers() == 1
+        :q
+    else
+        :bd
+    endif
+endfunction
+
 """"""""""""""""""""""""""" Key mappings
 " map, noremap, etc work in normal, visual+select, operator-pending modes...
 " vmap vnoremap... vork in visual+select
@@ -194,11 +207,11 @@ noremap t <nop>
 noremap T <nop>
 noremap tr "
 
-nnoremap tic :bdelete<CR>
+nnoremap tic :call BufDelOrQuit()<CR>
 nnoremap tiac :qa<CR>
 nnoremap tis :w<CR>
 nnoremap tias :wall<CR>
-nnoremap tie :w<CR>:bdelete<CR>
+nnoremap tie :w<CR>:call BufDelOrQuit()<CR>
 nnoremap tiae :wqall<CR>
 nnoremap tif :e<space>
 nnoremap tib :bp<CR>

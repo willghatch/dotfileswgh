@@ -24,14 +24,6 @@ it calls the next function one more time."
   (np-buffer-no-star 'previous-buffer))
 
 
-(evil-define-command wevil-quit ()
-  "Close buffer, primarily"
-  (kill-buffer))
-(evil-define-command wevil-save-and-quit ()
-  "Close buffer, primarily"
-  (save-buffer)
-  (kill-buffer))
-
 (defun backward-symbol (n)
   "this doesn't work right..."
   (interactive "p")
@@ -51,3 +43,20 @@ it calls the next function one more time."
 (defun ish (cmd) (interactive (list (read-shell-command "$ ")))
   (insert-string (shell-command-to-string cmd)))
 
+(require 'cl-lib)
+(defun kill-buffer-or-quit-emacs ()
+  "Kill buffer and, if there are no more file buffers and scratch is unmodified,
+quit emacs."
+  (interactive)
+  (kill-buffer (current-buffer))
+  (when (and
+       (or (not (buffer-modified-p (get-buffer "*scratch*")))
+           (not (get-buffer "*scratch*")))
+       (cl-notany 'buffer-file-name (buffer-list)))
+      (evil-quit-all)))
+
+(defun save-and-kill-buffer-and-maybe-quit-emacs ()
+  "Save buffer and kill it using kill-buffer-or-quit-emacs"
+  (interactive)
+  (save-buffer)
+  (kill-buffer-or-quit-emacs))
