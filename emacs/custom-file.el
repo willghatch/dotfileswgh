@@ -1,15 +1,3 @@
-(custom-set-variables
- ;; custom-set-variables was added by Custom.
- ;; If you edit it by hand, you could mess it up, so be careful.
- ;; Your init file should contain only one such instance.
- ;; If there is more than one, they won't work right.
- '(bmkp-last-as-first-bookmark-file "~/.emacs.d/bookmarks")
- '(evil-intercept-maps nil)
- '(evil-overriding-maps nil)
- '(fill-column 80)
- '(rainbow-identifiers-faces-to-override (quote (font-lock-variable-name-face)))
- '(sp-highlight-pair-overlay nil)
- '(sp-show-pair-from-inside t))
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.

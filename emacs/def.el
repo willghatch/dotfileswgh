@@ -39,6 +39,16 @@
 (if (fboundp 'xterm-mouse-mode) (xterm-mouse-mode) nil) ; shift-click for normal xterm mouse behavior
 (if (fboundp 'mouse-wheel-mode) (mouse-wheel-mode) nil)
 
+;; settings that need to be loaded before their packages
+(setq
+ evil-intercept-maps nil
+ evil-overriding-maps nil
+ rainbow-identifiers-faces-to-override '(font-lock-variable-name-face)
+ sp-highlight-pair-overlay nil
+ sp-show-pair-from-inside t
+ bmkp-last-as-first-bookmark-file "~/.emacs.d/bookmarks"
+ )
+
 ;; keys, keys, keys!!!
 (nobreak
  (require 'evil)
@@ -115,6 +125,7 @@
  (load-library "modeline-conf")
  (load-library "yasnippet-conf")
  (load-library "org-mode-conf")
+ (setq fill-column 80)
  (load-library "fci-mode-conf")
  (load-library "mode-hooks-conf")
  (load-library "company-conf")
