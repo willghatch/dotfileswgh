@@ -1,6 +1,6 @@
 # output the repos to my dotlocal dir
-ADOTDIR=$DOTFILESLOCALDIR/antigen
-source $DOTFILESDIR/external/zsh/antigen/antigen.zsh
+ADOTDIR=$DOTFILESWGH/dotlocal/antigen
+source $DOTFILESWGH/external/zsh/antigen/antigen.zsh
 
 antigen bundles <<EOBUNDLES
     zsh-users/zsh-history-substring-search

@@ -13,6 +13,6 @@ If you have any questions, comments, or suggestions let me know!
 
 Be warned -- I do weird stuff and experiment with things a lot.  You may find things that you think are crazy.
 
-If you want to try it out, the linkup.bash script hooks everything up to my liking.  Emacs and vim can be started with my config without fuss with <code>vim -u $DOTFILESDIR/vimrc</code> and <code>emacs -l $DOTFILESDIR/emacs/def.el</code>.  Note that emacs needs a ton of packages, so first I run $DOTFILESDIR/emacs/install.sh to install them.
+If you want to try it out, the linkup.bash script hooks everything up to my liking.  Emacs and vim can be started with my config without fuss with <code>vim -u $DOTFILESWGH/vimrc</code> and <code>emacs -l $DOTFILESWGH/emacs/def.el</code>.  Note that emacs needs a ton of packages, so first I run $DOTFILESWGH/emacs/install.sh to install them.
 
 

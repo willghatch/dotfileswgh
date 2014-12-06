@@ -48,9 +48,9 @@ function xterm-pager(){
     rm $file
 }
 
-if [ -f $DOTFILESLOCALDIR/vlaunchrc ]
+if [ -f $DOTFILESWGH/dotlocal/vlaunchrc ]
 then
-    source $DOTFILESLOCALDIR/vlaunchrc
+    source $DOTFILESWGH/dotlocal/vlaunchrc
 fi
 
 

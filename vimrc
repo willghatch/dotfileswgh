@@ -63,10 +63,10 @@ set mouse=a     " Allow mouse stuff in all modes
 
 set t_Co=256
 filetype off " required for vundle, supposedly
-set rtp+=$DOTFILESDIR/external/vim/Vundle.vim
+set rtp+=$DOTFILESWGH/external/vim/Vundle.vim
 
-if filereadable($DOTFILESDIR . "/external/vim/Vundle.vim/README.md")
-    call vundle#begin($DOTFILESLOCALDIR . "/vim")
+if filereadable($DOTFILESWGH . "/external/vim/Vundle.vim/README.md")
+    call vundle#begin($DOTFILESWGH . "/dotlocal/vim")
     Plugin 'tpope/vim-rsi'
     Plugin 'tpope/vim-repeat'
     Plugin 'tpope/vim-surround'
@@ -272,7 +272,7 @@ vnoremap gy "+y
 noremap h <nop>
 noremap l <nop>
 
-if filereadable($DOTFILESLOCALDIR . "/vimrc")
-    source $DOTFILESLOCALDIR/vimrc
+if filereadable($DOTFILESWGH . "/dotlocal/vimrc")
+    source $DOTFILESWGH/dotlocal/vimrc
 endif
 

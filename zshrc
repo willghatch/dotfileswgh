@@ -20,7 +20,7 @@ ZSH_HIGHLIGHT_HIGHLIGHTERS=(main brackets pattern cursor)
 
 source $HOME/dotfileswgh/bazsh/common.sh
 typeset -U PATH
-fpath=($fpath $DOTFILESDIR/zsh/completion/)
+fpath=($fpath $DOTFILESWGH/zsh/completion/)
 
 CDR_DIR=/tmp/$USER/cdr
 mkdir -p $CDR_DIR
@@ -62,10 +62,10 @@ recomp(){
 # if cabal is installed, use antigen-hs, since it's so much faster
 # ... if not, use regular antigen, because it doesn't need Haskell!
 if which cabal 1>/dev/null 2>&1; then
-    ANTIGEN_HS_MY=$DOTFILESDIR/zsh/antigen.conf.hs
-    source $DOTFILESDIR/external/zsh/antigen-hs/init.zsh
+    ANTIGEN_HS_MY=$DOTFILESWGH/zsh/antigen.conf.hs
+    source $DOTFILESWGH/external/zsh/antigen-hs/init.zsh
 else
-    source $DOTFILESDIR/zsh/antigen.conf.zsh
+    source $DOTFILESWGH/zsh/antigen.conf.zsh
 fi
 
 VZSH_MATCHER_STR='m:{a-z-}={A-Z_} m:{b,m,w,v,h,t,n,g,c,r}={0,1,2,3,4,5,6,7,8,9}'
@@ -186,12 +186,12 @@ if [[ "$USER" != "wgh" ]]; then
     MEGAPROMPT_STYLES[username]="%B%F{yellow}"
 fi
 
-tf=$DOTFILESLOCALDIR/bazshrc
+tf=$DOTFILESWGH/dotlocal/bazshrc
 if [ -f "$tf" ]
 then
     source $tf
 fi
-tf=$DOTFILESLOCALDIR/zshrc
+tf=$DOTFILESWGH/dotlocal/zshrc
 if [ -f "$tf" ]
 then
     source $tf

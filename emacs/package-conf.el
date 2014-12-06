@@ -2,7 +2,7 @@
 ; load local settings first, in case of proxy or something
 (with-demoted-errors "Error: %S" (load-file "~//dotfileswgh/dotlocal/emacs"))
 
-(let ((local-e-d (concat (getenv "DOTFILESLOCALDIR") "/emacs.d")))
+(let ((local-e-d (concat (getenv "DOTFILESWGH") "/dotlocal/emacs.d")))
   (make-directory local-e-d t)
   (setq package-user-dir (concat local-e-d "/elpa"))
 

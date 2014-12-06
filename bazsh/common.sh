@@ -7,9 +7,8 @@ if [[ -z "$WGHHOME" ]]; then
     #not true(IE when I use su), I'll set this elsewhere
 fi
 export HROOT=$WGHHOME/hroot
-export DOTFILESDIR=$WGHHOME/dotfileswgh
-export DOTFILESLOCALDIR=$DOTFILESDIR/dotlocal
-PATH=$WGHHOME/bin:$WGHHOME/lscripts:$WGHHOME/vscripts:$WGHHOME/wghsrv_scripts:$DOTFILESDIR/commands:$WGHHOME/.cabal/bin:$HROOT/bin:$HROOT/usr/bin:$HROOT/usr/local/bin:$PATH:/usr/bin:/bin:/usr/local/bin:/sbin:/usr/sbin:/usr/local/sbin
+export DOTFILESWGH=$WGHHOME/dotfileswgh
+PATH=$WGHHOME/bin:$WGHHOME/lscripts:$WGHHOME/vscripts:$WGHHOME/wghsrv_scripts:$DOTFILESWGH/commands:$WGHHOME/.cabal/bin:$HROOT/bin:$HROOT/usr/bin:$HROOT/usr/local/bin:$PATH:/usr/bin:/bin:/usr/local/bin:/sbin:/usr/sbin:/usr/local/sbin
 export MANPATH=/usr/share/man:/usr/local/man:/usr/local/share/man:/usr/X11R6/man:/opt/man:$HROOT/usr/share/man:$HROOT/share/man
 
 
@@ -26,11 +25,11 @@ umask 077 # privacy as a default
 #alias t="mpcl toggle"
 
 ####### Editing
-alias em="TERM=xterm-256color emacs -nw -l $DOTFILESDIR/emacs/def"
+alias em="TERM=xterm-256color emacs -nw -l $DOTFILESWGH/emacs/def"
 alias e="TERM=xterm-256color premacs-use -t"
 alias ex="premacs-use -c"
-alias emx="emacs -l $DOTFILESDIR/emacs/def"
-alias emp="TERM=xterm-256color emacs -nw -l $DOTFILESDIR/emacs/wghconf-package.el"
+alias emx="emacs -l $DOTFILESWGH/emacs/def"
+alias emp="TERM=xterm-256color emacs -nw -l $DOTFILESWGH/emacs/wghconf-package.el"
 alias v="vim"
 
 
@@ -53,10 +52,10 @@ export NUMCPUS=$(grep -c '^processor' /proc/cpuinfo)
 alias pmake="time nice make -j$NUMCPUS --load-average=$NUMCPUS"
 
 ####### Miscellaneous
-alias ffx="env GTK2_RC_FILES=$DOTFILESDIR/gtkrc-2.0-light firefox"
-alias ffxd="env GTK2_RC_FILES=$DOTFILESDIR/gtkrc-2.0-dark firefox"
-alias bbb="env GTK2_RC_FILES=$DOTFILESDIR/gtkrc-2.0-light dwb"
-alias bbbd="env GTK2_RC_FILES=$DOTFILESDIR/gtkrc-2.0-dark dwb"
+alias ffx="env GTK2_RC_FILES=$DOTFILESWGH/gtkrc-2.0-light firefox"
+alias ffxd="env GTK2_RC_FILES=$DOTFILESWGH/gtkrc-2.0-dark firefox"
+alias bbb="env GTK2_RC_FILES=$DOTFILESWGH/gtkrc-2.0-light dwb"
+alias bbbd="env GTK2_RC_FILES=$DOTFILESWGH/gtkrc-2.0-dark dwb"
 
 alias gka="gitk --all"
 alias gta="tig --all"
@@ -228,15 +227,15 @@ then
     source /usr/share/git/completion/git-prompt.sh
 fi
 
-source $DOTFILESDIR/bazsh/grml-funcs.sh
+source $DOTFILESWGH/bazsh/grml-funcs.sh
 
 if [ $(uname) = FreeBSD ]
 then
-    source $DOTFILESDIR/bazsh/bsd.sh
+    source $DOTFILESWGH/bazsh/bsd.sh
 fi
 
 ######## Add private stuff #######
-bazsh_common_pri=$DOTFILESDIR/pri/bazsh_common
+bazsh_common_pri=$DOTFILESWGH/pri/bazsh_common
 if [ -f $bazsh_common_pri ]
 then
     source $bazsh_common_pri

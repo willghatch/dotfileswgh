@@ -3,6 +3,6 @@
 # start up new emacs daemon
 
 newId=$RANDOM
-EDIR=$DOTFILESDIR/emacs
+EDIR=$DOTFILESWGH/emacs
 emacs -l $EDIR/def.el -l $EDIR/premacs-run.el --daemon=premacs$newId && \
 echo premacs$newId >> /tmp/premacs
