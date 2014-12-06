@@ -5,22 +5,23 @@
                  (list 'with-demoted-errors "Error %S" form))
                args)))
 
-(setq custom-file (concat (getenv "DOTFILESWGH") "/emacs/custom-file.el"))
+(setq dotfileswgh (getenv "DOTFILESWGH"))
+(setq custom-file (concat dotfileswgh "/emacs/custom-file.el"))
 (load custom-file)
 
-(setq package-user-dir (concat (getenv "DOTFILESWGH") "/dotlocal/emacs.d/elpa"))
+(setq package-user-dir (concat dotfileswgh "/dotlocal/emacs.d/elpa"))
 ;; Set up load path for requires
-(let ((default-directory (concat (getenv "DOTFILESWGH") "/dotlocal/emacs.d")))
+(let ((default-directory (concat dotfileswgh "/dotlocal/emacs.d")))
       (normal-top-level-add-subdirs-to-load-path))
 (let ((default-directory (concat (getenv "HOME") "/.emacs.d")))
       (normal-top-level-add-subdirs-to-load-path))
 (let ((default-directory "/usr/share/emacs/site-lisp"))
       (normal-top-level-add-subdirs-to-load-path))
-(let ((default-directory (concat (getenv "DOTFILESWGH") "/emacs")))
+(let ((default-directory (concat dotfileswgh "/emacs")))
       (normal-top-level-add-subdirs-to-load-path))
-(let ((default-directory (concat (getenv "DOTFILESWGH") "/external/emacs")))
+(let ((default-directory (concat dotfileswgh "/external/emacs")))
       (normal-top-level-add-subdirs-to-load-path))
-(setq load-path (cons (concat (getenv "DOTFILESWGH") "/emacs") load-path))
+(setq load-path (cons (concat dotfileswgh "/emacs") load-path))
 
 ;; backup settings
 (setq
@@ -133,7 +134,7 @@
 (if (fboundp 'smex)
     (global-set-key (kbd "M-x") 'smex))
 
-(let ((file (concat (getenv "DOTFILESWGH") "/dotlocal/emacs")))
+(let ((file (concat dotfileswgh "/dotlocal/emacs")))
   (if (file-exists-p file) (load-file file) nil))
 
 
