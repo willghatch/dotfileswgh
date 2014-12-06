@@ -1,7 +1,3 @@
-#!/bin/bash
-# This should never be run... but I'm putting the shabang so that editors will
-# recognize it...
-
 if [[ -z "$WGHHOME" ]]; then
     export WGHHOME=$HOME # I want to be able to reference this, and when it's
     #not true(IE when I use su), I'll set this elsewhere
