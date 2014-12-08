@@ -35,6 +35,7 @@
 (in 'expand-region)
 (in 'popwin)
 (in 'linum-relative)
+(in 'smooth-scrolling)
 
 (in 'helm)
 (in 'helm-swoop)

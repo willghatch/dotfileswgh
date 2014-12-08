@@ -139,6 +139,8 @@
  (require 'yafolding)
  (yafolding-mode 1)
  (load-library "borrowed")
+ (setq smooth-scroll-margin 5)
+ (require 'smooth-scrolling)
 )
 
 
