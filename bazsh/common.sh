@@ -213,16 +213,6 @@ cpost()
 
 ####### Add shell completion #######
 
-if [ -f /etc/bash_completion.d/git ]
-then
-    source /etc/bash_completion.d/git
-fi
-
-if [ -f /usr/share/git/completion/git-prompt.sh ]
-then
-    source /usr/share/git/completion/git-prompt.sh
-fi
-
 source $DOTFILESWGH/bazsh/grml-funcs.sh
 
 if [ $(uname) = FreeBSD ]

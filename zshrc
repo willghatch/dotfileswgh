@@ -11,6 +11,8 @@ then
     source $tf
 fi
 
+autoload -U compinit && compinit
+
 HISTSIZE=1000
 SAVEHIST=1000
 
