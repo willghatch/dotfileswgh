@@ -56,10 +56,9 @@ jd(){
     fi
 }
 
-recomp(){
+compinit-widget(){
     compinit
-    compdump
-}
+}; zle -N compinit-widget
 
 # if cabal is installed, use antigen-hs, since it's so much faster
 # ... if not, use regular antigen, because it doesn't need Haskell!
@@ -164,6 +163,7 @@ bindkey -M vicmd 'sm' vi-set-mark
 bindkey -M vicmd 'sg' vi-goto-mark
 bindkey -M vicmd 'sG' vi-goto-mark-line
 bindkey -r -M vicmd 't'
+bindkey -M vicmd 'tsc' compinit-widget
 define-prefix-command spacemap
 bindkey -M viins '^[ ' spacemap
 bindkey-to-prefix-map spacemap '' zaw
