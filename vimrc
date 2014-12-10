@@ -200,6 +200,8 @@ noremap eb +
 noremap ob -
 noremap oB ^
 noremap eB _
+noremap oj <C-o>
+noremap ej <C-i>
 
 noremap f ;
 noremap F ,
@@ -245,6 +247,8 @@ nnoremap tsa :set autoindent!<CR>
 
 nnoremap tlb :buffers<CR>
 nnoremap tlm :marks<CR>
+nnoremap tlj :jumps<CR>
+nnoremap tlr :registers<CR>
 
 noremap <Space>h <PageDown>
 noremap <Space>t <PageUp>

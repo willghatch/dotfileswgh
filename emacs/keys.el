@@ -350,6 +350,8 @@
 (define-key evil-motion-state-map "eB" 'evil-next-line-1-first-non-blank)
 (define-key evil-motion-state-map "eO" 'forward-symbol)
 (define-key evil-motion-state-map "oO" 'backward-symbol)
+(define-key evil-motion-state-map "ej" 'evil-jump-forward)
+(define-key evil-motion-state-map "oj" 'evil-jump-backward)
 
 (define-key evil-motion-state-map "f" 'evil-repeat-find-char)
 (define-key evil-motion-state-map "F" 'evil-repeat-find-char-reverse)
@@ -397,6 +399,8 @@
 ;(define-key evil-motion-state-map "tlk" 'list-keymaps) ; TODO - make this function
 (define-key evil-motion-state-map "tlc" 'list-colors-display)
 (define-key evil-motion-state-map "tlf" 'list-faces-display)
+(define-key evil-motion-state-map "tlr" 'evil-show-registers)
+; TODO - list jumps, maybe
 
 ;; s map
 ;(define-key evil-normal-state-map "ss" 'evil-substitute)
