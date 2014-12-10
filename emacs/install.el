@@ -57,5 +57,4 @@
 (in 'slime)
 (in 'lua-mode)
 (in 'vimrc-mode)
-(in 'php-mode)
 
