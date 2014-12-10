@@ -20,3 +20,9 @@
                          ))
 (package-initialize)
 
+
+(defun package-upgrade ()
+  (interactive)
+  (package-list-packages)
+  (package-menu-mark-upgrades)
+  (package-menu-execute))
