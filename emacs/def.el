@@ -105,7 +105,7 @@
  (require 'evil-matchit)
  (global-evil-matchit-mode 1)
 
- (require 'ido) ; comes standard with emacs
+ (load-library "ido-conf")
  (ido-mode 1)
  (setq ido-enable-flex-matching t
        ido-everywhere t)

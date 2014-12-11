@@ -151,6 +151,12 @@ noremap <esc>c :
 noremap <M-x> :
 noremap <esc>x :
 
+" make C-y default paste, like in emacs
+cnoremap <C-y> <C-r>"
+inoremap <C-y> <C-r>"
+cnoremap <esc>r <C-r>
+inoremap <esc>r <C-r>
+
 " o and e maps - o is left/back, e is right/forward
 noremap e <nop>
 noremap o <nop>

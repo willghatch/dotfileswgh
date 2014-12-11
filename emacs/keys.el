@@ -469,6 +469,7 @@
 ;; input mode
 (define-key evil-insert-state-map (kbd "DEL") 'delete-backward-char) ; remap away from the evil-version backspace
 (define-key evil-insert-state-map "\C-v" #'quoted-insert) ; more vim-like
+(define-key evil-insert-state-map "\M-r" 'evil-paste-from-register)
 
 ;; helm map to match what I've got going in zsh with zaw...
 (define-prefix-command 'meta-space-map)
@@ -516,6 +517,15 @@
 
 (define-key help-map "\C-h" 'describe-prefix-bindings)
 
+(define-key evil-ex-completion-map "\C-a" 'move-beginning-of-line)
+(define-key evil-ex-completion-map "\C-e" 'move-end-of-line)
+(define-key evil-ex-completion-map "\C-d" 'delete-char)
+(define-key evil-ex-completion-map "\C-k" 'kill-line)
+(define-key evil-ex-completion-map "\C-p" 'previous-complete-history-element)
+(define-key evil-ex-completion-map "\C-n" 'next-complete-history-element)
+(define-key evil-ex-completion-map "\C-f" 'forward-char)
+(define-key evil-ex-completion-map "\C-b" 'backward-char)
+(define-key evil-ex-completion-map "\M-r" 'evil-paste-from-register)
 
 ;; TEMPORORY - to train myself to use f/t better
 (define-key evil-motion-state-map "h" 'ignore)
