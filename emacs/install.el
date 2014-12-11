@@ -57,4 +57,6 @@
 (in 'slime)
 (in 'lua-mode)
 (in 'vimrc-mode)
+(in 'anaconda-mode)
+(in 'company-anaconda)
 
