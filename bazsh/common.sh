@@ -96,6 +96,7 @@ function tmn()
 
 export XDG_DOWNLOAD_DIR="$HOME/dl"
 
+export VLAUNCHRC="$DOTFILESWGH/dotlocal/vlaunchrc"
 
 export EDITOR=vim
 #export VISUAL="TERM=xterm-256color premacs-use -t"

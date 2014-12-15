@@ -48,9 +48,17 @@ function xterm-pager(){
     rm $file
 }
 
-if [ -f $DOTFILESWGH/dotlocal/vlaunchrc ]
-then
-    source $DOTFILESWGH/dotlocal/vlaunchrc
+if [ -f $HOME/.vlaunchrc ]; then
+    source $HOME/.vlaunchrc
+fi
+if [ -z "$XDG_CONFIG_HOME" ]; then
+    XDG_CONFIG_HOME=$HOME/.config
+fi
+if [ -f $XDG_CONFIG_HOME/vlaunchrc ]; then
+    source $XDG_CONFIG_HOME/vlaunchrc
+fi
+if [ -f "$VLAUNCHRC" ]; then
+    source $VLAUNCHRC
 fi
 
 
