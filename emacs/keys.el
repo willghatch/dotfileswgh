@@ -527,6 +527,3 @@
 (define-key evil-ex-completion-map "\C-b" 'backward-char)
 (define-key evil-ex-completion-map "\M-r" 'evil-paste-from-register)
 
-;; TEMPORORY - to train myself to use f/t better
-(define-key evil-motion-state-map "h" 'ignore)
-(define-key evil-motion-state-map "l" 'ignore)

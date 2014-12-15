@@ -278,9 +278,6 @@ vnoremap s/ :s/
 noremap gp "+p
 vnoremap gy "+y
 
-" TEMPORORY to train myself to use f/t better
-noremap h <nop>
-noremap l <nop>
 
 if filereadable($DOTFILESWGH . "/dotlocal/vimrc")
     source $DOTFILESWGH/dotlocal/vimrc
