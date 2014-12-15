@@ -85,7 +85,12 @@ then
 elif [ "s-$1" = "s-sundries" ]
 then
     mkSundries
+elif [ "s-$1" = "s-all" ]
+then
+    linkDotfiles
+    linkConfigSubdirs
+    mkSundries
 else
-    echo "usage: linkup.bash < dotfiles | configdir | sundries >"
+    echo "usage: linkup.bash < dotfiles | configdir | sundries | all >"
 fi
 
