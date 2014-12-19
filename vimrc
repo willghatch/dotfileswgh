@@ -38,7 +38,7 @@ set backspace=indent,eol,start
 "set background=dark  " Tell vim the background will be dark so it will set a good color scheme
 "set cursorcolumn   " Highlight current column
 "set cursorline     " Highlight current line
-"set insertmode     " make vim modeless!  I might check this out later...
+"set insertmode     " make vim modeless - bad idea.
 
 set backup    " Make backup files
 if !isdirectory($HOME . "/.cache/vimtmp")
