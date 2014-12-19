@@ -243,8 +243,8 @@ nnoremap thG :tabclose<cr>
 nnoremap thw gt
 nnoremap thb gT
 
-" toggle highlighting off after search
 nnoremap tst :set wrap!<CR>
+nnoremap tsW :set wrapscan!<CR>
 nnoremap tsh :nohl<CR>
 nnoremap tsH :set hlsearch!<CR>
 nnoremap tsr :set relativenumber!<CR>

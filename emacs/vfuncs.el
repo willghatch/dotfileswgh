@@ -60,3 +60,10 @@ quit emacs."
   (interactive)
   (save-buffer)
   (kill-buffer-or-quit-emacs))
+
+(defmacro setq-not (symbol)
+  `(setq ,symbol (not ,symbol)))
+
+(defun toggle-wrap-scan ()
+  (interactive)
+  (setq-not evil-search-wrap))
