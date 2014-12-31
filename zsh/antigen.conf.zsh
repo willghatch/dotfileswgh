@@ -6,7 +6,7 @@ antigen bundles <<EOBUNDLES
     zsh-users/zsh-history-substring-search
     hchbaw/opp.zsh.git
     #hchbaw/opp.zsh.git opp
-    alfredodeza/zsh-plugins.git vi #vi visual
+    #alfredodeza/zsh-plugins.git vi #vi visual
     zsh-users/zaw
     willghatch/zsh-zaw-extras
 
@@ -16,13 +16,13 @@ antigen bundles <<EOBUNDLES
     willghatch/zsh-grml-funcs
     willghatch/vzsh
 
-    tarrasch/zsh-colors
-    tarrasch/zsh-bd
-    tarrasch/zsh-functional
+    #tarrasch/zsh-colors
+    #tarrasch/zsh-bd
+    #tarrasch/zsh-functional
 
-    voronkovich/gitignore.plugin.zsh
+    #voronkovich/gitignore.plugin.zsh
     jocelynmallon/zshmarks
-    ehamberg/zsh-cabal-completion
+    #ehamberg/zsh-cabal-completion
     skx/sysadmin-util # adds cool commands (adds to path)
     zsh-users/zsh-syntax-highlighting
 EOBUNDLES
