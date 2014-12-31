@@ -64,6 +64,7 @@ compinit-widget(){
 # ... if not, use regular antigen, because it doesn't need Haskell!
 if which cabal 1>/dev/null 2>&1; then
     ANTIGEN_HS_MY=$DOTFILESWGH/zsh/antigen.conf.hs
+    export ANTIGEN_HS_OUT=$DOTFILESWGH/dotlocal/antigen-hs
     source $DOTFILESWGH/external/zsh/antigen-hs/init.zsh
 else
     source $DOTFILESWGH/zsh/antigen.conf.zsh
