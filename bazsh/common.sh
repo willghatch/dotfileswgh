@@ -28,7 +28,7 @@ alias e="TERM=xterm-256color premacs-use -t"
 alias ex="premacs-use -c"
 alias emx="emacs -l $DOTFILESWGH/emacs/def"
 alias emp="TERM=xterm-256color emacs -nw -l $DOTFILESWGH/emacs/wghconf-package.el"
-alias v="vim"
+alias v="vim -u $DOTFILESWGH/vimrc"
 
 
 ####### Unix tools, mostly coloring
