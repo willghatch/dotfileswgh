@@ -17,7 +17,12 @@ if [ -f ~/.bazshrc.pre ]; then
       . ~/.bazshrc.pre
 fi
 
-bazsh_common=~/dotfileswgh/bazsh/common.sh
+if [[ -z "$WGHHOME" ]]; then
+    export WGHHOME=$HOME # I want to be able to reference this, and when it's
+    #not true(IE when I use su), I'll set this elsewhere
+fi
+
+bazsh_common=$WGHHOME/dotfileswgh/bazsh/common.sh
 if [ -f $bazsh_common ]; then
       . $bazsh_common
 fi
