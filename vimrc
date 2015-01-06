@@ -197,7 +197,7 @@ noremap em ;
 noremap om ,
 noremap en n
 noremap on N
-noremap ol \|
+noremap ol <bar>
 noremap o<space>l ^
 noremap el $
 noremap oL g0
