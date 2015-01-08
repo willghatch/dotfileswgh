@@ -106,11 +106,15 @@ set hintkeys='aoeuhtnsidpgcrmk'
 "set followhints=0
 "set hinttimeout=0
 
-highlight -append Hint font:2em; font-weight:bold; color: #55ffff; background-color: #102030; font-family: Courier, monospace;
-highlight -append Hint[active] font:2em; font-weight:bold; color: #000000; background-color: #55ffff; font-family: Courier, monospace;
 
 set runtimepath+="$DOTFILESWGH/external/pentadactyl/"
 
-#source $DOTFILESWGH/pentadactylrc.usercss
+"source $DOTFILESWGH/pentadactylrc.usercss
+source $DOTFILESWGH/external/pentadactyl/pentadactyl-solarized/colors/solarized-dark.penta
+
+
+highlight -append Hint font:2em; font-weight:bold; font-family: Courier, monospace;
+highlight -append Hint[active] font:2em; font-weight:bold; font-family: Courier, monospace;
+highlight -append CompItem background-color: #073642;
 
 " vim: set ft=pentadactyl:

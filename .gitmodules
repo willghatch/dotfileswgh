@@ -13,3 +13,6 @@
 [submodule "external/vim/Vundle.vim"]
 	path = external/vim/Vundle.vim
 	url = https://github.com/gmarik/Vundle.vim.git
+[submodule "external/pentadactyl/pentadactyl-solarized"]
+	path = external/pentadactyl/pentadactyl-solarized
+	url = https://github.com/claytron/pentadactyl-solarized.git
