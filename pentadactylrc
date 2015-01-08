@@ -111,6 +111,6 @@ highlight -append Hint[active] font:2em; font-weight:bold; color: #000000; backg
 
 set runtimepath+="$DOTFILESWGH/external/pentadactyl/"
 
-source $DOTFILESWGH/pentadactylrc.usercss
+#source $DOTFILESWGH/pentadactylrc.usercss
 
 " vim: set ft=pentadactyl:
