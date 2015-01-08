@@ -116,5 +116,6 @@ source $DOTFILESWGH/external/pentadactyl/pentadactyl-solarized/colors/solarized-
 highlight -append Hint font:2em; font-weight:bold; font-family: Courier, monospace;
 highlight -append Hint[active] font:2em; font-weight:bold; font-family: Courier, monospace;
 highlight -append CompItem background-color: #073642;
+highlight -append Preview color: green !important;
 
 " vim: set ft=pentadactyl:
