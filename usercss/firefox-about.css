@@ -5,4 +5,6 @@
 
 /* firefox chrome */
 /*window {background-color:#111111; color:#f5f5f5}*/
-/*.tabbrowser-tabs {background-color:#111111; color:#f5f5f5}*/
+/*.tabbrowser-tabs {background-color:#202530 !important; color:#757575 !important;}*/
+tabbrowser tabpanels {background-color:#202530 !important; color:#757575 !important;}
+browser {background-color:#202530 !important; color:#757575 !important;}
