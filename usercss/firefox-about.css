@@ -8,3 +8,22 @@
 /*.tabbrowser-tabs {background-color:#202530 !important; color:#757575 !important;}*/
 tabbrowser tabpanels {background-color:#202530 !important; color:#757575 !important;}
 browser {background-color:#202530 !important; color:#757575 !important;}
+
+/* some defaults to hopefully help with GTK themes from sites that set only foreground or background color */
+input {
+    -moz-appearance: none !important;
+    background-color: white;
+    color: black;
+}
+
+textarea {
+    -moz-appearance: none !important;
+    background-color: white;
+    color: black;
+}
+
+select {
+    -moz-appearance: none !important;
+    background-color: white;
+    color: black;
+}
