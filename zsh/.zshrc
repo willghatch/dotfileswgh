@@ -194,6 +194,8 @@ if [[ "$USER" != "wgh" ]]; then
     MEGAPROMPT_STYLES[username]="%B%F{yellow}"
 fi
 
+eval $(dircolors -b $DOTFILESWGH/dircolors)
+
 tf=$DOTFILESWGH/dotlocal/bazshrc
 if [ -f "$tf" ]
 then

@@ -1,0 +1,177 @@
+# Configuration file for dircolors, a utility to help you set the
+# LS_COLORS environment variable used by GNU ls with the --color option.
+
+# The keywords COLOR, OPTIONS, and EIGHTBIT (honored by the
+# slackware version of dircolors) are recognized but ignored.
+
+
+# Below are the color init strings for the basic file types. A color init
+# string consists of one or more of the following numeric codes:
+# Attribute codes:
+# 00=none 01=bold 04=underscore 05=blink 07=reverse 08=concealed
+# Text color codes:
+# 30=black 31=red 32=green 33=yellow 34=blue 35=magenta 36=cyan 37=white
+# Background color codes:
+# 40=black 41=red 42=green 43=yellow 44=blue 45=magenta 46=cyan 47=white
+# 256-color: 38;5;### - foreground 256-color
+#            48;5;### - background 256-color
+
+# Blue - dirs
+# Green - exec
+# cyan - symlinks
+# that leaves variations of red, orange, yellow, magenta for other stuff
+# -- I'll use 256 color spectrum for extensions, no bold
+# 
+
+EXEC 01;32
+NORMAL 00 # global default, although everything should be something.
+FILE 00 # normal file
+LINK 01;36 # symbolic link
+ORPHAN 41;36;01 # symlink to nonexistent file
+FIFO 43;36;01 # pipe
+SOCK 43;36;01 # socket
+BLK 40;33;01 # block device driver
+CHR 40;33;01 # character device driver
+DIR 01;34 # directory
+STICKY 42;34;01
+STICKY_OTHER_WRITABLE 45;34;01
+
+
+
+# BLK                   38;5;68
+# CAPABILITY            38;5;17
+# CHR                   38;5;113;1
+# DIR                   38;5;30
+# DOOR                  38;5;127
+# EXEC                  38;5;208;1
+# FIFO                  38;5;126
+# FILE                  38;5;253
+# LINK                  target
+# MULTIHARDLINK         38;5;222;1
+# # "NORMAL don't reset the bold attribute -
+# # https://github.com/trapd00r/LS_COLORS/issues/11
+# #NORMAL                38;5;254
+# ORPHAN                48;5;196;38;5;232;1
+# OTHER_WRITABLE        38;5;220;1
+# SETGID                48;5;234;38;5;100;1
+# SETUID                38;5;137
+# SOCK                  38;5;197
+# STICKY                38;5;86;48;5;234
+# STICKY_OTHER_WRITABLE 48;5;235;38;5;139;3
+
+
+# extensions - list with *ext or .ext, but the . is included in the literal extension
+
+# archives / compressed
+*tar 38;5;094
+*tgz 38;5;094
+*arj 38;5;094
+*taz 38;5;094
+*lzh 38;5;094
+*zip 38;5;094
+*rar 38;5;094
+*z 38;5;094
+*Z 38;5;094
+*gz 38;5;094
+*xz 38;5;094
+*bz2 38;5;094
+*deb 38;5;094
+*rpm 38;5;094
+
+# image formats -- yellowish green
+*png 38;5;154
+*bmp 38;5;154
+*ppm 38;5;154
+*tga 38;5;154
+*xbm 38;5;154
+*xpm 38;5;154
+*tif 38;5;154
+*jpg 38;5;154
+
+
+# Video formats -- brighter than images
+*mp4 38;5;118
+
+
+# Documentation -- orange
+*README 38;5;202
+*README.md 38;5;202
+*README.markdown 38;5;202
+*INSTALL 38;5;202
+*HACKING 38;5;202
+*COPYING 38;5;202
+*CREDITS 38;5;202
+*LICENSE 38;5;202
+*TODO 38;5;202
+
+
+#### source code ####
+
+# build scripts
+*configure 38;5;100
+*autogen.sh 38;5;100
+*makefile 38;5;100
+*Makefile 38;5;100
+*mk 38;5;100
+.ant 38;5;100
+
+.c 38;5;091
+.cpp 38;5;091
+.cxx 38;5;091
+
+.h 38;5;093
+.hpp 38;5;093
+.hxx 38;5;093
+
+# various scripty ones...
+.py 38;5;201
+.sh 38;5;201
+.zsh 38;5;201
+.bash 38;5;201
+.csh 38;5;201
+.pl 38;5;201
+.el 38;5;201
+.hs 38;5;201
+.rb 38;5;201
+.lisp 38;5;201
+.lua 38;5;201
+
+
+# webby stuff
+.html 38;5;191
+.htm 38;5;191
+.js 38;5;198
+.php 38;5;206
+
+# config/data
+.xml 38;5;111
+.conf 38;5;111
+.ini 38;5;111
+.json 38;5;111
+
+## object/compiled -- dark maroon
+.o 38;5;052
+.pyc 38;5;052
+.elc 38;5;052
+.hi 38;5;052
+
+
+
+
+# Anything before term statements is global for all terminals, anything
+# below it only applies to the listed terminals
+TERM linux
+TERM console
+TERM con132x25
+TERM con132x30
+TERM con132x43
+TERM con132x60
+TERM con80x25
+TERM con80x28
+TERM con80x30
+TERM con80x43
+TERM con80x50
+TERM con80x60
+TERM xterm
+TERM vt100
+TERM xterm-256color
