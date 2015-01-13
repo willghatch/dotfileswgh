@@ -28,7 +28,7 @@ if [ -f $bazsh_common ]; then
 fi
 
 
-umask 077
+umask 027
 
 # Turn off TTY "start" and "stop" commands in all interactive shells.
 # They default to C-q and C-s, Bash uses C-s to do a forward history search.
