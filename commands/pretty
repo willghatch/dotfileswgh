@@ -1,0 +1,13 @@
+#!/bin/sh
+
+usage(){
+    echo "usage: $0 <xml|json>"
+}
+
+if [ "$1" = "json" ]; then
+    python -m json.tool <&0
+elif [ "$1" = "xml" ]; then
+    xmllint --format - <&0
+else
+    usage
+fi
