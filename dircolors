@@ -135,6 +135,7 @@ STICKY_OTHER_WRITABLE 45;34;01
 .rb 38;5;201
 .lisp 38;5;201
 .lua 38;5;201
+.rkt 38;5;201
 
 
 # webby stuff

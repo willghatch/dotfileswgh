@@ -53,6 +53,7 @@
 
 
 (in 'haskell-mode)
+(in 'racket-mode)
 (in 'markdown-mode)
 (in 'slime)
 (in 'lua-mode)
