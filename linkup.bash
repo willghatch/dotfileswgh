@@ -19,6 +19,7 @@ dotfiles=(
     Xresources
     xmobarrc
     tigrc
+    racketrc
 )
 
 function die() {
