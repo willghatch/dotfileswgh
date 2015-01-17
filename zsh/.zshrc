@@ -191,8 +191,15 @@ zstyle ':filter-select' extended-search yes
 zstyle ':filter-select' max-lines 15
 
 if [[ "$USER" != "wgh" ]]; then
-    MEGAPROMPT_STYLES[username]="%B%F{yellow}"
+    MEGAPROMPT_STYLES[username]="%B%F{cyan}"
+    MEGAPROMPT_DISPLAY_P[username]=true
+else
+    MEGAPROMPT_DISPLAY_P[username]=false
 fi
+if [ -z "$SSH_CLIENT" -a -z "$TMUX" ]; then
+    MEGAPROMPT_DISPLAY_P[host]=false
+fi
+MEGAPROMPT_DISPLAY_P[tty]=true
 
 eval $(dircolors -b $DOTFILESWGH/dircolors)
 
