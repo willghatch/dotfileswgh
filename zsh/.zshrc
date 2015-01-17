@@ -16,7 +16,11 @@ if [[ -z "$WGHHOME" ]]; then
     #not true(IE when I use su), I'll set this elsewhere
 fi
 
-#autoload -U compinit && compinit
+COMPDUMPFILE=$HOME/.cache/zshcompdump
+ZSH_COMPDUMP=$COMPDUMPFILE
+autoload -Uz compinit
+# compinit -d <dumpfile> [ -u to use insecure dirs, -i to ignore SILENTLY, -C to skip security check ]
+alias compinit="compinit -d $COMPDUMPFILE -i"
 
 HISTSIZE=1000
 SAVEHIST=1000
@@ -62,7 +66,7 @@ jd(){
 }
 
 compinit-widget(){
-    compinit
+    compinit -d $COMPDUMPFILE -i
 }; zle -N compinit-widget
 
 # if cabal is installed, use antigen-hs, since it's so much faster
@@ -202,6 +206,8 @@ fi
 MEGAPROMPT_DISPLAY_P[tty]=true
 
 eval $(dircolors -b $DOTFILESWGH/dircolors)
+
+compinit -d $COMPDUMPFILE -i
 
 tf=$DOTFILESWGH/dotlocal/bazshrc
 if [ -f "$tf" ]
