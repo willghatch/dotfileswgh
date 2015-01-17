@@ -200,7 +200,7 @@ if [[ "$USER" != "wgh" ]]; then
 else
     MEGAPROMPT_DISPLAY_P[username]=false
 fi
-if [ -z "$SSH_CLIENT" -a -z "$TMUX" ]; then
+if [ -z "$SSH_CLIENT" -a -z "$TMUX" -a -n "$DISPLAY" ]; then
     MEGAPROMPT_DISPLAY_P[host]=false
 fi
 MEGAPROMPT_DISPLAY_P[tty]=true
