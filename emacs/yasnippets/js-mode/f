@@ -1,0 +1,5 @@
+# -*- mode: snippet -*-
+#name : filter
+#key: f
+# --
+filter(${1:function(${2:x}){${3:return $2}}})$0
