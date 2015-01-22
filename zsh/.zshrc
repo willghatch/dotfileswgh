@@ -203,7 +203,11 @@ fi
 if [ -z "$SSH_CLIENT" -a -z "$TMUX" -a -n "$DISPLAY" ]; then
     MEGAPROMPT_DISPLAY_P[host]=false
 fi
-MEGAPROMPT_DISPLAY_P[tty]=true
+# also, even with no display I don't want it in my Android chroot either...
+if [ -n "$ANDROID_CHROOT" -a -z "$SSH_CLIENT" -a -z "$TMUX" ]; then
+    MEGAPROMPT_DISPLAY_P[host]=false
+fi
+MEGAPROMPT_DISPLAY_P[tty]=false
 
 eval $(dircolors -b $DOTFILESWGH/dircolors)
 
