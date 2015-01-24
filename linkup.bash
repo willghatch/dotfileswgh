@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 # Script to put symlinks for dotfiles
 # assumes my dotfiles git repo is at $HOME/dotfileswgh
