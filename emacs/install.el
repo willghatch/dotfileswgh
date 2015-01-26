@@ -60,4 +60,5 @@
 (in 'vimrc-mode)
 (in 'anaconda-mode)
 (in 'company-anaconda)
+(in web-mode)
 
