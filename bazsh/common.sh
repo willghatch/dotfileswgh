@@ -68,8 +68,9 @@ grebi(){
     git rebase -i HEAD~${1}
 }
 # I never use the gc command
-alias gc="git checkout"
-alias gcb="git checkout --branch"
+alias gc="git commit"
+alias gco="git checkout"
+alias gcob="git checkout --branch"
 alias gp="git push"
 alias gd="git diff"
 
