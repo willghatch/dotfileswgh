@@ -58,15 +58,20 @@ alias bbbd="env GTK2_RC_FILES=$DOTFILESWGH/gtkrc-2.0-dark dwb"
 alias gka="gitk --all"
 alias gta="tig --all"
 alias gunadd="git reset HEAD"
-alias gits="git status"
-alias gru="git remote update"
+# I never use ghost script
+alias gs="git status"
 alias greb="git rebase"
+alias gru="git remote update"
+alias grur="git remote update && git rebase"
+alias grurp="git remote update && git rebase && git push"
 grebi(){
     git rebase -i HEAD~${1}
 }
-alias gch="git checkout"
-alias gchb="git checkout --branch"
-alias grurp="git remote update && git rebase && git push"
+# I never use the gc command
+alias gc="git checkout"
+alias gcb="git checkout --branch"
+alias gp="git push"
+alias gd="git diff"
 
 alias hloc="locate --database $HOME/.cache/hloc.db"
 alias hupdb="updatedb --output $HOME/.cache/hloc.db --database-root $HOME --require-visibility no --add-prunepaths $HOME/.snapshot"
@@ -92,6 +97,12 @@ function tmn()
     else
         tmux new-session -s $@
     fi
+}
+
+alias c="cd"
+cd(){
+    builtin cd "$@" && \
+    ls -aF --color=auto
 }
 
 ################################ Environment Variables ##################################
