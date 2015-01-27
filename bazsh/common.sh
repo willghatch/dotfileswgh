@@ -73,6 +73,7 @@ alias gco="git checkout"
 alias gcob="git checkout --branch"
 alias gp="git push"
 alias gd="git diff"
+alias ga="git add"
 
 alias hloc="locate --database $HOME/.cache/hloc.db"
 alias hupdb="updatedb --output $HOME/.cache/hloc.db --database-root $HOME --require-visibility no --add-prunepaths $HOME/.snapshot"
