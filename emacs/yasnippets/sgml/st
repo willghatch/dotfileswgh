@@ -1,0 +1,6 @@
+# -*- mode: snippet; require-final-newline: nil -*-
+# name: simpletag
+# key: st
+# binding: direct-keybinding
+# --
+<${1:div}>`yas-selected-text`$2</$1>$0
