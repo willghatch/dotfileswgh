@@ -1,0 +1,6 @@
+# -*- mode: snippet; require-final-newline: nil -*-
+# name: tag-comment
+# key: tc
+# binding: direct-keybinding
+# --
+<!--`yas-selected-text`$1-->$0
