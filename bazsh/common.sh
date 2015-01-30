@@ -107,6 +107,13 @@ cd(){
     ls -aF --color=auto
 }
 
+# Run "a" command, which runs a command in the background disowned, then die.
+# IE. replace this xterm with this graphical command
+ak(){
+    a $@
+    exit
+}
+
 ################################ Environment Variables ##################################
 
 export XDG_DOWNLOAD_DIR="$HOME/dl"
