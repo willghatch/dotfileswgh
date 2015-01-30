@@ -1,5 +1,26 @@
-#!/bin/sh
+#!/usr/bin/env bash
 
-$@ &
+# launch a command in the background, disowned
+# with alias support
+
+if [ "$#" -eq 0 ]; then
+    echo "usage: $0 <cmd> [args ...]"
+fi
+
+shopt -s expand_aliases
+# get around the classic bashrc "exit if not interactive" line
+PS1="ps1"
+source ~/.bashrc
+
+cmd="$1"
+shift
+
+if alias "$cmd" >/dev/null 2>&1; then
+    cmd="$(alias "$cmd" | sed s/"alias ${cmd}="//)"
+    cmd=${cmd:1}
+    cmd=${cmd:0:$((${#cmd} - 1))}
+fi
+
+$cmd "$@" &
 disown
 
