@@ -81,3 +81,13 @@
  '(tool-bar ((t (:foreground "#00ff00" :box (:line-width 1 :style released-button)))))
  '(web-mode-html-tag-bracket-face ((t (:foreground "#c5a535"))))
  '(yafolding-ellipsis-face ((t (:background "#ff00ff"))) t))
+(custom-set-variables
+ ;; custom-set-variables was added by Custom.
+ ;; If you edit it by hand, you could mess it up, so be careful.
+ ;; Your init file should contain only one such instance.
+ ;; If there is more than one, they won't work right.
+ '(term-file-aliases
+   (quote
+    (("xterm" . "xterm-256color")
+     ("screen" . "xterm-256color")
+     ("screen-256color" . "xterm-256color")))))

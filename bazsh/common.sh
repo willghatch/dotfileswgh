@@ -23,11 +23,11 @@ umask 027 # privacy as a default
 #alias t="mpcl toggle"
 
 ####### Editing
-alias em="TERM=xterm-256color emacs -nw -l $DOTFILESWGH/emacs/def"
-alias e="TERM=xterm-256color premacs-use -t"
+alias em="emacs -nw -l $DOTFILESWGH/emacs/def"
+alias e="premacs-use -t"
 alias ex="premacs-use -c"
 alias emx="emacs -l $DOTFILESWGH/emacs/def"
-alias emp="TERM=xterm-256color emacs -nw -l $DOTFILESWGH/emacs/wghconf-package.el"
+alias emp="emacs -nw -l $DOTFILESWGH/emacs/wghconf-package.el"
 alias v="vim -u $DOTFILESWGH/vimrc"
 
 
@@ -117,15 +117,9 @@ ak(){
 ################################ Environment Variables ##################################
 
 export XDG_DOWNLOAD_DIR="$HOME/dl"
-
 export VLAUNCHRC="$DOTFILESWGH/dotlocal/vlaunchrc"
-
 export EDITOR=vim
-#export VISUAL="TERM=xterm-256color premacs-use -t"
-export XTERM=xterm
 export PAGER=less
-export TERMEM=lxterminal
-export TERMEM2=xfce4-terminal
 
 
 # For color in less (for man pages)
