@@ -1,0 +1,7 @@
+#compdef a
+#autoload
+
+# _command_names -e gives external commands
+# the second line gives the external command completion
+_arguments '(-):command: _command_names -e' \
+           '*::arguments: _normal'
