@@ -101,8 +101,7 @@ function tmn()
     fi
 }
 
-alias c="builtin cd"
-cd(){
+c(){
     builtin cd "$@" && \
     ls -aF --color=auto
 }
