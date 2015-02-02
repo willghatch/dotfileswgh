@@ -44,6 +44,8 @@ set indent_string="> " # how to indent copied lines on reply
 set help      # show help lines
 set mail_check=10 # how often to poll for new mail
 set sort=threads  # how to sort conversation threads
+set pager_context=3 # how many lines of context
+set pager_stop=yes # stop at end of message - don't go on to the next by scrolling
 
 
 
@@ -119,17 +121,26 @@ bind index X noop
 bind index Y noop
 bind index Z noop
 
-bind generic j next-line
-bind generic k previous-line
 bind generic \Chb help
 
+bind pager i noop # was exit, what q now does
 bind pager j next-line
 bind pager k previous-line
-bind pager <space>f next-page
-bind pager <space>b previous-page
+bind pager J next-entry
+bind pager K previous-entry
+bind pager <space>j next-page
+bind pager <space>k previous-page
 bind pager G bottom
 bind pager gg top
 bind pager q exit
+bind pager r noop
+bind pager rr reply
+bind pager ra group-reply
+bind pager rl list-reply
+bind pager N search-opposite
+bind pager a view-attachments
+bind pager A display-address
+# defaults include T for toggle quoted, f for forward, d for delete...
 
 
 bind index j next-undeleted
@@ -140,8 +151,18 @@ bind index G last-entry
 bind index gg first-entry
 bind index \Chb help
 bind index q quit
+bind index Q exit # don't save changes
 bind index u toggle-new
+bind index dd delete-message
+bind index U undelete-message
 bind index a view-attachments
+bind index A display-address
+bind index f change-folder
+bind index m mail # compose new mail
+bind index N search-opposite
+bind index tis sync-mailbox
+bind index tie quit # quit saving
+bind index tic exit # quit without saving
 macro index H '|elinks -force-html<enter>'
 
 macro index Ag '<change-folder>imaps://imap.gmail.com<enter>'
@@ -149,28 +170,6 @@ macro index Ay '<change-folder>imaps://imap.mail.yahoo.com<enter>'
 macro index Al "<change-folder>/var/spool/mail/$USER<enter>"
 
 
-# toggle-new -- read/unread (N)
-
-#
-# What do I need to do with email?
-#
-# in index:
-# read
-# mark read/unread
-# delete
-# move to folder
-# navigate up/down, pageup/down, top/bottom
-# search
-#
-# while reading:
-# delete
-# mark unread
-# reply
-# reply all
-# forward
-#
-#
-#
 
 
 
