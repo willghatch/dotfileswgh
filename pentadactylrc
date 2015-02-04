@@ -8,10 +8,6 @@ map -count -modes=i kj <Esc>
 
 map -count -modes=n -builtin a i
 
-" switch f to open a new tab and F to load in current
-map -count -builtin -modes=n f F
-map -count -builtin -modes=n F f
-
 " switch yanks -- now capital is for current URL, lowercase is selection or current word
 map -count -builtin -modes=n y Y
 map -count -builtin -modes=n Y y
@@ -54,9 +50,13 @@ map -count -modes=n -ex b tabprevious
 " make c kill tabs instead of d
 map -builtin -modes=n c d
 map -builtin -modes=n C D
-" c is normally a noop... so... do nothing now with d
-map -builtin -modes=n d c
-map -builtin -modes=n D C
+map -builtin -modes=n d <Nop>
+map -builtin -modes=n D <Nop>
+
+" e for extended hints
+map -builtin -modes=n e ;
+map -builtin -modes=n E g;
+
 " goto buffer (L2-style window) by name
 map -builtin -modes=n tha b
 map -count -modes=n -ex thj tabnext
