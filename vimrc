@@ -231,6 +231,7 @@ nnoremap thv <C-w>v
 nnoremap thj <C-w>w
 nnoremap thk <C-w>W
 nnoremap th= <C-w>=
+nnoremap thc <C-w>c
 nnoremap thh :vertical resize -5<CR>
 nnoremap thl :vertical resize +5<CR>
 nnoremap thH :resize -5<CR>
