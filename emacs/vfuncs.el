@@ -67,3 +67,12 @@ quit emacs."
 (defun toggle-wrap-scan ()
   (interactive)
   (setq-not evil-search-wrap))
+
+(defun reformat-file ()
+  (interactive)
+  (save-excursion
+    (mark-whole-buffer)
+    (call-interactively 'indent-region)
+    (mark-whole-buffer)
+    (call-interactively 'delete-trailing-whitespace)))
+
