@@ -13,11 +13,23 @@
 ")
 
 (setq scratch-useful-message
-";; Useful notes for run-time definitions:
-;(define-key evil-normal-state-map \"a\" 'evil-append)
-;(defalias 'eb 'eval-buffer)
-; kmap-[m,n,i,v,w,t]
-;(kmap-t \"p\" 'previous-something)
+"
+
+;; Useful notes for run-time definitions:
+;;(define-key evil-normal-state-map \"a\" 'evil-append)
+;;(defalias 'eb 'eval-buffer)
+;; kmap-[m,n,i,v,w,t]
+;;(kmap-t \"p\" 'previous-something)
+;;
+;;(defun foo (n)
+;;  (interactive)
+;;  (foo)) ; so I remember defun format
+;;
+;;(mapc (lambda (b)
+;;        (with-current-buffer b
+;;          (reformat-file)))
+;;      (file-visiting-buffer-list))
+
 ")
 
 

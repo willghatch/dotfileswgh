@@ -6,6 +6,9 @@
   (hc-toggle-highlight-tabs)
   (hc-toggle-highlight-trailing-whitespace))
 
+(defun file-visiting-buffer-list ()
+  (remove-if-not 'buffer-file-name (buffer-list)))
+
 (defun np-buffer-no-star (next-buffer-func)
   "Cycle buffers ignoring ** buffers.  If it circles back to the first buffer
 it calls the next function one more time."
