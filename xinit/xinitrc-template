@@ -12,6 +12,9 @@ stopTouchpadClick.sh &
 xmodmap ~/.Xmodmap
 xrdb ~/.Xresources
 
+# good trayer command
+#trayer --edge top --align right --width 10 --height 12 --transparent true --alpha 255 &
+
 
 exec awesome
 
