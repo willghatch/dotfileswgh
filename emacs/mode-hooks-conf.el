@@ -43,6 +43,12 @@
 (defun add-to-hooks (fun hooklist)
   (mapcar (lambda (hook) (add-hook hook fun)) hooklist))
 
+(add-hook 'dired-mode-hook
+          (lambda ()
+            ;; Don't let dired override evil.  This is the easiest way to do that,
+            ;; since I don't actually use dired for anything.
+            (setcdr dired-mode-map nil)
+            ))
 
 
 ;; TODO -- these are default values that I should deal with now
