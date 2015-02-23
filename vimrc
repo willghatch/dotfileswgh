@@ -131,6 +131,16 @@ function! BufDelOrQuit()
     endif
 endfunction
 
+" switch buffer function, but default to most recent buffer if arguments are empty
+function! BufSwitchFunc(buf)
+    if a:buf == ""
+        execute 'buffer' '#'
+    else
+        execute 'buffer' a:buf
+    endif
+endfunction
+command -nargs=? -complete=buffer BufSwitch call BufSwitchFunc("<args>")
+
 """"""""""""""""""""""""""" Key mappings
 " map, noremap, etc work in normal, visual+select, operator-pending modes...
 " vmap vnoremap... vork in visual+select
@@ -236,7 +246,7 @@ nnoremap thh :vertical resize -5<CR>
 nnoremap thl :vertical resize +5<CR>
 nnoremap thH :resize -5<CR>
 nnoremap thL :resize +5<CR>
-nnoremap tha :buffer<space>
+nnoremap tha :BufSwitch<space>
 
 " TODO - port these to emacs if I can ever get elscreen to work
 nnoremap thg :tabnew<cr>
