@@ -239,6 +239,8 @@
 (define-key evil-window-map " f" 'delete-other-windows)
 (define-key evil-window-map " u" 'winner-undo)
 (define-key evil-window-map " r" 'winner-redo)
+(define-key evil-window-map " j" 'window-swap-next)
+(define-key evil-window-map " k" 'window-swap-prev)
 (define-key evil-window-map "p" 'popwin-map)
 (define-key evil-window-map "=" 'balance-windows)
 

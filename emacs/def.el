@@ -144,6 +144,7 @@
  (require 'indent-guide)
  (setq indent-guide-recursive t)
  (setq indent-guide-delay 0.2)
+ (load-library "windows")
 )
 
 
