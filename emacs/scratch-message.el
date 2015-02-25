@@ -25,7 +25,7 @@
 ;;  (interactive)
 ;;  (foo)) ; so I remember defun format
 ;;
-;;(mapc (lambda (b)
+;;(mapcar (lambda (b)
 ;;        (with-current-buffer b
 ;;          (reformat-file)))
 ;;      (file-visiting-buffer-list))
