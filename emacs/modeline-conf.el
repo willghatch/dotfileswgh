@@ -72,19 +72,24 @@
        '(:eval (propertize " %b " 'face 'wevil-bufname-face))
 
        ;; line and column
-       " (" ;; '%02' to set to 2 chars at least; prevents flickering
-       (propertize "%03l" 'face 'font-lock-constant-face) ","
-       (propertize "%02c" 'face 'font-lock-constant-face)
-       ") "
+       '(:eval
+         (let ((nlines (line-number-at-pos (point-max)))
+               (curline (line-number-at-pos (point))))
+           (concat
+            (propertize (format "%2d" (/ (* 100 curline)
+                                         nlines))
+                        'face 'font-lock-constant-face)
+            "%% "
+            (propertize "%03l" 'face 'font-lock-constant-face)
+            "/"
+            (propertize (number-to-string nlines) 'face 'font-lock-constant-face)
+            " "
+            )))
+       " C:"
+       '(:eval (propertize "%02c" 'face 'font-lock-constant-face))
 
-       ;; relative position, size of file
-       "["
-       (propertize "%p" 'face 'font-lock-constant-face) ;; % above top
-       "/"
-       (propertize "%I" 'face 'font-lock-constant-face) ;; size
-       "] "
        ;; add the time, with the date and the emacs uptime in the tooltip
-       '(:eval (propertize (format-time-string "%H:%M ")
+       '(:eval (propertize (format-time-string " %H:%M ")
                            'face 'font-lock-type-face))
        '(:eval (let ((coding (symbol-name buffer-file-coding-system)))
                  (unless (or (equal coding "undecided-unix")
