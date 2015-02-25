@@ -141,6 +141,9 @@
  (load-library "borrowed")
  (setq smooth-scroll-margin 5)
  (require 'smooth-scrolling)
+ (require 'indent-guide)
+ (setq indent-guide-recursive t)
+ (setq indent-guide-delay 0.2)
 )
 
 

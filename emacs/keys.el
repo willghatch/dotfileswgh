@@ -394,6 +394,7 @@
 (define-key evil-motion-state-map "tsM" 'menu-bar-mode)
 (define-key evil-motion-state-map "tsm" '(lambda () (interactive)
                                            (menu-bar-mode 1) (menu-bar-open)))
+(define-key evil-motion-state-map "tsI" 'indent-guide-mode)
 
 (define-key evil-motion-state-map "tlb" 'list-buffers)
 (define-key evil-motion-state-map "tlm" 'evil-show-marks)

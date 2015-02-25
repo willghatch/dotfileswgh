@@ -60,5 +60,6 @@
 (in 'vimrc-mode)
 (in 'anaconda-mode)
 (in 'company-anaconda)
-(in web-mode)
+(in 'web-mode)
+(in 'indent-guide)
 
