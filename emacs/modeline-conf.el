@@ -91,10 +91,11 @@
        ;; add the time, with the date and the emacs uptime in the tooltip
        '(:eval (propertize (format-time-string " %H:%M ")
                            'face 'font-lock-type-face))
-       '(:eval (let ((coding (symbol-name buffer-file-coding-system)))
-                 (unless (or (equal coding "undecided-unix")
-                             (equal coding "utf-8-unix"))
-                   (propertize coding 'face 'font-lock-warning-face))))
+       '(:eval (let ((coding buffer-file-coding-system))
+                 (unless (or (equal coding 'undecided-unix)
+                             (equal coding 'utf-8-unix)
+                             (equal coding 'prefer-utf-8-unix))
+                   (propertize (symbol-name coding) 'face 'font-lock-warning-face))))
        "%]%["
        " {"
        '(:eval (mapconcat (lambda (buffer)
