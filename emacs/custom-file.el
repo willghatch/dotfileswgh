@@ -54,7 +54,7 @@
  '(menu ((t (:background "#003070" :foreground "#70c0ff"))))
  '(minibuffer-prompt ((t (:foreground "#ff00ff"))))
  '(mode-line ((t (:background "#161616" :foreground "#00afd7"))))
- '(mode-line-inactive ((t (:inherit mode-line :background "#161616" :foreground "#008787" :box (:line-width -1 :color "#303030") :weight light))))
+ '(mode-line-inactive ((t (:inherit mode-line :background "#161616" :foreground "#004747" :box (:line-width -1 :color "#303030") :weight light))))
  '(next-error ((t (:inherit region :foreground "#00cd00"))))
  '(org-hide ((t (:foreground "#252525"))))
  '(outline-1 ((t (:foreground "#ff00ff"))))
