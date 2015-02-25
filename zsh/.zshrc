@@ -69,14 +69,30 @@ compinit-widget(){
     compinit -d $COMPDUMPFILE -i
 }; zle -N compinit-widget
 
-# if cabal is installed, use antigen-hs, since it's so much faster
-# ... if not, use regular antigen, because it doesn't need Haskell!
-if which cabal 1>/dev/null 2>&1; then
-    ANTIGEN_HS_MY=$DOTFILESWGH/zsh/antigen.conf.hs
-    export ANTIGEN_HS_OUT=$DOTFILESWGH/dotlocal/antigen-hs
-    source $DOTFILESWGH/external/zsh/antigen-hs/init.zsh
-else
-    source $DOTFILESWGH/zsh/antigen.conf.zsh
+
+ZGEN_DIR=$DOTFILESWGH/dotlocal/zgen
+source $DOTFILESWGH/external/zsh/zgen/zgen.zsh
+if ! zgen saved; then
+    echo "zgen not set up -- cloning repos"
+    zgen load zsh-users/zsh-history-substring-search
+    zgen load hchbaw/opp.zsh
+    zgen load zsh-users/zaw
+    zgen load willghatch/zsh-zaw-extras
+    zgen load willghatch/zsh-hooks
+    zgen load willghatch/zsh-megaprompt
+    zgen load willghatch/zsh-snippets
+    zgen load willghatch/zsh-grml-funcs
+    zgen load willghatch/vzsh
+    #zgen load tarrasch/zsh-colors
+    #zgen load tarrasch/zsh-bd
+    #zgen load tarrasch/zsh-functional
+    zgen load jocelynmallon/zshmarks
+    zgen load skx/sysadmin-util
+    #zgen load ehamberg/zsh-cabal-completion
+    zgen load zsh-users/zsh-syntax-highlighting
+
+    echo "saving zgen init file"
+    zgen save
 fi
 
 VZSH_MATCHER_STR='m:{a-z-}={A-Z_} m:{b,m,w,v,h,t,n,g,c,r}={0,1,2,3,4,5,6,7,8,9}'

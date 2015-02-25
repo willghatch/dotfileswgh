@@ -4,15 +4,12 @@
 [submodule "external/emacs/yasnippet"]
 	path = external/emacs/yasnippet
 	url = https://github.com/capitaomorte/yasnippet.git
-[submodule "external/zsh/antigen"]
-	path = external/zsh/antigen
-	url = https://github.com/zsh-users/antigen.git
-[submodule "external/zsh/antigen-hs"]
-	path = external/zsh/antigen-hs
-	url = https://github.com/tarrasch/antigen-hs.git
 [submodule "external/vim/Vundle.vim"]
 	path = external/vim/Vundle.vim
 	url = https://github.com/gmarik/Vundle.vim.git
 [submodule "external/pentadactyl/pentadactyl-solarized"]
 	path = external/pentadactyl/pentadactyl-solarized
 	url = https://github.com/claytron/pentadactyl-solarized.git
+[submodule "external/zsh/zgen"]
+	path = external/zsh/zgen
+	url = https://github.com/tarjoilija/zgen.git
