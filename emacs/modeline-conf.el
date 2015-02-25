@@ -84,11 +84,22 @@
        (propertize "%I" 'face 'font-lock-constant-face) ;; size
        "] "
        ;; add the time, with the date and the emacs uptime in the tooltip
-       '(:eval (propertize (format-time-string "%H:%M")
+       '(:eval (propertize (format-time-string "%H:%M ")
                            'face 'font-lock-type-face))
-       " %Z %@ %e" ; coding system, whether the default dir is remote, mem full
+       '(:eval (let ((coding (symbol-name buffer-file-coding-system)))
+                 (unless (or (equal coding "undecided-unix")
+                             (equal coding "utf-8-unix"))
+                   (propertize coding 'face 'font-lock-warning-face))))
        "%]%["
-       " %-" ; dashes to end
+       " {"
+       '(:eval (mapconcat (lambda (buffer)
+                            (buffer-name buffer))
+                          (remove-if (lambda (buffer)
+                                       (equal (buffer-name buffer) (buffer-name)))
+                                     (file-visiting-buffer-list))
+                          " "))
+       "}"
+       "%-" ; dashes to end
        ))
 
 (setq-default header-line-format
@@ -113,6 +124,7 @@
        ;; is this buffer read-only?
        '(:eval (when buffer-read-only
                  (propertize "RO" 'face 'wevil-ro-face)))
+       "%e"
        "] "
        ;; the full file name
        '(:eval (propertize (or (buffer-file-name) "~NoFile~") 'face 'font-lock-preprocessor-face))
@@ -123,10 +135,8 @@
 
        '(:eval (propertize "%m" 'face 'font-lock-string-face))
 
-       "] "
-       " --"
-       minor-mode-alist  ;; list of minor modes
-       " %-" ;; fill with '-'
+       "]"
+       "%-" ;; fill with '-'
        ))
 
 
