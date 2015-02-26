@@ -290,6 +290,11 @@ noremap gp "+p
 vnoremap gy "+y
 
 
+
+" Highlighting
+highlight Comment cterm=italic
+
+
 if filereadable($DOTFILESWGH . "/dotlocal/vimrc")
     source $DOTFILESWGH/dotlocal/vimrc
 endif

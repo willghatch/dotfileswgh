@@ -11,6 +11,7 @@ xscreensaver -no-splash &
 stopTouchpadClick.sh &
 xmodmap ~/.Xmodmap
 xrdb ~/.Xresources
+tic $DOTFILESWGH/xterm-256color-italic.terminfo
 
 # good trayer command
 #trayer --edge top --align right --width 10 --height 12 --transparent true --alpha 255 &

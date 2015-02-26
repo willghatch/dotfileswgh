@@ -22,7 +22,7 @@
  '(flyspell-duplicate ((t (:inherit warning))))
  '(font-lock-builtin-face ((t (:foreground "#476cab"))))
  '(font-lock-comment-delimiter-face ((t (:foreground "#683d8b"))))
- '(font-lock-comment-face ((t (:foreground "#685d9b"))))
+ '(font-lock-comment-face ((t (:foreground "#685d9b" :slant italic))))
  '(font-lock-constant-face ((t (:foreground "#679cab"))))
  '(font-lock-doc-face ((t (:foreground "#ffffff"))))
  '(font-lock-function-name-face ((t (:foreground "#40af60"))))
