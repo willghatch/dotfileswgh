@@ -68,7 +68,7 @@
  (auto-compile-on-save-mode 1)
 
  (setq vc-follow-symlinks t) ; Don't prompt to follow symlinks of version-controlled files
- (setq tab-width 4) ; how many spaces for tab DISPLAY
+ (setq-default tab-width 4)
  (setq-default indent-tabs-mode nil) ; use spaces, not tabs
  (setq tab-stop-list (number-sequence 4 120 4)) ; setting tab expansion by setting stops
  (defun set-indent-auto (indent-p)
