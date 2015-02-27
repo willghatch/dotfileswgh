@@ -42,6 +42,13 @@ it calls the next function one more time."
   (interactive)
   (let ((ido-use-filename-at-point 'guess))
     (call-interactively 'ido-find-file)))
+(defun ido-find-file-from-pwd ()
+  (interactive)
+  (let* ((pwd (getenv "PWD"))
+         (default-directory (if (string-suffix-p "/" pwd)
+                                pwd
+                              (concat pwd "/"))))
+    (call-interactively 'ido-ffap-no)))
 
 (defun ish (cmd) (interactive (list (read-shell-command "$ ")))
   (insert-string (shell-command-to-string cmd)))

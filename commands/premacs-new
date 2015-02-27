@@ -4,5 +4,6 @@
 
 newId=$RANDOM
 EDIR=$DOTFILESWGH/emacs
+cd $HOME
 emacs -l $EDIR/def.el -l $EDIR/premacs-run.el --daemon=premacs$newId && \
 echo premacs$newId >> /tmp/premacs

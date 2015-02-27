@@ -369,7 +369,8 @@
 (define-key evil-motion-state-map "tie" 'save-and-kill-buffer-and-maybe-quit-emacs)
 (define-key evil-motion-state-map "tiae" 'evil-save-and-quit)
 (define-key evil-motion-state-map "tif" 'ido-ffap-no)
-(define-key evil-motion-state-map "tiF" 'ido-ffap-yes)
+(define-key evil-motion-state-map "tiF" 'ido-find-file-from-pwd)
+(define-key evil-motion-state-map "ti f" 'ido-ffap-yes)
 (define-key evil-motion-state-map "tiw" 'next-buffer-no-star)
 (define-key evil-motion-state-map "tib" 'prev-buffer-no-star)
 

@@ -231,7 +231,13 @@ nnoremap tis :w<CR>
 nnoremap tias :wall<CR>
 nnoremap tie :w<CR>:call BufDelOrQuit()<CR>
 nnoremap tiae :wqall<CR>
-nnoremap tif :e<space>
+" open file in same directory as current file
+" % mean current buffer (like with %s/foo/bar/)
+" :p means expand to full path
+" :h means head -- ie remove last component
+nnoremap tif :e <C-R>=expand("%:p:h") . "/" <CR>
+" open file from PWD
+nnoremap tiF :e<space>
 nnoremap tib :bp<CR>
 nnoremap tiw :bn<CR>
 
