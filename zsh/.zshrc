@@ -51,6 +51,55 @@ xclip-to-zsh(){
     BUFFER="${LBUFFER}$(xclip -o -selection clipboard)${RBUFFER}"
 }; zle -N xclip-to-zsh
 
+_search-forward-current-command(){
+    pat="$1"
+    for (( i=1; i <= ${#RBUFFER}; i++)); do
+        if [[ "${RBUFFER:$i:${#pat}}" = "$pat" ]]; then
+            CURSOR=$(($CURSOR + $i))
+            break
+        fi
+    done
+}; zle -N _search-forward-current-command
+_search-backward-current-command(){
+    pat="$1"
+    for (( i=$((${#LBUFFER} - 1)); i>=0; i--)); do
+        if [[ "${BUFFER:$i:${#pat}}" = "$pat" ]]; then
+            CURSOR=$i
+            break
+        fi
+    done
+}; zle -N _search-backward-current-command
+
+search-forward-current-command(){
+    autoload -Uz read-from-minibuffer
+    read-from-minibuffer "/"
+    _last_search_current_command="$REPLY"
+    _last_search_current_command_dir="f"
+    zle _search-forward-current-command "$_last_search_current_command"
+}; zle -N search-forward-current-command
+search-backward-current-command(){
+    autoload -Uz read-from-minibuffer
+    read-from-minibuffer "?"
+    _last_search_current_command="$REPLY"
+    _last_search_current_command_dir="b"
+    zle _search-backward-current-command "$_last_search_current_command"
+}; zle -N search-backward-current-command
+
+search-forward-current-command-repeat(){
+    if [[ "$_last_search_current_command_dir" = "f" ]]; then
+        zle _search-forward-current-command "$_last_search_current_command"
+    else
+        zle _search-backward-current-command "$_last_search_current_command"
+    fi
+}; zle -N search-forward-current-command-repeat
+search-backward-current-command-repeat(){
+    if [[ "$_last_search_current_command_dir" = "f" ]]; then
+        zle _search-backward-current-command "$_last_search_current_command"
+    else
+        zle _search-forward-current-command "$_last_search_current_command"
+    fi
+}; zle -N search-backward-current-command-repeat
+
 # zaw bookmark file
 BOOKMARKFILE=~/.cache/zsh/zaw-bookmarks
 # setup for zshmarks plugin
@@ -161,6 +210,10 @@ bindkey -M vicmd 'gp' xclip-to-zsh
 # include history substring search commands
 bindkey -M emacs '^P' history-substring-search-up
 bindkey -M emacs '^N' history-substring-search-down
+bindkey -M vicmd '/' search-forward-current-command
+bindkey -M vicmd '?' search-backward-current-command
+bindkey -M vicmd 'n' search-forward-current-command-repeat
+bindkey -M vicmd 'N' search-backward-current-command-repeat
 bindToMaps '^[c' execute-named-cmd $(bindkey -l)
 bindkey -r -M viins '\e'
 bindkey -M viins 'jk' vi-cmd-mode
