@@ -14,8 +14,5 @@ cabal install libmpd
 
 cabal install xmobar --flags="with_alsa,with_mpd"
 
-# for antigen-hs
-cabal install shelly
-
 xmonad --recompile
 
