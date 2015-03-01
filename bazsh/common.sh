@@ -13,7 +13,7 @@ export MANWIDTH=${MANWIDTH:-80}
 
 export ZDOTDIR=$DOTFILESWGH/zsh
 
-umask 027 # privacy as a default
+umask 022 # the covenient umask
 
 ################################################  ALIASES ############################### 
 
