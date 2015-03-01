@@ -226,8 +226,8 @@ cpost()
     fi
 }
 
-
-####### Add shell completion #######
+# fix terminal
+tic $DOTFILESWGH/xterm-256color-italic.terminfo
 
 source $DOTFILESWGH/bazsh/grml-funcs.sh
 
