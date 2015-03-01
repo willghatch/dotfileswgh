@@ -1,0 +1,5 @@
+#!/usr/bin/env bash
+myzsh=$(which zsh)
+user="$1"
+
+exec su "$user" -s "$myzsh"
