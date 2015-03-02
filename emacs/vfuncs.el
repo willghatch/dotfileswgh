@@ -49,6 +49,11 @@ it calls the next function one more time."
                                 pwd
                               (concat pwd "/"))))
     (call-interactively 'ido-ffap-no)))
+(defun chdir (dir)
+  (interactive "Dcd:")
+  (if (file-directory-p dir)
+      (setenv "PWD" dir)
+    (message (format "%s is not a directory!" dir))))
 
 (defun ish (cmd) (interactive (list (read-shell-command "$ ")))
   (insert-string (shell-command-to-string cmd)))
