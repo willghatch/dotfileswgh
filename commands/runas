@@ -3,19 +3,15 @@
 user="$1"
 shift
 
-evars=`sudo -i -u $user env`
-
-HOME=`echo "$evars" | egrep '^HOME='`
-HOME="${HOME:5}"
-USER=`echo "$evars" | egrep '^USER='`
-USER="${USER:5}"
+HOME=$( getent passwd "$user" | cut -d: -f6 )
+USER="$user"
 USERNAME="$USER"
 LOGNAME="$USER"
 unset XDG_DOWNLOAD_DIR
 unset XDG_RUNTIME_DIR
 unset MAIL
 
-if [ "${0:$((${#0} - 2)):2}" = "be" ]; then
+if [[ "${0:$((${#0} - 2)):2}" = "be" ]]; then
     # keep zdotdir by going through bash... somehow that works.
     exec sudo -E -u $user bash --rcfile $WGHHOME/.bashrc -i -c zsh
 else
