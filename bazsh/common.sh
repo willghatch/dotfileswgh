@@ -4,7 +4,7 @@ if [[ -z "$WGHHOME" ]]; then
 fi
 export HROOT=$WGHHOME/hroot
 export DOTFILESWGH=$WGHHOME/dotfileswgh
-PATH=$WGHHOME/bin:$WGHHOME/lscripts:$WGHHOME/vscripts:$WGHHOME/wghsrv_scripts:$DOTFILESWGH/commands:$WGHHOME/.cabal/bin:$HROOT/bin:$HROOT/usr/bin:$HROOT/usr/local/bin:$PATH:/usr/bin:/bin:/usr/local/bin:/sbin:/usr/sbin:/usr/local/sbin
+PATH=$WGHHOME/bin:$WGHHOME/lscripts:$WGHHOME/vscripts:$WGHHOME/wghsrv_scripts:$DOTFILESWGH/commands:$WGHHOME/.cabal/bin:$HROOT/bin:$HROOT/usr/bin:$HROOT/usr/local/bin:$WGHHOME/.local/bin:$PATH:/usr/bin:/bin:/usr/local/bin:/sbin:/usr/sbin:/usr/local/sbin
 export MANPATH=/usr/share/man:/usr/local/man:/usr/local/share/man:/usr/X11R6/man:/opt/man:$HROOT/usr/share/man:$HROOT/share/man
 
 
