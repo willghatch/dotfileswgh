@@ -453,6 +453,7 @@
 (define-key evil-motion-state-map "[" 'backward-list)
 (define-key evil-motion-state-map "]" 'forward-list)
 (define-key evil-motion-state-map (kbd "C-z") 'suspend-frame)
+(define-key evil-insert-state-map (kbd "C-z") 'suspend-frame)
 
 ; space map
 (define-key evil-motion-state-map " h" 'scroll-up)
