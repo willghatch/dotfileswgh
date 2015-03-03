@@ -11,6 +11,10 @@
 (setcdr evil-normal-state-map nil)
 (setcdr evil-motion-state-map nil)
 
+(defmacro myhydradef (hydra-name &rest hydra-keys)
+  `(defhydra ,hydra-name (:exit t :foreign-keys warn)
+     ,@hydra-keys))
+
 ;;; define some short-named functions for the most common types of mappings
 (defun kmap-m (keys func)
   (define-key evil-motion-state-map keys func))
@@ -234,7 +238,6 @@
     (let ((current-prefix-arg '(5)))
       (call-interactively 'evil-window-decrease-height))))
 (define-key evil-window-map "f" 'delete-other-windows)
-(define-key evil-window-map "a" 'switch-to-buffer)
 ;; Space will be for layout concerns
 (define-key evil-window-map " f" 'delete-other-windows)
 (define-key evil-window-map " u" 'winner-undo)
@@ -365,16 +368,16 @@
 ; t map
 (define-key evil-motion-state-map "tt" 'temp-key-map)
 
+(define-key evil-motion-state-map "tia" 'switch-to-buffer)
 (define-key evil-motion-state-map "tic" 'kill-buffer-or-quit-emacs)
-(define-key evil-motion-state-map "tiac" 'evil-quit-all)
+(define-key evil-motion-state-map " tica" 'evil-quit-all)
 (define-key evil-motion-state-map "tis" 'save-buffer)
-(define-key evil-motion-state-map "tiS" 'evil-write-all)
-(define-key evil-motion-state-map "tias" 'evil-write-all)
+(define-key evil-motion-state-map " tisa" 'evil-write-all)
 (define-key evil-motion-state-map "tie" 'save-and-kill-buffer-and-maybe-quit-emacs)
-(define-key evil-motion-state-map "tiae" 'evil-save-and-quit)
+(define-key evil-motion-state-map " tiea" 'evil-save-and-quit)
 (define-key evil-motion-state-map "tif" 'ido-ffap-no)
-(define-key evil-motion-state-map "tiF" 'ido-find-file-from-pwd)
-(define-key evil-motion-state-map "ti f" 'ido-ffap-yes)
+(define-key evil-motion-state-map " tifd" 'ido-find-file-from-pwd)
+(define-key evil-motion-state-map " tiff" 'ido-ffap-yes)
 (define-key evil-motion-state-map "tiw" 'next-buffer-no-star)
 (define-key evil-motion-state-map "tib" 'prev-buffer-no-star)
 
@@ -456,25 +459,26 @@
 (define-key evil-insert-state-map (kbd "C-z") 'suspend-frame)
 
 ; space map
-(define-key evil-motion-state-map " h" 'scroll-up)
-(define-key evil-motion-state-map " t" 'scroll-down)
-(define-key evil-motion-state-map " j" 'scroll-up)
-(define-key evil-motion-state-map " k" 'scroll-down)
-(define-key evil-motion-state-map " f" 'yafolding-toggle-element)
-(define-key evil-motion-state-map "  f" 'yafolding-toggle-all)
-(define-key evil-motion-state-map " /" 'helm-swoop)
-(define-key evil-motion-state-map "  /" 'helm-multi-swoop-all)
-(define-key evil-motion-state-map "   /" 'helm-multi-swoop)
-(define-key evil-motion-state-map " -" 'helm-M-x)
-(define-key evil-motion-state-map " &" 'evil-ex-repeat-global-substitute)
-(define-key evil-motion-state-map " v" 'mark-whole-buffer)
+(define-key evil-motion-state-map "sj" 'scroll-up)
+(define-key evil-motion-state-map "sk" 'scroll-down)
+(define-key evil-motion-state-map "sf" 'yafolding-toggle-element)
+(define-key evil-motion-state-map " sfa" 'yafolding-toggle-all)
+(define-key evil-motion-state-map " /"
+  (myhydradef search-hydra
+              ("s" helm-swoop "swoop")
+              ("a" helm-multi-swoop-all "multi-swoop all")
+              ("m" helm-multi-swoop "multi-swoop")
+  ))
+(define-key evil-motion-state-map " -h" 'helm-M-x)
+(define-key evil-motion-state-map " &g" 'evil-ex-repeat-global-substitute)
+(define-key evil-motion-state-map " va" 'mark-whole-buffer)
 
 ;; Joining
 ;; TODO -- make a better mapping for this.  I should make my prefixes be mnemonic or something...
 ;;         for instance, g<key> is mostly navigation... t... mosty has window stuff in th... space is mostly one handed
 ;;         navigation aside from this one
-(define-key evil-normal-state-map " J" 'evil-join)
-(define-key evil-normal-state-map "  J" 'evil-join-whitespace)
+(define-key evil-normal-state-map " sjj" 'evil-join)
+(define-key evil-normal-state-map " sjw" 'evil-join-whitespace)
 
 
 ;; input mode
@@ -491,20 +495,17 @@
 (define-key meta-space-map "p" 'helm-browse-project)
 (define-key meta-space-map "g" 'helm-do-grep)
 
-(define-prefix-command 'completer-map)
-(define-key evil-insert-state-map "\M-h" 'completer-map)
-(define-key completer-map "h" 'hippie-expand)
-(define-key completer-map "\M-h" 'hippie-expand)
-(define-key completer-map "n" 'evil-complete-next)
-(define-key completer-map "\M-n" 'evil-complete-next)
-(define-key completer-map "p" 'evil-complete-previous)
-(define-key completer-map "\M-p" 'evil-complete-previous)
-(define-key completer-map "f" 'he-expand-file-name)
-(define-key completer-map "\M-f" 'he-expand-file-name)
-(define-key completer-map "l" 'he-expand-lisp-symbol)
-(define-key completer-map "\M-l" 'he-expand-lisp-symbol)
-(define-key completer-map "s" 'yas-expand)
-(define-key completer-map "\M-s" 'yas-expand)
+(myhydradef completer-map
+            ("h" hippie-expand)
+            ("n" evil-complete-next)
+            ("p" evil-complete-previous)
+            ("f" he-expand-file-name)
+            ("l" he-expand-lisp-symbol)
+            ("s" yas-expand)
+)
+(define-key evil-insert-state-map "\M-h" 'completer-map/body)
+(define-key evil-insert-state-map (kbd "C-SPC TAB") completer-map/body)
+(define-key evil-insert-state-map (kbd "C-@ TAB") completer-map/body)
 (define-key evil-insert-state-map (kbd "TAB") 'company-complete-common-wgh)
 ;; put indentation on something...
 (define-key completer-map (kbd "TAB") 'indent-for-tab-command)

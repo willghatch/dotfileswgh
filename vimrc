@@ -225,19 +225,20 @@ noremap t <nop>
 noremap T <nop>
 noremap tr "
 
+nnoremap tia :BufSwitch<space>
 nnoremap tic :call BufDelOrQuit()<CR>
-nnoremap tiac :qa<CR>
+nnoremap <space>tica :qa<CR>
 nnoremap tis :w<CR>
-nnoremap tias :wall<CR>
+nnoremap <space>tisa :wall<CR>
 nnoremap tie :w<CR>:call BufDelOrQuit()<CR>
-nnoremap tiae :wqall<CR>
+nnoremap <space>tiea :wqall<CR>
 " open file in same directory as current file
 " % mean current buffer (like with %s/foo/bar/)
 " :p means expand to full path
 " :h means head -- ie remove last component
 nnoremap tif :e <C-R>=expand("%:p:h") . "/" <CR>
 " open file from PWD
-nnoremap tiF :e<space>
+nnoremap <space>tifd :e<space>
 nnoremap tib :bp<CR>
 nnoremap tiw :bn<CR>
 
@@ -252,7 +253,6 @@ nnoremap thh :vertical resize -5<CR>
 nnoremap thl :vertical resize +5<CR>
 nnoremap thH :resize -5<CR>
 nnoremap thL :resize +5<CR>
-nnoremap tha :BufSwitch<space>
 
 " TODO - port these to emacs if I can ever get elscreen to work
 nnoremap thg :tabnew<cr>
@@ -292,8 +292,10 @@ vnoremap sh :!
 noremap sa :
 vnoremap s/ :s/
 
-noremap gp "+p
-vnoremap gy "+y
+noremap <space>pc "+p
+vnoremap <space>yc "+y
+noremap <space>ps "*p
+vnoremap <space>ys "*y
 
 
 

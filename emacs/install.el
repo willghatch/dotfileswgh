@@ -8,6 +8,7 @@
 
 (in 'evil)
 (in 'key-chord)
+(in 'hydra)
 (in 'auto-compile)
 (in 'evil-surround)
 (in 'evil-matchit)

@@ -56,6 +56,7 @@
  (require 'key-chord)
  (key-chord-mode 1)
  (require 'evil-little-word)
+ (require 'hydra)
  (load-library "keys")
  )
 
