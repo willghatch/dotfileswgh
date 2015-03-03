@@ -243,6 +243,10 @@
 (define-key evil-window-map " k" 'window-swap-prev)
 (define-key evil-window-map "p" 'popwin-map)
 (define-key evil-window-map "=" 'balance-windows)
+(define-key evil-window-map "g" 'elscreen-create)
+(define-key evil-window-map "G" 'elscreen-kill)
+(define-key evil-window-map "w" 'elscreen-next)
+(define-key evil-window-map "b" 'elscreen-previous)
 
 
 (evil-define-state window

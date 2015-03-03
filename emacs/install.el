@@ -22,6 +22,7 @@
 (in 'smartparens)
 (in 'ace-jump-mode)
 
+(in 'elscreen)
 (in 'xclip)
 (in 'ag)
 (in 'smex)
