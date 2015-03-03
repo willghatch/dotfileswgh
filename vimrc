@@ -282,7 +282,7 @@ nnoremap <Space> v ggVG
 inoremap <C-g> <esc>
 noremap <C-g> <esc>
 vnoremap <C-g> <esc>
-cnoremap <C-g> <esc>
+cnoremap <C-g> <C-c>
 
 nnoremap sm m
 nnoremap sg `
