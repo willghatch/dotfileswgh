@@ -80,7 +80,8 @@
  '(sp-show-pair-match-face ((t (:background "#363636" :foreground "#00ff66"))))
  '(tool-bar ((t (:foreground "#00ff00" :box (:line-width 1 :style released-button)))))
  '(web-mode-html-tag-bracket-face ((t (:foreground "#c5a535"))))
- '(yafolding-ellipsis-face ((t (:background "#ff00ff"))) t))
+ '(yafolding-ellipsis-face ((t (:background "#ff00ff"))) t)
+ '(yas-field-highlight-face ((t (:background "#001d00"))) t))
 (custom-set-variables
  ;; custom-set-variables was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
