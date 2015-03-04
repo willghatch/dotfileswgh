@@ -275,8 +275,8 @@ nnoremap tlr :registers<CR>
 
 noremap <Space>h <PageDown>
 noremap <Space>t <PageUp>
-noremap <Space>j <PageDown>
-noremap <Space>k <PageUp>
+noremap sj <PageDown>
+noremap sk <PageUp>
 nnoremap <Space> v ggVG
 
 inoremap <C-g> <esc>

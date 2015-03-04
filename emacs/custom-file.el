@@ -43,6 +43,7 @@
  '(helm-selection-line ((t (:foreground "#000000" :background "#90b090"))))
  '(highlight ((t (:background "#005f00" :foreground "#0000ff"))))
  '(hl-line ((t (:background "#000035"))))
+ '(hydra-face-blue ((t (:foreground "#2646ff"))))
  '(ido-first-match ((t (:foreground "#fd0060"))))
  '(ido-subdir ((t (:foreground "#3050f0"))))
  '(isearch-fail ((t (:background "#cd0000"))))

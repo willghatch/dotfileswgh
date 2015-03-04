@@ -57,6 +57,7 @@
  (key-chord-mode 1)
  (require 'evil-little-word)
  (require 'hydra)
+ (setq hydra-lv nil)
  (load-library "keys")
  )
 

@@ -17,8 +17,8 @@ map -count -builtin -modes=v c s
 map -count -builtin -modes=n <Space> <Nop>
 map -count -builtin -modes=n <Space>h <PageDown>
 map -count -builtin -modes=n <Space>t <PageUp>
-map -count -builtin -modes=n <Space>j 20j
-map -count -builtin -modes=n <Space>k 20k
+map -count -builtin -modes=n sj 20j
+map -count -builtin -modes=n sk 20k
 " These are half-page scrollers
 map -count -builtin -modes=n J <C-d>
 map -count -builtin -modes=n K <C-u>
