@@ -79,6 +79,7 @@ if filereadable($DOTFILESWGH . "/external/vim/Vundle.vim/README.md")
     "Plugin 'tpope/vim-commentary'
     "Plugin 'tpope/vim-abolish'
     Plugin 'matchit.zip'
+    Plugin 'chrisbra/csv.vim'
     " a is alternate
     Plugin 'a.vim'
     Plugin 'bling/vim-airline'
