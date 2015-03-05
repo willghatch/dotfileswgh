@@ -95,6 +95,10 @@ if filereadable($DOTFILESWGH . "/external/vim/Vundle.vim/README.md")
     " to run the vundle installer, run :PluginInstall
 
     let g:airline#extensions#tabline#enabled = 1
+    let g:airline_left_sep = '▶'
+    let g:airline_right_sep = '◀'
+    source $DOTFILESWGH/vim/vairl-airline-theme.vim
+    let g:airline_theme='vairl'
 
     let g:rainbow_active = 1
 
