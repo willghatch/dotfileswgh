@@ -67,6 +67,7 @@ set rtp+=$DOTFILESWGH/external/vim/Vundle.vim
 
 if filereadable($DOTFILESWGH . "/external/vim/Vundle.vim/README.md")
     call vundle#begin($DOTFILESWGH . "/dotlocal/vim")
+    Plugin 'kana/vim-submode'
     Plugin 'tpope/vim-rsi'
     Plugin 'tpope/vim-repeat'
     Plugin 'tpope/vim-surround'
@@ -119,6 +120,28 @@ if filereadable($DOTFILESWGH . "/external/vim/Vundle.vim/README.md")
     " these can be bound maybe...
     "<Plug>(easymotion-next)
     "<Plug>(easymotion-prev)
+
+    let g:submode_always_show_submode = 1
+    let g:submode_keyseqs_to_leave = ['<esc>', '<C-g>']
+    let g:submode_timeout = 9999
+    let g:submode_timeoutlen = 9999
+    call submode#enter_with('windowing', 'n', '', 'th', '<NOP>')
+    call submode#leave_with('windowing', 'n', '', 'e')
+    call submode#map('windowing', 'n', '', 'j', '<C-w>w')
+    call submode#map('windowing', 'n', '', 'k', '<C-w>W')
+    call submode#map('windowing', 'n', '', 's', '<C-w>s')
+    call submode#map('windowing', 'n', '', 'v', '<C-w>v')
+    call submode#map('windowing', 'n', '', '=', '<C-w>=')
+    call submode#map('windowing', 'n', '', 'c', '<C-w>c')
+    call submode#map('windowing', 'n', '', 'h', ':vertical resize -5<CR>')
+    call submode#map('windowing', 'n', '', 'l', ':vertical resize +5<CR>')
+    call submode#map('windowing', 'n', '', 'H', ':resize -5<CR>')
+    call submode#map('windowing', 'n', '', 'L', ':resize +5<CR>')
+    call submode#map('windowing', 'n', '', 'g', ':tabnew<cr>')
+    call submode#map('windowing', 'n', '', 'G', ':tabclose<cr>')
+    call submode#map('windowing', 'n', '', 'w', 'gt')
+    call submode#map('windowing', 'n', '', 'b', 'gT')
+
 endif
 
 filetype plugin indent on
@@ -246,24 +269,6 @@ nnoremap tif :e <C-R>=expand("%:p:h") . "/" <CR>
 nnoremap <space>tifd :e<space>
 nnoremap tib :bp<CR>
 nnoremap tiw :bn<CR>
-
-" window keys
-nnoremap ths <C-w>s
-nnoremap thv <C-w>v
-nnoremap thj <C-w>w
-nnoremap thk <C-w>W
-nnoremap th= <C-w>=
-nnoremap thc <C-w>c
-nnoremap thh :vertical resize -5<CR>
-nnoremap thl :vertical resize +5<CR>
-nnoremap thH :resize -5<CR>
-nnoremap thL :resize +5<CR>
-
-" TODO - port these to emacs if I can ever get elscreen to work
-nnoremap thg :tabnew<cr>
-nnoremap thG :tabclose<cr>
-nnoremap thw gt
-nnoremap thb gT
 
 nnoremap tst :set wrap!<CR>
 nnoremap tsW :set wrapscan!<CR>
