@@ -91,7 +91,7 @@ if filereadable($DOTFILESWGH . "/external/vim/Vundle.vim/README.md")
     Plugin 'msanders/snipmate.vim'
     Plugin 'camelcasemotion'
     Plugin 'AndrewRadev/sideways.vim'
-    Plugin 'luochen1990/rainbow'
+    "Plugin 'luochen1990/rainbow'
     call vundle#end()
     " to run the vundle installer, run :PluginInstall
 
