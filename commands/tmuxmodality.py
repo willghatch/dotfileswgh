@@ -205,6 +205,7 @@ def mode_command():
     binder.bind( "i", [ "run-shell", python + ' ' + modality + mc + ' insert -p command' ] )
     #binder.bind( "m", [ "run-shell", python + ' ' + modality + mc + ' insert -p command' ], use_prefix = True )
     binder.bind( "m", [ "run-shell", python + ' ' + modality + mc + ' insert -p command' ] )
+    binder.bind( "e", [ "run-shell", python + ' ' + modality + mc + ' insert -p command' ] )
 
     if use_mode_colors:
         binder.set_colors( command_mode_colors )
@@ -327,14 +328,15 @@ def mode_default():
 
     binder.bind( "a", [ "split-window", "-h", "zsh -i -t", " \\; ", "send-keys", "tmux join-pane -s " ], use_prefix = True )
     binder.bind( "o", [ "command-prompt", "find-window '%%'" ], use_prefix = True )
-    binder.bind( "e", [ "split-window", "-v", "zsh -i -t", " \\; ", "send-keys", "tmux switch-client -t " ], use_prefix = True )
+    binder.bind( "i", [ "split-window", "-v", "zsh -i -t", " \\; ", "send-keys", "tmux switch-client -t " ], use_prefix = True )
     #binder.bind( "G", [ "command-prompt", "-p", "window name: ", "new-window -n %%" ], use_prefix = True )
     #binder.bind( "r", [ "command-prompt", "-p", "window name: rename-window %%" ], use_prefix = True )
     #binder.bind( "R", [ "command-prompt", "-p", "session name: rename-session %%" ], use_prefix = True )
     binder.bind( "y", [ "copy-mode" ], use_prefix = True )
     binder.bind( "P", [ "paste-buffer" ], use_prefix = True )
 
-    binder.bind( "C-h", [ "split-window", "-v", "sh -i -t", " \\; ", "send-keys", "tmux list-keys \| less\\n" ], use_prefix = True )
+    # this doesn't work super well, I should fix it later.
+    #binder.bind( "C-h", [ "split-window", "-v", "sh -i -t", " \\; ", "send-keys", "tmux list-keys \| less\\n" ], use_prefix = True )
 
     return binder
 
@@ -363,8 +365,12 @@ def mode_insert():
 
     #binder.bind( "C-\\", [ "run-shell", python + ' ' +
     #                       modality + pt + mc + ' -p insert command'] )
-    binder.bind( "m", [ "run-shell", python + ' ' +
-                           modality + pt + mc + ' -p insert command'], use_prefix=True )
+    goto_command = [ "run-shell", python + ' ' + modality + pt + mc + ' -p insert command']
+    binder.bind( "m", goto_command, use_prefix=True )
+    # match my emacs "get into window mode" keys - I'll still be able to do
+    # their normal function once I'm actually in command mode
+    binder.bind( "h", goto_command, use_prefix=True )
+    binder.bind( "C-h", goto_command, use_prefix=True )
 
     if use_mode_colors:
         binder.set_colors( insert_mode_colors )

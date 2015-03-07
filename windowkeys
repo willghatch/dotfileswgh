@@ -12,10 +12,10 @@ wb  L2 focus
 (2) L2 move
 np  L3 focus
 (2) L3 move
-aoei - pull/send by name, goto by name for L1-3 -- these I'm not sure how I want to do yet, because support for these types of operations are often so spotty, and I'm not sure of my ideal way to do it yet.  They are more useful for L1 and L2.
+aoi - pull/send by name, goto by name for L1-3 -- these I'm not sure how I want to do yet, because support for these types of operations are often so spotty, and I'm not sure of my ideal way to do it yet.  They are more useful for L1 and L2.
 a   L1 pull by name
 (2) L1 push to named L2
-e   L2 goto by name
+i   L2 goto by name
 hl  L1 quick resize (a more thorough resize should be in some sort of mode... though set layouts would be more efficient)
 (2) maybe the secondary function can resize L3, supposing large enough monitors for virtual L3 splits
 f   maximize (fullscreen)
@@ -27,11 +27,13 @@ sv  L1 split (horizontal and vertical)
 :-  run command (both : and - for now...)
 c   close (akin to control-C)
 r   run (for window manager, a run prompt (bashrun!), though if my WM later supports choosing what kind of split I do, maybe rv/rs will do that
-m   mode - if I'm in a window mode, get out of it
 q   lock
 (2) quit - kill window manager
 ret launch terminal in window manager -- though this could be in s/v... for now I'll leave it as return
 t   reserved for possible extended commands/secondary level
+
+m   mode - if I'm in a window mode, get out of it
+e   same as m - I can see myself moving to going modal by default, so I want a home row escape key
 
 
 unused - d,z,u,tab,bspc,x,y...
