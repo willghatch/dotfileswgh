@@ -315,6 +315,7 @@ highlight Comment cterm=italic
 highlight ColorColumn ctermbg=17
 highlight CursorLine cterm=NONE ctermbg=233
 highlight CursorColumn ctermbg=233
+highlight Search ctermbg=20 ctermfg=2
 
 
 if filereadable($DOTFILESWGH . "/dotlocal/vimrc")
