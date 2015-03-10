@@ -36,8 +36,8 @@ set incsearch    " search incrementally (move cursor to show nearest match)
 set hlsearch     " highlight all results -- turn off temporarily with :nohl
 set backspace=indent,eol,start
 "set background=dark  " Tell vim the background will be dark so it will set a good color scheme
-"set cursorcolumn   " Highlight current column
-"set cursorline     " Highlight current line
+set cursorcolumn   " Highlight current column
+set cursorline     " Highlight current line
 "set insertmode     " make vim modeless - bad idea.
 
 set backup    " Make backup files
@@ -145,6 +145,7 @@ if filereadable($DOTFILESWGH . "/external/vim/Vundle.vim/README.md")
 endif
 
 filetype plugin indent on
+autocmd FileType * setlocal formatoptions-=r formatoptions-=o
 
 """"""""""""""""""""""""""" Functions
 function! NumBuffers()
@@ -312,6 +313,8 @@ vnoremap <space>ys "*y
 " Highlighting
 highlight Comment cterm=italic
 highlight ColorColumn ctermbg=17
+highlight CursorLine cterm=NONE ctermbg=233
+highlight CursorColumn ctermbg=233
 
 
 if filereadable($DOTFILESWGH . "/dotlocal/vimrc")
