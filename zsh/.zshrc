@@ -119,7 +119,7 @@ compinit-widget(){
 }; zle -N compinit-widget
 
 
-ZGEN_DIR=$DOTFILESWGH/dotlocal/zgen
+ZGEN_DIR=$DOTFILESWGH/dotlocal/zsh/zgen
 source $DOTFILESWGH/external/zsh/zgen/zgen.zsh
 if ! zgen saved; then
     echo "zgen not set up -- cloning repos"
