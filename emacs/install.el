@@ -52,8 +52,8 @@
 (in 'helm-descbinds)
 
 
-
-
+(in 'js2-mode)
+(in 'js2-refactor)
 (in 'haskell-mode)
 (in 'racket-mode)
 (in 'markdown-mode)
