@@ -4,7 +4,7 @@
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
  '(default ((t (:inherit nil :stipple nil :background "#050505" :foreground "#909090" :inverse-video nil :box nil :strike-through nil :overline nil :underline nil :slant normal :weight normal :height 99 :width normal :foundry "unknown" :family "DejaVu Sans Mono"))))
- '(bold-italic ((t (:foreground "#00ff5f" :slant italic :weight bold))))
+ '(bold-italic ((t (:slant italic :weight bold))))
  '(col-highlight ((t (:background "#000035"))))
  '(custom-comment-tag ((t (:foreground "#0087ff"))))
  '(diff-added ((t (:background "#001500"))))
@@ -47,6 +47,8 @@
  '(ido-first-match ((t (:foreground "#fd0060"))))
  '(ido-subdir ((t (:foreground "#3050f0"))))
  '(isearch-fail ((t (:background "#cd0000"))))
+ '(italic ((t (:slant italic))))
+ '(js2-warning ((t (:slant italic))))
  '(lazy-highlight ((t (:background "#0087ff" :foreground "#000000"))))
  '(linum ((t (:inherit mode-line :foreground "#309f9f" :underline nil :weight normal))))
  '(magit-diff-none ((t (:inherit diff-header))))
@@ -82,7 +84,7 @@
  '(tool-bar ((t (:foreground "#00ff00" :box (:line-width 1 :style released-button)))))
  '(web-mode-html-tag-bracket-face ((t (:foreground "#c5a535"))))
  '(yafolding-ellipsis-face ((t (:background "#ff00ff"))) t)
- '(yas-field-highlight-face ((t (:background "#001d00"))) t))
+ '(yas-field-highlight-face ((t (:background "#001d00")))))
 (custom-set-variables
  ;; custom-set-variables was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
