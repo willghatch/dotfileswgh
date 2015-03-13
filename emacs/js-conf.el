@@ -5,6 +5,7 @@
 (defun js-maybe-semicolon ()
   (if js-want-semicolon ";" ""))
 
+(require 'sgml-mode)
 (require 'js2-mode)
 (js2-minor-mode 1)
 (setq js2-strict-missing-semi-warning nil)

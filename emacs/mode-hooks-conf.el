@@ -31,6 +31,7 @@
 (add-hook 'web-mode-hook
           (lambda ()
             (setq web-mode-markup-indent-offset 2)
+            (require 'sgml-mode)
             ))
 
 (add-hook 'emacs-lisp-mode-hook
