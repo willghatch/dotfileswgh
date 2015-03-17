@@ -86,7 +86,7 @@ myKeys = \c -> mkKeymap c $
     , ("M4-e c", promptWSGroupForget defaultXPConfig "Forget group: ")
 
     -- Quit xmonad
-    , ("M4-M1-q", io (exitWith ExitSuccess))
+    , ("M4-M1-C-q", io (exitWith ExitSuccess))
     -- Restart xmonad
     , ("M4-C-q", spawn "xmonad --recompile; xmonad --restart")
 
