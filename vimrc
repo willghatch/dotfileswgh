@@ -23,8 +23,6 @@ syntax on     " Do syntax highlighting
 set scrolloff=5  " Auto-scroll up or down to keep context above/below cursor
 set nowrap       " turn off word-wrap
 set sidescrolloff=5 " Auto-scroll L/R to keep context in view
-set textwidth=80  " set 80 character width
-set colorcolumn=+1 " Color column 80
 
 " complete only up to where possibilities diverge, and list options (ex prompt)
 set wildmenu
@@ -169,6 +167,24 @@ function! BufSwitchFunc(buf)
     endif
 endfunction
 command -nargs=? -complete=buffer BufSwitch call BufSwitchFunc("<args>")
+
+"set textwidth=80  " set 80 character width
+"set colorcolumn=+0 " Color textwidth +0
+
+function! SetColorColumn()
+    if &textwidth == 0
+        :set colorcolumn=80
+    else
+        :set colorcolumn=+0
+    endif
+endfunction
+
+function! SetTextWidth(n)
+    :execute "set textwidth=" . a:n
+    :call SetColorColumn()
+endfunction
+command -nargs=1 Width call SetTextWidth("<args>")
+command -nargs=1 ColumnWidth call SetTextWidth("<args>")
 
 """"""""""""""""""""""""""" Key mappings
 " map, noremap, etc work in normal, visual+select, operator-pending modes...
