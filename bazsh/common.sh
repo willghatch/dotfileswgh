@@ -25,8 +25,8 @@ umask 022 # the covenient umask
 ####### Editing
 alias em="emacs -nw -l $DOTFILESWGH/emacs/def"
 alias e="premacs-use -t"
-alias ex="premacs-use -c"
-alias emx="emacs -l $DOTFILESWGH/emacs/def"
+alias eg="premacs-use -c"
+alias emg="emacs -l $DOTFILESWGH/emacs/def"
 alias emp="emacs -nw -l $DOTFILESWGH/emacs/wghconf-package.el"
 alias v="vim -u $DOTFILESWGH/vimrc"
 
