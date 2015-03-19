@@ -1,0 +1,11 @@
+#!/bin/bash
+
+if [ -z "$1" ]; then
+    echo "usage, taking prepended text from stdin:  prepend <file>"
+    exit
+fi
+
+tmpname=$(mktemp /tmp/$(basename "$1")_prepend_tmp_file_XXXXXX)
+
+cat - "$1" > "$tmpname" && mv "$tmpname" "$1"
+
