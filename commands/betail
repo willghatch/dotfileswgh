@@ -1,0 +1,9 @@
+#!/bin/bash
+
+if [[ -z "$1" ]]; then
+    echo "usage, with input from stdin: $0 <num lines to cut>"
+    exit
+fi
+
+cat - | head -n -"$1"
+

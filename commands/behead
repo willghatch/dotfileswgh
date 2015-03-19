@@ -1,0 +1,9 @@
+#!/bin/bash
+
+if [[ -z "$1" ]]; then
+    echo "usage, with input from stdin: $0 <num lines to behead>"
+    exit
+fi
+
+cat - | tail -n +$(( 1 + $1 ))
+
