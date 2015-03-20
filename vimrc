@@ -3,7 +3,7 @@ set nocompatible " be improved always
 colorscheme elflord
 
 set number       " Display line numbers
-set relativenumber " Show line numbers relative to current line
+"set relativenumber " Show line numbers relative to current line
 " indenting
 set autoindent   " Use indent from previous line when starting a new line
 set copyindent   " Use tab/space format from previous line, even with expandtab
