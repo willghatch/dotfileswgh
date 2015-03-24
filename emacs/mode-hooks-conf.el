@@ -21,10 +21,6 @@
           (lambda ()
             (electric-indent-mode -1)
             ))
-(add-hook 'js-mode-hook
-          (lambda ()
-            (load-library "js-conf")
-            ))
 
 (add-to-list 'auto-mode-alist '("\\.html?\\'" . web-mode))
 (add-to-list 'auto-mode-alist '("\\.php\\'" . web-mode))
@@ -51,6 +47,7 @@
             (setcdr dired-mode-map nil)
             ))
 
+ (load-library "js-conf")
 
 ;; TODO -- these are default values that I should deal with now
 ;evil-overriding-maps
