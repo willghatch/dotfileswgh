@@ -1,4 +1,3 @@
-#!/usr/bin/zsh
 
 tf=$HOME/.zshrc.pre
 if [ -f "$tf" ]
