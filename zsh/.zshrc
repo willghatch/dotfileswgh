@@ -39,13 +39,6 @@ autoload -U add-zsh-hook
 add-zsh-hook chpwd chpwd_recent_dirs
 zstyle ':chpwd:*' recent-dirs-file $CDR_DIR/recent-dirs
 
-foreground(){
-    local b
-    zle push-line
-    BUFFER="fg"
-    zle accept-line
-}; zle -N foreground
-
 xclip-to-zsh(){
     BUFFER="${LBUFFER}$(xclip -o -selection clipboard)${RBUFFER}"
 }; zle -N xclip-to-zsh
@@ -202,6 +195,11 @@ if [[ -n "$ZSH_HIGHLIGHT_STYLES" ]]; then
     # Highlighters pattern
     # TODO -- use this one, because it looks cool and helpful, but requires more setup
 fi
+
+foreground(){
+    fg
+    mp-updatePrompt
+}; zle -N foreground
 
 
 bindkey -M emacs '^Z' foreground
