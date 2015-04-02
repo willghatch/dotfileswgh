@@ -211,7 +211,21 @@ ls-widget(){
     mp-updatePrompt
 }; zle -N ls-widget
 
+insert-last-word-left-indexed(){
+    # like the built-in insert-last-word, but if given a numeric argument
+    # it chooses the Nth word from the left, rather than the right
+    local index
+    index="$"
+    if [[ -n "$NUMERIC" ]]; then
+        index="$NUMERIC"
+    fi
+    LBUFFER="${LBUFFER}!!${index}"
+    zle complete-word
+}; zle -N insert-last-word-left-indexed
 
+bindkey -M viins '^[h' completionkey
+bindkey-to-prefix-map completionkey "l" insert-last-word-left-indexed
+bindkey-to-prefix-map completionkey "L" insert-last-word
 bindkey -M emacs '\el' ls-widget
 bindkey -M emacs '^Z' foreground
 bindkey -M vicmd 'gp' xclip-to-zsh
