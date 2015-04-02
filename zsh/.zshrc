@@ -201,7 +201,18 @@ foreground(){
     mp-updatePrompt
 }; zle -N foreground
 
+ls-widget(){
+    # echo so the output starts on a fresh line
+    echo ""
+    ls --color=auto
+    # echo a blank line so the last line of output isn't clobbered
+    # by my two line prompt
+    echo ""
+    mp-updatePrompt
+}; zle -N ls-widget
 
+
+bindkey -M emacs '\el' ls-widget
 bindkey -M emacs '^Z' foreground
 bindkey -M vicmd 'gp' xclip-to-zsh
 # include history substring search commands
