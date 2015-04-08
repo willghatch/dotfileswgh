@@ -1,5 +1,8 @@
 #!/bin/sh
 
+# get the latest data...
+cabal update
+
 # these are because apparently cabal can't figure out build dependencies...
 cabal install happy # for c2hs... and lots of stuff
 cabal install alex # just in case
