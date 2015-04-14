@@ -186,6 +186,8 @@ endfunction
 command -nargs=1 Width call SetTextWidth("<args>")
 command -nargs=1 ColumnWidth call SetTextWidth("<args>")
 
+command -nargs=0 Rot13 normal ggg?G
+
 """"""""""""""""""""""""""" Key mappings
 " map, noremap, etc work in normal, visual+select, operator-pending modes...
 " vmap vnoremap... vork in visual+select
