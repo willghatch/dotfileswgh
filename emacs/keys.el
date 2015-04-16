@@ -368,6 +368,8 @@
 (define-key evil-motion-state-map " tiff" 'ido-ffap-yes)
 (define-key evil-motion-state-map "tiw" 'next-buffer-no-star)
 (define-key evil-motion-state-map "tib" 'prev-buffer-no-star)
+(define-key evil-motion-state-map " tiwd" 'next-dirty-buffer-no-star)
+(define-key evil-motion-state-map " tibd" 'prev-dirty-buffer-no-star)
 
 (define-key evil-motion-state-map "th" 'evil-window-map/body)
 (define-key evil-motion-state-map "tp" 'projectile-command-map)

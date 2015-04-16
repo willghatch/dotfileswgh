@@ -9,23 +9,38 @@
 (defun file-visiting-buffer-list ()
   (remove-if-not 'buffer-file-name (buffer-list)))
 
-(defun np-buffer-no-star (next-buffer-func)
-  "Cycle buffers ignoring ** buffers.  If it circles back to the first buffer
-it calls the next function one more time."
+(defun np-buffer-conditional (next-buffer-func ignore-func advance-on-failure-func)
+  "Cycle buffers until one isn't ignored by the ignore-func.  If in reaches the starting
+buffer, it will call the next-buffer-func once more if advance-on-failure-p."
   (let ((cbuf (buffer-name)))
     (funcall next-buffer-func)
-    (while (and (string= "*" (substring (buffer-name) 0 1))
-                (not (string= cbuf (buffer-name))))
+    (while (and (not (string= cbuf (buffer-name)))
+                (funcall ignore-func))
       (funcall next-buffer-func))
-    (when (string= cbuf (buffer-name))
-      (funcall next-buffer-func))))
+    (when (and (string= cbuf (buffer-name)) advance-on-failure-func)
+      (funcall advance-on-failure-func))))
+
+(defun np-buffer-no-star (next-buffer-func advance-on-failure-func)
+  (let ((ignore (lambda () (string= "*" (substring (buffer-name) 0 1)))))
+    (np-buffer-conditional next-buffer-func ignore advance-on-failure-func)))
 (defun next-buffer-no-star ()
   (interactive)
-  (np-buffer-no-star 'next-buffer))
+  (np-buffer-no-star 'next-buffer 'next-buffer))
 (defun prev-buffer-no-star ()
   (interactive)
-  (np-buffer-no-star 'previous-buffer))
+  (np-buffer-no-star 'previous-buffer 'previous-buffer))
 
+(defun np-dirty-buffer (next-buffer-func advance-on-failure-func)
+  (let ((ignore (lambda () (not (buffer-modified-p)))))
+    (np-buffer-conditional next-buffer-func ignore advance-on-failure-func)))
+(defun prev-dirty-buffer-no-star ()
+  (interactive)
+  (np-dirty-buffer (lambda () (np-buffer-no-star 'previous-buffer nil))
+                   'prev-buffer-no-star))
+(defun next-dirty-buffer-no-star ()
+  (interactive)
+  (np-dirty-buffer (lambda () (np-buffer-no-star 'next-buffer nil))
+                   'next-buffer-no-star))
 
 (defun backward-symbol (n)
   "this doesn't work right..."
