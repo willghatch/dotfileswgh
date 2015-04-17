@@ -91,6 +91,8 @@ if filereadable($DOTFILESWGH . "/external/vim/Vundle.vim/README.md")
     Plugin 'camelcasemotion'
     Plugin 'AndrewRadev/sideways.vim'
     "Plugin 'luochen1990/rainbow'
+    Plugin 'pelodelfuego/vim-swoop'
+    Plugin 'terryma/vim-multiple-cursors'
     call vundle#end()
     " to run the vundle installer, run :PluginInstall
 
@@ -139,6 +141,13 @@ if filereadable($DOTFILESWGH . "/external/vim/Vundle.vim/README.md")
     call submode#map('windowing', 'n', '', 'G', ':tabclose<cr>')
     call submode#map('windowing', 'n', '', 'w', 'gt')
     call submode#map('windowing', 'n', '', 'b', 'gT')
+
+    let g:multi_cursor_use_default_mapping=0
+    let g:multi_cursor_start_key='<C-o>'
+    let g:multi_cursor_next_key='<C-o>'
+    let g:multi_cursor_prev_key='<C-e>'
+    let g:multi_cursor_skip_key='<C-a>'
+    let g:multi_cursor_quit_key='<C-k>'
 
 endif
 
@@ -271,6 +280,11 @@ noremap F ,
 noremap t <nop>
 noremap T <nop>
 noremap tr "
+
+noremap <space>/s :call Swoop()<CR>
+vnoremap <space>/s :call SwoopSelection()<CR>
+noremap <space>/a :call SwoopMulti()<CR>
+vnoremap <space>/a :call SwoopMultiSelection()<CR>
 
 nnoremap tia :BufSwitch<space>
 nnoremap tic :call BufDelOrQuit()<CR>

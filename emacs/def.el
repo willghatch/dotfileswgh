@@ -152,6 +152,8 @@
  (setq indent-guide-recursive t)
  (setq indent-guide-delay 0.2)
  (load-library "windows")
+ (require 'helm)
+ (setq helm-swoop-pre-input-function (lambda () "")) ; disable symbol-at-point nonsense
 )
 
 
