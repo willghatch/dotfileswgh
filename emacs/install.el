@@ -1,10 +1,13 @@
 
 (load-file "~/dotfileswgh/emacs/package-conf.el")
 
+(message "Updating package lists...")
 (package-refresh-contents)
 
 (defun in (package)
   (with-demoted-errors "Error installing: %S" (package-install package)))
+
+(message "Installing packages...")
 
 (in 'evil)
 (in 'key-chord)
@@ -64,4 +67,6 @@
 (in 'company-anaconda)
 (in 'web-mode)
 (in 'indent-guide)
+
+(message "Done installing packages!")
 
