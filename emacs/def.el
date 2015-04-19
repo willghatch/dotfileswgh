@@ -65,9 +65,9 @@
 (nobreak
  ;; compile settings
  (setq load-prefer-newer t)
- (require 'auto-compile)
- (auto-compile-on-load-mode 1)
- (auto-compile-on-save-mode 1)
+ ;(require 'auto-compile)
+ ;(auto-compile-on-load-mode 1)
+ ;(auto-compile-on-save-mode 1)
 
  (setq vc-follow-symlinks t) ; Don't prompt to follow symlinks of version-controlled files
  (setq-default tab-width 4)
