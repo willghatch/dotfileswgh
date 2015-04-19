@@ -18,8 +18,8 @@ menu_select space Return
 #next_img j Right space
 #prev_img k Left BackSpace
 
-next_img o Right space
-prev_img i Left BackSpace
+next_img w Right space
+prev_img b Left BackSpace
 
 # and image movement
 scroll_up    k C-Up
@@ -32,13 +32,13 @@ scroll_right l C-Right
 #delete   C-d C-Delete
 
 # remove now conflicts with toggle_filenames, so change that
-toggle_filenames f
+toggle_filenames n
 
 # zooming
-zoom_in  C-Up f
-zoom_out C-Down a
-zoom_default d
-zoom_fit s
+zoom_in  C-Up e
+zoom_out C-Down o
+zoom_default F
+zoom_fit f
 
 # I only hit these accidentaly
 save_image
