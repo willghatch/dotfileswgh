@@ -88,10 +88,19 @@ STICKY_OTHER_WRITABLE 45;34;01
 *tif 38;5;154
 *jpg 38;5;154
 
-
 # Video formats -- brighter than images
 *mp4 38;5;118
 
+# sound
+.flac 38;5;037
+.wav 38;5;037
+.mp3 38;5;036
+.ogg 38;5;036
+
+# book/pdf
+.epub 38;5;190
+.mobi 38;5;184
+.pdf 38;5;184
 
 # Documentation -- orange
 *README 38;5;202
@@ -102,7 +111,9 @@ STICKY_OTHER_WRITABLE 45;34;01
 *COPYING 38;5;202
 *CREDITS 38;5;202
 *LICENSE 38;5;202
+*LICENCE 38;5;202
 *TODO 38;5;202
+*todo 38;5;202
 
 
 #### source code ####
@@ -131,6 +142,7 @@ STICKY_OTHER_WRITABLE 45;34;01
 .csh 38;5;201
 .pl 38;5;201
 .el 38;5;201
+.vim 38;5;201
 .hs 38;5;201
 .rb 38;5;201
 .lisp 38;5;201
@@ -144,17 +156,45 @@ STICKY_OTHER_WRITABLE 45;34;01
 .js 38;5;198
 .php 38;5;206
 
+# written stuff...
+.txt 38;5;208
+.org 38;5;208
+.scrbl 38;5;208
+.md 38;5;208
+.textile 38;5;208
+.rst 38;5;208
+.rdoc 38;5;208
+.asciidoc 38;5;208
+.adoc 38;5;208
+.creole 38;5;208
+.pod 38;5;208
+
 # config/data
-.xml 38;5;111
-.conf 38;5;111
-.ini 38;5;111
-.json 38;5;111
+*rc 38;5;099
+.xml 38;5;099
+.conf 38;5;099
+.ini 38;5;099
+.json 38;5;099
+.csv 38;5;099
+.tsv 38;5;099
+
+# documents in ODF. Also crappy proprietary formats (even though openxml is supposedly open...)
+.odt 38;5;094
+.odp 38;5;094
+.ods 38;5;094
+.doc 38;5;094
+.docx 38;5;094
+.ppt 38;5;094
+.pptx 38;5;094
+.xls 38;5;094
+.xlsx 38;5;094
 
 ## object/compiled -- dark maroon
 .o 38;5;052
 .pyc 38;5;052
 .elc 38;5;052
 .hi 38;5;052
+.zo 38;5;052
 
 
 
@@ -176,3 +216,4 @@ TERM con80x60
 TERM xterm
 TERM vt100
 TERM xterm-256color
+TERM xterm-256color-italic
