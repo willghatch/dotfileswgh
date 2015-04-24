@@ -275,8 +275,6 @@
 (define-key evil-motion-state-map (kbd "RET") 'ignore)
 (define-key evil-motion-state-map "S" 'ignore)
 (define-key evil-motion-state-map "T" 'ignore)
-(define-key evil-motion-state-map "f" 'ignore)
-(define-key evil-motion-state-map "F" 'ignore)
 
 ; g map
 (define-key evil-motion-state-map "gr" 'evil-ace-jump-word-mode)
