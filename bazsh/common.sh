@@ -51,10 +51,8 @@ export NUMCPUS=$(grep -c '^processor' /proc/cpuinfo)
 alias pmake="time nice make -j$NUMCPUS --load-average=$NUMCPUS"
 
 ####### Miscellaneous
-alias ffx="env GTK2_RC_FILES=$DOTFILESWGH/gtkrc-2.0-light firefox"
-alias ffxd="env GTK2_RC_FILES=$DOTFILESWGH/gtkrc-2.0-dark firefox"
-alias bbb="env GTK2_RC_FILES=$DOTFILESWGH/gtkrc-2.0-light dwb"
-alias bbbd="env GTK2_RC_FILES=$DOTFILESWGH/gtkrc-2.0-dark dwb"
+alias ffx="nice -n 5 env GTK2_RC_FILES=$DOTFILESWGH/gtkrc-2.0-light firefox"
+alias ffxd="nice -n 5 env GTK2_RC_FILES=$DOTFILESWGH/gtkrc-2.0-dark firefox"
 
 alias gka="gitk --all"
 alias gta="tig --all"
@@ -79,8 +77,6 @@ alias ga="git add"
 alias hloc="locate --database $HOME/.cache/hloc.db"
 alias hupdb="updatedb --output $HOME/.cache/hloc.db --database-root $HOME --require-visibility no --add-prunepaths $HOME/.snapshot"
 export LOCATE_PATH=$HOME/.cache/hloc.db
-
-alias wdl="wd ls"
 
 alias tm="tmux"
 alias tma="tmux attach-session -t"
