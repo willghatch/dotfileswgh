@@ -10,6 +10,3 @@
 [submodule "external/zsh/zgen"]
 	path = external/zsh/zgen
 	url = https://github.com/tarjoilija/zgen.git
-[submodule "external/emacs/emacs-repeatable-motion"]
-	path = external/emacs/emacs-repeatable-motion
-	url = https://github.com/willghatch/emacs-repeatable-motion
