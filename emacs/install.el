@@ -10,6 +10,7 @@
 (message "Installing packages...")
 
 (in 'evil)
+(in 'repeatable-motion)
 (in 'key-chord)
 (in 'hydra)
 (in 'auto-compile)
