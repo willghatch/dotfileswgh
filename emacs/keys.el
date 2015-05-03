@@ -107,11 +107,11 @@
 (define-key evil-motion-state-map "f" 'repeatable-motion-evil-find-char)
 (define-key evil-motion-state-map "F" 'repeatable-motion-evil-find-char-backward)
 (define-key evil-motion-state-map "G" 'evil-goto-line)
-(define-key evil-motion-state-map "h" 'repeatable-motion-evil-backward-char)
+(define-key evil-motion-state-map "h" (lambda () (interactive) (message "use oc")))
 (define-key evil-motion-state-map "H" 'evil-window-top)
 (define-key evil-motion-state-map "j" 'repeatable-motion-evil-next-line)
 (define-key evil-motion-state-map "k" 'repeatable-motion-evil-previous-line)
-(define-key evil-motion-state-map "l" 'repeatable-motion-evil-forward-char)
+(define-key evil-motion-state-map "l" (lambda () (interactive) (message "use ec")))
 (define-key evil-motion-state-map "K" 'evil-lookup)
 (define-key evil-motion-state-map "L" 'evil-window-bottom)
 (define-key evil-motion-state-map "M" 'evil-window-middle)
@@ -338,7 +338,7 @@
 (define-key evil-motion-state-map "om" 'repeatable-motion-evil-repeat-find-char-reverse)
 (define-key evil-motion-state-map "en" 'evil-search-next)
 (define-key evil-motion-state-map "on" 'evil-search-previous)
-(define-key evil-motion-state-map "ol" 'repeatable-motion-evil-goto-column)
+(define-key evil-motion-state-map "ol" 'evil-goto-column)
 (define-key evil-motion-state-map "o l" 'evil-first-non-blank)
 (define-key evil-motion-state-map "el" 'evil-end-of-line)
 (define-key evil-motion-state-map "oL" 'evil-beginning-of-visual-line)
@@ -476,8 +476,8 @@
 ;; TODO -- make a better mapping for this.  I should make my prefixes be mnemonic or something...
 ;;         for instance, g<key> is mostly navigation... t... mosty has window stuff in th... space is mostly one handed
 ;;         navigation aside from this one
-(define-key evil-normal-state-map " sjj" 'evil-join)
-(define-key evil-normal-state-map " sjw" 'evil-join-whitespace)
+(define-key evil-normal-state-map " jl" 'evil-join)
+(define-key evil-normal-state-map " jw" 'evil-join-whitespace)
 
 
 ;; input mode
