@@ -69,7 +69,7 @@ grebi(){
 # I never use the gc command
 alias gc="git commit"
 alias gco="git checkout"
-alias gcob="git checkout --branch"
+alias gcob="git checkout -b"
 alias gp="git push"
 alias gd="git diff"
 alias ga="git add"
