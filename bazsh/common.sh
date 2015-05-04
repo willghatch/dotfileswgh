@@ -27,7 +27,7 @@ alias em="emacs -nw -l $DOTFILESWGH/emacs/def"
 alias e="premacs-use -t"
 alias eg="premacs-use -c"
 alias emg="emacs -l $DOTFILESWGH/emacs/def"
-alias emp="emacs -nw -l $DOTFILESWGH/emacs/wghconf-package.el"
+alias emp="emacs -nw -l $DOTFILESWGH/emacs/package-conf.el"
 alias v="vim -u $DOTFILESWGH/vimrc"
 
 
