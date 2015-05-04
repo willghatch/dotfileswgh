@@ -4,5 +4,5 @@
 
 df=$DOTFILESWGH
 
-emacs -l $df/emacs/def.el -batch -f batch-byte-compile $df/**/*.el ~/.emacs.d/**/*.el
+emacs -l $df/emacs/def.el -batch -f batch-byte-compile $df/**/*.el
 
