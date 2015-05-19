@@ -9,13 +9,16 @@ unclutter -idle 5 &
 
 xscreensaver -no-splash &
 stopTouchpadClick.sh &
-xmodmap ~/.Xmodmap
+hkk # get keyboard layout
+#xmodmap ~/.Xmodmap
 xrdb ~/.Xresources
+feh --bg-max ~/wallpaper
 tic $DOTFILESWGH/xterm-256color-italic.terminfo
 
 # good trayer command
 #trayer --edge top --align right --width 10 --height 12 --transparent true --alpha 255 &
+xcompmgr &
+nm-applet &
 
-
-exec awesome
+exec xmonad
 
