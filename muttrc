@@ -160,6 +160,7 @@ bind index A display-address
 bind index f change-folder
 bind index m mail # compose new mail
 bind index N search-opposite
+bind index r imap-fetch-mail # the other fetch-mail uses pop
 bind index tis sync-mailbox
 bind index tie quit # quit saving
 bind index tic exit # quit without saving
