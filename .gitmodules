@@ -10,3 +10,6 @@
 [submodule "external/zsh/zgen"]
 	path = external/zsh/zgen
 	url = https://github.com/tarjoilija/zgen.git
+[submodule "external/gtk/gtk-adb"]
+	path = external/gtk/gtk-adb
+	url = https://github.com/willghatch/gtk-adb

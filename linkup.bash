@@ -65,14 +65,22 @@ function linkConfigSubdirs() {
     done
 }
 
+function linkSundries() {
+    # link in themes!
+    mkdir -p $HOME/.themes
+    cd $HOME/.themes
+    ln -s $HOME/dotfileswgh/external/gtk/gtk-adb $HOME/.themes/
+}
+
 function mkSundries() {
 # Make sundry directories and files so things (especially vim) don't complain
 # and stuff that I just like to be there in general
-    mkdir -p $HOME/dotfileswgh/dotlocal/vimtmp
+    mkdir -p $HOME/.cache/vimtmp
     mkdir -p $HOME/dl # my default download directory
     mkdir -p $HOME/vsvr
     mkdir -p $HOME/tmp
-    mkdir -p $HOME/lscripts
+    mkdir -p $HOME/.themes
+    mkdir -p $HOME/.config
 }
 
 #######################################
@@ -86,12 +94,16 @@ then
 elif [ "s-$1" = "s-sundries" ]
 then
     mkSundries
+elif [ "s-$1" = "s-linksundries" ]
+then
+    linkSundries
 elif [ "s-$1" = "s-all" ]
 then
+    mkSundries
     linkDotfiles
     linkConfigSubdirs
-    mkSundries
+    linkSundries
 else
-    echo "usage: linkup.bash < dotfiles | configdir | sundries | all >"
+    echo "usage: linkup.bash < dotfiles | configdir | sundries | linksundries | all >"
 fi
 
