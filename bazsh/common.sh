@@ -52,8 +52,8 @@ export NUMCPUS=$(grep -c '^processor' /proc/cpuinfo)
 alias pmake="time nice make -j$NUMCPUS --load-average=$NUMCPUS"
 
 ####### Miscellaneous
-alias ffx="nice -n 5 env GTK2_RC_FILES=$DOTFILESWGH/gtkrc-2.0-light firefox"
-alias ffxd="nice -n 5 env GTK2_RC_FILES=$DOTFILESWGH/gtkrc-2.0-dark firefox"
+alias ffx="nice -n 5 env GTK2_RC_FILES=$DOTFILESWGH/gtk2rc-light firefox"
+alias ffxd="nice -n 5 env GTK2_RC_FILES=$DOTFILESWGH/gtk2rc-dark firefox"
 
 alias gka="gitk --all"
 alias gta="tig --all"
