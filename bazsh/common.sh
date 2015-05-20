@@ -10,6 +10,7 @@ export MANPATH=/usr/share/man:/usr/local/man:/usr/local/share/man:/usr/X11R6/man
 # themes to ease eye strain
 export GTK_THEME=gtk-adb
 export GTK2_RC_FILES=$DOTFILESWGH/gtk2rc-dark
+export QT_STYLE_OVERRIDE=gtk
 
 ## Use a default width of 80 for manpages for more convenient reading
 export MANWIDTH=${MANWIDTH:-80}
