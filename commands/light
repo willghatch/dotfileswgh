@@ -1,4 +1,4 @@
 #!/usr/bin/env bash
 
-env GTK2_RC_FILES=$DOTFILESWGH/gtk2rc-light "$@"
+env GTK_THEME=Adwaita GTK2_RC_FILES=$DOTFILESWGH/gtk2rc-light "$@"
 

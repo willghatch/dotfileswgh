@@ -7,6 +7,9 @@ export DOTFILESWGH=$WGHHOME/dotfileswgh
 PATH=$DOTFILESWGH/dotlocal/commands:$WGHHOME/wghsrv_scripts:$DOTFILESWGH/commands:$WGHHOME/.cabal/bin:$HROOT/bin:$HROOT/usr/bin:$HROOT/usr/local/bin:$WGHHOME/.local/bin:$WGHHOME/bin:$PATH:/usr/bin:/bin:/usr/local/bin:/sbin:/usr/sbin:/usr/local/sbin
 export MANPATH=/usr/share/man:/usr/local/man:/usr/local/share/man:/usr/X11R6/man:/opt/man:$HROOT/usr/share/man:$HROOT/share/man
 
+# themes to ease eye strain
+export GTK_THEME=gtk-adb
+export GTK2_RC_FILES=$DOTFILESWGH/gtk2rc-dark
 
 ## Use a default width of 80 for manpages for more convenient reading
 export MANWIDTH=${MANWIDTH:-80}
@@ -15,7 +18,7 @@ export ZDOTDIR=$DOTFILESWGH/zsh
 
 umask 022 # the covenient umask
 
-################################################  ALIASES ############################### 
+################################################  ALIASES ###############################
 
 
 #alias n="mpcl next"
@@ -52,9 +55,6 @@ export NUMCPUS=$(grep -c '^processor' /proc/cpuinfo)
 alias pmake="time nice make -j$NUMCPUS --load-average=$NUMCPUS"
 
 ####### Miscellaneous
-alias ffx="nice -n 5 env GTK2_RC_FILES=$DOTFILESWGH/gtk2rc-light firefox"
-alias ffxd="nice -n 5 env GTK2_RC_FILES=$DOTFILESWGH/gtk2rc-dark firefox"
-
 alias gka="gitk --all"
 alias gta="tig --all"
 alias gunadd="git reset HEAD"

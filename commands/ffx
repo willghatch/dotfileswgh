@@ -1,0 +1,5 @@
+#!/bin/sh
+
+# as a script rather than an alias so I can combine it with other things...
+
+exec nice -n 5 firefox
