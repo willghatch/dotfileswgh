@@ -1,0 +1,13 @@
+#!/bin/sh
+
+if [ -z "$DISPLAY" ]; then
+    # since I'm making a notification for myself, I
+    # probably want it displayed -- the 'at' command
+    # doesn't preserve the display variable, so I'll
+    # make a reasonable assumption.
+    DISPLAY=":0"
+    export DISPLAY
+fi
+
+notify-send "Note:" "$*"
+
