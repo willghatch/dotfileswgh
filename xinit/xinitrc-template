@@ -19,6 +19,7 @@ tic $DOTFILESWGH/xterm-256color-italic.terminfo
 #trayer --edge top --align right --width 10 --height 12 --transparent true --alpha 255 &
 xcompmgr &
 nm-applet &
+$DOTFILESWGH/external/misc/libnotifylog/libnotifylogger.py $HOME/.cache/notifications.log &
 
 exec xmonad
 

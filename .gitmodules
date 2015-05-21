@@ -13,3 +13,6 @@
 [submodule "external/gtk/gtk-adb"]
 	path = external/gtk/gtk-adb
 	url = https://github.com/willghatch/gtk-adb
+[submodule "external/misc/libnotifylog"]
+	path = external/misc/libnotifylog
+	url = https://github.com/willghatch/libnotifylog.git
