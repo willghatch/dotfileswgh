@@ -1,4 +1,4 @@
-
+# -*-muttrc-*-
 set editor="/usr/bin/vim"
 set text_flowed=yes
 
@@ -15,7 +15,6 @@ set certificate_file=~/.mutt/certificates
 set move = no
 
 set mark_old=no # don't differentiate between seen and unseen unread
-# -*-muttrc-*-
 
 # Palette for use with the Linux console.  Black background.
 
@@ -32,8 +31,9 @@ color normal white black
 color markers red black
 color search white black
 color tilde brightmagenta black
-color index blue black ~F
-color index red black "~N|~O"
+color index brightgreen black ~F # important
+color index brightred black "~N|~O" # new or... something
+color index brightgreen red "~N|~O ~F" # new AND important
 
 # color body brightwhite black '\*+[^*]+\*+'
 # color body brightwhite black '_+[^_]+_+'
@@ -42,12 +42,15 @@ set copy=yes  # make a copy of outgoing mail
 set include   # include message when replying
 set indent_string="> " # how to indent copied lines on reply
 set help      # show help lines
-set mail_check=10 # how often to poll for new mail
+set mail_check=5 # how often to poll for new mail
 set sort=threads  # how to sort conversation threads
 set pager_context=3 # how many lines of context
 set pager_stop=yes # stop at end of message - don't go on to the next by scrolling
+set pager_index_lines=7 # this many lines of the index show while reading email
+set tilde # show ~ after the end of the email, a la vim
+unset resolve # don't try to go to the next message after an operation
 
-
+#set sidebar_visible = yes # show sidebar in patched version
 
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 #
@@ -124,10 +127,16 @@ bind index Z noop
 bind generic \Chb help
 
 bind pager i noop # was exit, what q now does
+bind pager s noop
+bind pager ss save-message
+bind pager sj next-page
+bind pager sk previous-page
 bind pager j next-line
 bind pager k previous-line
-bind pager J next-entry
-bind pager K previous-entry
+bind pager J next-undeleted
+bind pager K previous-undeleted
+bind pager w next-undeleted
+bind pager b previous-undeleted
 bind pager <space>j next-page
 bind pager <space>k previous-page
 bind pager G bottom
@@ -140,6 +149,8 @@ bind pager rl list-reply
 bind pager N search-opposite
 bind pager a view-attachments
 bind pager A display-address
+bind pager u mark-as-new
+bind pager U undelete-message
 # defaults include T for toggle quoted, f for forward, d for delete...
 
 
@@ -147,6 +158,8 @@ bind index j next-undeleted
 bind index k previous-undeleted
 bind index <space>j next-page
 bind index <space>k previous-page
+bind index sj next-page
+bind index sk previous-page
 bind index G last-entry
 bind index gg first-entry
 bind index \Chb help
@@ -165,6 +178,9 @@ bind index tis sync-mailbox
 bind index tie quit # quit saving
 bind index tic exit # quit without saving
 bind index tia change-folder
+bind index tsi flag-message
+bind index tsr toggle-new
+bind index tsf set-flag
 macro index H '|elinks -force-html<enter>'
 
 macro index Ag '<change-folder>imaps://imap.gmail.com<enter>'
