@@ -1,0 +1,16 @@
+#!/usr/bin/env bash
+
+# reschedule at commands
+#
+# duplicates header crap -- but that probably shouldn't change
+# anyway...
+
+if [[ -z "$1" || "$1" = "--help" ]]; then
+    echo "usage: $0 <at job id> <new time spec>" 1>&2
+    exit 1
+fi
+
+jobnum=$1
+shift
+
+at -c $jobnum | at "$@" && atrm $jobnum
