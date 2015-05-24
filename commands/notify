@@ -9,5 +9,5 @@ if [ -z "$DISPLAY" ]; then
     export DISPLAY
 fi
 
-notify-send "Note:" "$*"
+notify-send "Note" "$*"
 
