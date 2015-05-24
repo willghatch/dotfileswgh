@@ -15,7 +15,6 @@
 (in 'hydra)
 (in 'auto-compile)
 (in 'evil-surround)
-(in 'evil-matchit)
 (in 'evil-search-highlight-persist)
 (in 'yafolding)
 (in 'company)

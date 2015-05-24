@@ -110,8 +110,6 @@
  (require 'evil-textobj-between)
  (require 'evil-search-highlight-persist)
  (global-evil-search-highlight-persist 1)
- (require 'evil-matchit)
- (global-evil-matchit-mode 1)
  (require 'repeatable-motion)
 
  (load-library "ido-conf")
