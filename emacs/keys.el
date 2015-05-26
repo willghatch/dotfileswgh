@@ -476,8 +476,11 @@
 ;; TODO -- make a better mapping for this.  I should make my prefixes be mnemonic or something...
 ;;         for instance, g<key> is mostly navigation... t... mosty has window stuff in th... space is mostly one handed
 ;;         navigation aside from this one
-(define-key evil-normal-state-map " jl" 'evil-join)
-(define-key evil-normal-state-map " jw" 'evil-join-whitespace)
+(define-key evil-motion-state-map " j"
+  (myhydradef j-hydra
+              ("l" evil-join "join lines")
+              ("w" evil-join-whitespace "join whitespace")
+              ))
 
 
 ;; input mode
