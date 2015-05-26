@@ -70,6 +70,8 @@ function linkSundries() {
     mkdir -p $HOME/.themes
     cd $HOME/.themes
     ln -s $HOME/dotfileswgh/external/gtk/gtk-adb $HOME/.themes/
+    ln -s $HOME/dotfileswgh/xmonad.hs $HOME/.xmonad/xmonad.hs
+    ln -s $HOME/dotfileswgh/elinks/elinks.conf $HOME/.elinks/elinks.conf
 }
 
 function mkSundries() {
@@ -81,6 +83,8 @@ function mkSundries() {
     mkdir -p $HOME/tmp
     mkdir -p $HOME/.themes
     mkdir -p $HOME/.config
+    mkdir -p $HOME/.xmonad
+    mkdir -p $HOME/.elinks
 }
 
 #######################################
