@@ -16,3 +16,6 @@
 [submodule "external/misc/libnotifylog"]
 	path = external/misc/libnotifylog
 	url = https://github.com/willghatch/libnotifylog.git
+[submodule "external/misc/hatchak"]
+	path = external/misc/hatchak
+	url = https://github.com/willghatch/hatchak.git

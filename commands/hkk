@@ -1,0 +1,4 @@
+#!/bin/sh
+
+xkbcomp -I$DOTFILESWGH/external/misc/hatchak/xkb $DOTFILESWGH/external/misc/hatchak/xkb/hatchak.xkb $DISPLAY
+
