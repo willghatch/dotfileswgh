@@ -8,12 +8,13 @@ pm base base-devel openssh net-tools wpa_supplicant networkmanager wireless_tool
 pm git
 pm zsh vim emacs tmux elinks
 
-pm xorg konsole xterm xorg-xinit arandr bashrun
+pm xorg konsole xterm xorg-xinit arandr bashrun ttf-dejavu
 pm python python2 python-pip python2-pip ghc cabal-install racket nodejs npm
 pm firefox
 pm sshfs zip unzip evince tig
 
 pm \
+feh \
 awesome \
 lxterminal \
 xfce4-terminal \
@@ -38,5 +39,6 @@ abcde \
 lxappearance \
 fortune-mod \
 cowsay \
+xcompmgr \
 texlive-bin
 
