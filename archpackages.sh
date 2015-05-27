@@ -21,6 +21,7 @@ xfce4-terminal \
 chromium \
 xterm \
 xscreensaver \
+pm-utils \
 unclutter \
 vorbis-tools \
 vlc \
@@ -40,5 +41,6 @@ lxappearance \
 fortune-mod \
 cowsay \
 xcompmgr \
+mutt \
 texlive-bin
 
