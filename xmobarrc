@@ -9,8 +9,8 @@ Config { bgColor = "black"
                     --[ Run MultiCpu ["-t","Cpu: <autototal>","-L","3","-H","50","-l","green","--normal","yellow","--high","red"] 10
                     --, Run Weather "LJLJ" ["-t"," C","-L","64","-H","77","--normal","green","--high","red","--low","lightblue"] 36000
                     , Run Network "wlp2s0" ["-m","5","-L","10000","-H","150000","-l","green","--normal","yellow","--high","red"] 10
-                    , Run Network "eth0" ["-m","5","-L","10000","-H","150000","-l","green","--normal","yellow","--high","red"] 10
-                    , Run Network "eth1" ["-m","5","-L","10000","-H","150000","-l","green","--normal","yellow","--high","red"] 10
+                    , Run Network "wlp4s0" ["-m","5","-L","10000","-H","150000","-l","green","--normal","yellow","--high","red"] 10
+                    , Run Network "enp3s0f1" ["-m","5","-L","10000","-H","150000","-l","green","--normal","yellow","--high","red"] 10
                     , Run Network "enp5s0" ["-m","5","-L","10000","-H","150000","-l","green","--normal","yellow","--high","red"] 10
                     --, Run DynNetwork ["-L","0","-H","32","--normal","green","--high","red"] 10
                     , Run Memory ["-m","2","-t","Mem: <usedratio>%", "-h","red","-n","yellow","-l","green"] 10
