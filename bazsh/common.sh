@@ -228,6 +228,9 @@ cpost()
 
 # fix terminal
 tic $DOTFILESWGH/xterm-256color-italic.terminfo
+if [[ "$TERM" = "xterm" ]]; then
+    TERM=xterm-256color-italic
+fi
 
 source $DOTFILESWGH/bazsh/grml-funcs.sh
 
