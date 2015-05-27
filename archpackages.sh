@@ -8,7 +8,7 @@ pm base base-devel openssh net-tools wpa_supplicant networkmanager wireless_tool
 pm git
 pm zsh vim emacs tmux elinks
 
-pm xorg konsole xterm xorg-xinit arandr bashrun ttf-dejavu
+pm xorg konsole xterm xorg-xinit arandr bashrun ttf-dejavu xclip
 pm python python2 python-pip python2-pip ghc cabal-install racket nodejs npm
 pm firefox
 pm sshfs zip unzip evince tig
@@ -42,5 +42,8 @@ fortune-mod \
 cowsay \
 xcompmgr \
 mutt \
+pidgin \
+finch \
+tk \
 texlive-bin
 
