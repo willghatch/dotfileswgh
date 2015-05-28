@@ -16,6 +16,7 @@ pm sshfs zip unzip evince tig
 pm \
 feh \
 awesome \
+vicious \
 lxterminal \
 xfce4-terminal \
 chromium \
