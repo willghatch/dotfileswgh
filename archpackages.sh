@@ -46,5 +46,9 @@ mutt \
 pidgin \
 finch \
 tk \
+python2-dbus \
 texlive-bin
+
+# for teensy programming (IE ergodox)
+pm avr-binutils avr-gcc avr-libc
 
