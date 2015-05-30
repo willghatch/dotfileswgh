@@ -230,6 +230,8 @@ noremap ee e
 noremap oe ge
 noremap eo o
 noremap oo O
+noremap ec l
+noremap oc h
 noremap eE E
 noremap oE gE
 noremap ea a

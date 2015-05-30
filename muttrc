@@ -167,7 +167,7 @@ bind index q quit
 bind index Q exit # don't save changes
 bind index u toggle-new
 bind index dd delete-message
-bind index U undelete-message
+bind index U undelete-pattern
 bind index a view-attachments
 bind index A display-address
 bind index f change-folder
