@@ -4,8 +4,11 @@ if [[ -z "$WGHHOME" ]]; then
 fi
 export HROOT=$WGHHOME/hroot
 export DOTFILESWGH=$WGHHOME/dotfileswgh
-PATH=$DOTFILESWGH/dotlocal/commands:$WGHHOME/wghsrv_scripts:$DOTFILESWGH/commands:$WGHHOME/.cabal/bin:$HROOT/bin:$HROOT/usr/bin:$HROOT/usr/local/bin:$WGHHOME/.local/bin:$WGHHOME/bin:$PATH:/usr/bin:/bin:/usr/local/bin:/sbin:/usr/sbin:/usr/local/sbin
-export MANPATH=/usr/share/man:/usr/local/man:/usr/local/share/man:/usr/X11R6/man:/opt/man:$HROOT/usr/share/man:$HROOT/share/man
+export NPM_DIR=$DOTFILESWGH/dotlocal/npm
+export NODE_PATH="$NPM_DIR/lib/node_modules"
+PATH=$DOTFILESWGH/dotlocal/commands:$WGHHOME/wghsrv_scripts:$DOTFILESWGH/commands:$WGHHOME/.cabal/bin:$NPM_DIR/bin:$HROOT/bin:$HROOT/usr/bin:$HROOT/usr/local/bin:$WGHHOME/.local/bin:$WGHHOME/bin:$PATH:/usr/bin:/bin:/usr/local/bin:/sbin:/usr/sbin:/usr/local/sbin
+unset MANPATH # so I can use manpath command at end here
+export MANPATH=/usr/share/man:/usr/local/man:/usr/local/share/man:/usr/X11R6/man:/opt/man:$HROOT/usr/share/man:$HROOT/share/man:$NPM_DIR/share/man:$(manpath)
 
 # themes to ease eye strain
 export GTK_THEME=gtk-adb

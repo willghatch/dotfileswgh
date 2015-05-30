@@ -20,6 +20,7 @@ dotfiles=(
     xmobarrc
     tigrc
     racketrc
+    npmrc
 )
 
 function die() {
