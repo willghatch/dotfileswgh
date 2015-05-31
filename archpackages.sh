@@ -14,6 +14,7 @@ pm firefox
 pm sshfs zip unzip evince tig
 
 pm \
+pkgfile \
 the_silver_searcher \
 feh \
 awesome \
