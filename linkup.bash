@@ -16,7 +16,6 @@ dotfiles=(
     makepkg.conf
     inputrc
     pentadactylrc
-    Xresources
     xmobarrc
     tigrc
     racketrc

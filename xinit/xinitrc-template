@@ -11,7 +11,7 @@ xscreensaver -no-splash &
 stopTouchpadClick.sh &
 hkk # get keyboard layout
 #xmodmap ~/.Xmodmap
-xrdb ~/.Xresources
+xrdb $DOTFILESWGH/Xresources
 feh --bg-max ~/wallpaper
 tic $DOTFILESWGH/xterm-256color-italic.terminfo
 
