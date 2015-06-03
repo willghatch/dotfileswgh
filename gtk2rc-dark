@@ -61,14 +61,14 @@ style "default"
     text[PRELIGHT]    = "#fcfcfc"
     text[SELECTED]    = "#fcfcfc"
 
-    engine "xfce" 
-    {
-	smooth_edge = true
-        boxfill
-        {
-            fill_style = plain
-        }
-    }
+#    engine "xfce" 
+#    {
+#	smooth_edge = true
+#        boxfill
+#        {
+#            fill_style = plain
+#        }
+#    }
 }
 widget_class "*"                   style "default"
 
@@ -89,18 +89,18 @@ style "button" = "default"
     xthickness = 2
     ythickness = 2
 
-    engine "xfce" 
-    {
-        smooth_edge = true
-        grip_style = none
-        boxfill
-        {
-            fill_style = gradient
-            orientation = vertical
-            shade_start = 1.25
-            shade_end = 1.00
-        }
-    }
+#    engine "xfce" 
+#    {
+#        smooth_edge = true
+#        grip_style = none
+#        boxfill
+#        {
+#            fill_style = gradient
+#            orientation = vertical
+#            shade_start = 1.25
+#            shade_end = 1.00
+#        }
+#    }
 }
 widget_class "*Button*"            style "button"
 class "*Button*"                   style "button"
@@ -117,18 +117,18 @@ style "sbstyle" = "default"
 {
     xthickness = 2
     ythickness = 2
-    engine "xfce" 
-    {
-        smooth_edge = true
-        grip_style = none
-        boxfill
-        {
-            fill_style = gradient
-            orientation = automatic
-            shade_start = 1.25
-            shade_end = 1.00
-        }
-    }
+#    engine "xfce" 
+#    {
+#        smooth_edge = true
+#        grip_style = none
+#        boxfill
+#        {
+#            fill_style = gradient
+#            orientation = automatic
+#            shade_start = 1.25
+#            shade_end = 1.00
+#        }
+#    }
 
     # this is the normal color
     bg[NORMAL]        = "#005353"
