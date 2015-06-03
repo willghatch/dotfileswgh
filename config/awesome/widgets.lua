@@ -31,7 +31,7 @@ memwidget:set_height(10)
 memwidget:set_vertical(true)
 memwidget:set_background_color("#494B4F")
 memwidget:set_border_color(nil)
-memwidget:set_color("#fa6500")
+memwidget:set_color("#003599")
 --memwidget:set_color({ type = "linear", from = { 0, 0 }, to = { 10,0 }, stops = { {0, "#AECF96"}, {0.5, "#88A175"},
 --                         {1, "#FF5656"}}})
 -- Register widget
@@ -100,7 +100,7 @@ batteryWidget:set_height(10)
 batteryWidget:set_vertical(true)
 batteryWidget:set_background_color("#494B4F")
 batteryWidget:set_border_color(nil)
-batteryWidget:set_color("#1155ee")
+batteryWidget:set_color("#f05030")
 --batteryWidget:set_color({ type = "linear", from = { 0, 0 }, to = { 10,0 }, stops = { {0, "#AECF96"}, {0.5, "#88A175"},
 --                         {1, "#FF5656"}}})
 vicious.register(batteryWidget, vicious.widgets.bat, "$2", 30, "BAT0")
