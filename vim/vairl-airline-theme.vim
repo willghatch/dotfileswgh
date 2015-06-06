@@ -58,7 +58,7 @@ let g:airline#themes#vairl#palette.replace.airline_a = [ s:I2[0]   , '#af0000' ,
 let g:airline#themes#vairl#palette.replace_modified = g:airline#themes#vairl#palette.insert_modified
 
 
-let s:V1 = [ '#000000' , '#30ff30' , 232 , 10 ]
+let s:V1 = [ '#000000' , '#30ff30' , 232 , 50 ]
 let s:V2 = [ '#000000' , '#00c900' , 232 , 2 ]
 let s:V3 = [ '#ffffff' , '#30a030' , 15  , 28  ]
 let g:airline#themes#vairl#palette.visual = airline#themes#generate_color_map(s:V1, s:V2, s:V3)
