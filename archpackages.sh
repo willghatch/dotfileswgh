@@ -49,6 +49,7 @@ pidgin \
 finch \
 tk \
 python2-dbus \
+markdown \
 texlive-bin
 
 # for teensy programming (IE ergodox)
