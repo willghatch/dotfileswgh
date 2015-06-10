@@ -304,6 +304,14 @@ eval $(dircolors -b $DOTFILESWGH/dircolors)
 
 compinit -d $COMPDUMPFILE -i
 
+if [[ -z "$KONSOLE_DBUS_SESSION" ]]; then
+    # currently some programs use the existance of this variable to know
+    # whether to use 24-bit color, even though nearly every terminal supports
+    # it, and with the same codes.  This should be removed once that's not
+    # the case.
+    export KONSOLE_DBUS_SESSION=/dev/null
+fi
+
 tf=$DOTFILESWGH/dotlocal/bazshrc
 if [ -f "$tf" ]
 then
