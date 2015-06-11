@@ -61,10 +61,10 @@ if [ -f "$VLAUNCHRC" ]; then
     source $VLAUNCHRC
 fi
 
-
-if [ -z "$(eval 'echo \$$1')" ]; then
+if [ -z "$(eval "echo \$$1")" ]; then
     echo 1>&2 "$0 cammand not found: $1"
+    exit 37
 fi
 
-exec $(eval "\$$1")
+exec $(eval "echo \$$1")
 
