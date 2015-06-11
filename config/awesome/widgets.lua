@@ -54,42 +54,42 @@ vicious.register(cpuTextWidget, vicious.widgets.cpu, "CPU: $1%")
 --vicious.register(cpuwidget, vicious.widgets.cpu, "$1")
 
 --volume widget
-volume_widget = wibox.widget.textbox()
-volume_widget:set_align("right")
+--volume_widget = wibox.widget.textbox()
+--volume_widget:set_align("right")
 
-function update_volume(widget)
-   local fd = io.popen("amixer sget Master")
-   local status = fd:read("*all")
-   fd:close()
-
-   -- local volume = tonumber(string.match(status, "(%d?%d?%d)%%")) / 100
-   local volume = string.match(status, "(%d?%d?%d)%%")
-   volume = string.format("% 3d", volume)
-
-   status = string.match(status, "%[(o[^%]]*)%]")
-
-   if string.find(status, "on", 1, true) then
-      -- For the volume numbers
-      volume = volume .. "%"
-   else
-      -- For the mute button
-      volume = volume .. "M"
-
-   end
-   widget:set_markup("Vol: "..volume.."   |")
-end
-
-update_volume(volume_widget)
-
-volume_widget_timer = timer({ timeout = 0.2 })
-volume_widget_timer:connect_signal("timeout", function () update_volume(volume_widget) end)
-volume_widget_timer:start()
-volume_widget:buttons(awful.util.table.join(
-                     awful.button({ }, 1, function () awful.util.spawn("vlaunch mixer") end),
-                     awful.button({ }, 2, function () awful.util.spawn("vlaunch volmute")   end),
-                     awful.button({ }, 4, function () awful.util.spawn("vlaunch volup", false) end),
-                     awful.button({ }, 5, function () awful.util.spawn("vlaunch voldown", false) end)
-))
+--function update_volume(widget)
+--   local fd = io.popen("amixer sget Master")
+--   local status = fd:read("*all")
+--   fd:close()
+--
+--   -- local volume = tonumber(string.match(status, "(%d?%d?%d)%%")) / 100
+--   local volume = string.match(status, "(%d?%d?%d)%%")
+--   volume = string.format("% 3d", volume)
+--
+--   status = string.match(status, "%[(o[^%]]*)%]")
+--
+--   if string.find(status, "on", 1, true) then
+--      -- For the volume numbers
+--      volume = volume .. "%"
+--   else
+--      -- For the mute button
+--      volume = volume .. "M"
+--
+--   end
+--   widget:set_markup("Vol: "..volume.."   |")
+--end
+--
+--update_volume(volume_widget)
+--
+--volume_widget_timer = timer({ timeout = 0.2 })
+--volume_widget_timer:connect_signal("timeout", function () update_volume(volume_widget) end)
+--volume_widget_timer:start()
+--volume_widget:buttons(awful.util.table.join(
+--                     awful.button({ }, 1, function () awful.util.spawn("vlaunch mixer") end),
+--                     awful.button({ }, 2, function () awful.util.spawn("vlaunch volmute")   end),
+--                     awful.button({ }, 4, function () awful.util.spawn("vlaunch volup", false) end),
+--                     awful.button({ }, 5, function () awful.util.spawn("vlaunch voldown", false) end)
+--))
 
 -- battery widget
 batteryTextWidget = wibox.widget.textbox()
@@ -183,7 +183,7 @@ for s = 1, screen.count() do
    -- Widgets that are aligned to the right
    local right_layout = wibox.layout.fixed.horizontal()
    right_layout:add(mpdwidget)
-   right_layout:add(volume_widget)
+   --right_layout:add(volume_widget)
    right_layout:add(cpuTextWidget)
    --right_layout:add(cpuwidget)
    right_layout:add(memTextWidget)
