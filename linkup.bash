@@ -44,8 +44,11 @@ function linkDotfiles() {
     done
 }
 
-function linkConfigSubdirs() {
-    cdir=$HOME/$dfDir/config
+function linkSubdirs() {
+# put a dot as arg 2 if the directory should be dotted in $HOME
+    dot=$2
+    subdir=$1
+    cdir=$HOME/$dfDir/$subdir
     if [ ! -d $cdir ] 
     then
         die "Config dir not found in proper place"
@@ -55,12 +58,12 @@ function linkConfigSubdirs() {
     cd $HOME
     for f in $found
     do
-        orig="$dfDir/config/$f"
+        orig="$dfDir/$subdir/$f"
         if [ -d $orig ]
         then
-            mkdir -p ".config/$f"
+            mkdir -p "${dot}${subdir}/$f"
         else
-            mklink "$HOME/$orig" ".config/$f"
+            mklink "$HOME/$orig" "${dot}${subdir}/$f"
         fi
     done
 }
@@ -94,7 +97,8 @@ then
     linkDotfiles
 elif [ "s-$1" = "s-configdir" ]
 then
-    linkConfigSubdirs
+    linkSubdirs config .
+    linkSubdirs local .
 elif [ "s-$1" = "s-sundries" ]
 then
     mkSundries
@@ -105,7 +109,8 @@ elif [ "s-$1" = "s-all" ]
 then
     mkSundries
     linkDotfiles
-    linkConfigSubdirs
+    linkSubdirs config .
+    linkSubdirs local .
     linkSundries
 else
     echo "usage: linkup.bash < dotfiles | configdir | sundries | linksundries | all >"
