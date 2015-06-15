@@ -6,14 +6,14 @@ style "default"
     GtkButton::child_displacement_y              = 1
     GtkButton::default_spacing                   = 8
     GtkButton::focus-padding                     = 0
-    GtkCheckButton::indicator_size               = 12
+    GtkCheckButton::indicator_size               = 16
     GtkMenuBar::internal-padding                 = 4
     GtkMenuBar::shadow_type                      = out
     GtkHandleBox::shadow_type                    = out
     GtkMenuItem::selected_shadow_type            = etched-in
     GtkPaned::handle_full_size                   = 1
     GtkPaned::handle_size                        = 7
-    GtkRadioButton::indicator_size               = 15
+    GtkRadioButton::indicator_size               = 16
     GtkRange::slider_width                       = 16
     GtkRange::stepper_size                       = 16
     GtkRange::stepper_spacing                    = 0
