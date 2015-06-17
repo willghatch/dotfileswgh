@@ -240,8 +240,7 @@ genGlobalKeys = function(modkey)
       awful.key({ modkey, "Control" }, "Return", function () awful.util.spawn(terminal2) end),
 
       --awful.key({ modkey, "Mod1"    }, "b", function () awful.util.spawn("dwb") end),
-      --awful.key({ "Control", "Mod1" }, "l", function () awful.util.spawn("xscreensaver-command -lock") end),
-      awful.key({ modkey,           }, "q", function () awful.util.spawn("xscreensaver-command -lock") end),
+      awful.key({ modkey,           }, "q", function () awful.util.spawn("vlaunch lockscreen") end),
       awful.key({ modkey,    "Mod1" }, "a", function () awful.util.spawn("arandr") end)
    ) -- initial globalkeys ends here
 
