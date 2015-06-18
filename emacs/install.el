@@ -67,6 +67,7 @@
 (in 'company-anaconda)
 (in 'web-mode)
 (in 'indent-guide)
+(in 'hl-todo)
 
 (message "Done installing packages!")
 
