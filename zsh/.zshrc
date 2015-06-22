@@ -290,6 +290,13 @@ bindkey-to-prefix-map spacemap "-" zaw-widgets
 zstyle ':filter-select' extended-search yes
 zstyle ':filter-select' max-lines 15
 
+bindkey -M filterselect "^[^h" backward-delete-word
+bindkey -M filterselect "^[^?" backward-delete-word
+# for some reason these don't work...
+bindkey -M filterselect "^[b" backward-word
+bindkey -M filterselect "^[f" backward-word
+bindkey -M filterselect "^[d" kill-word
+
 if [[ "$USER" != "wgh" ]]; then
     MEGAPROMPT_STYLES[username]="%B%F{cyan}"
     MEGAPROMPT_DISPLAY_P[username]=true
