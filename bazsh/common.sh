@@ -76,6 +76,7 @@ grebi(){
 alias gc="git commit"
 alias gco="git checkout"
 alias gcob="git checkout -b"
+alias gclone="git clone --recursive"
 alias gp="git push"
 alias gd="git diff"
 alias ga="git add"
