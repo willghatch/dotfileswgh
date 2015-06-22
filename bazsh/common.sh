@@ -59,6 +59,9 @@ alias make="time nice make" # this is always what I actually want
 export NUMCPUS=$(grep -c '^processor' /proc/cpuinfo)
 alias pmake="time nice make -j$NUMCPUS --load-average=$NUMCPUS"
 
+alias xclipo="xclip -o -clipboard"
+alias xclipi="xclip -i -clipboard"
+
 ####### Miscellaneous
 alias gka="gitk --all"
 alias gta="tig --all"
