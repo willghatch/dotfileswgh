@@ -28,6 +28,9 @@ VZSH_REMAP_KEYS_P=true
 
 ZSH_HIGHLIGHT_HIGHLIGHTERS=(main brackets pattern cursor)
 
+# source fasd before bazsh, because they add some aliases that I will overwrite
+eval "$(fasd --init auto >/dev/null 2>&1)"
+
 source $WGHHOME/dotfileswgh/bazsh/common.sh
 typeset -U PATH
 fpath=($fpath $DOTFILESWGH/zsh/completion/)
