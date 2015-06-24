@@ -16,6 +16,11 @@
             (rainbow-identifiers-mode 1)
             (company-mode 1)
             (projectile-mode 1)
+            (smartparens-mode 1)
+            ))
+(add-hook 'racket-mode-hook
+          (lambda ()
+            (define-key racket-mode-map "[" nil)
             ))
 (add-hook 'python-mode-hook
           (lambda ()
