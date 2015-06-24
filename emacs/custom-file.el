@@ -81,7 +81,7 @@
  '(rainbow-delimiters-unmatched-face ((t (:background "#6f0000"))))
  '(region ((t (:background "#0000d7" :foreground "#ff00ff"))))
  '(secondary-selection ((t (:background "#5d2d50" :foreground "#20cf20"))))
- '(sp-show-pair-match-face ((t (:background "#363636" :foreground "#00ff66"))))
+ '(sp-show-pair-match-face ((t (:background "#363636"))))
  '(tool-bar ((t (:foreground "#00ff00" :box (:line-width 1 :style released-button)))))
  '(web-mode-html-tag-bracket-face ((t (:foreground "#c5a535"))))
  '(yafolding-ellipsis-face ((t (:background "#ff00ff"))) t)
