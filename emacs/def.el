@@ -111,6 +111,7 @@
  (require 'evil-textobj-between)
  (require 'evil-search-highlight-persist)
  (global-evil-search-highlight-persist 1)
+ (require 'on-parens)
  (require 'repeatable-motion)
 
  (load-library "ido-conf")
