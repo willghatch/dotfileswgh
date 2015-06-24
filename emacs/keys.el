@@ -433,6 +433,7 @@
 (define-key evil-normal-state-map "sG" 'bookmark-jump)
 (define-key evil-insert-state-map (kbd "M-c") 'smex)
 (define-key evil-motion-state-map (kbd "M-c") 'smex)
+(global-set-key (kbd "M-c") 'smex)
 (define-key evil-motion-state-map "sx" 'eval-expression)
 
 (define-key evil-visual-state-map (kbd "C-s") 'yas-insert-with-region)

@@ -43,6 +43,7 @@
 (setq
  evil-intercept-maps nil
  evil-overriding-maps nil
+ evil-emacs-state-modes nil
  rainbow-identifiers-faces-to-override '(font-lock-variable-name-face)
  sp-highlight-pair-overlay nil
  sp-show-pair-from-inside t
