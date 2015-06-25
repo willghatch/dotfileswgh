@@ -18,9 +18,17 @@
             (projectile-mode 1)
             (smartparens-mode 1)
             ))
+(defun racket-close-paren-hack (&optional arg)
+  (interactive "p")
+  (if (on-parens-on-close?)
+      (self-insert-command arg)
+    (racket-insert-closing-paren)))
 (add-hook 'racket-mode-hook
           (lambda ()
             (define-key racket-mode-map "[" nil)
+            (define-key racket-mode-map ")" 'racket-close-paren-hack)
+            (define-key racket-mode-map "]" nil)
+            (define-key racket-mode-map "}" nil)
             ))
 (add-hook 'python-mode-hook
           (lambda ()
