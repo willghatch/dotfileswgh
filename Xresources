@@ -52,3 +52,37 @@ URxvt.color13: rgb:fc/54/fc
 URxvt.color14: rgb:54/fc/fc
 URxvt.color15: rgb:fc/fc/fc
 URxvt.colorBD: rgb:fc/fc/fc
+
+
+!!!!! xscreensaver
+xscreensaver.splash: false
+!font settings
+xscreensaver.Dialog.headingFont:        -*-dejavu sans mono-bold-r-*-*-40-*-*-*-*-*-*-*
+xscreensaver.Dialog.bodyFont:           -*-dejavu sans mono-medium-r-*-*-20-*-*-*-*-*-*-*
+! if the label font is not as big as the date font, the date is covered by the
+! background of the password prompt...
+xscreensaver.Dialog.labelFont:          -*-dejavu sans mono-medium-r-*-*-25-*-*-*-*-*-*-*
+xscreensaver.Dialog.unameFont:          -*-dejavu sans mono-medium-r-*-*-20-*-*-*-*-*-*-*
+xscreensaver.Dialog.buttonFont:         -*-dejavu sans mono-bold-r-*-*-30-*-*-*-*-*-*-*
+xscreensaver.Dialog.dateFont:           -*-dejavu sans mono-medium-r-*-*-25-*-*-*-*-*-*-*
+xscreensaver.passwd.passwdFont:         -*-dejavu sans mono-bold-r-*-*-20-*-*-*-*-*-*-*
+!general dialog box (affects main hostname, username, password text)
+xscreensaver.Dialog.foreground:         #a07fef
+xscreensaver.Dialog.background:         #111111
+xscreensaver.Dialog.topShadowColor:     #111111
+xscreensaver.Dialog.bottomShadowColor:  #111111
+xscreensaver.Dialog.Button.foreground:  #111111
+xscreensaver.Dialog.Button.background:  #2040e0
+!username/password input box and date text colour
+xscreensaver.Dialog.text.foreground:    #50c0f0
+xscreensaver.Dialog.text.background:    #333333
+xscreensaver.Dialog.internalBorderWidth:36
+xscreensaver.Dialog.borderWidth:        0
+xscreensaver.Dialog.shadowThickness:    2
+!timeout bar (background is actually determined by Dialog.text.background)
+xscreensaver.passwd.thermometer.foreground:  #702020
+xscreensaver.passwd.thermometer.background:  #202020
+xscreensaver.passwd.thermometer.width:       10
+!datestamp format--see the strftime(3) manual page for details
+xscreensaver.dateFormat:    %Y-%m-%d %A,   %k:%M
+
