@@ -18,8 +18,8 @@
 ;; Useful notes for run-time definitions:
 ;;(define-key evil-normal-state-map \"a\" 'evil-append)
 ;;(defalias 'eb 'eval-buffer)
-;; kmap-[m,n,i,v,w,t]
-;;(kmap-t \"p\" 'previous-something)
+;; [m,n,i,v,w,t]kmap
+;;(tkmap \"p\" 'previous-something)
 ;;
 ;;(defun foo (n)
 ;;  (interactive)
