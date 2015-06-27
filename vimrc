@@ -90,11 +90,20 @@ if filereadable($DOTFILESWGH . "/external/vim/Vundle.vim/README.md")
     Plugin 'msanders/snipmate.vim'
     Plugin 'camelcasemotion'
     Plugin 'AndrewRadev/sideways.vim'
+    Plugin 'vim-scripts/paredit.vim'
     "Plugin 'luochen1990/rainbow'
     Plugin 'pelodelfuego/vim-swoop'
     Plugin 'terryma/vim-multiple-cursors'
     call vundle#end()
     " to run the vundle installer, run :PluginInstall
+
+    " Sometimes I can't see the parens.  It might work better when terminal vim
+    " supports true color well.
+    "Plugin 'kien/rainbow_parentheses.vim'
+    "au VimEnter * RainbowParenthesesToggle
+    "au Syntax * RainbowParenthesesLoadRound
+    "au Syntax * RainbowParenthesesLoadSquare
+    "au Syntax * RainbowParenthesesLoadBraces
 
     let g:airline#extensions#tabline#enabled = 1
     let g:airline_left_sep = '▶'
