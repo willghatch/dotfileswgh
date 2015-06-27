@@ -4,6 +4,9 @@
 # end up being a bother syncing because I just use different options on different
 # machines (which has somewhat been the case so far), then it won't matter.
 
+# merge xresources first, so other programs in this (xscreensaver) can get settings
+xrdb $DOTFILESWGH/Xresources
+
 # Unclutter hides the mouse pointer after the given number of seconds
 unclutter -idle 5 &
 
@@ -11,7 +14,6 @@ xscreensaver -no-splash &
 stopTouchpadClick.sh &
 hkk # get keyboard layout
 #xmodmap ~/.Xmodmap
-xrdb $DOTFILESWGH/Xresources
 feh --bg-max ~/wallpaper
 tic $DOTFILESWGH/xterm-256color-italic.terminfo
 
