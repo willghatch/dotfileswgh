@@ -388,6 +388,7 @@
 (mkmap " tibd" 'prev-dirty-buffer-no-star)
 
 (mkmap "th" 'evil-window-map/body)
+(autoload 'projectile-command-map "projectile-conf" "" t 'keymap)
 (mkmap "tp" 'projectile-command-map)
 (mkmap "tr" 'evil-use-register)
 ;; "ts" will stand for "toggle setting"
@@ -525,11 +526,11 @@
             ("s" yas-expand "yas")
 )
 (ikmap "\M-h" 'completer-map/body)
-(ikmap (kbd "C-SPC TAB") completer-map/body)
-(ikmap (kbd "C-@ TAB") completer-map/body)
+(ikmap (kbd "C-SPC TAB") 'completer-map/body)
+(ikmap (kbd "C-@ TAB") 'completer-map/body)
 (ikmap (kbd "TAB") 'company-complete-common-wgh)
 ;; put indentation on something...
-(define-key completer-map (kbd "TAB") 'indent-for-tab-command)
+;(define-key 'completer-map (kbd "TAB") 'indent-for-tab-command)
 (ikmap (kbd "<backtab>") 'indent-for-tab-command)
 
 (global-set-key (kbd "C-\\") 'evil-execute-in-normal-state)

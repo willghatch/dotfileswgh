@@ -50,19 +50,6 @@
  bmkp-last-as-first-bookmark-file "~/.emacs.d/bookmarks"
  )
 
-;; keys, keys, keys!!!
-(nobreak
- (require 'evil)
- (evil-mode 1)
- (require 'key-chord)
- (key-chord-mode 1)
- (require 'evil-little-word)
- (require 'hydra)
- (setq hydra-lv nil)
- (load-library "keys")
- )
-
-
 (nobreak
  ;; compile settings
  (setq load-prefer-newer t)
@@ -95,26 +82,57 @@
  (setq inhibit-startup-message t)
  )
 
+(defun load-library--around (orig-fun &rest args)
+  (let ((curtime (current-time))
+        (mylib (car args)))
+    (apply orig-fun args)
+    (let ((diff (time-to-seconds (time-subtract (current-time) curtime))))
+      (when (>= diff 0.005)
+        (message (format "load time for %s: %f" mylib diff))))))
+(advice-add 'load-library :around #'load-library--around)
+(advice-add 'require :around #'load-library--around)
+
+;; keys, keys, keys!!!
 (nobreak
+ ;;; these are the most critical loads
+ (require 'evil)
+ (evil-mode 1)
+ (require 'key-chord)
+ (key-chord-mode 1)
+ (require 'hydra)
+ (setq hydra-lv nil)
+ (load-library "keys")
  (load-library "vfuncs")
- (load-library "ace-jump-mode-conf")
+ (setq repeatable-motion-count-needed-prefix "rmo-c/")
+ (setq repeatable-motion-definition-prefix "rmo/")
+ (require 'repeatable-motion)
+ )
+
+(nobreak
+ ;;; secondarily important
  (load-library "xclip-conf")
+
+ ;; elscreen must start before other mode-line stuff, or it wouldn't be this high...
  (require 'elscreen)
  (setq elscreen-display-tab nil)
  (elscreen-start)
  (load-library "modeline-conf")
  ;; reset the header line in initial buffer, which gets messed up by elscreen
  (setq header-line-format (default-value 'header-line-format))
- (require 'evil-args)
+
+ )
+
+
+(nobreak
+ (load-library "ace-jump-mode-conf")
+ (require 'evil-little-word)
+ ;(require 'evil-args) ; autoloaded
  (require 'evil-surround)
  (global-evil-surround-mode 1)
  (require 'evil-textobj-between)
  (require 'evil-search-highlight-persist)
  (global-evil-search-highlight-persist 1)
  (require 'on-parens)
- (setq repeatable-motion-count-needed-prefix "rmo-c/")
- (setq repeatable-motion-definition-prefix "rmo/")
- (require 'repeatable-motion)
 
  (load-library "ido-conf")
  (ido-mode 1)
@@ -123,15 +141,15 @@
  (require 'flx-ido)
  (flx-ido-mode 1)
 
- (require 'linum)
+ ;(require 'linum)
  (global-linum-mode 1) ; add line numbers
  (require 'hlinum)
  (hlinum-activate)
- (require 'linum-relative)
- (linum-relative-toggle) ; turn it off as the default
+ ;(require 'linum-relative) ;; I don't ever use this...
+ ;(linum-relative-toggle) ; turn it off as the default
 
- (require 'smex)
- (require 'rainbow-delimiters)
+ ;(require 'smex) ; autoloaded
+ ;(require 'rainbow-delimiters) ; autoloaded
  (load-library "package-conf")
  (load-library "yasnippet-conf")
  (load-library "org-mode-conf")
@@ -142,24 +160,24 @@
  (load-library "auto-complete-conf")
  (load-library "hippie-expand-conf")
  (load-library "popwin-conf")
- (load-library "projectile-conf")
+ ;(load-library "projectile-conf")
  (load-library "scratch-message")
- (winner-mode 1)
+ ;(winner-mode 1)
  (load-library "smartparens-conf")
  (show-smartparens-global-mode 1)
- (require 'yafolding)
+ ;(require 'yafolding)
  (yafolding-mode 1)
  (load-library "borrowed")
  (setq smooth-scroll-margin 5)
  (require 'smooth-scrolling)
- (require 'indent-guide)
+ ;(require 'indent-guide)
  (setq indent-guide-recursive t)
  (setq indent-guide-delay 0.2)
  (load-library "windows")
  (setq hl-todo-activate-in-modes '(prog-mode))
- (require 'hl-todo)
+ ;(require 'hl-todo)
  (global-hl-todo-mode 1)
- (require 'helm)
+ ;(require 'helm)
  (setq helm-swoop-pre-input-function (lambda () "")) ; disable symbol-at-point nonsense
 )
 
@@ -170,7 +188,9 @@
 (let ((file (concat dotfileswgh "/dotlocal/emacs")))
   (if (file-exists-p file) (load-file file) nil))
 
-
-(print (format "start time: %f" (time-to-seconds (time-subtract (current-time) before-init-time))))
+(message "-")
+(message "--")
+(message "---")
+(message (format "start time: %f" (time-to-seconds (time-subtract (current-time) before-init-time))))
 
 

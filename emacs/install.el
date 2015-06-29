@@ -11,6 +11,7 @@
 
 (in 'evil)
 (in 'repeatable-motion)
+(in 'on-parens)
 (in 'key-chord)
 (in 'hydra)
 (in 'auto-compile)

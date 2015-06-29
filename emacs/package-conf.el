@@ -1,6 +1,8 @@
 
 ; load local settings first, in case of proxy or something
-(with-demoted-errors "Warning: %S" (load-file "~//dotfileswgh/dotlocal/emacs"))
+(let ((local-f "~/dotfileswgh/dotlocal/emacs"))
+  (when (file-exists-p local-f)
+    (with-demoted-errors "Warning: %S" (load-file local-f))))
 
 (let ((local-e-d (concat (getenv "DOTFILESWGH") "/dotlocal/emacs.d")))
   (make-directory local-e-d t)
@@ -16,7 +18,7 @@
 (setq package-archives '(
                          ("melpa" . "http://melpa.milkbox.net/packages/")
                          ("gnu" . "http://elpa.gnu.org/packages/")
-                         ("marmalade" . "http://marmalade-repo.org/packages/")
+                         ;("marmalade" . "http://marmalade-repo.org/packages/")
                          ))
 (package-initialize)
 
