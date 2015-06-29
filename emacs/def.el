@@ -112,6 +112,8 @@
  (require 'evil-search-highlight-persist)
  (global-evil-search-highlight-persist 1)
  (require 'on-parens)
+ (setq repeatable-motion-count-needed-prefix "rmo-c/")
+ (setq repeatable-motion-definition-prefix "rmo/")
  (require 'repeatable-motion)
 
  (load-library "ido-conf")
