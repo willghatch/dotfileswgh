@@ -27,6 +27,16 @@
       (normal-top-level-add-subdirs-to-load-path))
 (setq load-path (cons (concat dotfileswgh "/emacs") load-path))
 
+(defun load-library--around (orig-fun &rest args)
+  (let ((curtime (current-time))
+        (mylib (car args)))
+    (apply orig-fun args)
+    (let ((diff (time-to-seconds (time-subtract (current-time) curtime))))
+      (when (>= diff 0.005)
+        (message (format "load time for %s: %f" mylib diff))))))
+(advice-add 'load-library :around #'load-library--around)
+(advice-add 'require :around #'load-library--around)
+
 (nobreak (require 'wgh-theme))
 (load-theme 'wgh)
 (setq custom-file (concat dotfileswgh "/dotlocal/emacs.d/custom-file.el"))
@@ -90,16 +100,6 @@
  (setq inhibit-splash-screen t)
  (setq inhibit-startup-message t)
  )
-
-(defun load-library--around (orig-fun &rest args)
-  (let ((curtime (current-time))
-        (mylib (car args)))
-    (apply orig-fun args)
-    (let ((diff (time-to-seconds (time-subtract (current-time) curtime))))
-      (when (>= diff 0.005)
-        (message (format "load time for %s: %f" mylib diff))))))
-(advice-add 'load-library :around #'load-library--around)
-(advice-add 'require :around #'load-library--around)
 
 ;; keys, keys, keys!!!
 (nobreak
