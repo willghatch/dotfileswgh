@@ -1,8 +1,20 @@
-(custom-set-faces
- ;; custom-set-faces was added by Custom.
- ;; If you edit it by hand, you could mess it up, so be careful.
- ;; Your init file should contain only one such instance.
- ;; If there is more than one, they won't work right.
+;;; wgh-theme.el --- my ad-hoc theme                 -*- lexical-binding: t; -*-
+
+;; Copyright (C) 2015 William Hatch
+
+;; I hereby grant an eternal license to anyone to do with this file as
+;; they wish, including redistributing in whole or in part, modified
+;; or unmodified, etc.
+
+;;; Commentary:
+
+;;; Code:
+
+(deftheme wgh "my ad-hoc theme")
+
+(custom-theme-set-faces
+ 'wgh
+
  '(default ((t (:inherit nil :stipple nil :background "#050505" :foreground "#909090" :inverse-video nil :box nil :strike-through nil :overline nil :underline nil :slant normal :weight normal :height 99 :width normal :foundry "unknown" :family "DejaVu Sans Mono"))))
  '(bold-italic ((t (:slant italic :weight bold))))
  '(col-highlight ((t (:background "#000035"))))
@@ -85,14 +97,14 @@
  '(tool-bar ((t (:foreground "#00ff00" :box (:line-width 1 :style released-button)))))
  '(web-mode-html-tag-bracket-face ((t (:foreground "#c5a535"))))
  '(yafolding-ellipsis-face ((t (:background "#ff00ff"))) t)
- '(yas-field-highlight-face ((t (:background "#001d00")))))
-(custom-set-variables
- ;; custom-set-variables was added by Custom.
- ;; If you edit it by hand, you could mess it up, so be careful.
- ;; Your init file should contain only one such instance.
- ;; If there is more than one, they won't work right.
- '(term-file-aliases
-   (quote
-    (("xterm" . "xterm-256color")
-     ("screen" . "xterm-256color")
-     ("screen-256color" . "xterm-256color")))))
+ '(yas-field-highlight-face ((t (:background "#001d00"))))
+ )
+
+;;;###autoload
+(when load-file-name
+  (add-to-list 'custom-theme-load-path
+               (file-name-as-directory (file-name-directory load-file-name))))
+
+(provide-theme 'wgh)
+
+;;; wgh-theme.el ends here

@@ -1,3 +1,9 @@
+(setq term-file-aliases
+      '(("xterm" . "xterm-256color")
+        ("screen" . "xterm-256color")
+        ("rackterm" . "xterm-256color")
+        ("screen-256color" . "xterm-256color")))
+
 ;; macro for more robust starting-up
 (defmacro nobreak (&rest args)
   `(progn
@@ -6,8 +12,6 @@
                args)))
 
 (setq dotfileswgh (getenv "DOTFILESWGH"))
-(setq custom-file (concat dotfileswgh "/emacs/custom-file.el"))
-(load custom-file)
 
 (setq package-user-dir (concat dotfileswgh "/dotlocal/emacs.d/elpa"))
 ;; Set up load path for requires
@@ -22,6 +26,11 @@
 (let ((default-directory (concat dotfileswgh "/external/emacs")))
       (normal-top-level-add-subdirs-to-load-path))
 (setq load-path (cons (concat dotfileswgh "/emacs") load-path))
+
+(nobreak (require 'wgh-theme))
+(load-theme 'wgh)
+(setq custom-file (concat dotfileswgh "/dotlocal/emacs.d/custom-file.el"))
+(nobreak (load custom-file))
 
 ;; backup settings
 (setq
