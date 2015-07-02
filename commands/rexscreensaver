@@ -1,0 +1,6 @@
+#!/bin/sh
+
+killall xscreensaver
+xscreensaver &
+disown
+
