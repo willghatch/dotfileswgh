@@ -120,6 +120,8 @@
 (nobreak
  ;;; secondarily important
  (load-library "xclip-conf")
+ (unless (display-graphic-p)
+   (require 'evil-terminal-cursor-changer))
 
  ;; elscreen must start before other mode-line stuff, or it wouldn't be this high...
  (require 'elscreen)
@@ -188,11 +190,11 @@
  (global-hl-todo-mode 1)
  ;(require 'helm)
  (setq helm-swoop-pre-input-function (lambda () "")) ; disable symbol-at-point nonsense
+ (global-anzu-mode 1)
+ (setq guide-key/guide-key-sequence '("SPC"))
+ (setq guide-key/recursive-key-sequence-flag t)
+ (guide-key-mode 1)
 )
-
-
-(if (fboundp 'smex)
-    (global-set-key (kbd "M-x") 'smex))
 
 (let ((file (concat dotfileswgh "/dotlocal/emacs")))
   (if (file-exists-p file) (load-file file) nil))

@@ -25,6 +25,9 @@
 ;;          (reformat-file)))
 ;;      (file-visiting-buffer-list))
 
+;; eval this line to run the hooks necessary for actual elisp editing
+(lisp-interaction-mode)
+
 ")
 
 

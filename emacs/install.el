@@ -17,6 +17,8 @@
 (in 'auto-compile)
 (in 'evil-surround)
 (in 'evil-search-highlight-persist)
+(in 'evil-terminal-cursor-changer)
+(in 'evil-anzu)
 (in 'yafolding)
 (in 'company)
 
@@ -42,6 +44,7 @@
 (in 'popwin)
 (in 'linum-relative)
 (in 'smooth-scrolling)
+(in 'guide-key)
 
 (in 'helm)
 (in 'helm-swoop)
@@ -69,6 +72,10 @@
 (in 'web-mode)
 (in 'indent-guide)
 (in 'hl-todo)
+
+;; some other packages I don't currently use, but might want to later:
+;; ace-link -- ace jump to navigation links in info, help, eww, or compilation mode
+;; figlet -- make ascii banners
 
 (message "Done installing packages!")
 

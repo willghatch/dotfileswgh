@@ -1,3 +1,6 @@
+(defun add-to-hooks (fun hooklist)
+  (mapcar (lambda (hook) (add-hook hook fun)) hooklist))
+
 (add-to-list 'auto-mode-alist '("\\.zsh\\'" . shell-script-mode))
 
 (add-hook 'after-save-hook 'executable-make-buffer-file-executable-if-script-p)
@@ -43,15 +46,15 @@
             (require 'sgml-mode)
             ))
 
-(add-hook 'emacs-lisp-mode-hook
-          (lambda ()
-            (define-key evil-motion-state-local-map "gdd" 'elisp-slime-nav-find-elisp-thing-at-point)
-            (define-key evil-motion-state-local-map "gdp" 'pop-tag-mark)
-            (define-key evil-motion-state-local-map "gD" 'elisp-slime-nav-describe-elisp-thing-at-point)
-            ))
-
-(defun add-to-hooks (fun hooklist)
-  (mapcar (lambda (hook) (add-hook hook fun)) hooklist))
+(add-to-hooks
+ (lambda ()
+   (define-key evil-motion-state-local-map "gdd" 'elisp-slime-nav-find-elisp-thing-at-point)
+   (define-key evil-motion-state-local-map "gdp" 'pop-tag-mark)
+   (define-key evil-motion-state-local-map "gD" 'elisp-slime-nav-describe-elisp-thing-at-point)
+   (eldoc-mode 1)
+   )
+ '(emacs-lisp-mode-hook
+   lisp-interaction-mode-hook))
 
 (add-hook 'dired-mode-hook
           (lambda ()
