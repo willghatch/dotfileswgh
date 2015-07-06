@@ -2,9 +2,7 @@
 ; taken from emacswiki
 (defun set-tab-stop-width (width)
       "Set all tab stops to WIDTH in current buffer.
-    
     This updates `tab-stop-list', but not `tab-width'.
-    
     By default, `indent-for-tab-command' uses tabs to indent, see
     `indent-tabs-mode'."
       (interactive "nTab width: ")
@@ -44,5 +42,3 @@
           (match-end 0)
           'face (list :background (match-string-no-properties 0)))))))
   (font-lock-fontify-buffer))
-
-

@@ -1,16 +1,11 @@
-(setq scratch-ascii-banner
-";;      ___           ___           ___           ___           ___     
-;;     /  /\\         /__/\\         /  /\\         /  /\\         /  /\\    
-;;    /  /:/_       |  |::\\       /  /::\\       /  /:/        /  /:/_   
-;;   /  /:/ /\\      |  |:|:\\     /  /:/\\:\\     /  /:/        /  /:/ /\\  
-;;  /  /:/ /:/_   __|__|:|\\:\\   /  /:/~/::\\   /  /:/  ___   /  /:/ /::\\ 
-;; /__/:/ /:/ /\\ /__/::::| \\:\\ /__/:/ /:/\\:\\ /__/:/  /  /\\ /__/:/ /:/\\:\\
-;; \\  \\:\\/:/ /:/ \\  \\:\\~~\\__\\/ \\  \\:\\/:/__\\/ \\  \\:\\ /  /:/ \\  \\:\\/:/~/:/
-;;  \\  \\::/ /:/   \\  \\:\\        \\  \\::/       \\  \\:\\  /:/   \\  \\::/ /:/ 
-;;   \\  \\:\\/:/     \\  \\:\\        \\  \\:\\        \\  \\:\\/:/     \\__\\/ /:/  
-;;    \\  \\::/       \\  \\:\\        \\  \\:\\        \\  \\::/        /__/:/   
-;;     \\__\\/         \\__\\/         \\__\\/         \\__\\/         \\__\\/    
-")
+(require 'vfuncs)
+
+(let* ((banner-dir (concat (getenv "DOTFILESWGH") "/emacs/banners/"))
+       (banner-files (directory-files banner-dir t "^[^\.]"))
+       (banner-file (nth (random (length banner-files)) banner-files)))
+  (setq scratch-ascii-banner
+        (apply #'concat (mapcar (lambda (x) (concat ";; " x "\n"))
+                                (file->lines banner-file)))))
 
 (setq scratch-useful-message
 "

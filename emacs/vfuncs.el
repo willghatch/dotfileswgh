@@ -106,3 +106,12 @@ quit emacs."
     (mark-whole-buffer)
     (call-interactively 'delete-trailing-whitespace)))
 
+(defun file->string (file)
+  (with-temp-buffer
+    (insert-file-contents file)
+    (buffer-string)))
+
+(defun file->lines (file)
+  (split-string (file->string file) "\n"))
+
+(provide 'vfuncs)
