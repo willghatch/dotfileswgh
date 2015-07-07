@@ -15,8 +15,8 @@ else
     getpage="curl"
     #getpage="wget -qO-"
     
-    $getpage icanhazip.com
-    #$getpage ipv4.icanhazip.com
+    #$getpage icanhazip.com
+    $getpage ipv4.icanhazip.com
     #$getpage ipv6.icanhazip.com
     #$getpage ident.me
     #$getpage v4.ident.me
