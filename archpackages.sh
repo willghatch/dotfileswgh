@@ -50,6 +50,7 @@ finch \
 tk \
 python2-dbus \
 markdown \
+dns-utils \
 texlive-bin
 
 # for teensy programming (IE ergodox)
