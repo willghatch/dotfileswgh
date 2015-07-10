@@ -8,6 +8,8 @@ set keymap vi-command
 # o/e map
 "e":
 "o":
+"ec": forward-char
+"oc": backward-char
 # readline determines the behavior of vi-char-search based on the last character
 # typed in the binding...
 "ef": vi-char-search

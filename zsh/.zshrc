@@ -245,6 +245,8 @@ bindkey -M viins 'kj' vi-cmd-mode
 # o/e keys
 bindkey -r -M vicmd 'o'
 bindkey -r -M vicmd 'e'
+bindkey -M vicmd 'ec' forward-char
+bindkey -M vicmd 'oc' backward-char
 bindkey -M vicmd 'of' vi-find-prev-char
 bindkey -M vicmd 'ef' vi-find-next-char
 bindkey -M vicmd 'ot' vi-find-prev-char-skip
