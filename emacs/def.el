@@ -25,7 +25,10 @@
       (normal-top-level-add-subdirs-to-load-path))
 (let ((default-directory (concat dotfileswgh "/external/emacs")))
       (normal-top-level-add-subdirs-to-load-path))
+(let ((default-directory (concat dotfileswgh "/pri/emacs")))
+      (normal-top-level-add-subdirs-to-load-path))
 (setq load-path (cons (concat dotfileswgh "/emacs") load-path))
+(setq load-path (cons (concat dotfileswgh "/pri/emacs") load-path))
 
 (defun load-library--around (orig-fun &rest args)
   (let ((curtime (current-time))
