@@ -35,6 +35,7 @@ ncmpc \
 espeak \
 qemu \
 network-manager-applet \
+blueman \
 mlocate \
 ctags \
 clisp \
