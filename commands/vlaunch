@@ -12,6 +12,7 @@ function scmd(){
 }
 
 scmd terminal "konsole"
+scmd terminal2 "konsole"
 scmd lockscreen "xscreensaver-command -lock"
 scmd launcher "bashrun"
 scmd calendar "xterm-pager cal $(date +%Y)"
