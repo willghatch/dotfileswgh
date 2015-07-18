@@ -17,6 +17,7 @@
 	lf = log -u
 	lc = ls-files -u | awk '{print $4}' | sort -u
 	shallow = clone --depth 1
+	unshallow = fetch --unshallow
 
 [url "https://github.com/"]
 	insteadOf = gh:
