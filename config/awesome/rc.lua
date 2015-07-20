@@ -155,11 +155,19 @@ enterKeyState = function(stateName, globalkeys, clientkeys)
    mainRule.properties.keys = clientkeys
 end
 
+getCurrentClient = function()
+   return awful.client.next(0)
+end
+
 enterNormalState = function()
    enterKeyState("normal", globalKeysNormal, clientKeysNormal)
+   theme.border_focus = theme.border_focus__normal
+   getCurrentClient().border_color = theme.border_focus__normal
 end
 enterLockedState = function()
    enterKeyState("locked", globalKeysLocked, clientKeysLocked)
+   theme.border_focus = theme.border_focus__locked
+   getCurrentClient().border_color = theme.border_focus__locked
 end
 
 toggleKeyState = function()
