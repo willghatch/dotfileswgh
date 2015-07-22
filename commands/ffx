@@ -1,5 +1,6 @@
-#!/bin/sh
+#!/usr/bin/env bash
 
 # as a script rather than an alias so I can combine it with other things...
+FFX=${FFX:-firefox}
 
-exec nice -n 5 firefox
+exec nice -n 5 $FFX
