@@ -110,6 +110,7 @@ set hintkeys='aoeuhtnsidpgcrmk'
 "set followhints=0
 "set hinttimeout=0
 
+set defsearch=duckduckgo
 
 set runtimepath+="$DOTFILESWGH/external/pentadactyl/"
 
