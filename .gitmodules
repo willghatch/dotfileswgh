@@ -19,3 +19,10 @@
 [submodule "external/misc/hatchak"]
 	path = external/misc/hatchak
 	url = https://github.com/willghatch/hatchak.git
+[submodule "external/firefox/scrollhighlight"]
+	path = external/firefox/scrollhighlight
+	url = https://github.com/tejohnso/scrollhighlight
+[submodule "external/firefox/dactyl"]
+	path = external/firefox/dactyl
+	url = https://github.com/5digits/dactyl.git
+	ignore = dirty

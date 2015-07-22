@@ -81,7 +81,7 @@ function mkSundries() {
     mkdir -p $HOME/.xmonad
     mkdir -p $HOME/.elinks
     mkdir -p $HOME/.themes
-    mkdir -p $dpath/dotlocal/firefox-default-profile
+    mkdir -p $dpath/dotlocal/firefox-default-profile/extensions
 }
 
 function linkSundries() {
