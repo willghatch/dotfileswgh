@@ -74,16 +74,23 @@ buffer, it will call the next-buffer-func once more if advance-on-failure-p."
   (insert-string (shell-command-to-string cmd)))
 
 (require 'cl-lib)
+(defun do-kill-buffer-or-quit-emacs ()
+  (kill-buffer (current-buffer))
+  (when (and
+         (or (not (buffer-modified-p (get-buffer "*scratch*")))
+             (not (get-buffer "*scratch*")))
+         (cl-notany 'buffer-file-name (buffer-list)))
+    (evil-quit-all)))
 (defun kill-buffer-or-quit-emacs ()
   "Kill buffer and, if there are no more file buffers and scratch is unmodified,
 quit emacs."
   (interactive)
-  (kill-buffer (current-buffer))
-  (when (and
-       (or (not (buffer-modified-p (get-buffer "*scratch*")))
-           (not (get-buffer "*scratch*")))
-       (cl-notany 'buffer-file-name (buffer-list)))
-      (evil-quit-all)))
+  (if (and (symbol-function 'server-edit) server-buffer-clients)
+      ;; Run server-edit to close buffer if I'm in a server and clients are using it.
+      ;; If server-edit returns non-nil, it means that there are no more
+      ;; server-buffers, so just kill normally.
+      (when (server-edit) (do-kill-buffer-or-quit-emacs))
+    (do-kill-buffer-or-quit-emacs)))
 
 (defun save-and-kill-buffer-and-maybe-quit-emacs ()
   "Save buffer and kill it using kill-buffer-or-quit-emacs"

@@ -6,8 +6,8 @@ daemon="none"
 
 if [ ! -f $premaxf ]
 then
-    echo "premacs not set up 2>&1"
-    exit 37
+    # rather than die, fall back on ALTERNATE_EDITOR
+    exec emacsclient -nw "$@"
 fi
 
 mv $premaxf $preUse

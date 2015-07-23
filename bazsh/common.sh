@@ -31,7 +31,7 @@ umask 022 # the covenient umask
 
 ####### Editing
 alias em="emacs -nw -l $DOTFILESWGH/emacs/def"
-alias e="premacs-use -t"
+alias e="premacs-use-t"
 alias eg="premacs-use -c"
 alias emg="emacs -l $DOTFILESWGH/emacs/def"
 alias emp="emacs -nw -l $DOTFILESWGH/emacs/package-conf.el"
@@ -124,7 +124,12 @@ ak(){
 
 export XDG_DOWNLOAD_DIR="$HOME/dl"
 export VLAUNCHRC="$DOTFILESWGH/dotlocal/vlaunchrc"
-export EDITOR=vim
+export ALTERNATE_EDITOR=vim
+if which emacs 1>/dev/null 2>/dev/null; then
+    export EDITOR=premacs-use-t
+else
+    export EDITOR=$ALTERNATE_EDITOR
+fi
 export PAGER=less
 
 

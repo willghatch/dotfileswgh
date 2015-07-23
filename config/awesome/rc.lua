@@ -54,8 +54,8 @@ beautiful.init("/home/wgh/.config/awesome/theme.lua")
 --terminal = "xterm -fg white -bg black"
 terminal2 = "vlaunch terminal2"
 terminal = "vlaunch terminal"
---editor = os.getenv("EDITOR") or "nano"
-editor = "vim"
+editor = os.getenv("EDITOR") or "nano"
+--editor = "vim"
 editor_cmd = terminal .. " -e " .. editor
 
 -- Default modkey.

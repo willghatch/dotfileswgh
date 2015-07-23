@@ -1,5 +1,5 @@
 # -*-muttrc-*-
-set editor="/usr/bin/vim"
+#set editor="/usr/bin/vim"
 set text_flowed=yes
 
 # source aliases

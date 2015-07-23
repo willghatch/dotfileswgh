@@ -2,8 +2,6 @@
 	email = willghatch@gmail.com
 	name = William G Hatch
 [core]
-	editor = vim
-[core]
 	excludesfile = ~/dotfileswgh/gitignore_global
 [push]
 	default = current
