@@ -45,6 +45,9 @@
   '((t (:foreground "black" :background "yellow" :bold t)))
   "read only tag face")
 
+(defface wevil-pager-face
+  '((t (:foreground "black" :background "purple")))
+  "pager state marker face")
 
 ;; You can set both header-line-format and mode-line-format
 
@@ -67,6 +70,8 @@
                  (propertize "<EMCS>" 'face 'wevil-emacs-face))
                 ((eq evil-state 'operator)
                  (propertize "<OPER>" 'face 'wevil-operator-face))
+                ((eq evil-state 'pager)
+                 (propertize "<PAGE>" 'face 'wevil-pager-face))
                 (t (propertize "WHAT STATE??" 'face 'wevil-emacs-face))))
 
        '(:eval (propertize " %b " 'face 'wevil-bufname-face))

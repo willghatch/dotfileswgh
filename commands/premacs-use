@@ -1,32 +1,22 @@
 #!/bin/sh
 
-premaxf=/tmp/premacs
-preUse=/tmp/premacs-in-use
-daemon="none"
+daemon="$(premacs-get-next-daemon)"
 
-if [ ! -f $premaxf ]
-then
+if [[ "none" = "$daemon" ]]; then
     # rather than die, fall back on ALTERNATE_EDITOR
     exec emacsclient -nw "$@"
 fi
 
-mv $premaxf $preUse
-while read line
-do
-      if [ "none" = "$daemon" ]
-      then
-          daemon=$line
-      else
-          echo $line >> $premaxf
-      fi
-done <$preUse
+old=/tmp/premacs
+new=/tmp/premacs-tmp
+mv $old $new
+grep -v $daemon $new > $old
+rm $new
 
-# tidy up files and spawn new daemon
-rm $preUse
 premacs-new >/dev/null 2>&1 &
 
 emacsclient -e "(setenv \"PWD\" \"$PWD\")" -s $daemon >/dev/null
-emacsclient -s $daemon $@
+emacsclient -s $daemon "$@"
 emacsclient -e '(kill-emacs)' -s $daemon
 
 

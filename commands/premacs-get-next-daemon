@@ -1,0 +1,13 @@
+#!/bin/sh
+
+premaxf=/tmp/premacs
+
+if [ -f $premaxf ]
+then
+    head -n 1 $premaxf
+    exit 0
+else
+    echo "none"
+    exit 1
+fi
+

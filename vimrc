@@ -133,7 +133,7 @@ if filereadable($DOTFILESWGH . "/external/vim/Vundle.vim/README.md")
 
     let g:submode_always_show_submode = 1
     let g:submode_keyseqs_to_leave = ['<esc>', '<C-g>']
-    let g:submode_timeout = 9999
+    let g:submode_timeout = 0
     let g:submode_timeoutlen = 9999
     call submode#enter_with('windowing', 'n', '', 'th', '<NOP>')
     call submode#leave_with('windowing', 'n', '', 'e')
@@ -151,6 +151,16 @@ if filereadable($DOTFILESWGH . "/external/vim/Vundle.vim/README.md")
     call submode#map('windowing', 'n', '', 'G', ':tabclose<cr>')
     call submode#map('windowing', 'n', '', 'w', 'gt')
     call submode#map('windowing', 'n', '', 'b', 'gT')
+
+    call submode#enter_with('pager', 'n', '', 'to', '<NOP>')
+    call submode#leave_with('pager', 'n', '', 'e')
+    call submode#map('pager', 'n', '', 'j', '<C-d>')
+    call submode#map('pager', 'n', '', 'k', '<C-u>')
+    call submode#map('pager', 'n', '', 'J', '<C-e>')
+    call submode#map('pager', 'n', '', 'K', '<C-y>')
+    call submode#map('pager', 'n', '', 'sj', '<pagedown>')
+    call submode#map('pager', 'n', '', 'sk', '<pageup>')
+    call submode#map('pager', 'n', '', 'tic', ':call BufDelOrQuit()<cr>')
 
     let g:multi_cursor_use_default_mapping=0
     let g:multi_cursor_start_key='<C-e>'

@@ -1,0 +1,18 @@
+#!/usr/bin/env bash
+
+export ALTERNATE_EDITOR=less
+dir="/tmp/$(whoami)/premacs-pages"
+mkdir -p "$dir"
+chmod 700 "$dir"
+tmpf="$(mktemp $dir/pager-XXXXXX)"
+cat <&0 >"$tmpf"
+
+if premacs-get-next-daemon >/dev/null; then
+  daemon="$(premacs-get-next-daemon)"
+  emacsclient -e '(setq start-on-pager-state t)' -s "$daemon" >/dev/null
+fi
+
+premacs-use-t "$tmpf" "$@"
+
+rm "$tmpf"
+

@@ -63,6 +63,17 @@
             (setcdr dired-mode-map nil)
             ))
 
+;; so it doesn't barf when it's not set!
+(setq start-on-pager-state nil)
+(add-hook 'server-switch-hook
+          (lambda ()
+            (if start-on-pager-state
+                (progn
+                  (evil-pager-state)
+                  (pkmap "q" 'kill-buffer-or-quit-emacs))
+              (message "")
+              )))
+
  (load-library "js-conf")
 
 ;; TODO -- these are default values that I should deal with now

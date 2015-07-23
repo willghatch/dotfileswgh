@@ -11,6 +11,15 @@
 (setcdr evil-normal-state-map nil)
 (setcdr evil-motion-state-map nil)
 
+(evil-define-state pager
+  "Pager State"
+  :tag "<P>"
+  :message "-- PAGER STATE --"
+  :enable (motion)
+  :suppress-keymap t
+  )
+
+
 (defmacro myhydradef (hydra-name &rest hydra-keys)
   `(defhydra ,hydra-name (:exit t :foreign-keys warn)
      ,@hydra-keys))
@@ -26,6 +35,8 @@
   (nobreak-define-key evil-visual-state-map keys func))
 (defun ikmap (keys func)
   (nobreak-define-key evil-insert-state-map keys func))
+(defun pkmap (keys func)
+  (nobreak-define-key evil-pager-state-map keys func))
 
 ;; for temporary on-the-fly bindings
 (define-prefix-command 'temp-key-map)
@@ -477,9 +488,21 @@
 (mkmap (kbd "C-z") 'suspend-frame)
 (ikmap (kbd "C-z") 'suspend-frame)
 
+(pkmap "j" 'pscroll-down-half)
+(pkmap "k" 'pscroll-up-full)
+(pkmap "J" 'pscroll-down-line)
+(pkmap "K" 'pscroll-up-line)
+(pkmap "sj" 'pscroll-down-full)
+(pkmap "sk" 'pscroll-up-full)
+(pkmap "e" 'evil-normal-state)
+; maybe q should quit?
+(pkmap "q" 'evil-normal-state)
+(mkmap "to" 'evil-pager-state)
+
+
 ; space map
-(mkmap "sj" 'scroll-up)
-(mkmap "sk" 'scroll-down)
+(mkmap "sj" 'pscroll-down-half)
+(mkmap "sk" 'pscroll-up-half)
 (mkmap "sf" 'yafolding-toggle-element)
 (mkmap " sfa" 'yafolding-toggle-all)
 (mkmap " /"
