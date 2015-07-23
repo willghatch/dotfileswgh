@@ -1,7 +1,19 @@
+# $WGHHOME is set so that I can su to other accounts and keep using my settings
 if [[ -z "$WGHHOME" ]]; then
-    export WGHHOME=$HOME # I want to be able to reference this, and when it's
-    #not true(IE when I use su), I'll set this elsewhere
+    export WGHHOME=$HOME
 fi
+
+# When $WGHHOME is not equal to $HOME I've switched to another user, and while I'll
+# want to keep using my normal dotfiles and such for most things, some settings will
+# need to change.
+i-am-me() {
+    if [[ "$HOME" = "$WGHHOME" ]]; then
+        return 0
+    else
+        return 1
+    fi
+}
+
 export HROOT=$WGHHOME/hroot
 export DOTFILESWGH=$WGHHOME/dotfileswgh
 export NPM_DIR=$DOTFILESWGH/dotlocal/npm
@@ -20,6 +32,30 @@ export MANWIDTH=${MANWIDTH:-80}
 
 export ZDOTDIR=$DOTFILESWGH/zsh
 
+# v is a wrapper script to launch vim with my settings
+export ALTERNATE_EDITOR=v
+if which emacs 1>/dev/null 2>/dev/null && i-am-me; then
+    export EDITOR=premacs-use-t
+else
+    export EDITOR=$ALTERNATE_EDITOR
+fi
+
+export XDG_DOWNLOAD_DIR="$HOME/dl"
+export VLAUNCHRC="$DOTFILESWGH/dotlocal/vlaunchrc"
+export PAGER=less
+
+
+# For color in less (for man pages)
+export LESS_TERMCAP_mb=$(printf "\e[1;31m")
+export LESS_TERMCAP_md=$(printf "\e[1;31m")
+export LESS_TERMCAP_me=$(printf "\e[0m")
+export LESS_TERMCAP_se=$(printf "\e[0m")
+export LESS_TERMCAP_so=$(printf "\e[1;44;33m")
+export LESS_TERMCAP_ue=$(printf "\e[0m")
+export LESS_TERMCAP_us=$(printf "\e[1;32m")
+
+export GREP_COLOR="1;32"
+
 umask 022 # the covenient umask
 
 ################################################  ALIASES ###############################
@@ -31,11 +67,10 @@ umask 022 # the covenient umask
 
 ####### Editing
 alias em="emacs -nw -l $DOTFILESWGH/emacs/def"
-alias e="premacs-use-t"
+alias e="$EDITOR"
 alias eg="premacs-use -c"
 alias emg="emacs -l $DOTFILESWGH/emacs/def"
 alias emp="emacs -nw -l $DOTFILESWGH/emacs/package-conf.el"
-alias v="vim -u $DOTFILESWGH/vimrc"
 
 
 ####### Unix tools, mostly coloring
@@ -120,29 +155,6 @@ ak(){
     exit
 }
 
-################################ Environment Variables ##################################
-
-export XDG_DOWNLOAD_DIR="$HOME/dl"
-export VLAUNCHRC="$DOTFILESWGH/dotlocal/vlaunchrc"
-export ALTERNATE_EDITOR=vim
-if which emacs 1>/dev/null 2>/dev/null; then
-    export EDITOR=premacs-use-t
-else
-    export EDITOR=$ALTERNATE_EDITOR
-fi
-export PAGER=less
-
-
-# For color in less (for man pages)
-export LESS_TERMCAP_mb=$(printf "\e[1;31m")
-export LESS_TERMCAP_md=$(printf "\e[1;31m")
-export LESS_TERMCAP_me=$(printf "\e[0m")
-export LESS_TERMCAP_se=$(printf "\e[0m")
-export LESS_TERMCAP_so=$(printf "\e[1;44;33m")
-export LESS_TERMCAP_ue=$(printf "\e[0m")
-export LESS_TERMCAP_us=$(printf "\e[1;32m")
-
-export GREP_COLOR="1;32"
 
 
 #################################### Functions ###########################################
