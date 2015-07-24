@@ -1,5 +1,8 @@
 #!/usr/bin/env bash
 
+# wrapper for my most common usage of awk, because I always
+# forget its syntax.
+
 awkcmd='{print $'"$1"
 shift
 

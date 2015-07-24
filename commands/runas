@@ -1,5 +1,17 @@
 #!/usr/bin/env bash
 
+# runas/be script.
+# I made them one because they would only differ by one line, but it
+# means they need a symlink and have to test which name it runs as.
+#
+# This is a wrapper to su or sudo to another user (be and runas, respectively),
+# but run with my config files.  It keeps all of my environment except a few
+# variables, like home, username... which need to point to the new user for
+# most purposes.
+#
+# This will always run me with zsh, and needs sudo access, not just su.  For
+# when I don't have sudo, there is a similar be-su wrapper script.
+
 user="$1"
 shift
 

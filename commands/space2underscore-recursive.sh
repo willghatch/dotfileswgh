@@ -1,5 +1,6 @@
 #!/bin/sh
 
+# Rename files with spaces to underscores.  Recurse into directories.
 
 ls | while read -r FILE
 do

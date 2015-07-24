@@ -1,5 +1,8 @@
 #!/usr/bin/env js
 
+# Get current unix time in seconds.  But while it worked on the machine I wrote it on,
+# it doesn't seem to now.  Maybe I'll fix it some time...
+
 var printUnix = function(date){
     date = new Date(date)
     print("in ms: ")

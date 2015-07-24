@@ -1,5 +1,7 @@
 #!/usr/bin/env bash
 
+# install the packages I generally use on Arch Linux
+
 pm (){
     pacman -S --needed --noconfirm "$@"
 }

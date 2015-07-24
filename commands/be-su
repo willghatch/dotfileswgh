@@ -1,4 +1,9 @@
 #!/usr/bin/env bash
+
+# Like my be/runas combo script, but this is for when I don't have sudo access
+# and specifically need to use the su command.  (IE I'm unpriviledged, but have
+# su access to some utility account)
+
 myzsh=$(which zsh)
 user="$1"
 

@@ -1,4 +1,6 @@
 #!/bin/sh
 
+# wrapper since I never remember the python module name
+
 python2 -m SimpleHTTPServer $1
 

@@ -1,5 +1,7 @@
 #!/bin/sh
 
+# restart xscreensaver -- necessary for some monitor configuration changes
+
 killall xscreensaver
 xscreensaver &
 disown

@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
 
-# as a script rather than an alias so I can combine it with other things...
+# as a script rather than an alias so I can combine it with other things... (eg dark/light wrappers
+# to set gtk theme).
 FFX=${FFX:-firefox}
 
 exec nice -n 5 $FFX

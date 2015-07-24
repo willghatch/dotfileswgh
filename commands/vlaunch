@@ -1,7 +1,20 @@
 #!/usr/bin/env bash
 
-# script to launch stuff from dwm, so I can keep a local config of which actual programs to launch without
-# changing my global config and tracking that...
+# It's nice to set keys on eg. window managers to launch programs.  But sometimes
+# you want to launch different programs for the same purpose on different machines.
+# You don't want to muck about with your WM config for each of these, though, especially
+# if you're running something that's configured in source, like dwm or xmonad.
+#
+# This script is to be put in place of raw commands in such config files.  It has
+# some likely portable defaults, and sources a config file (bash script) to set overrides.
+# That way you can change the specific programs for any machine simply by putting one line
+# in a local config file.  This keeps your WM config consistent and easy to keep in version
+# control.
+#
+# To override which terminal to launch, put
+# terminal="my-xterm"
+# in ~/.vlaunchrc, $XDG_CONFIG_DIR/vlaunchrc, or in the file pointed at by the $VLAUNCHRC variable.
+
 
 function scmd(){
     if [ -z "$(eval echo \$$1)" ]; then

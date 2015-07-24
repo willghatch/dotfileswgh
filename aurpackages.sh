@@ -1,5 +1,7 @@
 #!/usr/bin/env bash
 
+# install the packages I most use from the AUR
+
 pa (){
     pacaur -S --needed --noconfirm --noedit "$@"
 }

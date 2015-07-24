@@ -1,4 +1,6 @@
 #!/bin/sh
 
+# Switch to hatchak layout
+
 xkbcomp -I$DOTFILESWGH/external/misc/hatchak/xkb $DOTFILESWGH/external/misc/hatchak/xkb/hatchak.xkb $DISPLAY
 

@@ -1,0 +1,29 @@
+#!/usr/bin/env bash
+
+cat << EOF
+
+So premacs is a wrapper to launch emacs quickly.
+
+I like to run a lot of editors but keep them separate -- I like to
+have each editor with a buffer list limited to the things that I
+intentionally put there (probably because they are logically connected).
+I like that they keep their own separate copy/paste registers (and I
+have functions to use xclip to copy/paste with the global clipboard).
+
+Emacsclient connecting to an emacs daemon seems to be the only reliable
+way to have a really fast emacs startup.  But since I don't want to
+have everything jumbled together, I created premacs to preemptively
+start up multiple emacs daemons, refreshing the pool as they are used.
+
+It has some drawbacks --- if you change your elisp and forget your next
+premacs instance was already started before the change, there is some
+confusion.  So when changing configs it is better to just load emacs
+normally and then kill and respawn the premacs instances afterward.
+
+TODO:
+
+I really should roll all these scripts into one, and take a command
+argument that says what function to run.
+
+EOF
+

@@ -1,5 +1,7 @@
 #!/bin/sh
 
+# Pretty print files that are often ugly.
+
 usage(){
     echo "usage: $0 <xml|json>"
 }
