@@ -72,6 +72,7 @@
 (in 'web-mode)
 (in 'indent-guide)
 (in 'hl-todo)
+(in 'git-commit)
 
 ;; some other packages I don't currently use, but might want to later:
 ;; ace-link -- ace jump to navigation links in info, help, eww, or compilation mode
