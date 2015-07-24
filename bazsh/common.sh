@@ -257,6 +257,8 @@ if [[ "$TERM" = "xterm" ]]; then
     TERM=xterm-256color-italic
 fi
 
+lesskey $DOTFILESWGH/lesskey
+
 source $DOTFILESWGH/bazsh/grml-funcs.sh
 
 if [ $(uname) = FreeBSD ]
