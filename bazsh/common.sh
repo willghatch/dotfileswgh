@@ -1,7 +1,8 @@
 # $WGHHOME is set so that I can su to other accounts and keep using my settings
-if [[ -z "$WGHHOME" ]]; then
+if [ -z "$WGHHOME" ]; then
     export WGHHOME=$HOME
 fi
+export DOTFILESWGH=$WGHHOME/dotfileswgh
 
 # When $WGHHOME is not equal to $HOME I've switched to another user, and while I'll
 # want to keep using my normal dotfiles and such for most things, some settings will
@@ -15,7 +16,6 @@ i-am-me() {
 }
 
 export HROOT=$WGHHOME/hroot
-export DOTFILESWGH=$WGHHOME/dotfileswgh
 export NPM_DIR=$DOTFILESWGH/dotlocal/npm
 export NODE_PATH="$NPM_DIR/lib/node_modules"
 PATH=$DOTFILESWGH/dotlocal/commands:$WGHHOME/wghsrv_scripts:$DOTFILESWGH/commands:$WGHHOME/.cabal/bin:$NPM_DIR/bin:$HROOT/bin:$HROOT/usr/bin:$HROOT/usr/local/bin:$WGHHOME/.local/bin:$WGHHOME/bin:$PATH:/usr/bin:/bin:/usr/local/bin:/sbin:/usr/sbin:/usr/local/sbin:$WGHHOME/.screenlayout
