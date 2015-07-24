@@ -9,14 +9,14 @@ fi
 
 old=/tmp/premacs
 new=/tmp/premacs-tmp
-mv $old $new
-grep -v $daemon $new > $old
-rm $new
+mv "$old" "$new"
+grep -v "$daemon" "$new" > "$old"
+rm "$new"
 
 premacs-new >/dev/null 2>&1 &
 
-emacsclient -e "(setenv \"PWD\" \"$PWD\")" -s $daemon >/dev/null
-emacsclient -s $daemon "$@"
-emacsclient -e '(kill-emacs)' -s $daemon
+emacsclient -e "(setenv \"PWD\" \"$PWD\")" -s "$daemon" >/dev/null
+emacsclient -s "$daemon" "$@"
+emacsclient -e '(kill-emacs)' -s "$daemon"
 
 
