@@ -72,6 +72,7 @@
                   (evil-pager-state)
                   (pkmap "q" 'kill-buffer-or-quit-emacs-ignore-dirty)
                   (pkmap "tic" 'kill-buffer-or-quit-emacs-ignore-dirty)
+                  (ansi-color-buffer)
                   ))))
 
  (load-library "js-conf")

@@ -495,7 +495,6 @@
 (pkmap "sj" 'pscroll-down-full)
 (pkmap "sk" 'pscroll-up-full)
 (pkmap "e" 'evil-normal-state)
-(pkmap "a" 'ansi-color-buffer)
 ;; if I start in pager mode, this gets remapped to quit
 (pkmap "q" 'evil-normal-state)
 (mkmap "to" 'evil-pager-state)
