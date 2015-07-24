@@ -42,7 +42,7 @@ fi
 
 export XDG_DOWNLOAD_DIR="$HOME/dl"
 export VLAUNCHRC="$DOTFILESWGH/dotlocal/vlaunchrc"
-export PAGER=less
+export PAGER=premacs-pager
 
 
 # For color in less (for man pages)

@@ -151,6 +151,7 @@ quit emacs."
 
 (defun ansi-color-buffer ()
   (interactive)
-  (ansi-color-apply-on-region (point-min) (point-max)))
+  (ansi-format-decode (point-min) (point-max))
+  (backspace-overstrike-decode (point-min) (point-max)))
 
 (provide 'vfuncs)

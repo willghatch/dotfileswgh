@@ -182,7 +182,7 @@
  ;(require 'yafolding)
  (yafolding-mode 1)
  (load-library "borrowed")
- (load-library "ansi-color")
+ (load-library "tty-format")
  (setq scroll-margin 5)
  ;(setq smooth-scroll-margin 5)
  ;(require 'smooth-scrolling)
