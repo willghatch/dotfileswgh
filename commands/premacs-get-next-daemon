@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-premaxf=/tmp/premacs
+premaxf=/tmp/$(whoami)/premacs
 
 if [ -f $premaxf ]
 then

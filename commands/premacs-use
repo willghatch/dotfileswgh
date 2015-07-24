@@ -7,8 +7,8 @@ if [[ "none" = "$daemon" ]]; then
     exec emacsclient -nw "$@"
 fi
 
-old=/tmp/premacs
-new=/tmp/premacs-tmp
+old=/tmp/$(whoami)/premacs
+new=/tmp/$(whoami)/premacs-tmp
 mv "$old" "$new"
 grep -v "$daemon" "$new" > "$old"
 rm "$new"

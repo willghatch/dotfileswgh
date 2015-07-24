@@ -3,7 +3,7 @@
 while read daemon
 do
     emacsclient -e '(kill-emacs)' -s $daemon
-done </tmp/premacs
+done </tmp/$(whoami)/premacs
 
-rm /tmp/premacs
+rm /tmp/$(whoami)/premacs
 

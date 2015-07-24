@@ -7,5 +7,5 @@ done
 
 ps aux | grep emacs | grep daemon | grep premacs | awk '{print $2}' | xargs kill -9
 
-rm /tmp/premacs
+rm /tmp/$(whoami)/premacs
 
