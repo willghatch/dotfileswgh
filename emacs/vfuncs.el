@@ -149,5 +149,8 @@ quit emacs."
   (interactive "p")
   (pscroll-down-line (window-text-height)))
 
+(defun ansi-color-buffer ()
+  (interactive)
+  (ansi-color-apply-on-region (point-min) (point-max)))
 
 (provide 'vfuncs)

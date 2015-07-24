@@ -17,11 +17,13 @@ map -count -builtin -modes=v c s
 map -count -builtin -modes=n <Space> <Nop>
 map -count -builtin -modes=n <Space>h <PageDown>
 map -count -builtin -modes=n <Space>t <PageUp>
-map -count -builtin -modes=n sj 20j
-map -count -builtin -modes=n sk 20k
+map -count -builtin -modes=n sj <C-f>
+map -count -builtin -modes=n sk <C-b>
 " These are half-page scrollers
-map -count -builtin -modes=n J <C-d>
-map -count -builtin -modes=n K <C-u>
+map -count -builtin -modes=n j <C-d>
+map -count -builtin -modes=n k <C-u>
+map -count -builtin -modes=n J j
+map -count -builtin -modes=n K k
 
 " s-map -- make ss do what S did - search in new tab
 map -builtin -modes=n s <Nop>
