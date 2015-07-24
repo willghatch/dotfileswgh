@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/usr/bin/env bash
 
 # script to pre-launch emacs daemons to speed up start time
 
