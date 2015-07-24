@@ -92,6 +92,11 @@ quit emacs."
       (when (server-edit) (do-kill-buffer-or-quit-emacs))
     (do-kill-buffer-or-quit-emacs)))
 
+(defun kill-buffer-or-quit-emacs-ignore-dirty ()
+  (interactive)
+  (set-buffer-modified-p nil)
+  (kill-buffer-or-quit-emacs))
+
 (defun save-and-kill-buffer-and-maybe-quit-emacs ()
   "Save buffer and kill it using kill-buffer-or-quit-emacs"
   (interactive)

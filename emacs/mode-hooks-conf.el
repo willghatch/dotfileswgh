@@ -67,12 +67,12 @@
 (setq start-on-pager-state nil)
 (add-hook 'server-switch-hook
           (lambda ()
-            (if start-on-pager-state
+            (when start-on-pager-state
                 (progn
                   (evil-pager-state)
-                  (pkmap "q" 'kill-buffer-or-quit-emacs))
-              (message "")
-              )))
+                  (pkmap "q" 'kill-buffer-or-quit-emacs-ignore-dirty)
+                  (pkmap "tic" 'kill-buffer-or-quit-emacs-ignore-dirty)
+                  ))))
 
  (load-library "js-conf")
 
