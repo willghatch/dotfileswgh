@@ -36,13 +36,14 @@ export ZDOTDIR=$DOTFILESWGH/zsh
 export ALTERNATE_EDITOR=v
 if which emacs 1>/dev/null 2>/dev/null && i-am-me; then
     export EDITOR=premacs-use-t
+    export PAGER=premacs-pager
 else
     export EDITOR=$ALTERNATE_EDITOR
+    export PAGER=less
 fi
 
 export XDG_DOWNLOAD_DIR="$HOME/dl"
 export VLAUNCHRC="$DOTFILESWGH/dotlocal/vlaunchrc"
-export PAGER=premacs-pager
 
 
 # For color in less (for man pages)
