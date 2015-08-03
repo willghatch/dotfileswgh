@@ -6,3 +6,4 @@
 
 ;; add some pairs that seem to be lacking
 (sp-local-pair 'racket-mode "#|" "|#")
+(setq sp-sexp-prefix '((racket-mode regexp "#?[`',]@?")))
