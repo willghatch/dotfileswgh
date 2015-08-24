@@ -274,15 +274,14 @@ bindkey -M viins '^[ ' spacemap
 bindkey-to-prefix-map spacemap '' zaw
 bindkey-to-prefix-map spacemap "r" zaw-history
 bindkey-to-prefix-map spacemap "t" zaw-tmux
-bindkey-to-prefix-map spacemap "a" zaw-ack
+bindkey-to-prefix-map spacemap "a" zaw-searcher # ag
 bindkey-to-prefix-map spacemap "f" zaw-git-files
 bindkey-to-prefix-map spacemap "s" zaw-git-status
 bindkey-to-prefix-map spacemap "l" zaw-git-log
 bindkey-to-prefix-map spacemap "b" zaw-git-branches
 bindkey-to-prefix-map spacemap "o" zaw-open-file
 bindkey-to-prefix-map spacemap "p" zaw-process
-bindkey-to-prefix-map spacemap "c" zaw-commands
-bindkey-to-prefix-map spacemap "d" zaw-cdr
+bindkey-to-prefix-map spacemap "c" zaw-cdr
 bindkey-to-prefix-map spacemap "F" zaw-fasd-files
 bindkey-to-prefix-map spacemap "w" zaw-widgets
 bindkey-to-prefix-map spacemap "-" zaw-widgets
