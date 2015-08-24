@@ -287,6 +287,9 @@
 (mkmap "S" 'ignore)
 (mkmap "T" 'ignore)
 
+;; I'm not sure a better place to put this...
+(nkmap (kbd "TAB") 'sp-indent-defun)
+
 ; g map
 (mkmap "gr" 'evil-ace-jump-word-mode)
 (mkmap "gc" 'evil-ace-jump-char-mode)
