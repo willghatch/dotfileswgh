@@ -85,7 +85,7 @@ buffer, it will call the next-buffer-func once more if advance-on-failure-p."
   "Kill buffer and, if there are no more file buffers and scratch is unmodified,
 quit emacs."
   (interactive)
-  (if (and (symbol-function 'server-edit) server-buffer-clients)
+  (if (and (fboundp 'server-edit) server-buffer-clients)
       ;; Run server-edit to close buffer if I'm in a server and clients are using it.
       ;; If server-edit returns non-nil, it means that there are no more
       ;; server-buffers, so just kill normally.
