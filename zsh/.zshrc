@@ -35,7 +35,7 @@ source $WGHHOME/dotfileswgh/bazsh/common.sh
 typeset -U PATH
 fpath=($fpath $DOTFILESWGH/zsh/completion/)
 
-CDR_DIR=/tmp/$USER/cdr
+CDR_DIR=$HOME/.cache/cdr
 mkdir -p $CDR_DIR
 autoload -Uz chpwd_recent_dirs cdr
 autoload -U add-zsh-hook
