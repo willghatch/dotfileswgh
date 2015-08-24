@@ -54,6 +54,8 @@ tk \
 python2-dbus \
 markdown \
 bind-tools \
+libnotify \
+dunst \
 texlive-bin
 
 # for teensy programming (IE ergodox)
