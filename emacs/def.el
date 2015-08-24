@@ -38,8 +38,10 @@
     (let ((diff (time-to-seconds (time-subtract (current-time) curtime))))
       (when (>= diff 0.005)
         (message (format "load time for %s: %f" mylib diff))))))
-(advice-add 'load-library :around #'load-library--around)
-(advice-add 'require :around #'load-library--around)
+
+(nobreak
+ (advice-add 'load-library :around #'load-library--around)
+ (advice-add 'require :around #'load-library--around))
 
 (nobreak (require 'wgh-theme))
 (load-theme 'wgh)
