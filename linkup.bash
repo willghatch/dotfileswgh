@@ -89,6 +89,7 @@ function linkSundries() {
     mklink $dpath/external/gtk/gtk-adb $HOME/.themes/gtk-adb
     mklink $dpath/xmonad.hs $HOME/.xmonad/xmonad.hs
     mklink $dpath/elinks/elinks.conf $HOME/.elinks/elinks.conf
+    mkdir -p $HOME/.mozilla/firefox/profiles.ini
     mklink $dpath/firefox-profiles.ini $HOME/.mozilla/firefox/profiles.ini
 }
 
