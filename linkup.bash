@@ -21,6 +21,7 @@ dotfiles=(
     tigrc
     racketrc
     npmrc
+    keynavrc
 )
 
 function die() {
