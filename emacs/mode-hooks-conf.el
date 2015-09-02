@@ -2,6 +2,8 @@
   (mapcar (lambda (hook) (add-hook hook fun)) hooklist))
 
 (add-to-list 'auto-mode-alist '("\\.zsh\\'" . shell-script-mode))
+(add-to-list 'auto-mode-alist '("PKGBUILD" . shell-script-mode))
+(add-to-list 'auto-mode-alist '("\\.install" . shell-script-mode))
 
 (add-hook 'after-save-hook 'executable-make-buffer-file-executable-if-script-p)
 
