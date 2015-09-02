@@ -75,6 +75,8 @@ if filereadable($DOTFILESWGH . "/external/vim/Vundle.vim/README.md")
     Plugin 'tpope/vim-tbone'
     Plugin 'tpope/vim-eunuch'
     Plugin 'tpope/vim-sleuth'
+    Plugin 'kana/vim-textobj-user'
+    Plugin 'rhysd/vim-textobj-anyblock'
     "Plugin 'tpope/vim-afterimage'
     "Plugin 'tpope/vim-commentary'
     "Plugin 'tpope/vim-abolish'
@@ -94,7 +96,7 @@ if filereadable($DOTFILESWGH . "/external/vim/Vundle.vim/README.md")
     Plugin 'vim-scripts/paredit.vim'
     "Plugin 'luochen1990/rainbow'
     Plugin 'pelodelfuego/vim-swoop'
-    Plugin 'terryma/vim-multiple-cursors'
+    "Plugin 'terryma/vim-multiple-cursors'
     call vundle#end()
     " to run the vundle installer, run :PluginInstall
 
