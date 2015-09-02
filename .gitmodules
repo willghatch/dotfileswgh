@@ -26,3 +26,6 @@
 	path = external/firefox/dactyl
 	url = https://github.com/5digits/dactyl.git
 	ignore = dirty
+[submodule "external/misc/keynav"]
+	path = external/misc/keynav
+	url = https://github.com/jordansissel/keynav.git
