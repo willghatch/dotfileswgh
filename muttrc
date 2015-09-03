@@ -69,6 +69,8 @@ unset resolve # don't try to go to the next message after an operation
 #		pager		text viewer
 #
 
+bind editor <Tab> complete-query
+bind editor ^T complete
 
 # unbind all letters in index - I don't want to accidentally do things
 bind index a noop
