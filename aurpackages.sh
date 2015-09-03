@@ -12,4 +12,6 @@ pa pacaur
 pa xkbset
 pa ledmon
 #pa trayer-srg
+pa khal
+pa khard-git
 
