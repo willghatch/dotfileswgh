@@ -17,6 +17,7 @@
 (in 'auto-compile)
 (in 'evil-surround)
 (in 'evil-search-highlight-persist)
+(in 'evil-textobj-anyblock)
 (in 'evil-terminal-cursor-changer)
 (in 'evil-anzu)
 (in 'yafolding)

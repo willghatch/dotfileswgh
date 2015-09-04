@@ -148,6 +148,7 @@
  (global-evil-surround-mode 1)
  (require 'evil-textobj-between)
  (require 'evil-search-highlight-persist)
+ (require 'evil-textobj-anyblock)
  (global-evil-search-highlight-persist 1)
  (require 'on-parens)
 

@@ -277,6 +277,8 @@
 (define-key evil-inner-text-objects-map "a" 'evil-inner-arg)
 (define-key evil-outer-text-objects-map "a" 'evil-outer-arg)
 (define-key evil-inner-text-objects-map "e" 'er/expand-region)
+(define-key evil-inner-text-objects-map "b" 'evil-textobj-anyblock-inner-block)
+(define-key evil-outer-text-objects-map "b" 'evil-textobj-anyblock-a-block)
 
 ;; Normal state switch!
 (key-chord-define evil-insert-state-map (kbd "kj") 'evil-normal-state)
