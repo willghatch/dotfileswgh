@@ -60,4 +60,6 @@ texlive-bin
 
 # for teensy programming (IE ergodox)
 pm avr-binutils avr-gcc avr-libc
+# for mkfs.vfat
+pm dosfstools
 
