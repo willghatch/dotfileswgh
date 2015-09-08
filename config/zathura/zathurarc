@@ -1,0 +1,9 @@
+
+map j scroll half-down
+map k scroll half-up
+map J scroll down
+map K scroll up
+map r recolor
+map R rotate
+map <C-r> reload
+

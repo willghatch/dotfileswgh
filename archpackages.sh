@@ -23,7 +23,8 @@ pm emacs
 pm xorg konsole xterm xorg-xinit arandr bashrun ttf-dejavu xclip
 pm python python2 python-pip python2-pip ghc cabal-install racket nodejs npm
 pm firefox
-pm sshfs zip unzip evince tig
+pm sshfs zip unzip tig
+pm zathura zathura-pdf-poppler zathura-ps zathura-djvu
 
 pm \
 pkgfile \
