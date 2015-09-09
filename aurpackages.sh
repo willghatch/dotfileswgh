@@ -15,3 +15,6 @@ pa ledmon
 pa khal
 pa khard-git
 
+# I don't actually care, but hey, let's quiet those gtk errors
+pa gtk-engine-unico
+

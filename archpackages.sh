@@ -73,3 +73,8 @@ texlive-bin
 pm avr-binutils avr-gcc avr-libc
 # for mkfs.vfat
 pm dosfstools
+
+# for xdg-open type stuff
+pm perl-file-mimeinfo
+# because it's decent and small, so it can be the default file manager
+pm pcmanfm
