@@ -82,5 +82,5 @@ fi
 
 to_exec=$(eval "echo \$$1")
 shift
-exec "$to_exec" "$@"
+exec $to_exec "$@"
 
