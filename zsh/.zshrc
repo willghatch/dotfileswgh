@@ -128,6 +128,7 @@ if ! zgen saved; then
     zgen load skx/sysadmin-util
     #zgen load ehamberg/zsh-cabal-completion
     zgen load zsh-users/zsh-syntax-highlighting
+    zgen load racket/shell-completion
 
     echo "saving zgen init file"
     zgen save
