@@ -121,6 +121,7 @@ if ! zgen saved; then
     zgen load zsh-users/zsh-history-substring-search
     zgen load hchbaw/opp.zsh
     zgen load zsh-users/zaw
+    zgen load willghatch/zsh-saneopt
     zgen load willghatch/zsh-hooks
     zgen load willghatch/zsh-megaprompt
     zgen load willghatch/zsh-snippets
