@@ -35,13 +35,6 @@ source $WGHHOME/dotfileswgh/bazsh/common.sh
 typeset -U PATH
 fpath=($fpath $DOTFILESWGH/zsh/completion/)
 
-CDR_DIR=$HOME/.cache/cdr
-mkdir -p $CDR_DIR
-autoload -Uz chpwd_recent_dirs cdr
-autoload -U add-zsh-hook
-add-zsh-hook chpwd chpwd_recent_dirs
-zstyle ':chpwd:*' recent-dirs-file $CDR_DIR/recent-dirs
-
 xclip-to-zsh(){
     BUFFER="${LBUFFER}$(xclip -o -selection clipboard)${RBUFFER}"
 }; zle -N xclip-to-zsh
@@ -120,6 +113,7 @@ if ! zgen saved; then
     echo "zgen not set up -- cloning repos"
     zgen load zsh-users/zsh-history-substring-search
     zgen load hchbaw/opp.zsh
+    zgen load willghatch/zsh-cdr
     zgen load zsh-users/zaw
     zgen load willghatch/zsh-saneopt
     zgen load willghatch/zsh-hooks
