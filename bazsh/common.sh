@@ -22,6 +22,24 @@ PATH=$DOTFILESWGH/dotlocal/commands:$WGHHOME/wghsrv_scripts:$DOTFILESWGH/command
 unset MANPATH # so I can use manpath command at end here
 export MANPATH=/usr/share/man:/usr/local/man:/usr/local/share/man:/usr/X11R6/man:/opt/man:$HROOT/usr/share/man:$HROOT/share/man:$NPM_DIR/share/man:$(manpath)
 
+# XDG basedir spec
+# I'm putting the defaults all here as reference
+# Having the read-only path to search for config and data is *awesome*,
+# but unfortunately most things ignore them and only use data/config_home.
+#
+# writable data location
+#XDG_DATA_HOME=$HOME/.local/share
+# read-only but searched data locations
+#XDG_DATA_DIRS=/usr/local/share/:/usr/share/
+XDG_DATA_DIRS=$DOTFILESWGH/local/share/:/usr/local/share/:/usr/share/
+# writable config location
+#XDG_CONFIG_HOME=$HOME/.config
+# read-only but searched config locations
+#XDG_CONFIG_DIRS=/etc/xdg
+XDG_CONFIG_DIRS=$DOTFILESWGH/config:/etc/xdg
+# writable cache dir
+#XDG_CACHE_HOME=$HOME/.cache
+
 # themes to ease eye strain
 export GTK_THEME=gtk-adb
 export GTK2_RC_FILES=$DOTFILESWGH/gtk2rc-dark
