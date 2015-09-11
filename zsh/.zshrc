@@ -221,6 +221,8 @@ insert-last-word-left-indexed(){
     zle complete-word
 }; zle -N insert-last-word-left-indexed
 
+source $DOTFILESWGH/zsh/zaw-sources/todoman-zaw.zsh
+
 bindkey -M viins '^[h' completionkey
 bindkey-to-prefix-map completionkey "l" insert-last-word-left-indexed
 bindkey-to-prefix-map completionkey "L" insert-last-word
