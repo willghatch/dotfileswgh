@@ -106,6 +106,7 @@ compinit-widget(){
     compinit -d $COMPDUMPFILE -i
 }; zle -N compinit-widget
 
+ZAW_MPC_COMMAND="mpc --port 6637"
 
 ZGEN_DIR=$DOTFILESWGH/dotlocal/zsh/zgen
 source $DOTFILESWGH/external/zsh/zgen/zgen.zsh
@@ -115,6 +116,7 @@ if ! zgen saved; then
     zgen load hchbaw/opp.zsh
     zgen load willghatch/zsh-cdr
     zgen load zsh-users/zaw
+    zgen load willghatch/zsh-zaw-mpd
     zgen load willghatch/zsh-saneopt
     zgen load willghatch/zsh-hooks
     zgen load willghatch/zsh-megaprompt
