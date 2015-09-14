@@ -83,6 +83,9 @@ function mkSundries() {
     mkdir -p $HOME/.elinks
     mkdir -p $HOME/.themes
     mkdir -p $dpath/dotlocal/firefox-default-profile/extensions
+    # dirs for mpd
+    mkdir -p $HOME/.cache/mpd/playlists
+    mkdir -p $HOME/musc-local
 }
 
 function linkSundries() {

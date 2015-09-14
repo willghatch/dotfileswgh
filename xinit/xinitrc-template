@@ -20,6 +20,7 @@ tic $DOTFILESWGH/xterm-256color-italic.terminfo
 # good trayer command
 #trayer --edge top --align right --width 10 --height 12 --transparent true --alpha 255 &
 dunst &
+mpd &
 xcompmgr &
 nm-applet &
 blueman-applet &
