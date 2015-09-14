@@ -7,3 +7,10 @@ map r recolor
 map R rotate
 map <C-r> reload
 
+# guioptions --
+# c = command line
+# s = statusbar
+# h = vertical scrollbar
+# v = horizontal scrollbar
+set guioptions cshv
+
