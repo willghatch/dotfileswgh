@@ -270,6 +270,7 @@ bindkey -M vicmd 'sG' vi-goto-mark-line
 bindkey -r -M vicmd 't'
 bindkey -M vicmd 'tsc' compinit-widget
 define-prefix-command spacemap
+bindkey -M viins '^@' zaw
 bindkey -M viins '^[ ' spacemap
 bindkey-to-prefix-map spacemap '' zaw
 bindkey-to-prefix-map spacemap "r" zaw-history
