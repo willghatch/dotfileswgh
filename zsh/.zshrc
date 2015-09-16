@@ -117,6 +117,7 @@ if ! zgen saved; then
     zgen load willghatch/zsh-cdr
     zgen load zsh-users/zaw
     zgen load willghatch/zsh-zaw-mpd
+    zgen load willghatch/zsh-zaw-todoman
     zgen load willghatch/zsh-saneopt
     zgen load willghatch/zsh-hooks
     zgen load willghatch/zsh-megaprompt
@@ -222,8 +223,6 @@ insert-last-word-left-indexed(){
     LBUFFER="${LBUFFER}!!${index}"
     zle complete-word
 }; zle -N insert-last-word-left-indexed
-
-source $DOTFILESWGH/zsh/zaw-sources/todoman-zaw.zsh
 
 bindkey -M viins '^[h' completionkey
 bindkey-to-prefix-map completionkey "l" insert-last-word-left-indexed
