@@ -124,6 +124,8 @@ if ! zgen saved; then
     zgen load willghatch/zsh-snippets
     zgen load willghatch/zsh-grml-funcs
     zgen load willghatch/vzsh
+    zgen load termoshtt/zaw-systemd
+    #zgen load junkblocker/calibre-zaw-source
     #zgen load tarrasch/zsh-colors
     #zgen load tarrasch/zsh-bd
     #zgen load tarrasch/zsh-functional
