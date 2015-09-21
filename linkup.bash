@@ -74,6 +74,8 @@ function mkSundries() {
 # Make sundry directories and files so things (especially vim) don't complain
 # and stuff that I just like to be there in general
     mkdir -p $HOME/.cache/vimtmp
+    # the cache could hold sensitive stuff
+    chmod 700 $HOME/.cache
     mkdir -p $HOME/dl # my default download directory
     mkdir -p $HOME/vsvr
     mkdir -p $HOME/tmp
