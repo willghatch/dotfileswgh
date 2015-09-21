@@ -251,7 +251,10 @@ genGlobalKeys = function(modkey)
 
       --awful.key({ modkey, "Mod1"    }, "b", function () awful.util.spawn("dwb") end),
       awful.key({ modkey,           }, "q", function () awful.util.spawn("vlaunch lockscreen") end),
-      awful.key({ modkey,    "Mod1" }, "a", function () awful.util.spawn("arandr") end)
+      awful.key({ modkey,    "Mod1" }, "a", function () awful.util.spawn("arandr") end),
+      awful.key({ hyperkey,         }, "m", function () awful.util.spawn("vlaunch volmute") end),
+      awful.key({ hyperkey,         }, "u", function () awful.util.spawn("vlaunch volup") end),
+      awful.key({ hyperkey,         }, "d", function () awful.util.spawn("vlaunch voldown") end)
    ) -- initial globalkeys ends here
 
 -- I don't want these keys...
