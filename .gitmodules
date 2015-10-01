@@ -29,3 +29,6 @@
 [submodule "external/misc/keynav"]
 	path = external/misc/keynav
 	url = https://github.com/jordansissel/keynav.git
+[submodule "external/misc/rootgit-tools"]
+	path = external/misc/rootgit-tools
+	url = https://github.com/willghatch/rootgit-tools
