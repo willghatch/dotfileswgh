@@ -133,10 +133,10 @@ bind pager s noop
 bind pager ss save-message
 bind pager sj next-page
 bind pager sk previous-page
-bind pager j next-line
-bind pager k previous-line
-bind pager J next-undeleted
-bind pager K previous-undeleted
+bind pager j half-down
+bind pager k half-up
+bind pager J next-line
+bind pager K previous-line
 bind pager w next-undeleted
 bind pager b previous-undeleted
 bind pager <space>j next-page
@@ -158,8 +158,8 @@ bind pager U undelete-message
 
 bind index j next-undeleted
 bind index k previous-undeleted
-bind index <space>j next-page
-bind index <space>k previous-page
+bind index J next-page
+bind index K previous-page
 bind index sj next-page
 bind index sk previous-page
 bind index G last-entry
