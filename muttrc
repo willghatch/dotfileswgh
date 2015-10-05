@@ -160,6 +160,8 @@ bind index j next-undeleted
 bind index k previous-undeleted
 bind index J next-page
 bind index K previous-page
+bind index n next-unread
+bind index p previous-unread
 bind index sj next-page
 bind index sk previous-page
 bind index G last-entry
