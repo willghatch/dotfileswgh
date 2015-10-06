@@ -1,3 +1,5 @@
+-- vicious widget registration:
+-- vicious.register(widget, wtype, format, interval, warg)
 
 -- {{{ Wibox
 -- Create a textclock widget
@@ -21,7 +23,7 @@ vicious.register(mpdwidget, vicious.widgets.mpd,
 -- Initialize widget
 memTextWidget = wibox.widget.textbox()
 -- Register widget
-vicious.register(memTextWidget, vicious.widgets.mem, "RAM: $1%", 13)
+vicious.register(memTextWidget, vicious.widgets.mem, "RAM: $1% ")
 
 -- Initialize widget
 memwidget = awful.widget.progressbar()
@@ -40,7 +42,7 @@ vicious.register(memwidget, vicious.widgets.mem, "$1", 13)
 -- Initialize widget
 cpuTextWidget = wibox.widget.textbox()
 -- Register widget
-vicious.register(cpuTextWidget, vicious.widgets.cpu, "CPU: $1%")
+vicious.register(cpuTextWidget, vicious.widgets.cpu, "CPU: $1% | ")
 
 -- this CPU widget is full of crap.
 ---- Initialize widget
@@ -54,46 +56,14 @@ vicious.register(cpuTextWidget, vicious.widgets.cpu, "CPU: $1%")
 --vicious.register(cpuwidget, vicious.widgets.cpu, "$1")
 
 --volume widget
---volume_widget = wibox.widget.textbox()
---volume_widget:set_align("right")
+volumewidget = wibox.widget.textbox()
+volumewidget:set_align("right")
+vicious.register(volumewidget, vicious.widgets.volume, "Vol: $1% $2 | ", 1, "Master")
 
---function update_volume(widget)
---   local fd = io.popen("amixer sget Master")
---   local status = fd:read("*all")
---   fd:close()
---
---   -- local volume = tonumber(string.match(status, "(%d?%d?%d)%%")) / 100
---   local volume = string.match(status, "(%d?%d?%d)%%")
---   volume = string.format("% 3d", volume)
---
---   status = string.match(status, "%[(o[^%]]*)%]")
---
---   if string.find(status, "on", 1, true) then
---      -- For the volume numbers
---      volume = volume .. "%"
---   else
---      -- For the mute button
---      volume = volume .. "M"
---
---   end
---   widget:set_markup("Vol: "..volume.."   |")
---end
---
---update_volume(volume_widget)
---
---volume_widget_timer = timer({ timeout = 0.2 })
---volume_widget_timer:connect_signal("timeout", function () update_volume(volume_widget) end)
---volume_widget_timer:start()
---volume_widget:buttons(awful.util.table.join(
---                     awful.button({ }, 1, function () awful.util.spawn("vlaunch mixer") end),
---                     awful.button({ }, 2, function () awful.util.spawn("vlaunch volmute")   end),
---                     awful.button({ }, 4, function () awful.util.spawn("vlaunch volup", false) end),
---                     awful.button({ }, 5, function () awful.util.spawn("vlaunch voldown", false) end)
---))
 
 -- battery widget
 batteryTextWidget = wibox.widget.textbox()
-vicious.register(batteryTextWidget, vicious.widgets.bat, "Bat: $2% $1", 30, "BAT0")
+vicious.register(batteryTextWidget, vicious.widgets.bat, " Bat: $2% $1", 30, "BAT0")
 
 batteryWidget = awful.widget.progressbar()
 batteryWidget:set_width(8)
@@ -183,7 +153,7 @@ for s = 1, screen.count() do
    -- Widgets that are aligned to the right
    local right_layout = wibox.layout.fixed.horizontal()
    right_layout:add(mpdwidget)
-   --right_layout:add(volume_widget)
+   right_layout:add(volumewidget)
    right_layout:add(cpuTextWidget)
    --right_layout:add(cpuwidget)
    right_layout:add(memTextWidget)
