@@ -14,9 +14,9 @@ vicious.register(mpdwidget, vicious.widgets.mpd,
                     if args["{state}"] == "Stop" then
                        return ret.." - "..fin
                     else
-                       return ret..args["{Artist}"]..' - '.. args["{Title}"]..fin
+                       return ret..args["{Artist}"]..' - '..args["{Album}"]..' - '.. args["{Title}"]..fin
                     end
-                 end, 10)
+                 end, 10, {port=6637})
 
 -- Initialize widget
 memTextWidget = wibox.widget.textbox()
