@@ -2,11 +2,6 @@
 #set editor="/usr/bin/vim"
 set text_flowed=yes
 
-# source aliases
-
-source ~/dotfileswgh/pri/mutt/rc
-
-
 
 set header_cache=~/.mutt/cache/headers
 set message_cachedir=~/.mutt/cache/bodies
@@ -194,6 +189,9 @@ macro index Ag '<change-folder>imaps://imap.gmail.com<enter>'
 macro index Ay '<change-folder>imaps://imap.mail.yahoo.com<enter>'
 macro index Al "<change-folder>/var/spool/mail/$USER<enter>"
 
+
+
+source ~/dotfileswgh/pri/mutt/rc
 
 
 
