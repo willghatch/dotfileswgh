@@ -143,6 +143,7 @@ bind pager r noop
 bind pager rr reply
 bind pager ra group-reply
 bind pager rl list-reply
+bind pager n search-next
 bind pager N search-opposite
 bind pager a view-attachments
 bind pager A display-address
@@ -153,10 +154,10 @@ bind pager U undelete-message
 
 bind index j next-undeleted
 bind index k previous-undeleted
-bind index J next-page
-bind index K previous-page
-bind index n next-unread
-bind index p previous-unread
+#bind index J next-page
+#bind index K previous-page
+bind index J next-unread
+bind index K previous-unread
 bind index sj next-page
 bind index sk previous-page
 bind index G last-entry
@@ -171,6 +172,8 @@ bind index a view-attachments
 bind index A display-address
 bind index f change-folder
 bind index m mail # compose new mail
+macro index <space>/b /~b<space>
+bind index n search-next
 bind index N search-opposite
 bind index r imap-fetch-mail # the other fetch-mail uses pop
 bind index tis sync-mailbox
