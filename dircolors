@@ -70,6 +70,7 @@ STICKY_OTHER_WRITABLE 45;34;01
 *lzh 38;5;094
 *zip 38;5;094
 *rar 38;5;094
+*7z 38;5;094
 *z 38;5;094
 *Z 38;5;094
 *gz 38;5;094
@@ -90,12 +91,17 @@ STICKY_OTHER_WRITABLE 45;34;01
 
 # Video formats -- brighter than images
 *mp4 38;5;118
+*mkv 38;5;118
+*m4v 38;5;118
+*avi 38;5;118
+*ogv 38;5;118
 
 # sound
 .flac 38;5;037
 .wav 38;5;037
 .mp3 38;5;036
 .ogg 38;5;036
+.oga 38;5;036
 
 # book/pdf
 .epub 38;5;190
