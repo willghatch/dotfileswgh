@@ -175,6 +175,9 @@ ak(){
     exit
 }
 
+## recent versions of Libre Office in Arch Linux don't work without this, because they
+## switched to the upstream default of gtk3, which doesn't work because reasons.
+alias libreoffice="env SAL_USE_VCLPLUGIN=gtk libreoffice"
 
 
 #################################### Functions ###########################################
