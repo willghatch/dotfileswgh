@@ -1,0 +1,5 @@
+# number of ignorable "are you alive?" pings
+ServerAliveCountMax 3
+# number of seconds of inactivity before pinging
+ServerAliveInterval 300
+

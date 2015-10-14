@@ -35,6 +35,7 @@ function mklink() {
     then
         mv $2 ${2}.prelink
     fi
+    mkdir -p $(dirname "$2")
     ln -s $1 $2
 }
 
@@ -108,6 +109,7 @@ elif [ "s-$1" = "s-configdir" ]
 then
     linkSubdirs config .
     linkSubdirs local .
+    linkSubdirs ssh .
 elif [ "s-$1" = "s-sundries" ]
 then
     mkSundries
