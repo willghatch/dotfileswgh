@@ -48,6 +48,7 @@ ncmpc \
 espeak \
 qemu \
 network-manager-applet \
+gnome-keyring \
 blueman \
 mlocate \
 ctags \
