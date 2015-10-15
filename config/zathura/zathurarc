@@ -7,6 +7,8 @@ map r recolor
 map R rotate
 map <C-r> reload
 
+set recolor-darkcolor "#DDDDDD"
+set recolor-lightcolor "#111111"
 set recolor true
 
 # guioptions --
