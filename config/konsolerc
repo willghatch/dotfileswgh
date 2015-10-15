@@ -1,0 +1,24 @@
+[Desktop Entry]
+DefaultProfile=wgh.profile
+
+[Favorite Profiles]
+Favorites=hugetext.profile,wgh-light.profile,wgh.profile,bigtext.profile
+
+[KonsoleWindow]
+ShowMenuBarByDefault=false
+
+[MainWindow]
+Height 1080=1055
+Height 600=1055
+MenuBar=Disabled
+State=AAAA/wAAAAD9AAAAAAAAAvoAAAQfAAAABAAAAAQAAAAIAAAACPwAAAAA
+ToolBarsMovable=Disabled
+Width 1920=1914
+Width 800=1914
+
+[Profile Shortcuts]
+Ctrl+Alt+D=wgh.profile
+Ctrl+Alt+L=wgh-light.profile
+
+[TabBar]
+TabBarVisibility=ShowTabBarWhenNeeded
