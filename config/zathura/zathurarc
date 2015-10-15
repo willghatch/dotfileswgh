@@ -7,6 +7,8 @@ map r recolor
 map R rotate
 map <C-r> reload
 
+set recolor true
+
 # guioptions --
 # c = command line
 # s = statusbar
