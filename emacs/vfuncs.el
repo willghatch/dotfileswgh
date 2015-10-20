@@ -159,4 +159,13 @@ quit emacs."
   (ansi-format-decode (point-min) (point-max))
   (backspace-overstrike-decode (point-min) (point-max)))
 
+(defun light-theme ()
+  (interactive)
+  (load-theme 'tango)
+  (disable-theme 'wgh))
+(defun dark-theme ()
+  (interactive)
+  (load-theme 'wgh)
+  (disable-theme 'tango))
+
 (provide 'vfuncs)
