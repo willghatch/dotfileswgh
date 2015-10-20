@@ -17,9 +17,12 @@ fi
 
 COMPDUMPFILE=$HOME/.cache/zshcompdump
 ZSH_COMPDUMP=$COMPDUMPFILE
-autoload -Uz compinit
+# autoload compinit to get the compdef function
 # compinit -d <dumpfile> [ -u to use insecure dirs, -i to ignore SILENTLY, -C to skip security check ]
-alias compinit="compinit -d $COMPDUMPFILE -i"
+COMPINIT_COMMAND="compinit -d $COMPDUMPFILE -i"
+# shadow compinit to prevent plugins from calling it, because it is SLOW!
+compdef(){}
+compinit(){}
 
 HISTSIZE=1000
 SAVEHIST=1000
@@ -103,11 +106,12 @@ jd(){
 }
 
 compinit-widget(){
-    compinit -d $COMPDUMPFILE -i
+    ${=COMPINIT_COMMAND}
 }; zle -N compinit-widget
 
 ZAW_MPC_COMMAND="mpc --port 6637"
 
+ZGEN_AUTOLOAD_COMPINIT=false
 ZGEN_DIR=$DOTFILESWGH/dotlocal/zsh/zgen
 source $DOTFILESWGH/external/zsh/zgen/zgen.zsh
 if ! zgen saved; then
@@ -316,7 +320,10 @@ MEGAPROMPT_DISPLAY_P[tty]=false
 
 eval $(dircolors -b $DOTFILESWGH/dircolors)
 
-compinit -d $COMPDUMPFILE -i
+unfunction compinit
+unfunction compdef
+autoload -Uz compinit
+${=COMPINIT_COMMAND}
 
 if [[ -z "$KONSOLE_DBUS_SESSION" ]]; then
     # currently some programs use the existance of this variable to know
