@@ -2,7 +2,7 @@
 DefaultProfile=wgh.profile
 
 [Favorite Profiles]
-Favorites=wgh-light.profile,hugetext.profile,bigtext.profile,wgh.profile
+Favorites=wgh.profile,bigtext.profile,wgh-light.profile,hugetext.profile
 
 [KonsoleWindow]
 ShowMenuBarByDefault=false
