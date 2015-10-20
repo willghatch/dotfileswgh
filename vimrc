@@ -1,6 +1,5 @@
 set nocompatible " be improved always
 
-colorscheme elflord
 
 set number       " Display line numbers
 "set relativenumber " Show line numbers relative to current line
@@ -367,12 +366,25 @@ vnoremap <space>ys "*y
 
 
 " Highlighting
-highlight Comment cterm=italic
-highlight ColorColumn ctermbg=17
-highlight CursorLine cterm=NONE ctermbg=233
-highlight CursorColumn ctermbg=233
-highlight Search ctermbg=20 ctermfg=2
+function! SetDarkTheme()
+    colorscheme elflord
+    highlight Comment cterm=italic
+    highlight ColorColumn ctermbg=17
+    highlight CursorLine cterm=NONE ctermbg=233
+    highlight CursorColumn ctermbg=233
+    highlight Search ctermbg=20 ctermfg=2
+endfunction
+command -nargs=0 DarkTheme call SetDarkTheme()
 
+function! SetLightTheme()
+    colorscheme morning
+    highlight Comment cterm=italic
+    highlight CursorLine cterm=NONE ctermbg=247
+    highlight CursorColumn ctermbg=247
+endfunction
+command -nargs=0 LightTheme call SetLightTheme()
+
+call SetDarkTheme()
 
 if filereadable($DOTFILESWGH . "/dotlocal/vimrc")
     source $DOTFILESWGH/dotlocal/vimrc
