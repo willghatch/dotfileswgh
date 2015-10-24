@@ -27,7 +27,7 @@
   (interactive "p")
   (if (on-parens-on-close?)
       (self-insert-command arg)
-    (racket-insert-closing-paren)))
+    (racket-insert-closing)))
 (add-hook 'racket-mode-hook
           (lambda ()
             (define-key racket-mode-map "[" nil)
