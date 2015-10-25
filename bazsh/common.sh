@@ -143,23 +143,23 @@ alias hloc="locate --database $HOME/.cache/hloc.db"
 alias hupdb="updatedb --output $HOME/.cache/hloc.db --database-root $HOME --require-visibility no --add-prunepaths $HOME/.snapshot"
 export LOCATE_PATH=$HOME/.cache/hloc.db
 
-alias tm="tmux"
-alias tma="tmux attach-session -t"
-alias tmad="tmux attach-session -d -t"
-alias tml="tmux list-sessions"
-alias tmr="tmux rename-session"
-alias tmrw="tmux rename-window"
-alias tmd="tmux detach"
+alias tm="tmux -f $DOTFILESWGH/tmux.conf"
+alias tma="tmux -f $DOTFILESWGH/tmux.conf attach-session -t"
+alias tmad="tmux -f $DOTFILESWGH/tmux.conf attach-session -d -t"
+alias tml="tmux -f $DOTFILESWGH/tmux.conf list-sessions"
+alias tmr="tmux -f $DOTFILESWGH/tmux.conf rename-session"
+alias tmrw="tmux -f $DOTFILESWGH/tmux.conf rename-window"
+alias tmd="tmux -f $DOTFILESWGH/tmux.conf detach"
 function tmn()
 {
     if test -n "$TMUX"
     then
         pushd ~
-        TMUX="" tmux new-session -d -s $@
-        tmux switch-client -t $@
+        TMUX="" tmux -f $DOTFILESWGH/tmux.conf new-session -d -s $@
+        tmux -f $DOTFILESWGH/tmux.conf switch-client -t $@
         popd
     else
-        tmux new-session -s $@
+        tmux -f $DOTFILESWGH/tmux.conf new-session -s $@
     fi
 }
 
