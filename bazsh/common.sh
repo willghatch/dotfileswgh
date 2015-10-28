@@ -61,7 +61,7 @@ else
 fi
 
 export XDG_DOWNLOAD_DIR="$HOME/dl"
-export VLAUNCHRC="$DOTFILESWGH/dotlocal/vlaunchrc"
+export VLAUNCHRC="$DOTFILESWGH/vlaunchrc"
 
 
 # For color in less (for man pages)

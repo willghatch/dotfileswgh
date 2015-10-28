@@ -1,0 +1,8 @@
+
+terminal="konsole --profile ${KONSOLE_PROFILE:-wgh}"
+
+
+if [ -f $DOTFILESWGH/dotlocal/vlaunchrc ]; then
+    source $DOTFILESWGH/dotlocal/vlaunchrc
+fi
+
