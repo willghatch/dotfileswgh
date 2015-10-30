@@ -5,6 +5,25 @@
 -- Create a textclock widget
 mytextclock = awful.widget.textclock()
 
+
+
+get_unread_count = function()
+    local io = { popen = io.popen }
+    local s = io.popen("unread-gmail-count all")
+    local str = ''
+
+    for line in s:lines() do
+        str = str .. "["..line.."] "
+    end
+    s:close()
+    return "| mail: " .. str
+end
+email_widget = wibox.widget.textbox()
+email_widget:set_text(get_unread_count())
+email_timer = timer({ timeout = 60 })
+email_timer:connect_signal("timeout", function() email_widget:set_text(get_unread_count()) end)
+email_timer:start()
+
 -- create some vicious widgets
 -- Initialize widget
 mpdwidget = wibox.widget.textbox()
@@ -18,7 +37,7 @@ vicious.register(mpdwidget, vicious.widgets.mpd,
                     else
                        return ret..args["{Artist}"]..' - '..args["{Album}"]..' - '.. args["{Title}"]..fin
                     end
-                 end, 10, {port=6637})
+                 end, 3, {port=6637})
 
 -- Initialize widget
 memTextWidget = wibox.widget.textbox()
@@ -58,7 +77,7 @@ vicious.register(cpuTextWidget, vicious.widgets.cpu, "CPU: $1% | ")
 --volume widget
 volumewidget = wibox.widget.textbox()
 volumewidget:set_align("right")
-vicious.register(volumewidget, vicious.widgets.volume, "Vol: $1% $2 | ", 1, "Master")
+vicious.register(volumewidget, vicious.widgets.volume, " Vol: $1% $2 | ", 1, "Master")
 
 
 -- battery widget
@@ -152,14 +171,15 @@ for s = 1, screen.count() do
 
    -- Widgets that are aligned to the right
    local right_layout = wibox.layout.fixed.horizontal()
+   right_layout:add(email_widget)
    right_layout:add(mpdwidget)
-   right_layout:add(volumewidget)
    right_layout:add(cpuTextWidget)
    --right_layout:add(cpuwidget)
    right_layout:add(memTextWidget)
    right_layout:add(memwidget)
    right_layout:add(batteryTextWidget)
    right_layout:add(batteryWidget)
+   right_layout:add(volumewidget)
    if s == 1 then right_layout:add(wibox.widget.systray()) end
    right_layout:add(mytextclock)
    right_layout:add(mylayoutbox[s])
