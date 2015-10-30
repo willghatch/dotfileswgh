@@ -4,4 +4,4 @@
 # to set gtk theme).
 FFX=${FFX:-firefox}
 
-exec nice -n 5 $FFX
+exec nice -n 5 $FFX "$@"

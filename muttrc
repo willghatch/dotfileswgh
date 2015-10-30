@@ -138,6 +138,11 @@ bind pager <space>j next-page
 bind pager <space>k previous-page
 bind pager G bottom
 bind pager gg top
+bind pager H display-toggle-weed # show headers
+macro pager hh '|elinks -force-html<enter>'
+macro attach hh '|elinks -force-html<enter>'
+macro attach hf "<pipe-entry>cat >/tmp/html-mutt.html && ffx --new-tab /tmp/html-mutt.html<enter>"
+macro pager hf "<pipe-entry>cat >/tmp/html-mutt.html && ffx --new-tab /tmp/html-mutt.html<enter>"
 bind pager q exit
 bind pager r noop
 bind pager rr reply
@@ -184,9 +189,6 @@ bind index tsi flag-message
 bind index tsr toggle-new
 bind index tsf set-flag
 
-macro index H '|elinks -force-html<enter>'
-macro pager H '|elinks -force-html<enter>'
-macro attach H '|elinks -force-html<enter>'
 
 macro index Ag '<change-folder>imaps://imap.gmail.com<enter>'
 macro index Ay '<change-folder>imaps://imap.mail.yahoo.com<enter>'
