@@ -3,9 +3,9 @@
 set text_flowed=yes
 
 
-set header_cache=~/.mutt/cache/headers
-set message_cachedir=~/.mutt/cache/bodies
-set certificate_file=~/.mutt/certificates
+set header_cache=~/.cache/mutt/headers
+set message_cachedir=~/.cache/mutt/bodies
+set certificate_file=~/.cache/mutt/certificates
 
 set move = no
 
@@ -198,6 +198,32 @@ macro index Al "<change-folder>/var/spool/mail/$USER<enter>"
 
 source ~/dotfileswgh/pri/mutt/rc
 
+
+set status_format="Unread:%u Box:%f Msgs:%m Flagged:%F Boxes-with-new:%b Postponed: %p Bytes-used:%l Pattern:%V Status:%r"
+# variables
+#%b 	number of mailboxes with new mail *
+#%d 	number of deleted messages *
+#%f 	the full pathname of the current mailbox
+#%F 	number of flagged messages *
+#%h 	local hostname
+#%l 	size (in bytes) of the current mailbox *
+#%L 	size (in bytes) of the messages shown (i.e., which match the current limit) *
+#%m 	the number of messages in the mailbox *
+#%M 	the number of messages shown (i.e., which match the current limit) *
+#%n 	number of new messages in the mailbox *
+#%o 	number of old unread messages *
+#%p 	number of postponed messages *
+#%P 	percentage of the way through the index
+#%r 	modified/read-only/won't-write/attach-message indicator, according to $status_chars
+#%s 	current sorting mode ($sort)
+#%S 	current aux sorting method ($sort_aux)
+#%t 	number of tagged messages *
+#%u 	number of unread messages *
+#%v 	Mutt version string
+#%V 	currently active limit pattern, if any *
+#%>X 	right justify the rest of the string and pad with “X”
+#%|X 	pad to the end of the line with “X”
+#%*X 	soft-fill with character “X” as pad 
 
 
 

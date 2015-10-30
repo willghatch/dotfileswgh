@@ -11,7 +11,7 @@ mpdwidget = wibox.widget.textbox()
 -- Register widget
 vicious.register(mpdwidget, vicious.widgets.mpd,
                  function (mpdwidget, args)
-                    local ret = "MPD: "
+                    local ret = "| MPD: "
                     local fin = "   |   "
                     if args["{state}"] == "Stop" then
                        return ret.." - "..fin
