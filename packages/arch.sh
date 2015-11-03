@@ -74,6 +74,8 @@ texlive-bin
 pm avr-binutils avr-gcc avr-libc
 # for mkfs.vfat
 pm dosfstools
+# for mounting iso images without root
+pm fuseiso
 
 # for xdg-open type stuff
 pm perl-file-mimeinfo
