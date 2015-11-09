@@ -108,6 +108,7 @@ alias ags="ag --color-match '1;36' --smart-case"
 alias pyg="pygmentize -g --" # colored cat, with pygments installed with pip
 alias feh="feh --scale-down" # think this is always the default I want...
 alias atcat="at -c"
+alias o="xdg-open"
 
 alias make="time nice make" # this is always what I actually want
 # parallel make
