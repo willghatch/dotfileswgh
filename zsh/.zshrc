@@ -243,7 +243,7 @@ bindkey -M vicmd '/' search-forward-current-command
 bindkey -M vicmd '?' search-backward-current-command
 bindkey -M vicmd 'n' search-forward-current-command-repeat
 bindkey -M vicmd 'N' search-backward-current-command-repeat
-bindToMaps '^[c' execute-named-cmd $(bindkey -l)
+bindToMaps '^[c' zaw-widgets $(bindkey -l)
 bindkey -r -M viins '\e'
 bindkey -M viins 'jk' vi-cmd-mode
 bindkey -M viins 'kj' vi-cmd-mode
