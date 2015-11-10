@@ -165,6 +165,7 @@ bind index J next-unread
 bind index K previous-unread
 bind index sj next-page
 bind index sk previous-page
+bind index ss save-message
 bind index G last-entry
 bind index gg first-entry
 bind index \Chb help
