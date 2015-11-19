@@ -127,6 +127,10 @@
  ;;; secondarily important
  (load-library "xclip-conf")
  (unless (display-graphic-p)
+   (setq evil-normal-state-cursor 'box); █
+   (setq evil-visual-state-cursor 'box); █
+   (setq evil-insert-state-cursor 'bar); ⎸
+   (setq evil-emacs-state-cursor 'hbar); _
    (require 'evil-terminal-cursor-changer))
 
  ;; elscreen must start before other mode-line stuff, or it wouldn't be this high...
