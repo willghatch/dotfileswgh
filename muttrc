@@ -196,6 +196,8 @@ macro index Ay '<change-folder>imaps://imap.mail.yahoo.com<enter>'
 macro index Al "<change-folder>/var/spool/mail/$USER<enter>"
 
 
+bind index - enter-command
+bind pager - enter-command
 
 source ~/dotfileswgh/pri/mutt/rc
 
