@@ -88,9 +88,11 @@ STICKY_OTHER_WRITABLE 45;34;01
 *xpm 38;5;154
 *tif 38;5;154
 *jpg 38;5;154
+*JPG 38;5;154
 
 # Video formats -- brighter than images
 *mp4 38;5;118
+*3gp 38;5;118
 *mkv 38;5;118
 *m4v 38;5;118
 *avi 38;5;118
