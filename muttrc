@@ -199,7 +199,8 @@ macro index Al "<change-folder>/var/spool/mail/$USER<enter>"
 bind index - enter-command
 bind pager - enter-command
 
-source ~/dotfileswgh/pri/mutt/rc
+# lame conditional sourcing...
+source `FILE=~/dotfileswgh/pri/mutt/rc; if [ ! -s "$FILE" ]; then FILE=/dev/null; fi; echo "$FILE"`
 
 
 set status_format="Unread:%u Box:%f Msgs:%m Flagged:%F Boxes-with-new:%b Postponed: %p Bytes-used:%l Pattern:%V Status:%r"
