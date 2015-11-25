@@ -1,3 +1,5 @@
+gtk-key-theme-name = "Emacs"
+
 style "default"
 {
     GtkButton::default_border                    = {0, 0, 0, 0}
