@@ -126,6 +126,7 @@ bind generic \Chb help
 bind pager i noop # was exit, what q now does
 bind pager s noop
 bind pager ss save-message
+bind pager sc copy-message
 bind pager sj next-page
 bind pager sk previous-page
 bind pager j half-down
@@ -166,6 +167,7 @@ bind index K previous-unread
 bind index sj next-page
 bind index sk previous-page
 bind index ss save-message
+bind index sc copy-message
 bind index G last-entry
 bind index gg first-entry
 bind index \Chb help
