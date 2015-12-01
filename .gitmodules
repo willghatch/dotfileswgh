@@ -32,6 +32,3 @@
 [submodule "external/misc/rootgit-tools"]
 	path = external/misc/rootgit-tools
 	url = https://github.com/willghatch/rootgit-tools
-[submodule "external/firefox/adblockplus"]
-	path = external/firefox/adblockplus
-	url = https://github.com/adblockplus/adblockplus
