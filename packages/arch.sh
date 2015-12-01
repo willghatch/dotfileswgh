@@ -81,3 +81,6 @@ pm fuseiso
 pm perl-file-mimeinfo
 # because it's decent and small, so it can be the default file manager
 pm pcmanfm
+
+# to build adblock plus
+pm python2-jinja
