@@ -17,4 +17,6 @@ clean:
 	rm -rf dactyl/downloads/
 	rm -f scrollhighlight/*.xpi
 	rm adblockplus/*.xpi
+	rm -rf adblockplus/buildtools
+	rm -rf adblockplus/adblockplusui
 
