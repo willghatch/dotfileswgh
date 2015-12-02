@@ -138,6 +138,8 @@ if ! zgen saved; then
     #zgen load ehamberg/zsh-cabal-completion
     zgen load zsh-users/zsh-syntax-highlighting
     zgen load racket/shell-completion
+    # this one doesn't seem to work...
+    #zgen load RobSis/zsh-reentry-hook
 
     echo "saving zgen init file"
     zgen save
@@ -230,6 +232,16 @@ insert-last-word-left-indexed(){
     zle complete-word
 }; zle -N insert-last-word-left-indexed
 
+toggle-konsole-theme(){
+    if [[ "light" = "$CURRENT_KONSOLE_THEME" ]]; then
+        printf "\033]50;colors=%s\a" "wgh"
+        CURRENT_KONSOLE_THEME=dark
+    else
+        printf "\033]50;colors=%s\a" "wgh-light"
+        CURRENT_KONSOLE_THEME=light
+    fi
+}; zle -N toggle-konsole-theme
+
 bindkey -M viins '^[h' completionkey
 bindkey-to-prefix-map completionkey "l" insert-last-word-left-indexed
 bindkey-to-prefix-map completionkey "L" insert-last-word
@@ -274,6 +286,7 @@ bindkey -M vicmd 'sg' vi-goto-mark
 bindkey -M vicmd 'sG' vi-goto-mark-line
 bindkey -r -M vicmd 't'
 bindkey -M vicmd 'tsc' compinit-widget
+bindkey -M vicmd 'tsl' toggle-konsole-theme
 define-prefix-command spacemap
 bindkey -M viins '^@' zaw
 bindkey -M viins '^[ ' spacemap
