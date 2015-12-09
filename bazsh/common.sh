@@ -18,7 +18,7 @@ i-am-me() {
 export HROOT=$WGHHOME/hroot
 export NPM_DIR=$DOTFILESWGH/dotlocal/npm
 export NODE_PATH="$NPM_DIR/lib/node_modules"
-PATH=$DOTFILESWGH/dotlocal/commands:$DOTFILESWGH/commands:$DOTFILESWGH/external/misc/rootgit-tools:$WGHHOME/.cabal/bin:$NPM_DIR/bin:$HROOT/bin:$HROOT/usr/bin:$HROOT/usr/local/bin:$WGHHOME/.local/bin:$WGHHOME/bin:$PATH:/usr/bin:/bin:/usr/local/bin:/sbin:/usr/sbin:/usr/local/sbin:$WGHHOME/.screenlayout
+PATH=$DOTFILESWGH/dotlocal/commands:/rootgit/bin.rootgit:/rootgit/tools.rootgit:$DOTFILESWGH/commands:$DOTFILESWGH/external/misc/rootgit-tools:$WGHHOME/.cabal/bin:$NPM_DIR/bin:$HROOT/bin:$HROOT/usr/bin:$HROOT/usr/local/bin:$WGHHOME/.local/bin:$WGHHOME/bin:$PATH:/usr/bin:/bin:/usr/local/bin:/sbin:/usr/sbin:/usr/local/sbin:$WGHHOME/.screenlayout
 unset MANPATH # so I can use manpath command at end here
 export MANPATH=/usr/share/man:/usr/local/man:/usr/local/share/man:/usr/X11R6/man:/opt/man:$HROOT/usr/share/man:$HROOT/share/man:$NPM_DIR/share/man:$(manpath)
 
@@ -290,9 +290,21 @@ then
 fi
 
 ######## Add private stuff #######
-bazsh_common_pri=$DOTFILESWGH/pri/bazsh_common
+bazsh_common_pri=$DOTFILESWGH/pri/bazshrc
 if [ -f $bazsh_common_pri ]
 then
     source $bazsh_common_pri
+fi
+
+bazsh_common_rootgit=$WGHHOME/rootgit-dotfiles/bazshrc
+if [ -f $bazsh_common_rootgit ]
+then
+    source $bazsh_common_rootgit
+fi
+
+bazsh_common_local=$DOTFILESWGH/dotlocal/bazshrc
+if [ -f $bazsh_common_local ]
+then
+    source $bazsh_common_local
 fi
 

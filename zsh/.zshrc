@@ -346,7 +346,7 @@ if [[ -z "$KONSOLE_DBUS_SESSION" ]]; then
     export KONSOLE_DBUS_SESSION=/dev/null
 fi
 
-tf=$DOTFILESWGH/dotlocal/bazshrc
+tf=$WGHHOME/rootgit-dotfiles/zshrc
 if [ -f "$tf" ]
 then
     source $tf

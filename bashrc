@@ -42,8 +42,7 @@ stty ixany # let any character restart output, not only start character
 export PS1="\[$(tput bold)\]\[$(tput setaf 6)\]\A \[$(tput setaf 7)\][\[$(tput setaf 2)\]\u\[$(tput setaf 7)\]@\[$(tput setaf 4)\]\h\[$(tput setaf 7)\]] \[$(tput setaf 4)\]\w \[$(tput setaf 7)\]\\$\[$(tput sgr0)\] "
 
 
-sourceIfExists $DOTFILESWGH/dotlocal/bazshrc
-
+sourceIfExists $WGHHOME/rootgit-dotfiles/bashrc
 sourceIfExists $DOTFILESWGH/dotlocal/bashrc
 
 
