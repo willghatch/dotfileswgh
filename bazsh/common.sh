@@ -22,6 +22,9 @@ PATH=$DOTFILESWGH/dotlocal/commands:/rootgit/bin.rootgit:/rootgit/tools.rootgit:
 unset MANPATH # so I can use manpath command at end here
 export MANPATH=/usr/share/man:/usr/local/man:/usr/local/share/man:/usr/X11R6/man:/opt/man:$HROOT/usr/share/man:$HROOT/share/man:$NPM_DIR/share/man:$(manpath)
 
+export PKG_CONFIG_PATH=$HROOT/lib/pkgconfig:/usr/local/lib/pkgconfig:/usr/lib/pkgconfig:/lib/pkgconfig
+export LD_LIBRARY_PATH=$HROOT/lib:/usr/local/lib:/usr/lib:/lib
+
 # XDG basedir spec
 # I'm putting the defaults all here as reference
 # Having the read-only path to search for config and data is *awesome*,
