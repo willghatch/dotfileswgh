@@ -5,6 +5,9 @@
 (add-to-list 'auto-mode-alist '("PKGBUILD" . shell-script-mode))
 (add-to-list 'auto-mode-alist '("\\.install" . shell-script-mode))
 
+(add-to-list 'auto-mode-alist '("\\.service" . systemd-mode))
+(add-to-list 'auto-mode-alist '("\\.socket" . systemd-mode))
+
 (add-hook 'after-save-hook 'executable-make-buffer-file-executable-if-script-p)
 
 (add-hook 'Buffer-menu-mode-hook
