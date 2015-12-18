@@ -203,7 +203,7 @@ bind pager - enter-command
 
 # lame conditional sourcing...
 source `FILE=~/dotfileswgh/pri/mutt/rc; if [ ! -s "$FILE" ]; then FILE=/dev/null; fi; echo "$FILE"`
-source `FILE=~/dotfiles-rootgit/muttrc; if [ ! -s "$FILE" ]; then FILE=/dev/null; fi; echo "$FILE"`
+source `FILE=~/rootgit-dotfiles/muttrc; if [ ! -s "$FILE" ]; then FILE=/dev/null; fi; echo "$FILE"`
 source `FILE=~/dotfileswgh/dotlocal/muttrc; if [ ! -s "$FILE" ]; then FILE=/dev/null; fi; echo "$FILE"`
 
 
