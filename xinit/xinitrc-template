@@ -26,5 +26,8 @@ nm-applet &
 blueman-applet &
 $DOTFILESWGH/external/misc/libnotifylog/libnotifylogger.py $HOME/.cache/notifications.log &
 
+# set sticky keys, don't cancel sticky keys if two keys are pressed at once, allow latch-to-lock
+#xkbset sticky -twokey latchlock
+
 exec xmonad
 
