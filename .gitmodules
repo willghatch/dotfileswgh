@@ -32,3 +32,6 @@
 [submodule "external/misc/rootgit-tools"]
 	path = external/misc/rootgit-tools
 	url = https://github.com/willghatch/rootgit-tools
+[submodule "external/misc/kbd-state-mon"]
+	path = external/misc/kbd-state-mon
+	url = https://github.com/willghatch/kbd-state-mon

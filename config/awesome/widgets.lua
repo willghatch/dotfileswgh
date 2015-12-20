@@ -6,6 +6,8 @@
 mytextclock = awful.widget.textclock()
 
 
+kbd_state_widget = wibox.widget.textbox()
+kbd_state_widget:set_text("")
 
 get_unread_count = function()
     local io = { popen = io.popen }
@@ -61,7 +63,7 @@ vicious.register(memwidget, vicious.widgets.mem, "$1", 13)
 -- Initialize widget
 cpuTextWidget = wibox.widget.textbox()
 -- Register widget
-vicious.register(cpuTextWidget, vicious.widgets.cpu, "CPU: $1% | ")
+vicious.register(cpuTextWidget, vicious.widgets.cpu, " | CPU: $1% | ")
 
 -- this CPU widget is full of crap.
 ---- Initialize widget
@@ -173,6 +175,7 @@ for s = 1, screen.count() do
    local right_layout = wibox.layout.fixed.horizontal()
    right_layout:add(email_widget)
    right_layout:add(mpdwidget)
+   right_layout:add(kbd_state_widget)
    right_layout:add(cpuTextWidget)
    --right_layout:add(cpuwidget)
    right_layout:add(memTextWidget)

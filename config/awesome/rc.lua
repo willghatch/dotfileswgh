@@ -4,6 +4,8 @@ gears = require("gears")
 awful = require("awful")
 awful.rules = require("awful.rules")
 require("awful.autofocus")
+-- so awesome-client will work
+require("awful.remote")
 -- Widget and layout library
 wibox = require("wibox")
 -- Theme handling library
