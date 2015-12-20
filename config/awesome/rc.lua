@@ -448,4 +448,6 @@ client.connect_signal("focus", function(c) c.border_color = beautiful.border_foc
 client.connect_signal("unfocus", function(c) c.border_color = beautiful.border_normal end)
 -- }}}
 
+-- Send mouse to corner so that it's not on the edge of two windows causing contention
+mouse.coords({x = 10, y = 10})
 
