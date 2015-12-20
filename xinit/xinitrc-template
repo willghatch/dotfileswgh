@@ -25,6 +25,7 @@ xcompmgr &
 nm-applet &
 blueman-applet &
 $DOTFILESWGH/external/misc/libnotifylog/libnotifylogger.py $HOME/.cache/notifications.log &
+$DOTFILESWGH/config/awesome/kbd-state-mon.sh &
 
 # set sticky keys, don't cancel sticky keys if two keys are pressed at once, allow latch-to-lock
 #xkbset sticky -twokey latchlock
