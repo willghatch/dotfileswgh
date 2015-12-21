@@ -11,7 +11,7 @@ set recolor-darkcolor "#DDDDDD"
 set recolor-lightcolor "#111111"
 set recolor true
 
-set scrollbar-fg "#222222"
+set scrollbar-fg "#333333"
 
 # guioptions --
 # c = command line
