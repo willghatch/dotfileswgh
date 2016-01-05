@@ -76,6 +76,8 @@ pm avr-binutils avr-gcc avr-libc
 pm dosfstools
 # for mounting iso images without root
 pm fuseiso
+# for keeping encrypted dirs and mounting the decrypted version
+pm encfs
 
 # for xdg-open type stuff
 pm perl-file-mimeinfo
