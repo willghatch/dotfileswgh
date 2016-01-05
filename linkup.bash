@@ -78,7 +78,8 @@ function mkSundries() {
     # the cache could hold sensitive stuff
     chmod 700 $HOME/.cache
     mkdir -p $HOME/dl # my default download directory
-    mkdir -p $HOME/vsvr
+    mkdir -p $HOME/vserv-mount
+    ln -s vserv-mount/vsvr $HOME/vsvr
     mkdir -p $HOME/tmp
     mkdir -p $HOME/.themes
     mkdir -p $HOME/.config
