@@ -11,7 +11,7 @@ kbd_state_widget:set_text("")
 
 get_unread_count = function()
     local io = { popen = io.popen }
-    local s = io.popen("unread-gmail-count all")
+    local s = io.popen("unread-hatchmail-count all")
     local str = ''
 
     for line in s:lines() do
