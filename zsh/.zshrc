@@ -111,10 +111,16 @@ compinit-widget(){
 
 ZAW_MPC_COMMAND="mpc --port 6637"
 
+# TODO - see where lazy sourcing can speed things up
+lazy_source () {
+    eval "$1 () { [ -f $2 ] && source $2 && $1 \$@ }"
+}
+
 ZGEN_AUTOLOAD_COMPINIT=false
 ZGEN_DIR=$DOTFILESWGH/dotlocal/zsh/zgen
-source $DOTFILESWGH/external/zsh/zgen/zgen.zsh
-if ! zgen saved; then
+lazy_source zgen $DOTFILESWGH/external/zsh/zgen/zgen.zsh
+#if ! zgen saved; then
+if ! source "$ZGEN_DIR/init.zsh"; then
     echo "zgen not set up -- cloning repos"
     zgen load zsh-users/zsh-history-substring-search
     zgen load hchbaw/opp.zsh
