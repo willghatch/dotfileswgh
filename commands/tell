@@ -15,6 +15,9 @@ if [[ "$(basename $0)" = "etell" ]]; then
   chmod 600 $mfile
   $EDITOR $mfile
   message=$(cat $mfile)
+  rm $mfile
+elif [[ "$(basename $0)" = "ctell" ]]; then
+  message=$(cat -)
 else
   message="$@"
 fi

@@ -47,6 +47,9 @@ def color(c):
 # TODO -- add RGB, bold, italic, bg colors, etc
 
 def new_message(sig):
+    # TODO - new_message also gets message carbons, which then look like they
+    # are TO me FROM the other user when they are TO the other user FROM me.
+
     # message structure: 
     # sig[0] = domain (maybe account?)
     # sig[1][0] = user on other end (with resource)
