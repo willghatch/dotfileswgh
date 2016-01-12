@@ -1,0 +1,28 @@
+#!/usr/bin/env bash
+
+declare -A TELL_ALIASES
+if [[ -f "$TELL_ALIAS_FILE" ]]; then
+  # this should fill the associative array TELL_ALIASES
+  source "$TELL_ALIAS_FILE"
+fi
+
+to="${TELL_ALIASES[$1]-$1}"
+shift
+
+message=""
+if [[ "$(basename $0)" = "etell" ]]; then
+  mfile=$(mktemp /tmp/etell-message-XXXXX)
+  chmod 600 $mfile
+  $EDITOR $mfile
+  message=$(cat $mfile)
+else
+  message="$@"
+fi
+
+if [[ "$message" = "" ]]; then
+  echo "Not sending empty message..."
+  exit 0
+fi
+
+gajim-remote send_single_message "$to" jabber-subjects-are-ignored "$message"
+
