@@ -67,8 +67,8 @@ def new_message(sig):
     out(": ")
     color("cyan")
     out(content)
-    out("\n")
     color("default")
+    out("\n")
     sys.stdout.flush()
 
 def message_sent(sig):
@@ -93,8 +93,8 @@ def message_sent(sig):
     out(": ")
     color("brown")
     out(content)
-    out("\n")
     color("default")
+    out("\n")
     sys.stdout.flush()
 
 bus = dbus.SessionBus()
