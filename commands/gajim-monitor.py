@@ -47,9 +47,6 @@ def color(c):
 # TODO -- add RGB, bold, italic, bg colors, etc
 
 def new_message(sig):
-    # TODO - new_message also gets message carbons, which then look like they
-    # are TO me FROM the other user when they are TO the other user FROM me.
-
     # message structure: 
     # sig[0] = domain (maybe account?)
     # sig[1][0] = user on other end (with resource)
@@ -62,13 +59,23 @@ def new_message(sig):
     # sig[1][6] = state (string "active")
     # sig[1][7+] = ??
 
+    # HACK - it seems that messages that are actually from other
+    # users have a user@host/resource JID, but if they are carbons
+    # of messages sent from me, they DON'T have a resource.
+    from_self_b = len(str(other_user).split("/")) < 2
+
     color("red")
     out(timestamp_str())
     out(" ")
     color("green")
+    if from_self_b:
+        color("blue")
+        out("Me -> ")
     out(other_user)
     out(": ")
     color("cyan")
+    if from_self_b:
+        color("brown")
     out(content)
     color("default")
     out("\n")
