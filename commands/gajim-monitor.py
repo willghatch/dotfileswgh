@@ -69,6 +69,7 @@ def new_message(sig):
     out(content)
     out("\n")
     color("default")
+    sys.stdout.flush()
 
 def message_sent(sig):
     # these include real messages and state updates (active, composing, etc)
@@ -94,6 +95,7 @@ def message_sent(sig):
     out(content)
     out("\n")
     color("default")
+    sys.stdout.flush()
 
 bus = dbus.SessionBus()
 proxy_obj = bus.get_object(SERVICE, OBJ_PATH)
