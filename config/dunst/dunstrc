@@ -223,12 +223,8 @@
 #    summary = "foobar"
 #    format = ""
 
-[gmail]
-    summary = "*new gmail*"
-    urgency = low
-    timeout = 5
-[hmail]
-    summary = "*new hmail*"
+[email]
+    summary = "*new email*"
     urgency = low
     timeout = 5
 
