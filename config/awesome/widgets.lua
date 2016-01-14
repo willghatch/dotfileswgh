@@ -20,10 +20,14 @@ get_unread_count = function()
     s:close()
     return "| mail: " .. str
 end
+set_email_widget = function()
+   email_widget:set_markup('<span color="green">'.. get_unread_count() .."</span>")
+end
 email_widget = wibox.widget.textbox()
-email_widget:set_text(get_unread_count())
-email_timer = timer({ timeout = 60 })
-email_timer:connect_signal("timeout", function() email_widget:set_text(get_unread_count()) end)
+-- initialize email widget, then let it run every so often
+set_email_widget()
+email_timer = timer({ timeout = 20 })
+email_timer:connect_signal("timeout", set_email_widget)
 email_timer:start()
 
 -- create some vicious widgets
@@ -32,8 +36,8 @@ mpdwidget = wibox.widget.textbox()
 -- Register widget
 vicious.register(mpdwidget, vicious.widgets.mpd,
                  function (mpdwidget, args)
-                    local ret = "| MPD: "
-                    local fin = "   |   "
+                    local ret = '|<span color="#2275FF"> MPD: '
+                    local fin = "   </span>|   "
                     if args["{state}"] == "Stop" then
                        return ret.." - "..fin
                     else
@@ -79,12 +83,12 @@ vicious.register(cpuTextWidget, vicious.widgets.cpu, " | CPU: $1% | ")
 --volume widget
 volumewidget = wibox.widget.textbox()
 volumewidget:set_align("right")
-vicious.register(volumewidget, vicious.widgets.volume, " Vol: $1% $2 | ", 1, "Master")
+vicious.register(volumewidget, vicious.widgets.volume, "<span color='#FF9999'> Vol: $1%</span> <span color='#99FF99'>$2 </span>| ", 1, "Master")
 
 
 -- battery widget
 batteryTextWidget = wibox.widget.textbox()
-vicious.register(batteryTextWidget, vicious.widgets.bat, " Bat: $2% $1", 30, "BAT0")
+vicious.register(batteryTextWidget, vicious.widgets.bat, "<span color='orange'> Bat: $2% $1</span>", 30, "BAT0")
 
 batteryWidget = awful.widget.progressbar()
 batteryWidget:set_width(8)
