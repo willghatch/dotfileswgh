@@ -83,7 +83,16 @@ vicious.register(cpuTextWidget, vicious.widgets.cpu, " | CPU: $1% | ")
 --volume widget
 volumewidget = wibox.widget.textbox()
 volumewidget:set_align("right")
-vicious.register(volumewidget, vicious.widgets.volume, "<span color='#FF9999'> Vol: $1%</span> <span color='#99FF99'>$2 </span>| ", 1, "Master")
+-- wrapper to make mute status more visible...
+volume_widget_wrapper = function(...)
+   ret = vicious.widgets.volume(...)
+   mutestr = ""
+   if ret[2] == "♩" then
+      mutestr = "MUTE"
+   end
+   return {ret[1], mutestr}
+end
+vicious.register(volumewidget, volume_widget_wrapper, "<span color='#FF9999'> Vol: $1%</span> <span color='#99FF99'>$2 </span>| ", 1, "Master")
 
 
 -- battery widget
