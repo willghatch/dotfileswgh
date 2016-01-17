@@ -1,0 +1,4 @@
+#!/usr/bin/env bash
+
+set-xkb-key "$1" "$2" "$(xclip -o -primary)"
+
