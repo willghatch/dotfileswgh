@@ -188,6 +188,13 @@ alias libreoffice="env SAL_USE_VCLPLUGIN=gtk libreoffice"
 
 # Generic Shell Functions
 
+for-each-line(){
+    local line
+    while read line; do
+        "$@" "$line"
+    done
+}
+
 function volume()
 {
     if [ -z $1 ]
