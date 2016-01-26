@@ -158,8 +158,10 @@ bind pager U undelete-message
 # defaults include T for toggle quoted, f for forward, d for delete...
 
 
-bind index j next-undeleted
-bind index k previous-undeleted
+bind index j next-entry
+bind index k previous-entry
+#bind index j next-undeleted
+#bind index k previous-undeleted
 #bind index J next-page
 #bind index K previous-page
 bind index J next-unread
