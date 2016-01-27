@@ -25,6 +25,12 @@ export MANPATH=/usr/share/man:/usr/local/man:/usr/local/share/man:/usr/X11R6/man
 export PKG_CONFIG_PATH=$HROOT/lib/pkgconfig:/usr/local/lib/pkgconfig:/usr/lib/pkgconfig:/lib/pkgconfig
 export LD_LIBRARY_PATH=$HROOT/lib:/usr/local/lib:/usr/lib:/lib
 
+if /system/bin/true >/dev/null 2>&1; then
+    # I'm on android... bleh...
+    # Set LD_LIBRARY_PATH for termux
+    LD_LIBRARY_PATH=$PREFIX/lib:$LD_LIBRARY_PATH
+fi
+
 # XDG basedir spec
 # I'm putting the defaults all here as reference
 # Having the read-only path to search for config and data is *awesome*,
