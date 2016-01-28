@@ -141,7 +141,7 @@ grebi(){
     git rebase -i HEAD~${1}
 }
 # I never use the gc command
-alias gc="env EDITOR=v-start-inserted git commit"
+alias gc="git commit"
 alias gco="git checkout"
 alias gcob="git checkout -b"
 alias gclone="git clone --recursive"
