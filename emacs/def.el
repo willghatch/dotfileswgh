@@ -131,7 +131,10 @@
    (setq evil-visual-state-cursor 'box); █
    (setq evil-insert-state-cursor 'bar); ⎸
    (setq evil-emacs-state-cursor 'hbar); _
-   (require 'evil-terminal-cursor-changer))
+   ;; evil-terminal-cursor-changer makes the font size reset (at least in Konsole)...
+   ;; it's clearly a bug, and has annoyed me for a long time.  Let's not use it until it is fixed.
+   ;(require 'evil-terminal-cursor-changer)
+   )
 
  ;; elscreen must start before other mode-line stuff, or it wouldn't be this high...
  (require 'elscreen)
