@@ -113,6 +113,9 @@ elif [ "s-$1" = "s-configdir" ]
 then
     linkSubdirs config .
     linkSubdirs local .
+    # this *really* should be in ~/.local/share/icons/... but apparently some icons
+    # are required to be in ~/.icons/
+    linkSubdirs icons .
     linkSubdirs ssh .
 elif [ "s-$1" = "s-sundries" ]
 then
