@@ -30,5 +30,6 @@ $DOTFILESWGH/config/awesome/kbd-state-mon.sh &
 # set sticky keys, don't cancel sticky keys if two keys are pressed at once, allow latch-to-lock
 #xkbset sticky -twokey latchlock
 
-exec xmonad
+# use dbus-launch to start a dbus session... or gnome-terminal (and maybe other things) won't work
+exec dbus-launch --exit-with-session awesome
 
