@@ -194,9 +194,18 @@
  (yafolding-mode 1)
  (load-library "borrowed")
  (load-library "tty-format")
+
+ ;;; MAKE SCROLLING BE SANE, PLEASE¡
+ (setq scroll-step 1)
+ (setq scroll-conservatively 10000)
  (setq scroll-margin 5)
- ;(setq smooth-scroll-margin 5)
- ;(require 'smooth-scrolling)
+ (setq smooth-scroll-margin 5)
+ (setq scroll-up-aggressively 0.0)
+ (setq-default scroll-up-aggressively 0.0)
+ (setq scroll-down-aggressively 0.0)
+ (setq-default scroll-down-aggressively 0.0)
+ (require 'smooth-scrolling)
+
  ;(require 'indent-guide)
  (setq indent-guide-recursive t)
  (setq indent-guide-delay 0.2)
