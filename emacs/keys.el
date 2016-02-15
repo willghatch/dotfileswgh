@@ -493,6 +493,7 @@
 (mkmap (kbd "C-z") 'suspend-frame)
 (ikmap (kbd "C-z") 'suspend-frame)
 
+(pkmap " " 'pscroll-down-half)
 (pkmap "j" 'pscroll-down-half)
 (pkmap "k" 'pscroll-up-full)
 (pkmap "J" 'pscroll-down-line)
