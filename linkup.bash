@@ -36,7 +36,7 @@ function mklink() {
         mv $2 ${2}.prelink
     fi
     mkdir -p $(dirname "$2")
-    ln -s $1 $2
+    ln -s -f $1 $2
 }
 
 function linkDotfiles() {
@@ -79,7 +79,6 @@ function mkSundries() {
     chmod 700 $HOME/.cache
     mkdir -p $HOME/dl # my default download directory
     mkdir -p $HOME/vserv-mount
-    ln -s vserv-mount/vsvr $HOME/vsvr
     mkdir -p $HOME/tmp
     mkdir -p $HOME/.themes
     mkdir -p $HOME/.config
@@ -96,11 +95,11 @@ function mkSundries() {
 }
 
 function linkSundries() {
-    mkSundries
     mklink $dpath/external/gtk/gtk-adb $HOME/.themes/gtk-adb
     mklink $dpath/xmonad.hs $HOME/.xmonad/xmonad.hs
     mklink $dpath/elinks/elinks.conf $HOME/.elinks/elinks.conf
-    mkdir -p $HOME/.mozilla/firefox/profiles.ini
+    mklink vserv-mount/vsvr $HOME/vsvr
+    mkdir -p $HOME/.mozilla/firefox
     mklink $dpath/firefox-profiles.ini $HOME/.mozilla/firefox/profiles.ini
 }
 
@@ -129,6 +128,8 @@ then
     linkDotfiles
     linkSubdirs config .
     linkSubdirs local .
+    linkSubdirs icons .
+    linkSubdirs ssh .
     linkSundries
 else
     echo "usage: linkup.bash < dotfiles | configdir | sundries | linksundries | all >"
