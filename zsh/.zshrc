@@ -139,7 +139,7 @@ if ! source "$ZGEN_DIR/init.zsh"; then
     #zgen load tarrasch/zsh-colors
     #zgen load tarrasch/zsh-bd
     #zgen load tarrasch/zsh-functional
-    zgen load jocelynmallon/zshmarks
+    #zgen load jocelynmallon/zshmarks
     zgen load skx/sysadmin-util
     #zgen load ehamberg/zsh-cabal-completion
     zgen load zsh-users/zsh-syntax-highlighting
