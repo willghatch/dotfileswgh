@@ -322,6 +322,9 @@ bindkey -M filterselect "^[b" backward-word
 bindkey -M filterselect "^[f" backward-word
 bindkey -M filterselect "^[d" kill-word
 
+if [[ -z "$USER" ]]; then
+    USER="$(whoami)"
+fi
 if [[ "$USER" != "wgh" ]]; then
     MEGAPROMPT_STYLES[username]="%B%F{cyan}"
     MEGAPROMPT_DISPLAY_P[username]=true
@@ -333,6 +336,10 @@ if [ -z "$SSH_CLIENT" -a -z "$TMUX" -a -n "$DISPLAY" ]; then
 fi
 # also, even with no display I don't want it in my Android chroot either...
 if [ -n "$ANDROID_CHROOT" -a -z "$SSH_CLIENT" -a -z "$TMUX" ]; then
+    MEGAPROMPT_DISPLAY_P[host]=false
+fi
+# a pox on systems that don't have real hostnames
+if [ "$HOST" = localhost -a -z "$SSH_CLIENT" -a -z "$TMUX" ]; then
     MEGAPROMPT_DISPLAY_P[host]=false
 fi
 MEGAPROMPT_DISPLAY_P[tty]=false
