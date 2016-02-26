@@ -70,6 +70,8 @@ libnotify \
 dunst \
 texlive-bin
 
+pm fail2ban
+
 # for teensy programming (IE ergodox)
 pm avr-binutils avr-gcc avr-libc
 # for mkfs.vfat
