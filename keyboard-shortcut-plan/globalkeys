@@ -1,0 +1,44 @@
+This started out as an exploration of just media keys, but I need to make some sense of my global key situation
+
+categories:
+  media actions -- some global, some local
+    !! some of these I will sometimes want to perform for a remote machine (eg media server) instead of local
+    volume up
+    volume down
+    toggle mute
+  
+    toggle pause/play
+    pause?
+    play?
+    stop?
+    next song/scene
+    prev song/scene
+    rewind a little
+    fast forward a little
+  zoom -- local
+    zoom in
+    zoom out
+    zoom 100%
+    zoom full
+  notifications -- global
+    clear notifications
+    recall old notifications
+  state -- I am increasingly leaning toward keeping some sort of store of state for various things I do and haveing convenient ways to switch the state at a global level.
+    change global UI state -- set which app should receive media commands, which machine should get volume commands, dark/light theme globally, etc.  
+    display state stuff somehow
+  
+
+
+media issues:
+  sometimes I want to control these options on the local machine, sometimes another machine (IE media computer)
+  what I want to pause/play may be various different programs -- mpd, vlc, kodi...
+
+
+  So some of these can have in-app keystrokes, but generally I want more or less global keys for some of them.
+  I might have shell keystrokes for them, then I solve the "which machine" problem and I assume I'll have an ssh shell open for any machine I care about affecting
+  I might have a keybinding for local volume, and another binding for "alternate", and just hope I never have reason to have more than one alternate configured.
+
+
+perhaps I should have some sort of state file that says which machine and app I'm controlling, and have a convenience program to set machine/app easily?  Then I could just have one keyset for controlling, and just switch the state.
+
+
