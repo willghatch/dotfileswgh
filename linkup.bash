@@ -22,6 +22,7 @@ dotfiles=(
     racketrc
     npmrc
     keynavrc
+    xinitrc
 )
 
 function die() {
