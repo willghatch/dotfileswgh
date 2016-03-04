@@ -61,7 +61,7 @@ set mouse=a     " Allow mouse stuff in all modes
 
 set t_Co=256
 filetype off " required for vundle, supposedly
-set rtp+=$DOTFILESWGH/external/vim/Vundle.vim
+set rtp+=$DOTFILESWGH/external/vim/Vundle.vim,$DOTFILESWGH/vim
 
 if filereadable($DOTFILESWGH . "/external/vim/Vundle.vim/README.md")
     call vundle#begin($DOTFILESWGH . "/dotlocal/vim")
@@ -110,8 +110,6 @@ if filereadable($DOTFILESWGH . "/external/vim/Vundle.vim/README.md")
     let g:airline#extensions#tabline#enabled = 1
     let g:airline_left_sep = '▶'
     let g:airline_right_sep = '◀'
-    source $DOTFILESWGH/vim/vairl-airline-theme.vim
-    let g:airline_theme='vairl'
 
     let g:rainbow_active = 1
 
@@ -367,17 +365,22 @@ vnoremap <space>ys "*y
 
 " Highlighting
 function! SetDarkTheme()
-    colorscheme elflord
+    "colorscheme elflord
+    colorscheme wgh-dark
+    let g:airline_theme='vairl'
+    "call airline#switch_theme('vairl')
+    highlight Normal cterm=NONE ctermfg=253 ctermbg=233
     highlight Comment cterm=italic
     highlight ColorColumn ctermbg=17
-    highlight CursorLine cterm=NONE ctermbg=233
-    highlight CursorColumn ctermbg=233
+    highlight CursorLine cterm=NONE ctermbg=235
+    highlight CursorColumn ctermbg=235
     highlight Search ctermbg=20 ctermfg=2
 endfunction
 command -nargs=0 DarkTheme call SetDarkTheme()
 
 function! SetLightTheme()
     colorscheme morning
+    "call airline#switch_theme('light')
     highlight Comment cterm=italic
     highlight CursorLine cterm=NONE ctermbg=247
     highlight CursorColumn ctermbg=247
