@@ -30,8 +30,7 @@ _archive_command_list(){
         echo "no handler yet for $1"
         return 1
     elif [[ "$1" =~ .cpio$ ]]; then
-        echo "no handler yet for $1"
-        return 1
+        cpio -t < "$1"
     else
         echo "Archive type for $1 not recognized" 1>&2
         return 1
@@ -61,8 +60,7 @@ _archive_command_extract(){
         echo "no handler yet for $1"
         return 1
     elif [[ "$1" =~ .cpio$ ]]; then
-        echo "no handler yet for $1"
-        return 1
+        cpio -id < "$1"
     else
         echo "Archive type for $1 not recognized" 1>&2
         return 1
@@ -96,8 +94,10 @@ _archive_command_create(){
         echo "no handler yet for $archive"
         return 1
     elif [[ "$archive" =~ .cpio$ ]]; then
-        echo "no handler yet for $archive"
-        return 1
+        local f
+        for f in "$@"; do
+            echo "$f"
+        done | cpio -o > "$archive"
     else
         echo "Archive type for $archive not recognized" 1>&2
         return 1
