@@ -1,0 +1,122 @@
+#!/usr/bin/env bash
+
+_archive_command_help(){
+    echo "usage: archive-command list <archive>"
+    echo "usage: archive-command extract <archive>"
+    echo "usage: archive-command create <archive> <file> ..."
+    return 1
+}
+
+_archive_command_list(){
+    if [[ "$1" =~ .tar.gz$
+        || "$1" =~ .tgz$
+        ]]; then
+        tar -tzf "$1"
+    elif [[ "$1" =~ .tar.bz$ ]]; then
+        tar -tjf "$1"
+    elif [[ "$1" =~ .tar.xz$ ]]; then
+        tar -tJf "$1"
+    elif [[ "$1" =~ .zip$ ]]; then
+        unzip -l "$1"
+    elif [[ "$1" =~ .7z$ ]]; then
+        7z l "$1"
+    elif [[ "$1" =~ .rar$ ]]; then
+        unrar l "$1"
+    elif [[ "$1" =~ .ar$ ]]; then
+        ar t "$1"
+    elif [[ "$1" =~ .deb$ ]]; then
+        ar t "$1"
+    elif [[ "$1" =~ .rpm$ ]]; then
+        echo "no handler yet for $1"
+        return 1
+    elif [[ "$1" =~ .cpio$ ]]; then
+        echo "no handler yet for $1"
+        return 1
+    else
+        echo "Archive type for $1 not recognized" 1>&2
+        return 1
+    fi
+}
+
+_archive_command_extract(){
+    if [[ "$1" =~ .tar.gz$
+        || "$1" =~ .tgz$
+        ]]; then
+        tar -xzf "$1"
+    elif [[ "$1" =~ .tar.bz$ ]]; then
+        tar -xjf "$1"
+    elif [[ "$1" =~ .tar.xz$ ]]; then
+        tar -xJf "$1"
+    elif [[ "$1" =~ .zip$ ]]; then
+        unzip "$1"
+    elif [[ "$1" =~ .7z$ ]]; then
+        7z x "$1"
+    elif [[ "$1" =~ .rar$ ]]; then
+        unrar x "$1"
+    elif [[ "$1" =~ .ar$ ]]; then
+        ar x "$1"
+    elif [[ "$1" =~ .deb$ ]]; then
+        ar x "$1"
+    elif [[ "$1" =~ .rpm$ ]]; then
+        echo "no handler yet for $1"
+        return 1
+    elif [[ "$1" =~ .cpio$ ]]; then
+        echo "no handler yet for $1"
+        return 1
+    else
+        echo "Archive type for $1 not recognized" 1>&2
+        return 1
+    fi
+}
+
+_archive_command_create(){
+    local archive="$1"
+    shift
+    if [[ "$archive" =~ .tar.gz$
+        || "$archive" =~ .tgz$
+        ]]; then
+        tar -czf "$archive" "$@"
+    elif [[ "$archive" =~ .tar.bz$ ]]; then
+        tar -cjf "$archive" "$@"
+    elif [[ "$archive" =~ .tar.xz$ ]]; then
+        tar -cJf "$archive" "$@"
+    elif [[ "$archive" =~ .zip$ ]]; then
+        zip "$archive" "$@"
+    elif [[ "$archive" =~ .7z$ ]]; then
+        7z a "$archive" "$@"
+    elif [[ "$archive" =~ .rar$ ]]; then
+        rar a "$archive" "$@"
+    elif [[ "$archive" =~ .ar$ ]]; then
+        echo "no handler yet for $archive"
+        return 1
+    elif [[ "$archive" =~ .deb$ ]]; then
+        echo "no handler yet for $archive"
+        return 1
+    elif [[ "$archive" =~ .rpm$ ]]; then
+        echo "no handler yet for $archive"
+        return 1
+    elif [[ "$archive" =~ .cpio$ ]]; then
+        echo "no handler yet for $archive"
+        return 1
+    else
+        echo "Archive type for $archive not recognized" 1>&2
+        return 1
+    fi
+}
+
+archive-command(){
+    local cmd="$1"
+    shift
+    if [[ "$cmd" = create ]]; then
+        _archive_command_create "$@"
+    elif [[ "$cmd" = list ]]; then
+        _archive_command_list "$@"
+    elif [[ "$cmd" = extract ]]; then
+        _archive_command_extract "$@"
+    else
+        _archive_command_help
+    fi
+}
+
+archive-command "$@"
+
