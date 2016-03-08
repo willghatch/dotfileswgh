@@ -50,8 +50,12 @@ $DOTFILESWGH/external/misc/libnotifylog/libnotifylogger.py $HOME/.cache/notifica
 # Watch keyboard state for awesome
 $DOTFILESWGH/config/awesome/kbd-state-mon.sh &
 
-source $DOTFILESWGH/pri/xinitrc
-source $DOTFILESWGH/dotlocal/xinitrc
+if [ -f $DOTFILESWGH/pri/xinitrc ]; then
+    source $DOTFILESWGH/pri/xinitrc
+fi
+if [ -f $DOTFILESWGH/dotlocal/xinitrc ]; then
+    source $DOTFILESWGH/dotlocal/xinitrc
+fi
 
 exec awesome
 
