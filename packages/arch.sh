@@ -60,6 +60,7 @@ fortune-mod \
 cowsay \
 xcompmgr \
 mutt \
+notmuch \
 pidgin \
 finch \
 tk \
