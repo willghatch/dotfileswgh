@@ -194,10 +194,12 @@ bind index tsi flag-message
 bind index tsr toggle-new
 bind index tsf set-flag
 
-
-macro index Ag '<change-folder>imaps://imap.gmail.com<enter>'
-macro index Ay '<change-folder>imaps://imap.mail.yahoo.com<enter>'
-macro index Al "<change-folder>/var/spool/mail/$USER<enter>"
+# limit filters to mails that match a pattern (in subject/from fields only)
+bind index l limit
+# 'L' performs a notmuch query, showing only the results
+macro index L "<enter-command>unset wait_key<enter><shell-escape>read -p 'notmuch query: ' x; echo \$x >~/.cache/mutt_terms<enter><limit>~i \"\`notmuch search --output=messages \$(cat ~/.cache/mutt_terms) | head -n 600 | perl -le '@a=<>;chomp@a;s/\^id:// for@a;$,=\"|\";print@a'\`\"<enter>" "show only messages matching a notmuch pattern"
+# 'a' shows all messages again (supersedes default <alias> binding)
+macro index A "<limit>all\n" "show all messages (undo limit)"
 
 
 bind index - enter-command
