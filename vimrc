@@ -302,6 +302,10 @@ noremap t <nop>
 noremap T <nop>
 noremap tr "
 
+" I really need to figure out something better here, this binding was
+" ill-advised but now I'm used to it
+noremap <space>jl J
+
 noremap <space>/s :call Swoop()<CR>
 vnoremap <space>/s :call SwoopSelection()<CR>
 noremap <space>/a :call SwoopMulti()<CR>
