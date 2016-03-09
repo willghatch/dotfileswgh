@@ -153,6 +153,10 @@ alias hloc="locate --database $HOME/.cache/hloc.db"
 alias hupdb="updatedb --output $HOME/.cache/hloc.db --database-root $HOME --require-visibility no --add-prunepaths $HOME/.snapshot"
 export LOCATE_PATH=$HOME/.cache/hloc.db
 
+alias arx="archive-command extract"
+alias arl="archive-command list"
+alias arc="archive-command create"
+
 alias tm="tmux -f $DOTFILESWGH/tmux.conf"
 alias tma="tmux -f $DOTFILESWGH/tmux.conf attach-session -t"
 alias tmad="tmux -f $DOTFILESWGH/tmux.conf attach-session -d -t"
