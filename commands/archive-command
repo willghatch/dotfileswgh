@@ -12,7 +12,8 @@ _archive_command_list(){
         || "$1" =~ .tgz$
         ]]; then
         tar -tzf "$1"
-    elif [[ "$1" =~ .tar.bz$ ]]; then
+    elif [[ "$1" =~ .tar.bz$
+        || "$1" =~ .tar.bz2$ ]]; then
         tar -tjf "$1"
     elif [[ "$1" =~ .tar.xz$ ]]; then
         tar -tJf "$1"
@@ -42,7 +43,8 @@ _archive_command_extract(){
         || "$1" =~ .tgz$
         ]]; then
         tar -xzf "$1"
-    elif [[ "$1" =~ .tar.bz$ ]]; then
+    elif [[ "$1" =~ .tar.bz$
+        || "$1" =~ .tar.bz2$ ]]; then
         tar -xjf "$1"
     elif [[ "$1" =~ .tar.xz$ ]]; then
         tar -xJf "$1"
@@ -74,7 +76,8 @@ _archive_command_create(){
         || "$archive" =~ .tgz$
         ]]; then
         tar -czf "$archive" "$@"
-    elif [[ "$archive" =~ .tar.bz$ ]]; then
+    elif [[ "$1" =~ .tar.bz$
+        || "$1" =~ .tar.bz2$ ]]; then
         tar -cjf "$archive" "$@"
     elif [[ "$archive" =~ .tar.xz$ ]]; then
         tar -cJf "$archive" "$@"
