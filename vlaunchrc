@@ -1,5 +1,6 @@
 
 terminal="konsole --profile ${KONSOLE_PROFILE:-wgh}"
+unicode="racket -l unicoder"
 
 
 if [ -f $DOTFILESWGH/dotlocal/vlaunchrc ]; then

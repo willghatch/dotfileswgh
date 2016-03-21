@@ -254,6 +254,8 @@ genGlobalKeys = function(modkey)
       --awful.key({ modkey, "Mod1"    }, "b", function () awful.util.spawn("dwb") end),
       awful.key({ modkey,           }, "q", function () awful.util.spawn("vlaunch lockscreen") end),
       awful.key({ modkey,    "Mod1" }, "a", function () awful.util.spawn("arandr") end),
+
+      awful.key({ modkey,           }, "y", function () awful.util.spawn("vlaunch unicode") end),
       ----- Set keys on level 3 and level 4 shift for top row
       awful.key({ hyperkey,         }, "Tab", function () awful.util.spawn("set-xkb-key-from-primary 12 3") end),
       awful.key({ hyperkey,         }, "=", function () awful.util.spawn("set-xkb-key-from-primary 13 3") end),
