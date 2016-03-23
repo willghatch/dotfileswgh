@@ -2,4 +2,6 @@
 ServerAliveCountMax 3
 # number of seconds of inactivity before pinging
 ServerAliveInterval 300
+# just check the fingerprint, don't check that the IP is also known
+CheckHostIP no
 
