@@ -45,6 +45,8 @@ xcompmgr &
 nm-applet &
 blueman-applet &
 
+the-unicoder --server --path "/tmp/the-unicoder_${USER}_${DISPLAY}" &
+
 $DOTFILESWGH/external/misc/libnotifylog/libnotifylogger.py $HOME/.cache/notifications.log &
 
 # Watch keyboard state for awesome
