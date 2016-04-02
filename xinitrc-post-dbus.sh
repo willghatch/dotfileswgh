@@ -45,7 +45,10 @@ xcompmgr &
 nm-applet &
 blueman-applet &
 
-the-unicoder --server --path "/tmp/the-unicoder_${USER}_${DISPLAY}" &
+unicoder_socket="/tmp/the-unicoder_${USER}_${DISPLAY}"
+
+rm -f "$unicoder_socket"
+the-unicoder --server --path "$unicoder_socket" &
 
 $DOTFILESWGH/external/misc/libnotifylog/libnotifylogger.py $HOME/.cache/notifications.log &
 
