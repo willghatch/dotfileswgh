@@ -37,15 +37,14 @@ fi
 # but unfortunately most things ignore them and only use data/config_home.
 #
 # writable data location
+## TODO -- add dotfile dirs to CONFIG/DATA_DIRS, but not the ones that are symlinked
 #XDG_DATA_HOME=$HOME/.local/share
 # read-only but searched data locations
 #XDG_DATA_DIRS=/usr/local/share/:/usr/share/
-XDG_DATA_DIRS=$DOTFILESWGH/local/share/:/usr/local/share/:/usr/share/
 # writable config location
 #XDG_CONFIG_HOME=$HOME/.config
 # read-only but searched config locations
 #XDG_CONFIG_DIRS=/etc/xdg
-XDG_CONFIG_DIRS=$DOTFILESWGH/config:/etc/xdg
 # writable cache dir
 #XDG_CACHE_HOME=$HOME/.cache
 
