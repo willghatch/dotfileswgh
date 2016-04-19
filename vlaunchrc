@@ -1,6 +1,7 @@
 
 terminal="konsole --profile ${KONSOLE_PROFILE:-wgh}"
 unicode="the-unicoder --client --path /tmp/the-unicoder_${USER}_${DISPLAY}"
+screenshot=scrot
 
 
 if [ -f $DOTFILESWGH/dotlocal/vlaunchrc ]; then

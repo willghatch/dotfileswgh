@@ -274,6 +274,7 @@ genGlobalKeys = function(modkey)
       awful.key({ hyperkey, "Mod1"  }, "(", function () awful.util.spawn("set-xkb-key-from-primary 18 4") end),
       awful.key({ hyperkey, "Mod1"  }, ")", function () awful.util.spawn("set-xkb-key-from-primary 19 4") end),
       --
+      awful.key({ hyperkey,         }, "s", function () awful.util.spawn("vlaunch screenshot") end),
       awful.key({ hyperkey,         }, "g", function () awful.util.spawn("gajim-remote show_next_pending_event") end),
       awful.key({ hyperkey,         }, "m", function () awful.util.spawn("vlaunch volmute") end),
       awful.key({ hyperkey,         }, "u", function () awful.util.spawn("vlaunch volup") end),
