@@ -198,7 +198,7 @@ if [[ -n "$ZSH_HIGHLIGHT_STYLES" ]]; then
     # Highlighters root
     ZSH_HIGHLIGHT_STYLES[root]="standout"
     # Highlighters cursor
-    ZSH_HIGHLIGHT_STYLES[cursor]="standout"
+    ZSH_HIGHLIGHT_STYLES[cursor]="underline"
     # Highlighters brackets
     ZSH_HIGHLIGHT_STYLES[bracket-level-1]="fg=blue,bold"
     ZSH_HIGHLIGHT_STYLES[bracket-level-2]="fg=green,bold"
