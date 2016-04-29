@@ -1,0 +1,12 @@
+#hash{
+["ctilde" . "\u0303"]
+
+["cacute" . "\u0301"]
+
+["cgrave" . "\u0300"]
+["ccaron" . "\u030C"]
+["cmacron" . "\u0304"]
+
+["ccircum" . "\u0302"]
+}
+
