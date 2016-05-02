@@ -142,7 +142,7 @@ if ! source "$ZGEN_DIR/init.zsh"; then
     #zgen load jocelynmallon/zshmarks
     zgen load skx/sysadmin-util
     #zgen load ehamberg/zsh-cabal-completion
-    zgen load zsh-users/zsh-syntax-highlighting
+    zgen load zsh-users/zsh-syntax-highlighting . 0.4.0
     zgen load racket/shell-completion
     # this one doesn't seem to work...
     #zgen load RobSis/zsh-reentry-hook
