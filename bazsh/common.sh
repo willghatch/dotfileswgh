@@ -49,7 +49,7 @@ fi
 #XDG_CACHE_HOME=$HOME/.cache
 
 # themes to ease eye strain
-export GTK_THEME=gtk-adb
+export GTK_THEME=Adwaita:dark
 export GTK2_RC_FILES=$DOTFILESWGH/gtk2rc-dark
 export QT_STYLE_OVERRIDE=gtk
 

@@ -96,7 +96,6 @@ function mkSundries() {
 }
 
 function linkSundries() {
-    mklink $dpath/external/gtk/gtk-adb $HOME/.themes/gtk-adb
     mklink $dpath/xmonad.hs $HOME/.xmonad/xmonad.hs
     mklink $dpath/elinks/elinks.conf $HOME/.elinks/elinks.conf
     mklink vserv-mount/vsvr $HOME/vsvr
