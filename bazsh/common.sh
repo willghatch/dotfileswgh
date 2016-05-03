@@ -51,12 +51,12 @@ fi
 # themes to ease eye strain
 if [[ "$WGH_THEME_DARK_OR_LIGHT" = "light" ]]; then
     export WGH_THEME_DARK_OR_LIGHT="light"
-    export GTK_THEME=Adwaita:dark
-    export GTK2_RC_FILES=$DOTFILESWGH/gtk2rc-dark
-else
-    export WGH_THEME_DARK_OR_LIGHT="dark"
     export GTK_THEME=Adwaita:light
     export GTK2_RC_FILES=$DOTFILESWGH/gtk2rc-light
+else
+    export WGH_THEME_DARK_OR_LIGHT="dark"
+    export GTK_THEME=Adwaita:dark
+    export GTK2_RC_FILES=$DOTFILESWGH/gtk2rc-dark
 fi
 export QT_STYLE_OVERRIDE=gtk
 
