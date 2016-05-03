@@ -30,7 +30,8 @@ xterm*color13: rgb:fc/54/fc
 xterm*color14: rgb:54/fc/fc
 xterm*color15: rgb:fc/fc/fc
 
-xterm*faceName: Monospace:size=10:antialias=false
+xterm*faceName: DejaVu Sans Mono:size=12:antialias=true
+bashrun*faceName: DejaVu Sans Mono:size=13:antialias=true
 
 URxvt.font: xft:monospace:size=10
 URxvt.foreground: rgb:a8/a8/a8
