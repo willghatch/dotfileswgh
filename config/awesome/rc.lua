@@ -195,7 +195,12 @@ end
 
 mkspawn = function(cmd)
    return function()
-      local cmdwrapper = {"env", theme_env_var.."="..globalstate.theme_ld}
+      local l_or_d = "dark"
+      if globalstate.theme_ld == "light" then
+         -- l_or_d should only ever be exactly "light" or "dark"
+         l_or_d = "light"
+      end
+      local cmdwrapper = {l_or_d}
       local full_command = table_concat(cmdwrapper, cmd)
       awful.util.spawn(full_command)
    end
