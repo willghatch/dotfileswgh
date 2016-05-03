@@ -391,7 +391,11 @@ function! SetLightTheme()
 endfunction
 command -nargs=0 LightTheme call SetLightTheme()
 
-call SetDarkTheme()
+if $WGH_THEME_DARK_OR_LIGHT == "light"
+    call SetLightTheme()
+else
+    call SetDarkTheme()
+endif
 
 if filereadable($DOTFILESWGH . "/dotlocal/vimrc")
     source $DOTFILESWGH/dotlocal/vimrc

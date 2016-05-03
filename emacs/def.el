@@ -44,7 +44,6 @@
  (advice-add 'require :around #'load-library--around))
 
 (nobreak (require 'wgh-theme))
-(load-theme 'wgh)
 (setq custom-file (concat dotfileswgh "/dotlocal/emacs.d/custom-file.el"))
 (nobreak (load custom-file))
 
@@ -118,6 +117,9 @@
  (setq hydra-lv nil)
  (load-library "keys")
  (load-library "vfuncs")
+ (if (equal (getenv "WGH_THEME_DARK_OR_LIGHT") "light")
+     (light-theme)
+   (dark-theme))
  (setq repeatable-motion-count-needed-prefix "rmo-c/")
  (setq repeatable-motion-definition-prefix "rmo/")
  (require 'repeatable-motion)
