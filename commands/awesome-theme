@@ -1,0 +1,4 @@
+#!/usr/bin/env bash
+
+echo -e "globalstate.theme_ld = \"${1:-dark}\"" | awesome-client
+

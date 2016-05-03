@@ -49,8 +49,15 @@ fi
 #XDG_CACHE_HOME=$HOME/.cache
 
 # themes to ease eye strain
-export GTK_THEME=Adwaita:dark
-export GTK2_RC_FILES=$DOTFILESWGH/gtk2rc-dark
+if [[ "$WGH_THEME_DARK_OR_LIGHT" = "light" ]]; then
+    export WGH_THEME_DARK_OR_LIGHT="light"
+    export GTK_THEME=Adwaita:dark
+    export GTK2_RC_FILES=$DOTFILESWGH/gtk2rc-dark
+else
+    export WGH_THEME_DARK_OR_LIGHT="dark"
+    export GTK_THEME=Adwaita:light
+    export GTK2_RC_FILES=$DOTFILESWGH/gtk2rc-light
+fi
 export QT_STYLE_OVERRIDE=gtk
 
 ## Use a default width of 80 for manpages for more convenient reading

@@ -211,6 +211,31 @@ if [[ -n "$ZSH_HIGHLIGHT_STYLES" ]]; then
     # TODO -- use this one, because it looks cool and helpful, but requires more setup
 fi
 
+
+if [[ "$WGH_THEME_DARK_OR_LIGHT" = "light" ]]; then
+    if [[ -n "$ZSH_HIGHLIGHT_STYLES" ]]; then
+        ZSH_HIGHLIGHT_STYLES[command]="fg=green"
+        ZSH_HIGHLIGHT_STYLES[bracket-level-2]="fg=green"
+        ZSH_HIGHLIGHT_STYLES[bracket-level-4]="fg=yellow"
+        ZSH_HIGHLIGHT_STYLES[builtin]="fg=green"
+        ZSH_HIGHLIGHT_STYLES[function]="fg=green"
+        ZSH_HIGHLIGHT_STYLES[alias]="fg=green"
+        ZSH_HIGHLIGHT_STYLES[assign]="fg=blue"
+        ZSH_HIGHLIGHT_STYLES[double-quoted-argument]="fg=red"
+        ZSH_HIGHLIGHT_STYLES[single-quoted-argument]="fg=red,bold"
+    fi
+
+    MEGAPROMPT_STYLES[git_ahead_mark]="%b%F{grey}▲%F{cyan}"
+    MEGAPROMPT_STYLES[git_behind_mark]="%b%F{grey}▼%F{cyan}"
+    MEGAPROMPT_STYLES[git_no_remote_tracking_mark]=" %b%F{grey}N"
+    MEGAPROMPT_GIT_STYLES[master]="%b%F{grey}"
+
+    ## TODO - make dark and light dircolors
+    eval $(dircolors -b $DOTFILESWGH/dircolors)
+else
+    eval $(dircolors -b $DOTFILESWGH/dircolors)
+fi
+
 foreground(){
     fg
     mp-updatePrompt
@@ -343,8 +368,6 @@ if [ "$HOST" = localhost -a -z "$SSH_CLIENT" -a -z "$TMUX" ]; then
     MEGAPROMPT_DISPLAY_P[host]=false
 fi
 MEGAPROMPT_DISPLAY_P[tty]=false
-
-eval $(dircolors -b $DOTFILESWGH/dircolors)
 
 unfunction compinit
 unfunction compdef

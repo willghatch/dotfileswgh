@@ -1,5 +1,12 @@
 
-terminal="konsole --profile ${KONSOLE_PROFILE:-wgh}"
+#terminal="konsole --profile ${KONSOLE_PROFILE:-wgh}"
+
+if [ "$WGH_THEME_DARK_OR_LIGHT" = "light" ]; then
+    terminal="gnome-terminal --profile=light"
+else
+    terminal="gnome-terminal --profile=dark"
+fi
+
 unicode="the-unicoder --client --path /tmp/the-unicoder_${USER}_${DISPLAY}"
 screenshot=scrot
 

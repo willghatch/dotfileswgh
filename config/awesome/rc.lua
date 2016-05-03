@@ -22,6 +22,22 @@ function table_shallow_copy(t)
    for k, v in pairs(t) do u[k] = v end
    return setmetatable(u, getmetatable(t))
 end
+function table_concat(t1,t2)
+   local t3 = table_shallow_copy(t1)
+   for i = 1, #t2 do
+      t3[#t1+i] = t2[i]
+   end
+   return t3
+end
+
+theme_env_var="WGH_THEME_DARK_OR_LIGHT"
+init_theme_state = os.getenv(theme_env_var) or "dark"
+
+globalstate = {
+   kbdstate = "normal",
+   theme_ld = init_theme_state
+}
+
 
 -- {{{ Error handling
 -- Check if awesome encountered an error during startup and fell back to
@@ -56,11 +72,9 @@ beautiful.init("/home/wgh/.config/awesome/theme.lua")
 -- This is used later as the default terminal and editor to run.
 --terminal = "xterm"
 --terminal = "xterm -fg white -bg black"
-terminal2 = "vlaunch terminal2"
-terminal = "vlaunch terminal"
+terminal2 = {"vlaunch", "terminal2"}
+terminal = {"vlaunch", "terminal"}
 editor = os.getenv("EDITOR") or "nano"
---editor = "vim"
-editor_cmd = terminal .. " -e " .. editor
 
 -- Default modkey.
 -- Usually, Mod4 is the key with a logo between Control and Alt.
@@ -116,8 +130,6 @@ end
 -- {{{ Menu
 -- Create a laucher widget and a main menu
 myawesomemenu = {
-   { "manual", terminal .. " -e man awesome" },
-   { "edit config", editor_cmd .. " " .. awesome.conffile },
    { "restart", awesome.restart },
    { "quit", awesome.quit }
 }
@@ -146,9 +158,8 @@ root.buttons(awful.util.table.join(
 ))
 -- }}}
 
-currentStateName = "normal"
 enterKeyState = function(stateName, globalkeys, clientkeys)
-   currentStateName = stateName
+   globalstate.kbdstate = stateName
    root.keys(globalkeys)
       -- client.iterate(filter, start, s) gives an iterator to cycle through clients
    local nullFilter = function(c) return true end
@@ -175,10 +186,18 @@ enterLockedState = function()
 end
 
 toggleKeyState = function()
-   if currentStateName == "normal" then
+   if globalstate.kbdstate == "normal" then
       enterLockedState()
    else
       enterNormalState()
+   end
+end
+
+mkspawn = function(cmd)
+   return function()
+      local cmdwrapper = {"env", theme_env_var.."="..globalstate.theme_ld}
+      local full_command = table_concat(cmdwrapper, cmd)
+      awful.util.spawn(full_command)
    end
 end
 
@@ -247,39 +266,39 @@ genGlobalKeys = function(modkey)
       --awful.key({ modkey }, "p", function() menubar.show() end)
 
       -- Launch Programs
-      awful.key({ modkey,           }, "r",     function () awful.util.spawn("bashrun")  end),
-      awful.key({ modkey,           }, "Return", function () awful.util.spawn(terminal) end),
-      awful.key({ modkey, "Control" }, "Return", function () awful.util.spawn(terminal2) end),
+      awful.key({ modkey,           }, "r",     mkspawn({"bashrun"})),
+      awful.key({ modkey,           }, "Return", mkspawn(terminal)),
+      awful.key({ modkey, "Control" }, "Return", mkspawn(terminal2)),
 
       --awful.key({ modkey, "Mod1"    }, "b", function () awful.util.spawn("dwb") end),
-      awful.key({ modkey,           }, "q", function () awful.util.spawn("vlaunch lockscreen") end),
-      awful.key({ modkey,    "Mod1" }, "a", function () awful.util.spawn("arandr") end),
+      awful.key({ modkey,           }, "q", mkspawn({"vlaunch", "lockscreen"})),
+      awful.key({ modkey,    "Mod1" }, "a", mkspawn({"arandr"})),
 
-      awful.key({ modkey,           }, "u", function () awful.util.spawn("vlaunch unicode") end),
-      awful.key({                   }, "XF86DOS", function () awful.util.spawn("vlaunch unicode") end),
+      awful.key({ modkey,           }, "u", mkspawn({"vlaunch", "unicode"})),
+      awful.key({                   }, "XF86DOS", mkspawn({"vlaunch", "unicode"})),
       ----- Set keys on level 3 and level 4 shift for top row
-      awful.key({ hyperkey,         }, "Tab", function () awful.util.spawn("set-xkb-key-from-primary 12 3") end),
-      awful.key({ hyperkey,         }, "=", function () awful.util.spawn("set-xkb-key-from-primary 13 3") end),
-      awful.key({ hyperkey,         }, ";", function () awful.util.spawn("set-xkb-key-from-primary 14 3") end),
-      awful.key({ hyperkey,         }, ":", function () awful.util.spawn("set-xkb-key-from-primary 15 3") end),
-      awful.key({ hyperkey,         }, "\\", function () awful.util.spawn("set-xkb-key-from-primary 16 3") end),
-      awful.key({ hyperkey,         }, "/", function () awful.util.spawn("set-xkb-key-from-primary 17 3") end),
-      awful.key({ hyperkey,         }, "(", function () awful.util.spawn("set-xkb-key-from-primary 18 3") end),
-      awful.key({ hyperkey,         }, ")", function () awful.util.spawn("set-xkb-key-from-primary 19 3") end),
-      awful.key({ hyperkey, "Mod1"  }, "Tab", function () awful.util.spawn("set-xkb-key-from-primary 12 4") end),
-      awful.key({ hyperkey, "Mod1"  }, "=", function () awful.util.spawn("set-xkb-key-from-primary 13 4") end),
-      awful.key({ hyperkey, "Mod1"  }, ";", function () awful.util.spawn("set-xkb-key-from-primary 14 4") end),
-      awful.key({ hyperkey, "Mod1"  }, ":", function () awful.util.spawn("set-xkb-key-from-primary 15 4") end),
-      awful.key({ hyperkey, "Mod1"  }, "\\", function () awful.util.spawn("set-xkb-key-from-primary 16 4") end),
-      awful.key({ hyperkey, "Mod1"  }, "/", function () awful.util.spawn("set-xkb-key-from-primary 17 4") end),
-      awful.key({ hyperkey, "Mod1"  }, "(", function () awful.util.spawn("set-xkb-key-from-primary 18 4") end),
-      awful.key({ hyperkey, "Mod1"  }, ")", function () awful.util.spawn("set-xkb-key-from-primary 19 4") end),
+      awful.key({ hyperkey,         }, "Tab", mkspawn({"set-xkb-key-from-primary 12 3"})),
+      awful.key({ hyperkey,         }, "=", mkspawn({"set-xkb-key-from-primary", "13", "3"})),
+      awful.key({ hyperkey,         }, ";", mkspawn({"set-xkb-key-from-primary", "14", "3"})),
+      awful.key({ hyperkey,         }, ":", mkspawn({"set-xkb-key-from-primary", "15", "3"})),
+      awful.key({ hyperkey,         }, "\\", mkspawn({"set-xkb-key-from-primary", "16", "3"})),
+      awful.key({ hyperkey,         }, "/", mkspawn({"set-xkb-key-from-primary", "17", "3"})),
+      awful.key({ hyperkey,         }, "(", mkspawn({"set-xkb-key-from-primary", "18", "3"})),
+      awful.key({ hyperkey,         }, ")", mkspawn({"set-xkb-key-from-primary", "19", "3"})),
+      awful.key({ hyperkey, "Mod1"  }, "Tab", mkspawn({"set-xkb-key-from-primary", "12", "4"})),
+      awful.key({ hyperkey, "Mod1"  }, "=", mkspawn({"set-xkb-key-from-primary", "13", "4"})),
+      awful.key({ hyperkey, "Mod1"  }, ";", mkspawn({"set-xkb-key-from-primary", "14", "4"})),
+      awful.key({ hyperkey, "Mod1"  }, ":", mkspawn({"set-xkb-key-from-primary", "15", "4"})),
+      awful.key({ hyperkey, "Mod1"  }, "\\", mkspawn({"set-xkb-key-from-primary", "16", "4"})),
+      awful.key({ hyperkey, "Mod1"  }, "/", mkspawn({"set-xkb-key-from-primary", "17", "4"})),
+      awful.key({ hyperkey, "Mod1"  }, "(", mkspawn({"set-xkb-key-from-primary", "18", "4"})),
+      awful.key({ hyperkey, "Mod1"  }, ")", mkspawn({"set-xkb-key-from-primary", "19", "4"})),
       --
-      awful.key({ hyperkey,         }, "s", function () awful.util.spawn("vlaunch screenshot") end),
-      awful.key({ hyperkey,         }, "g", function () awful.util.spawn("gajim-remote show_next_pending_event") end),
-      awful.key({ hyperkey,         }, "m", function () awful.util.spawn("vlaunch volmute") end),
-      awful.key({ hyperkey,         }, "u", function () awful.util.spawn("vlaunch volup") end),
-      awful.key({ hyperkey,         }, "d", function () awful.util.spawn("vlaunch voldown") end)
+      awful.key({ hyperkey,         }, "s", mkspawn({"vlaunch", "screenshot"})),
+      awful.key({ hyperkey,         }, "g", mkspawn({"gajim-remote", "show_next_pending_event"})),
+      awful.key({ hyperkey,         }, "m", mkspawn({"vlaunch", "volmute"})),
+      awful.key({ hyperkey,         }, "u", mkspawn({"vlaunch", "volup"})),
+      awful.key({ hyperkey,         }, "d", mkspawn({"vlaunch", "voldown"}))
    ) -- initial globalkeys ends here
 
 -- I don't want these keys...
