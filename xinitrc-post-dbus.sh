@@ -20,6 +20,7 @@ keynav &
 unclutter -idle 5 &
 
 # set the screen layout -- IE detect how many monitors I have connected and adjust
+# this script should live in one of my local script directories on my path
 screenlayout-default.sh
 
 # Backround
