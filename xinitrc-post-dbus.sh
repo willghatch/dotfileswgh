@@ -19,8 +19,17 @@ keynav &
 # Unclutter hides the mouse pointer after the given number of seconds
 unclutter -idle 5 &
 
+# set the screen layout -- IE detect how many monitors I have connected and adjust
+screenlayout-default.sh
+
 # Backround
-feh --bg-max ~/wallpaper || xsetroot -solid '#101020'
+{
+    while true; do
+        wallpaper-set-random
+        # 600 seconds = 10 minutes
+        sleep 600
+    done
+}&
 
 #cinnamon-screensaver &
 xscreensaver -no-splash &
