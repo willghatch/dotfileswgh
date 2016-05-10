@@ -22,8 +22,10 @@ PATH=$DOTFILESWGH/dotlocal/commands:/rootgit/bin.rootgit:/rootgit/tools.rootgit:
 unset MANPATH # so I can use manpath command at end here
 export MANPATH=/usr/share/man:/usr/local/man:/usr/local/share/man:/usr/X11R6/man:/opt/man:$HROOT/usr/share/man:$HROOT/share/man:$NPM_DIR/share/man:$(manpath)
 
-export PKG_CONFIG_PATH=$HROOT/lib/pkgconfig:/usr/local/lib/pkgconfig:/usr/lib/pkgconfig:/lib/pkgconfig
-export LD_LIBRARY_PATH=$HROOT/lib:/usr/local/lib:/usr/lib:/lib
+# I'll leave these commented for now.  I exported these to build stuff in my
+# $HROOT, but I'm hoping something like guix solves my user packaging issues...
+#export PKG_CONFIG_PATH=$HROOT/lib/pkgconfig:/usr/local/lib/pkgconfig:/usr/lib/pkgconfig:/lib/pkgconfig
+#export LD_LIBRARY_PATH=$HROOT/lib:/usr/local/lib:/usr/lib:/lib
 
 if /system/bin/true >/dev/null 2>&1; then
     # I'm on android... bleh...
