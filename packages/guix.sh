@@ -106,6 +106,7 @@ node
 #cinnamon
 
 # fonts
+pango
 freetype
 fontconfig
 gs-fonts
