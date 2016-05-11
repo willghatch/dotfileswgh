@@ -32,18 +32,18 @@ email_timer:start()
 
 -- create some vicious widgets
 -- Initialize widget
-mpdwidget = wibox.widget.textbox()
+-- mpdwidget = wibox.widget.textbox()
 -- Register widget
-vicious.register(mpdwidget, vicious.widgets.mpd,
-                 function (mpdwidget, args)
-                    local ret = '|<span color="#2275FF"> MPD: '
-                    local fin = "   </span>|   "
-                    if args["{state}"] == "Stop" then
-                       return ret.." - "..fin
-                    else
-                       return ret..args["{Artist}"]..' - '..args["{Album}"]..' - '.. args["{Title}"]..fin
-                    end
-                 end, 3, {port=6637})
+--vicious.register(mpdwidget, vicious.widgets.mpd,
+--                 function (mpdwidget, args)
+--                    local ret = '|<span color="#2275FF"> MPD: '
+--                    local fin = "   </span>|   "
+--                    if args["{state}"] == "Stop" then
+--                       return ret.." - "..fin
+--                    else
+--                       return ret..args["{Artist}"]..' - '..args["{Album}"]..' - '.. args["{Title}"]..fin
+--                    end
+--                 end, 3, {port=6637})
 
 -- Initialize widget
 memTextWidget = wibox.widget.textbox()
@@ -187,7 +187,7 @@ for s = 1, screen.count() do
    -- Widgets that are aligned to the right
    local right_layout = wibox.layout.fixed.horizontal()
    right_layout:add(email_widget)
-   right_layout:add(mpdwidget)
+   --right_layout:add(mpdwidget)
    right_layout:add(kbd_state_widget)
    right_layout:add(cpuTextWidget)
    --right_layout:add(cpuwidget)
