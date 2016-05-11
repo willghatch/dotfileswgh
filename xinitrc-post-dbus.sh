@@ -5,8 +5,7 @@
 # wrapping the exec to my window manager.  But gnome-terminal doesn't see it
 # if I just launch it in this script.  So I'll use dbus-launch to launch this.
 
-mkdir -p /tmp/$USER/private
-chmod 700 /tmp/$USER/private
+pulseaudio &
 
 # merge xresources first, so other programs in this (xscreensaver) can get settings
 xrdb $DOTFILESWGH/Xresources
