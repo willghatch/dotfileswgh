@@ -18,7 +18,8 @@ i-am-me() {
 export HROOT=$WGHHOME/hroot
 export NPM_DIR=$DOTFILESWGH/dotlocal/npm
 export NODE_PATH="$NPM_DIR/lib/node_modules"
-PATH=$DOTFILESWGH/dotlocal/commands:/rootgit/bin.rootgit:/rootgit/tools.rootgit:$DOTFILESWGH/commands:$DOTFILESWGH/external/misc/rootgit-tools:$WGHHOME/.cabal/bin:$NPM_DIR/bin:$HROOT/bin:$HROOT/usr/bin:$HROOT/usr/local/bin:$WGHHOME/.local/bin:$WGHHOME/bin:$PATH:/usr/bin:/bin:/usr/local/bin:/sbin:/usr/sbin:/usr/local/sbin
+PATH=$DOTFILESWGH/dotlocal/commands:/rootgit/bin.rootgit:/rootgit/tools.rootgit:$DOTFILESWGH/commands:$DOTFILESWGH/external/misc/rootgit-tools:$WGHHOME/.cabal/bin:$NPM_DIR/bin:$HROOT/bin:$HROOT/usr/bin:$HROOT/usr/local/bin:$WGHHOME/.local/bin:$WGHHOME/bin:$WGHHOME/.guix-profile/bin:$WGHHOME/.guix-profile/sbin:$PATH:/usr/bin:/bin:/usr/local/bin:/sbin:/usr/sbin:/usr/local/sbin
+export GUIX_LOCPATH=$WGHHOME/.guix-profile/lib/locale
 unset MANPATH # so I can use manpath command at end here
 export MANPATH=/usr/share/man:/usr/local/man:/usr/local/share/man:/usr/X11R6/man:/opt/man:$HROOT/usr/share/man:$HROOT/share/man:$NPM_DIR/share/man:$(manpath)
 
