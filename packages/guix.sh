@@ -6,10 +6,12 @@ put(){
 }
 
 
+pkgs=()
 while read pkg; do
     # if the line is non-empty and doesn't start with # then it's a package name.
     if [[ -n "$pkg" && "${pkg:0:1}" != "#" ]]; then
-        put "$pkg"
+        #put "$pkg"
+        pkgs=(${pkgs[@]} $pkg)
     fi
 done <<END_OF_PACKAGES
 # TODO
@@ -81,20 +83,22 @@ node
 #ctags
 
 # X11
-xorg-server
-xrdb
-xset
-xsetroot
-xinit
-setxkbmap
-xkbcomp
-xmodmap
-arandr
-xclip
-fluxbox
+#### I'm leaving these out for now, because they don't seem to be working
+#### on my current setup.
+#xorg-server
+#xrdb
+#xset
+#xsetroot
+#xinit
+#setxkbmap
+#xkbcomp
+#xmodmap
+#arandr
+#xclip
+#fluxbox
 # hide mouse cursor
-unclutter
-lxappearance
+#unclutter
+#lxappearance
 # TODO
 #awesome
 #vicious
@@ -102,9 +106,18 @@ lxappearance
 #cinnamon
 
 # fonts
+freetype
+fontconfig
 gs-fonts
-font-dejavu
 font-gnu-freefont-ttf
+font-dejavu
+font-misc-misc
+font-terminus
+font-liberation
+font-google-noto
+font-inconsolata
+font-gnu-unifont
+font-fantasque-sans
 
 # A decent default file browser
 pcmanfm
@@ -155,9 +168,10 @@ gajim
 # audio
 vorbis-tools
 flac
-alsa-utils
-pavucontrol
-mpd
+# alsa and mpd seem to not play nice with the host OS
+#alsa-utils
+#pavucontrol
+#mpd
 mpd-mpc
 ncmpc
 abcde
@@ -182,3 +196,5 @@ the-silver-searcher
 #mlocate
 
 END_OF_PACKAGES
+
+put "${pkgs[@]}"
