@@ -48,6 +48,7 @@ fi
 #XDG_DATA_HOME=$HOME/.local/share
 # read-only but searched data locations
 #XDG_DATA_DIRS=/usr/local/share/:/usr/share/
+XDG_DATA_DIRS=$DOTFILESWGH/local/share:$XDG_DATA_DIRS:/usr/local/share:/usr/share
 # writable config location
 #XDG_CONFIG_HOME=$HOME/.config
 # read-only but searched config locations
