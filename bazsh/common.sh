@@ -57,7 +57,7 @@ XDG_DATA_DIRS=$DOTFILESWGH/local/share:$XDG_DATA_DIRS:/usr/local/share:/usr/shar
 #XDG_CACHE_HOME=$HOME/.cache
 
 XDG_RUNTIME_DIR="/run/user/$(id -u)"
-if [[ -d "$XDG_RUNTIME_DIR" ]]; then
+if [[ ! -d "$XDG_RUNTIME_DIR" ]]; then
     XDG_RUNTIME_DIR="/tmp/${USER}_$(id -u)/runtime"
     mkdir -p "$XDG_RUNTIME_DIR"
     chmod 700 "$XDG_RUNTIME_DIR"
