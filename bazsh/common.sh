@@ -23,7 +23,7 @@ export GUIX_LOCPATH=$GUIX_PROFILE/lib/locale
 if [[ -f "$GUIX_PROFILE/etc/profile" ]]; then
     source "$GUIX_PROFILE/etc/profile"
 fi
-PATH=$DOTFILESWGH/dotlocal/commands:/rootgit/bin.rootgit:/rootgit/tools.rootgit:$DOTFILESWGH/commands:$DOTFILESWGH/external/misc/rootgit-tools:$WGHHOME/.cabal/bin:$NPM_DIR/bin:$HROOT/bin:$HROOT/usr/bin:$HROOT/usr/local/bin:$WGHHOME/.local/bin:$WGHHOME/bin:$WGHHOME/.guix-profile/bin:$WGHHOME/.guix-profile/sbin:$PATH:/usr/bin:/bin:/usr/local/bin:/sbin:/usr/sbin:/usr/local/sbin
+PATH=$DOTFILESWGH/dotlocal/commands:/rootgit/bin.rootgit:/rootgit/tools.rootgit:$DOTFILESWGH/commands:$DOTFILESWGH/external/misc/rootgit-tools:$WGHHOME/.cabal/bin:$NPM_DIR/bin:$HROOT/bin:$HROOT/usr/bin:$HROOT/usr/local/bin:$WGHHOME/.local/bin:$WGHHOME/bin:$PATH:/usr/bin:/bin:/usr/local/bin:/sbin:/usr/sbin:/usr/local/sbin
 unset MANPATH # so I can use manpath command at end here
 export MANPATH=/usr/share/man:/usr/local/man:/usr/local/share/man:/usr/X11R6/man:/opt/man:$HROOT/usr/share/man:$HROOT/share/man:$NPM_DIR/share/man:$(manpath)
 
