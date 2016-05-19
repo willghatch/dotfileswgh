@@ -353,3 +353,9 @@ then
     source $bazsh_common_local
 fi
 
+bazsh_common_pri_local=$DOTFILESWGH/pri/dotlocal/bazshrc
+if [ -f $bazsh_common_pri_local ]
+then
+    source $bazsh_common_pri_local
+fi
+
