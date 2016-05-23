@@ -20,7 +20,7 @@ export NPM_DIR=$DOTFILESWGH/dotlocal/npm
 export NODE_PATH="$NPM_DIR/lib/node_modules"
 export GUIX_PROFILE=$WGHHOME/.guix-profile
 export GUIX_LOCPATH=$GUIX_PROFILE/lib/locale
-if [[ -f "$GUIX_PROFILE/etc/profile" ]]; then
+if [[ "$USE_GUIX" = "true" && -f "$GUIX_PROFILE/etc/profile" ]]; then
     source "$GUIX_PROFILE/etc/profile"
 fi
 PATH=$DOTFILESWGH/dotlocal/commands:/rootgit/bin.rootgit:/rootgit/tools.rootgit:$DOTFILESWGH/commands:$DOTFILESWGH/external/misc/rootgit-tools:$WGHHOME/.cabal/bin:$NPM_DIR/bin:$HROOT/bin:$HROOT/usr/bin:$HROOT/usr/local/bin:$WGHHOME/.local/bin:$WGHHOME/bin:$PATH:/usr/bin:/bin:/usr/local/bin:/sbin:/usr/sbin:/usr/local/sbin
