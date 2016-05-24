@@ -58,8 +58,12 @@ set confirm    " confirm exit on unsaved files, rather than failing if no ! is u
 set mouse=a     " Allow mouse stuff in all modes
 "set clipboard=unnamedplus      " Use '+' register (X11 clipboard) for yanking/putting. 
                                 "Alternatively, unnamed uses '*', which is the middle click clipboard.
-
+" use 256 color palette in terminal
 set t_Co=256
+" use 24-bit color in terminal
+" I'll leave it off until it's available on my debian server...
+"set guicolors
+
 filetype off " required for vundle, supposedly
 set rtp+=$DOTFILESWGH/external/vim/Vundle.vim,$DOTFILESWGH/vim
 
