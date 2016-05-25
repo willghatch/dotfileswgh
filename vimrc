@@ -62,7 +62,9 @@ set mouse=a     " Allow mouse stuff in all modes
 set t_Co=256
 " use 24-bit color in terminal
 " I'll leave it off until it's available on my debian server...
-"set guicolors
+if has('termtruecolor')
+    set guicolors
+endif
 
 filetype off " required for vundle, supposedly
 set rtp+=$DOTFILESWGH/external/vim/Vundle.vim,$DOTFILESWGH/vim
@@ -198,7 +200,7 @@ function! BufSwitchFunc(buf)
         execute 'buffer' a:buf
     endif
 endfunction
-command -nargs=? -complete=buffer BufSwitch call BufSwitchFunc("<args>")
+command! -nargs=? -complete=buffer BufSwitch call BufSwitchFunc("<args>")
 
 "set textwidth=80  " set 80 character width
 "set colorcolumn=+0 " Color textwidth +0
@@ -215,10 +217,10 @@ function! SetTextWidth(n)
     :execute "set textwidth=" . a:n
     :call SetColorColumn()
 endfunction
-command -nargs=1 Width call SetTextWidth("<args>")
-command -nargs=1 ColumnWidth call SetTextWidth("<args>")
+command! -nargs=1 Width call SetTextWidth("<args>")
+command! -nargs=1 ColumnWidth call SetTextWidth("<args>")
 
-command -nargs=0 Rot13 normal ggg?G
+command! -nargs=0 Rot13 normal ggg?G
 
 """"""""""""""""""""""""""" Key mappings
 " map, noremap, etc work in normal, visual+select, operator-pending modes...
@@ -375,16 +377,16 @@ vnoremap <space>ys "*y
 function! SetDarkTheme()
     "colorscheme elflord
     colorscheme wgh-dark
-    let g:airline_theme='vairl'
+    let g:airline_theme='wghdark'
     "call airline#switch_theme('vairl')
-    highlight Normal cterm=NONE ctermfg=253 ctermbg=233
-    highlight Comment cterm=italic
-    highlight ColorColumn ctermbg=17
-    highlight CursorLine cterm=NONE ctermbg=235
-    highlight CursorColumn ctermbg=235
-    highlight Search ctermbg=20 ctermfg=2
+    "highlight Normal cterm=NONE ctermfg=253 ctermbg=233
+    "highlight Comment cterm=italic
+    "highlight ColorColumn ctermbg=17
+    "highlight CursorLine cterm=NONE ctermbg=235 guibg=#123456
+    "highlight CursorColumn ctermbg=235 guibg=#123456
+    "highlight Search ctermbg=20 ctermfg=2
 endfunction
-command -nargs=0 DarkTheme call SetDarkTheme()
+command! -nargs=0 DarkTheme call SetDarkTheme()
 
 function! SetLightTheme()
     colorscheme morning
@@ -393,7 +395,7 @@ function! SetLightTheme()
     highlight CursorLine cterm=NONE ctermbg=247
     highlight CursorColumn ctermbg=247
 endfunction
-command -nargs=0 LightTheme call SetLightTheme()
+command! -nargs=0 LightTheme call SetLightTheme()
 
 if $WGH_THEME_DARK_OR_LIGHT == "light"
     call SetLightTheme()
