@@ -92,14 +92,18 @@ awful.key.ignore_modifiers = {"Lock"}
 -- Table of layouts to cover with awful.layout.inc, order matters.
 local layouts =
    {
-      awful.layout.suit.fair,
-      awful.layout.suit.floating,
       awful.layout.suit.tile,
-      --awful.layout.suit.tile.left,
+      awful.layout.suit.floating,
+      -- I almost like fair as a better default than tile, because it will tile 4 windows by giving
+      -- each a quadrant.  But you can't resize the left and right sides, which is something I often
+      -- do on the tile layout.  And you can achieve the 4 quadrant layout in tile by changing the
+      -- number of windows in the master area.
+      awful.layout.suit.fair,
       awful.layout.suit.tile.bottom,
-      --awful.layout.suit.spiral.dwindle,
       awful.layout.suit.max,
 
+      --awful.layout.suit.tile.left,
+      --awful.layout.suit.spiral.dwindle,
       --awful.layout.suit.tile.top,
       --awful.layout.suit.fair.horizontal,
       --awful.layout.suit.spiral,
