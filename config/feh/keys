@@ -33,6 +33,7 @@ scroll_right l C-Right
 
 # remove now conflicts with toggle_filenames, so change that
 toggle_filenames n
+toggle_exif E
 
 # zooming
 zoom_in  C-Up e
