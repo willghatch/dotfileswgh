@@ -82,7 +82,8 @@ _archive_command_create(){
     elif [[ "$archive" =~ .tar.xz$ ]]; then
         tar -cJf "$archive" "$@"
     elif [[ "$archive" =~ .zip$ ]]; then
-        zip "$archive" "$@"
+        # -r makes it recursive
+        zip -r "$archive" "$@"
     elif [[ "$archive" =~ .7z$ ]]; then
         7z a "$archive" "$@"
     elif [[ "$archive" =~ .rar$ ]]; then
