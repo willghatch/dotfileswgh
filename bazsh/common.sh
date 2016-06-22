@@ -115,9 +115,9 @@ umask 022 # the covenient umask
 ################################################  ALIASES ###############################
 
 
-#alias n="mpcl next"
-#alias p="mpcl previous"
-#alias t="mpcl toggle"
+alias mn="mpcl next"
+alias mp="mpcl toggle"
+alias ms="mpcl stop"
 
 ####### Editing
 alias em="emacs -nw -l $DOTFILESWGH/emacs/def"
