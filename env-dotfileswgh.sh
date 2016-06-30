@@ -2,7 +2,11 @@
 
 # $WGHHOME is set so that I can su to other accounts and keep using my settings
 if [ -z "$WGHHOME" ]; then
-    export WGHHOME=$HOME
+    if [ -d /home/wgh ]; then
+        export WGHHOME=/home/wgh
+    else
+        export WGHHOME=$HOME
+    fi
 fi
 export DOTFILESWGH=$WGHHOME/dotfileswgh
 PATH=$DOFTILESWGH/commands:$PATH
