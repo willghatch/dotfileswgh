@@ -136,7 +136,8 @@ alias lls="ls --color=auto -laFh"
 alias di="ls --color=auto -laFh"
 alias pg="less"
 alias textprint="lp -o cpi=15 -o lpi=9 -o page-top=72 -o page-right=72 -o page-left=72 -o page-bottom=72 "
-alias cp="cp -a" #archive mode, to preserve timestamps
+alias cp="cp -a -i" # archive mode, to preserve timestamps, interactive check when overwriting
+alias mv="mv -i" # ask before overwriting something else
 alias ag="ag --color-match '1;36'"
 alias ags="ag --color-match '1;36' --smart-case"
 alias pyg="pygmentize -g --" # colored cat, with pygments installed with pip
