@@ -1,9 +1,15 @@
-#!/bin/sh
+#!/usr/bin/env bash
 
 # get my public IP address
 
-
+if [[ "$1" = -6 ]]; then
+    ip6=true
+fi
 if which dig >/dev/null 2>&1; then
+    hasdig=true
+fi
+
+if [[ "$hasdig" = true && "$ip6" != true ]]; then
     # using dns, if possible.  Note, dig is in the dnsutils package in Arch.
     dig +short myip.opendns.com @resolver1.opendns.com
 else
@@ -14,15 +20,25 @@ else
     # instead of curl you could use 
     getpage="curl"
     #getpage="wget -qO-"
+
+    page4=ipv4.icanhazip.com
+    page6=ipv6.icanhazip.com
     
-    #$getpage icanhazip.com
-    $getpage ipv4.icanhazip.com
-    #$getpage ipv6.icanhazip.com
-    #$getpage ident.me
-    #$getpage v4.ident.me
-    #$getpage v6.ident.me
-    #$getpage ipecho.net/plain
-    #$getpage ifconfig.me
-    #$getpage -s checkip.dyndns.org | sed -e 's/.*Current IP Address: //' -e 's/<.*$//'
+    #page4=icanhazip.com
+    #page4=ipv4.icanhazip.com
+    #page6=ipv6.icanhazip.com
+    #page4=ident.me
+    #page4=v4.ident.me
+    #page6=v6.ident.me
+    #page4=ipecho.net/plain
+    #page4=ifconfig.me
+
+    if [[ "$ip6" = true ]]; then
+        page=$page6
+    else
+        page=$page4
+    fi
+
+    "$getpage" "$page"
 
 fi
