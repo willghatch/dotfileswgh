@@ -1,0 +1,24 @@
+#!/usr/bin/env bash
+
+# rsync wrapper because rsync has weird behavior with the trailing 
+# slash of the source argument
+
+if [[ $# < 2 || "$1" == --help ]]; then
+  echo "usage: $0 <src> <dest>"
+  echo 'acts like `cp $src/* $dest/`'
+  exit 1
+fi
+
+src="$1"
+dst="$2"
+
+# rsync acts like cp/scp/etc if there is NO trailing slash on the src arg
+# otherwise it acts like cp $src/* $dst
+
+# a=archive (preserve metadata, copy symlinks as symlinks)
+# r=recursive
+# v=verbose (say what file is being copied)
+# add trailing src slash so it acts as described above
+rsync -arv "$src/" "$dst"
+
+
