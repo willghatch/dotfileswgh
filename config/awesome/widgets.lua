@@ -30,6 +30,23 @@ email_timer = timer({ timeout = 20 })
 email_timer:connect_signal("timeout", set_email_widget)
 email_timer:start()
 
+set_ipv6_widget = function()
+   local ip6str = ""
+   local io = { popen = io.popen }
+   local s = io.popen("ip address show scope global")
+   for line in s:lines() do
+      if line:match("inet6.*global") then
+         ip6str = "｢IPv6｣"
+      end
+   end
+   ipv6_widget:set_markup('<span color="#913191">'.. ip6str ..'</span>')
+end
+ipv6_widget = wibox.widget.textbox()
+set_ipv6_widget()
+ipv6_timer = timer({ timeout = 5 })
+ipv6_timer:connect_signal("timeout", set_ipv6_widget)
+ipv6_timer:start()
+
 -- create some vicious widgets
 -- Initialize widget
 -- mpdwidget = wibox.widget.textbox()
@@ -187,6 +204,7 @@ for s = 1, screen.count() do
    -- Widgets that are aligned to the right
    local right_layout = wibox.layout.fixed.horizontal()
    right_layout:add(email_widget)
+   right_layout:add(ipv6_widget)
    --right_layout:add(mpdwidget)
    right_layout:add(kbd_state_widget)
    right_layout:add(cpuTextWidget)
