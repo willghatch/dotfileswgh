@@ -62,6 +62,9 @@ STICKY_OTHER_WRITABLE 45;34;01
 
 # extensions - list with *ext or .ext, but the . is included in the literal extension
 
+# partially downloaded files
+*part 38;5;196
+
 # archives / compressed
 *tar 38;5;094
 *tgz 38;5;094
@@ -92,8 +95,10 @@ STICKY_OTHER_WRITABLE 45;34;01
 
 # Video formats -- brighter than images
 *mp4 38;5;118
+*mpg 38;5;118
 *3gp 38;5;118
 *mkv 38;5;118
+*webm 38;5;118
 *m4v 38;5;118
 *avi 38;5;118
 *ogv 38;5;118
