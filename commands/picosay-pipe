@@ -1,0 +1,9 @@
+#!/usr/bin/env bash
+
+text=$(cat -)
+tfile=$(mktemp /tmp/pico-XXXXXX.wav)
+
+pico2wave -l en-US -w "$tfile" "$text"
+aplay "$tfile"
+rm "$tfile"
+
