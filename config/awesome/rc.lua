@@ -72,8 +72,9 @@ beautiful.init("/home/wgh/.config/awesome/theme.lua")
 -- This is used later as the default terminal and editor to run.
 --terminal = "xterm"
 --terminal = "xterm -fg white -bg black"
-terminal2 = {"vlaunch", "terminal2"}
 terminal = {"vlaunch", "terminal"}
+terminal2 = {"vlaunch", "terminal2"}
+terminal3 = {"vlaunch", "terminal3"}
 editor = os.getenv("EDITOR") or "nano"
 
 -- Default modkey.
@@ -278,6 +279,7 @@ genGlobalKeys = function(modkey)
       awful.key({ modkey,           }, "r",     mkspawn({"bashrun"})),
       awful.key({ modkey,           }, "Return", mkspawn(terminal)),
       awful.key({ modkey, "Control" }, "Return", mkspawn(terminal2)),
+      awful.key({ modkey, "Mod1"    }, "Return", mkspawn(terminal3)),
 
       --awful.key({ modkey, "Mod1"    }, "b", function () awful.util.spawn("dwb") end),
       awful.key({ modkey,           }, "q", mkspawn({"vlaunch", "lockscreen"})),
