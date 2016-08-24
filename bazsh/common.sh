@@ -175,6 +175,8 @@ alias gp="git push"
 alias gd="git diff"
 alias ga="git add"
 
+alias rd="raco docs"
+
 alias hloc="locate --database $HOME/.cache/hloc.db"
 alias hupdb="updatedb --output $HOME/.cache/hloc.db --database-root $HOME --require-visibility no --add-prunepaths $HOME/.snapshot"
 export LOCATE_PATH=$HOME/.cache/hloc.db
