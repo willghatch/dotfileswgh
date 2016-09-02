@@ -165,7 +165,8 @@ zstyle ':completion:*' show-completer true
 zstyle ':completion:*' list-prompt "%l"
 
 # count / as word separators, so I can kill partial paths
-WORDCHARS="${WORDCHARS:s#/#}"
+# count other stuff as word characters, because it always messes me up
+WORDCHARS="${WORDCHARS:s#/#}+"
 
 fpath=($fpath $HROOT/build/zsh-completions/src)
 
