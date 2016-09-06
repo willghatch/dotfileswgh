@@ -175,7 +175,9 @@ alias gp="git push"
 alias gd="git diff"
 alias ga="git add"
 
-alias rd="raco docs"
+alias rd="rd-with-browser --browser \"dwb -n\""
+alias rdn="rd-with-browser --browser dwb"
+alias rdf="rd-with-browser --browser ffx"
 
 alias hloc="locate --database $HOME/.cache/hloc.db"
 alias hupdb="updatedb --output $HOME/.cache/hloc.db --database-root $HOME --require-visibility no --add-prunepaths $HOME/.snapshot"
