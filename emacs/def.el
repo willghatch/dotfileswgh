@@ -117,6 +117,7 @@
  (setq hydra-lv nil)
  (load-library "keys")
  (load-library "vfuncs")
+ (load-library "scribble-funcs")
  (if (equal (getenv "WGH_THEME_DARK_OR_LIGHT") "light")
      (light-theme)
    (dark-theme))

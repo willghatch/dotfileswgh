@@ -64,6 +64,7 @@
 (in 'js2-refactor)
 (in 'haskell-mode)
 (in 'racket-mode)
+(in 'scribble-mode)
 (in 'markdown-mode)
 (in 'slime)
 (in 'lua-mode)
