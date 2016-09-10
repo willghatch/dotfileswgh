@@ -98,7 +98,7 @@ if filereadable($DOTFILESWGH . "/external/vim/Vundle.vim/README.md")
     Plugin 'msanders/snipmate.vim'
     "Plugin 'camelcasemotion'
     Plugin 'AndrewRadev/sideways.vim'
-    Plugin 'vim-scripts/paredit.vim'
+    "Plugin 'vim-scripts/paredit.vim'
     "Plugin 'luochen1990/rainbow'
     Plugin 'pelodelfuego/vim-swoop'
     "Plugin 'terryma/vim-multiple-cursors'
