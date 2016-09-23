@@ -1,0 +1,18 @@
+#!/usr/bin/env racket
+#lang racket/base
+
+(require macro-debugger/stepper)
+(require racket/cmdline)
+
+(define file-to-step
+  (command-line
+   #:args (filename)
+   filename))
+
+(define-namespace-anchor anchor)
+
+;; expand-module/step tries to expand the symbol file-to-step normally...
+;; cheap workaround
+(eval `(expand-module/step ,file-to-step)
+      (namespace-anchor->namespace anchor))
+
