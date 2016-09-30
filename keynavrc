@@ -115,6 +115,9 @@
 #ctrl+semicolon start, grid 3x3
 #hyper+n start, grid 3x3
 #Escape end
+
+####################################################################
+
 super+s start, grid 3x3
 s end
 #ctrl+n start, grid 3x3
@@ -129,9 +132,9 @@ w cell-select 2x3
 v cell-select 3x3
 
 apostrophe move-left .50
-q move-down .50
-j move-up .50
-k move-right .50
+q move-right .50
+j move-down .50
+k move-up .50
 
 a warp
 # 1 is left, 2 is middle, 3 is right
@@ -144,7 +147,9 @@ shift+u warp, doubleclick 3
 ctrl+o drag 1, warp, drag 1
 ctrl+e drag 2, warp, drag 2
 ctrl+u drag 3, warp, drag 3
-minus warp, click 1
-period warp, click 2
-p warp, click 3
+minus warp, drag 1
+period warp, drag 2
+p warp, drag 3
+
+z history-back
 
