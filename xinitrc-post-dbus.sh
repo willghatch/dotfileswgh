@@ -37,8 +37,16 @@ screenlayout-default.sh
 #cinnamon-screensaver &
 xscreensaver -no-splash &
 
-# I hate it tappnig the touchpad counts as a mouse click.
-stopTouchpadClick.sh &
+#### touchpad config
+# turn off tap-to-click
+synclient maxtaptime=0
+# allow horizontal two-finger scroll
+synclient HorizTwoFingerScroll=1
+# make two-finger scroll slower.  Default is 108, higher is slower (IE cover more trackpad per scroll signal)
+# 300 is slower than I want in gnome-terminal and firefox, but still too fast for racket text fields...
+synclient VertScrollDelta=300
+synclient HorizScrollDelta=300
+
 
 # Be sure I have a decent terminfo available
 tic $DOTFILESWGH/xterm-256color-italic.terminfo
