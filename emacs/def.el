@@ -223,6 +223,8 @@
  (setq guide-key/recursive-key-sequence-flag t)
  (guide-key-mode 1)
  ;(global-git-commit-mode 1)
+
+ (load-library "keyfreq-conf")
 )
 
 (let ((file (concat dotfileswgh "/dotlocal/emacs")))

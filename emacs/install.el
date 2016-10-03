@@ -77,6 +77,8 @@
 (in 'git-commit)
 (in 'systemd)
 
+(in 'keyfreq)
+
 ;; some other packages I don't currently use, but might want to later:
 ;; ace-link -- ace jump to navigation links in info, help, eww, or compilation mode
 ;; figlet -- make ascii banners
