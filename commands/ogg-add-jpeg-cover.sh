@@ -7,8 +7,9 @@ if [[ "$#" -lt "2" ]]; then
 fi
 
 OGG="$1"
+ogg_basename="$(basename "$OGG")"
 PIC_ORIG="$2"
-PIC="/tmp/${OGG}.jpg"
+PIC="/tmp/${ogg_basename}.jpg"
 # copy, so I can have a pipe for the pic file
 cp "$PIC_ORIG" "$PIC"
 
@@ -23,8 +24,8 @@ APIC=`base64 --wrap=0 "$PIC"`
 #fi
 MIME="image/jpeg"
 
-tags1="/tmp/${OGG}.tags1"
-tags2="/tmp/${OGG}.tags2"
+tags1="/tmp/${ogg_basename}.tags1"
+tags2="/tmp/${ogg_basename}.tags2"
 
 vorbiscomment -l "$OGG" | grep -v '^COVERART=' | grep -v '^COVERARTDESCRIPTION=' | grep -v '^COVERARTMIME=' | grep -v 'METADATA_BLOCK_PICTURE=' > "$tags1"
 
