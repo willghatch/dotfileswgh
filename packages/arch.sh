@@ -54,6 +54,10 @@ mlocate \
 ctags \
 clisp \
 alsa-utils \
+pulseaudio \
+pulseaudio-alsa \
+pulseaudio-bluetooth \
+pavucontrol \
 abcde \
 lxappearance \
 fortune-mod \
