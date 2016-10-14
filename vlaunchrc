@@ -7,7 +7,7 @@ else
     terminal="gnome-terminal --profile=dark"
 fi
 
-unicode="the-unicoder --client --path /tmp/the-unicoder_${USER}_${DISPLAY}"
+unicode="racket -l the-unicoder -- --client --path /tmp/the-unicoder_${USER}_${DISPLAY}"
 screenshot=scrot
 
 
