@@ -72,7 +72,7 @@ $DOTFILESWGH/external/misc/libnotifylog/libnotifylogger.py $HOME/.cache/notifica
 $DOTFILESWGH/config/awesome/kbd-state-mon.sh &
 
 # start kdeconnect daemon, let my phone drive
-kdeconnect-cli
+#kdeconnect-cli
 
 if [ -f $DOTFILESWGH/pri/xinitrc ]; then
     source $DOTFILESWGH/pri/xinitrc
