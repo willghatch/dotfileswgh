@@ -191,7 +191,7 @@
  ;(load-library "projectile-conf")
  (load-library "scratch-message")
  ;(winner-mode 1)
- (load-library "smartparens-conf")
+ (load-library "delimiters-conf")
  (show-smartparens-global-mode 1)
  ;(require 'yafolding)
  (yafolding-mode 1)
