@@ -4,6 +4,11 @@
 (require 'evil-surround)
 (require 'cl-lib)
 
+;; don't treat random characetrs (like guillemets) as sticky
+(setq sp-sexp-suffix '((racket-mode syntax "")
+                       (scheme-mode syntax "")
+                       (emacs-lisp-mode syntax "")))
+
 ;; remove the pairs that won't be good for lisp
 (sp-pair "'" nil :actions :rem)
 (sp-pair "`" nil :actions :rem)
@@ -43,7 +48,6 @@
       `(,(string-to-char key) . (,l . ,r))
     nil))
 
-;;;; TODO -- macro that takes lists of parens and their name, adds them to sp-pair, and makes evil-textobjs with them, binds them the closing and opening paren in the keymaps, and adds them to evil-any-textobj's map, and also add stuff for `cs»｣` or `ds»`
 (defmacro add-delimiter-pairs (&rest delimiter-lists)
   `(progn
      ,@(mapcar (lambda (delim-list)
@@ -143,8 +147,8 @@
               (append
                (list '(?# . ("#|" . "|#"))
                      ;; don't use the versions with spaces, I hate those
-                     '(40 . ("(" . ")"))
-                     '(41 . ("[" . "]"))
+                     '(41 . ("(" . ")"))
+                     '(91 . ("[" . "]"))
                      '(123 . ("{" . "}"))
                      )
                evil-surround-pairs-alist-addendum

@@ -17,8 +17,6 @@
  ;; Set up load path for requires
  (let ((default-directory (concat dotfileswgh "/dotlocal/emacs.d")))
    (normal-top-level-add-subdirs-to-load-path))
- (let ((default-directory (concat (getenv "HOME") "/.emacs.d")))
-   (normal-top-level-add-subdirs-to-load-path))
  (let ((default-directory "/usr/share/emacs/site-lisp"))
    (normal-top-level-add-subdirs-to-load-path))
  (let ((default-directory (concat dotfileswgh "/emacs")))
