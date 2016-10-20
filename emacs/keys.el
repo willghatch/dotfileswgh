@@ -289,6 +289,15 @@
 (mkmap "S" 'ignore)
 (mkmap "T" 'ignore)
 
+;; make v a no-op in visual-char-mode, so I don't accidentally type vi)vi) and exit
+;; visual state
+(vkmap "v" (lambda (&optional mark point type message)
+             (interactive)
+             (if (and (equal evil-state 'visual)
+                      (equal evil-visual-selection 'char))
+                 (ignore)
+               (evil-visual-char evil-visual-mark evil-visual-point type message))))
+
 ;; I'm not sure a better place to put this...
 (nkmap (kbd "TAB") 'sp-indent-defun)
 
