@@ -14,7 +14,16 @@
 (sp-pair "`" nil :actions :rem)
 
 ;; treat quotes correctly
-(setq sp-sexp-prefix '((racket-mode regexp "#?[`',]@?")))
+
+;; TODO -- # by itself is a prefix, eg. #(1 2 3) vector literals, BUT
+;; they should NOT be a prefix if they are actually the last character
+;; of a multiline comment #||#.  However, I don't think I can have
+;; an emacs regex that looks behind the # to see if something is there
+;; without matching on it.
+
+;; Somehow I think emacs regexps don't work exactly as I expect...
+;; #? doesn't seem to work normally before ,@...
+(setq sp-sexp-prefix '((racket-mode regexp "#,@\\|,@\\|#?[`',]")))
 
 (defun make-inner-textobj-name (name)
   (intern (concat "inner-" name "-textobj")))
@@ -50,20 +59,37 @@
 
 (defmacro add-delimiter-pairs (&rest delimiter-lists)
   `(progn
+     ;; add delimiters to smartparens
      ,@(mapcar (lambda (delim-list)
                  `(sp-pair ,(car delim-list) ,(cadr delim-list)))
                delimiter-lists)
+     ;; add delimiters to evil-textobj-anyblock
      (setq evil-textobj-anyblock-blocks
            '(,@(mapcar (lambda (delim-list)
                          (cons (car delim-list) (cadr delim-list)))
                        delimiter-lists)))
+     ;; add evil-mode text objects for delimiters
      ,@(mapcar (lambda (delim-list)
                  `(define-text-object-with-name ,@delim-list))
                delimiter-lists)
+     ;; if the delimiters are single characters, bind the text object to
+     ;; the evil inner/outer text object maps
      ,@(mapcar (lambda (delim-list)
                  `(bind-textobj-key-maybe ,(cadr delim-list)
                                           ,(caddr delim-list)))
                delimiter-lists)
+     ;; be sure the default syntax table marks them as delimiters
+     ;; -- only if they are single character delimiters.
+     ,@(mapcar (lambda (delim-list)
+                 `(when (= 1 (length ,(car delim-list)))
+                    (modify-syntax-entry (string-to-char ,(car delim-list))
+                                         (concat "(" ,(cadr delim-list))
+                                         (standard-syntax-table))
+                    (modify-syntax-entry (string-to-char ,(cadr delim-list))
+                                         (concat ")" ,(car delim-list))
+                                         (standard-syntax-table))))
+               delimiter-lists)
+     ;; add delimiters to evil-surround (eg. `cs]}`)
      (setq
       evil-surround-pairs-alist-addendum
       '(,@(remove-if 'null
@@ -84,11 +110,9 @@
 
 (add-delimiter-pairs
 
- ;; don't run this on the parens with good built-in support...
- ;; the built-in support is better.
- ;;("(" ")" "parens")
- ;;("{" "}" "braces")
- ;;("\\[" "\\]" "brackets")
+ ("(" ")" "parens")
+ ("{" "}" "braces")
+ ("[" "]" "brackets")
 
  ;; quotes are handled weird, and are basically horrible.
  ;;("\"" . "\"")
