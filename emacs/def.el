@@ -66,7 +66,10 @@
  evil-intercept-maps nil
  evil-overriding-maps nil
  evil-emacs-state-modes nil
- rainbow-identifiers-faces-to-override '(font-lock-variable-name-face)
+ rainbow-identifiers-faces-to-override '(font-lock-variable-name-face
+                                         font-lock-builtin-face
+                                         font-lock-keyword-face
+                                         font-lock-function-name-face)
  sp-highlight-pair-overlay nil
  sp-show-pair-from-inside t
  bmkp-last-as-first-bookmark-file "~/.emacs.d/bookmarks"
