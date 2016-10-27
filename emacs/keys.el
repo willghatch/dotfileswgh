@@ -576,6 +576,7 @@
 ;; Default mode settings
 (setq evil-normal-state-modes (append evil-emacs-state-modes evil-normal-state-modes))
 (setq evil-emacs-state-modes nil)
+(setq evil-insert-state-modes (cons 'racket-repl-mode evil-insert-state-modes))
 
 
 ;; Mouse keys...
