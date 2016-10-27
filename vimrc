@@ -334,6 +334,21 @@ nnoremap <space>tifd :e<space>
 nnoremap tib :bp<CR>
 nnoremap tiw :bn<CR>
 
+" fix directory view keybindings
+augroup netrw_dir_fix
+    autocmd!
+    autocmd filetype netrw call Fix_netrw_maps()
+augroup END
+function! Fix_netrw_maps()
+    " I think I always just want to get out of the directory view
+    nnoremap <buffer> tic :call BufDelOrQuit()<CR>
+    nnoremap <buffer> <space>tica :qa<CR>
+    nnoremap <buffer> tia :BufSwitch<space>
+    nnoremap <buffer> tif :e <C-R>=expand("%:p:h") . "/" <CR>
+endfunction
+
+
+
 nnoremap tst :set wrap!<CR>
 nnoremap tsW :set wrapscan!<CR>
 nnoremap tsh :nohl<CR>
@@ -402,6 +417,7 @@ if $WGH_THEME_DARK_OR_LIGHT == "light"
 else
     call SetDarkTheme()
 endif
+
 
 if filereadable($DOTFILESWGH . "/dotlocal/vimrc")
     source $DOTFILESWGH/dotlocal/vimrc
