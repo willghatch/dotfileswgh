@@ -1,0 +1,56 @@
+
+let hintcharacters = "aoeuhtnsidpgcrmk"
+
+unmap a b c d e f g h i j k l m n o p q r s t u v w x y z
+unmap A B C D E F G H I J K L M N O P Q R S T U V W X Y Z
+
+map j scrollPageDown
+map J scrollDown
+map k scrollPageUp
+map K scrollUp
+map h scrollLeft
+map l scrollRight
+map gg scrollToTop
+map G scrollToBottom
+map H goBack
+map L goForward
+
+map i insertMode
+
+map f createTabbedHint
+map F createHint
+
+map n nextSearchResult
+map N previousSearchResult
+map v toggleVisualMode
+map V toggleVisualLineMode
+map tsh clearSearchHighlight
+
+map r reloadTab
+map w nextTab
+map W moveTabRight
+map b previousTab
+map B moveTabLeft
+map c closeTab
+map o :open<space>
+map O :open @%
+map tt :tabnew<space>
+map ss :tabnew duckduckgo<space>
+
+map zi zoomPageIn
+map zo zoomPageOut
+map z0 zoomOrig
+
+imap <C-a> beginningOfLine
+imap <C-e> endOfLine
+imap <C-k> deleteToEnd
+imap <C-d> deleteChar
+imap <M-d> deleteForwardWord
+imap <M-Backspace> deleteBackwardWord
+imap <C-p> backwardLine
+imap <C-n> forwardLine
+imap <C-f> forwardChar
+imap <M-f> forwardWord
+imap <C-b> backwardChar
+imap <M-b> backwardWord
+
