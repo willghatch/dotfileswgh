@@ -248,6 +248,9 @@ inoremap <C-y> <C-r>"
 cnoremap <esc>r <C-r>
 inoremap <esc>r <C-r>
 
+" emacs style kill line in insert mode
+inoremap <C-k> <C-o>D
+
 " o and e maps - o is left/back, e is right/forward
 noremap e <nop>
 noremap o <nop>
