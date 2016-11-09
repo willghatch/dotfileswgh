@@ -1,8 +1,23 @@
+"" It can't just get my $HOME environment variable? Lame.
+"let homedirectory = "/home/wgh"
+"let configpath = "~/dotfileswgh/cvimrc"
+"" use :source to refresh
+"set localconfig
+
+let defaultengine = "duckduckgo"
 
 let hintcharacters = "aoeuhtnsidpgcrmk"
+let barposition = "bottom"
+
+set smoothscroll
+set defaultnewtabpage
 
 unmap a b c d e f g h i j k l m n o p q r s t u v w x y z
 unmap A B C D E F G H I J K L M N O P Q R S T U V W X Y Z
+
+" Map it to something so it gets eaten and I remember that I'm almost
+" accidentally closing pages.
+map <C-w> scrollDown
 
 map j scrollPageDown
 map J scrollDown
@@ -36,6 +51,8 @@ map o :open<space>
 map O :open @%
 map tt :tabnew<space>
 map ss :tabnew duckduckgo<space>
+
+map Y yankUrl
 
 map zi zoomPageIn
 map zo zoomPageOut
