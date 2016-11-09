@@ -147,7 +147,7 @@ alias o="xdg-open"
 
 alias make="time nice make" # this is always what I actually want
 # parallel make
-export NUMCPUS=$(grep -c '^processor' /proc/cpuinfo)
+export NUMCPUS=$(grep -c '^processor' /proc/cpuinfo 2>/dev/null || echo 2)
 alias pmake="time nice make -j$NUMCPUS --load-average=$NUMCPUS"
 
 alias xclipo="xclip -o -selection clipboard"
@@ -330,11 +330,12 @@ if [[ "$TERM" = "xterm" ]]; then
     TERM=xterm-256color-italic
 fi
 
-lesskey $DOTFILESWGH/lesskey
+lesskey $DOTFILESWGH/lesskey 2>/dev/null
 
 source $DOTFILESWGH/bazsh/grml-funcs.sh
 
-if [ $(uname) = FreeBSD ]
+UNAME=$(uname)
+if [[ $UNAME = FreeBSD || $UNAME = Darwin ]]
 then
     source $DOTFILESWGH/bazsh/bsd.sh
 fi
