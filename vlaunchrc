@@ -7,7 +7,12 @@ else
     terminal="gnome-terminal --profile=dark"
 fi
 
-unicode="racket -l the-unicoder -- --client --path /tmp/the-unicoder_${USER}_${DISPLAY}"
+#unicode="racket -l the-unicoder -- --client --path /tmp/the-unicoder_${USER}_${DISPLAY/:/}"
+unicode_func(){
+    echo 'prompt' | socat - UNIX-CONNECT:/tmp/the-unicoder_${USER}_${DISPLAY/:/}
+}
+unicode="unicode_func"
+
 screenshot=scrot
 
 
