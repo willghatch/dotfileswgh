@@ -7,7 +7,7 @@
 let defaultengine = "duckduckgo"
 
 let hintcharacters = "aoeuhtnsidpgcrmk"
-let barposition = "bottom"
+"let barposition = "bottom"
 
 set smoothscroll
 set defaultnewtabpage
@@ -32,8 +32,8 @@ map L goForward
 
 map i insertMode
 
-map f createTabbedHint
-map F createHint
+map F createTabbedHint
+map f createHint
 
 map n nextSearchResult
 map N previousSearchResult
@@ -47,12 +47,14 @@ map W moveTabRight
 map b previousTab
 map B moveTabLeft
 map c closeTab
+map u lastClosedTab
 map o :open<space>
 map O :open @%
 map tt :tabnew<space>
 map ss :tabnew duckduckgo<space>
 
 map Y yankUrl
+map P openPasteTab
 
 map zi zoomPageIn
 map zo zoomPageOut
