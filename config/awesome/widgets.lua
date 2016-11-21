@@ -4,6 +4,7 @@
 -- {{{ Wibox
 -- Create a textclock widget
 mytextclock = awful.widget.textclock()
+math = require("math")
 
 
 kbd_state_widget = wibox.widget.textbox()
@@ -11,14 +12,45 @@ kbd_state_widget:set_text("")
 
 get_unread_count = function()
     local io = { popen = io.popen }
-    local s = io.popen("unread-hatchmail-count all")
-    local str = ''
-
-    for line in s:lines() do
-        str = str .. "["..line.."] "
+    local instr = io.popen("unread-hatchmail-count all")
+    local incr = function(v, n)
+       n = n or 0
+       n = tonumber(n)
+       n = math.floor(n)
+       return v + n
     end
-    s:close()
-    return "| mail: " .. str
+    local inboxy = 0
+    local spammy = 0
+    local mach_school = 0
+    local racket = 0
+    local lists = 0
+    local top_feeds = 0
+    local rfeeds = 0
+
+    for line in instr:lines() do
+       inboxy = incr(inboxy, line:match("INBOX (%d+)"))
+       spammy = incr(spammy, line:match("maybe.spam (%d+)"))
+       spammy = incr(spammy, line:match("Spam (%d+)"))
+       mach_school = incr(mach_school, line:match("school.lists (%d+)"))
+       mach_school = incr(mach_school, line:match("machines (%d+)"))
+       racket = incr(racket, line:match("racket (%d+)"))
+       lists = incr(lists, line:match("misc.lists (%d+)"))
+       top_feeds = incr(top_feeds, line:match("^feeds (%d+)"))
+       rfeeds = incr(rfeeds, line:match("many.feeds (%d+)"))
+    end
+    local green = "<span color='green'>"
+    local cc = "<span color='#99ff66'>"
+    local ecc = "</span>"
+    instr:close()
+    return green ..
+       "IN ".. cc .. inboxy .. ecc .." "..
+       "MS ".. cc .. mach_school .. ecc .." "..
+       "R ".. cc .. racket .. ecc .." "..
+       "L ".. cc .. lists .. ecc .." "..
+       "F ".. cc .. top_feeds .. ecc .." "..
+       "mF ".. cc .. rfeeds .. ecc .." "..
+       "S ".. cc .. spammy .. ecc .." "..
+       ecc .. " "
 end
 set_email_widget = function()
    email_widget:set_markup('<span color="green">'.. get_unread_count() .."</span>")
@@ -109,7 +141,7 @@ volume_widget_wrapper = function(...)
    end
    return {ret[1], mutestr}
 end
-vicious.register(volumewidget, volume_widget_wrapper, "<span color='#FF9999'> Vol: $1%</span> <span color='#99FF99'>$2 </span>| ", 1, "Master")
+vicious.register(volumewidget, volume_widget_wrapper, "<span color='#00ffff'> Vol: $1%</span> <span color='#99FF99'>$2 </span>| ", 1, "Master")
 
 
 -- battery widget
