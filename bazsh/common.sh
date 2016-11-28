@@ -178,6 +178,7 @@ alias ga="git add"
 alias rd="rd-with-browser --browser \"dwb -n\""
 alias rdn="rd-with-browser --browser dwb"
 alias rdf="rd-with-browser --browser ffx"
+alias rdc="rd-with-browser --browser chromium"
 
 alias hloc="locate --database $HOME/.cache/hloc.db"
 alias hupdb="updatedb --output $HOME/.cache/hloc.db --database-root $HOME --require-visibility no --add-prunepaths $HOME/.snapshot"
