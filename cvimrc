@@ -23,12 +23,14 @@ map j scrollPageDown
 map J scrollDown
 map k scrollPageUp
 map K scrollUp
-map h scrollLeft
-map l scrollRight
+map H scrollLeft
+map L scrollRight
+map h 8H
+map l 8L
 map gg scrollToTop
 map G scrollToBottom
-map H goBack
-map L goForward
+map < goBack
+map > goForward
 
 map i insertMode
 
@@ -53,7 +55,9 @@ map O :open @%
 map tt :tabnew<space>
 map ss :tabnew duckduckgo<space>
 
-map Y yankUrl
+map ;y yankUrl
+map y yankHighlight
+map Y yankDocumentUrl
 map P openPasteTab
 
 map zi zoomPageIn

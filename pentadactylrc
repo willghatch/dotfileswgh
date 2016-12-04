@@ -25,6 +25,13 @@ map -count -builtin -modes=n j <C-d>
 map -count -builtin -modes=n k <C-u>
 map -count -builtin -modes=n J j
 map -count -builtin -modes=n K k
+map -count -builtin -modes=n h 8h
+map -count -builtin -modes=n l 8l
+map -count -builtin -modes=n H h
+map -count -builtin -modes=n L l
+" history
+map -count -builtin -modes=n < H
+map -count -builtin -modes=n > L
 
 " s-map -- make ss do what S did - search in new tab
 map -builtin -modes=n s <Nop>
@@ -50,6 +57,8 @@ map -builtin -modes=n tt t
 " tab switch
 map -count -modes=n -ex w tabnext
 map -count -modes=n -ex b tabprevious
+map -count -modes=n -ex W tabmove! +1
+map -count -modes=n -ex B tabmove! -1
 " make c kill tabs instead of d
 map -builtin -modes=n c d
 map -builtin -modes=n C D
