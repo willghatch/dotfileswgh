@@ -134,6 +134,7 @@ alias lg="ls | grep -i"
 alias ll="ls --color=auto -aF"
 alias lls="ls --color=auto -laFh"
 alias di="ls --color=auto -laFh"
+alias igrep="grep -i"
 alias pg="less"
 alias textprint="lp -o cpi=15 -o lpi=9 -o page-top=72 -o page-right=72 -o page-left=72 -o page-bottom=72 "
 alias cp="cp -a -i" # archive mode, to preserve timestamps, interactive check when overwriting
