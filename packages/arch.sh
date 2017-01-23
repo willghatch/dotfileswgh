@@ -36,6 +36,8 @@ lxterminal \
 xfce4-terminal \
 chromium \
 android-udev \
+android-tools \
+repo \
 xterm \
 xscreensaver \
 pm-utils \
