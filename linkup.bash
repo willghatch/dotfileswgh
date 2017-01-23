@@ -9,6 +9,7 @@ dpath="$HOME/$dfDir"
 
 dotfiles=(
     bashrc
+    bash_profile
     zshrc
     vimrc
     gitconfig
