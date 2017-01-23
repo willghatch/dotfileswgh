@@ -38,6 +38,8 @@ chromium \
 android-udev \
 android-tools \
 repo \
+ccache \
+ninja \
 xterm \
 xscreensaver \
 pm-utils \
