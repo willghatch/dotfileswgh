@@ -35,4 +35,12 @@
         fsckobjects = true
 [receive]
         fsckObjects = true
+## lineage OS objects have zero padded filemodes... but I guess it shouldn't be a serious problem?
+## BUT there appears to be a git bug such that running git fsck by itself uses this setting, but not
+## auto-run git-fsck when doing transfer/fetch/receive... so for now I'll just comment out the above
+## settings when dealing with lineage OS.
+#[fsck]
+#	zeroPaddedFilemode = ignore
 
+[color]
+	ui = auto
