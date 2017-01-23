@@ -35,6 +35,7 @@ vicious \
 lxterminal \
 xfce4-terminal \
 chromium \
+android-udev \
 xterm \
 xscreensaver \
 pm-utils \
