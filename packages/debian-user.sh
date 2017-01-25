@@ -22,6 +22,7 @@ i mutt
 i offlineimap
 i htop
 i grep
+i coreutils
 i ncurses-utils
 i racket
 
