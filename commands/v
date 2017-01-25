@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/usr/bin/env sh
 
 # This was originally an alias, but I wanted to put it as my $EDITOR.
 # $EDITOR works best when the command is one word - no spaces.  So it's

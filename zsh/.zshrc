@@ -369,6 +369,10 @@ if [ "$HOST" = localhost -a -z "$SSH_CLIENT" -a -z "$TMUX" ]; then
     MEGAPROMPT_DISPLAY_P[host]=false
 fi
 MEGAPROMPT_DISPLAY_P[tty]=false
+if [[ "$HOME" = /data/data/com.termux/files/home ]]; then
+    # zsh on termux lacks the pcre module
+    MEGAPROMPT_DISPLAY_P[branch_style_regex]=false
+fi
 
 unfunction compinit
 unfunction compdef
