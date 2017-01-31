@@ -11,6 +11,4 @@ pa pacaur
 
 pa xkbset
 #pa trayer-srg
-pa khal
-pa khard-git
 
