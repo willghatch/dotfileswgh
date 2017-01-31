@@ -46,6 +46,7 @@
 (in 'linum-relative)
 (in 'smooth-scrolling)
 (in 'guide-key)
+(in 'magit)
 
 (in 'helm)
 (in 'helm-swoop)
