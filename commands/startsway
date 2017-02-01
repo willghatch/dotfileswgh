@@ -1,0 +1,9 @@
+#!/usr/bin/env bash
+
+# default to hatchak, allow switching with alt+shift
+# I don't like it much, but it's what sway allows for
+
+export XKB_DEFAULT_LAYOUT=hatchak,us
+export XKB_DEFAULT_OPTIONS=grp:alt_shift_toggle
+
+exec sway

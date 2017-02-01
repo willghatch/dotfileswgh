@@ -1,0 +1,171 @@
+# sway config with awesome-style support
+#
+# This config file will not work for i3.
+
+
+set $mod Mod4
+set $sup Mod4
+set $hyp Mod2
+set $alt Mod1
+set $ctl Control
+set $sh1 Shift
+set $sh2 Mod5
+set $sh4 Mod3
+
+
+# Font for window titles. Will also be used by the bar unless a different font
+# is used in the bar {} block below.
+font pango:monospace 8
+
+# This font is widely installed, provides lots of unicode glyphs, right-to-left
+# text rendering and scalability on retina/hidpi displays (thanks to pango).
+#font pango:DejaVu Sans Mono 8
+
+# Before i3 v4.8, we used to recommend this one as the default:
+# font -misc-fixed-medium-r-normal--13-120-75-75-C-70-iso10646-1
+# The font above is very space-efficient, that is, it looks good, sharp and
+# clear in small sizes. However, its unicode glyph coverage is limited, the old
+# X core fonts rendering does not support right-to-left and this being a bitmap
+# font, it doesn’t scale on retina/hidpi displays.
+
+# Use Mouse+$mod to drag floating windows to their wanted position
+floating_modifier $mod
+
+# start a terminal
+bindsym $mod+Return exec vlaunch terminal
+bindsym $mod+$ctl+Return exec vlaunch terminal2
+bindsym $mod+$alt+Return exec vlaunch terminal3
+bindsym $mod+r exec vlaunch launcher
+
+bindsym $mod+q exec vlaunch lockscreen
+
+#bindsym $mod+c close
+bindsym $mod+c kill
+
+
+# start dmenu (a program launcher)
+#bindsym $mod+e exec dmenu_run
+# There also is the (new) i3-dmenu-desktop which only displays applications
+# shipping a .desktop file. It is a wrapper around dmenu, so you need that
+# installed.
+# bindsym $mod+d exec --no-startup-id i3-dmenu-desktop
+
+#
+# Layout:
+#
+
+bindsym $mod+Space layout auto next
+bindsym $mod+$ctl+Space layout auto prev
+
+# Promote a child to master position in an auto layout
+#bindsym $mod+$ctl+Return move first
+
+bindsym $mod+l resize shrink width 10 px or 10 ppt
+bindsym $mod+h resize grow width 10 px or 10 ppt
+
+# Increase/decrease number of master elements in auto layout
+bindsym $mod+$alt+h layout auto master inc 1
+bindsym $mod+$alt+l layout auto master inc -1
+
+# Increase/decrease number of slave element groups in auto layout
+bindsym $mod+$ctl+h layout auto ncol inc 1
+bindsym $mod+$ctl+l layout auto ncol inc -1
+
+# change focus
+bindsym $mod+j focus next
+bindsym $mod+k focus prev
+#bindsym $mod+j focus down
+#bindsym $mod+k focus up
+#bindsym $mod+h focus left
+#bindsym $mod+l focus right
+
+
+# move focused window
+bindsym $mod+$alt+j move next
+bindsym $mod+$alt+k move prev
+#bindsym $mod+Shift+j move down
+#bindsym $mod+Shift+k move up
+#bindsym $mod+Shift+h move left
+#bindsym $mod+Shift+l move right
+
+# split in horizontal orientation
+#bindsym $mod+s split h
+
+# split in vertical orientation
+#bindsym $mod+v split v
+
+bindsym $mod+g exec --no-startup-id i3-make-empty-workspace.sh
+
+# enter fullscreen mode for the focused container
+bindsym $mod+f fullscreen toggle
+
+# change container layout (stacked, tabbed, toggle split)
+#bindsym $mod+o layout stacking
+#bindsym $mod+minus layout tabbed
+#bindsym $mod+period layout toggle split
+
+# toggle tiling / floating
+#bindsym $mod+$alt+f floating toggle
+
+# change focus between tiling / floating windows
+#bindsym $mod+$ctl+f focus mode_toggle
+
+# focus the parent container
+#bindsym $mod+a focus parent
+
+# focus the child container
+#bindsym $mod+d focus child
+
+# switch to workspace
+bindsym $mod+w workspace next_on_output
+bindsym $mod+b workspace prev_on_output
+bindsym $mod+Mod1+w move window to workspace next_on_output
+bindsym $mod+Mod1+b move window to workspace prev_on_output
+
+bindsym $mod+n focus output right
+bindsym $mod+p focus output left
+bindsym $mod+Mod1+n move window to output right
+bindsym $mod+Mod1+p move window to output left
+
+# reload the configuration file
+bindsym $mod+Mod1+r reload
+# restart i3 inplace (preserves your layout/session, can be used to upgrade i3)
+bindsym $mod+Shift+r restart
+# exit i3 (logs you out of your X session)
+#bindsym $mod+Shift+period exec "i3-nagbar -t warning -m 'You pressed the exit shortcut. Do you really want to exit i3? This will end your X session.' -b 'Yes, exit i3' 'i3-msg exit'"
+
+## resize window (you can also use the mouse for that)
+#mode "resize" {
+#        # These bindings trigger as soon as you enter the resize mode
+#
+#        # Pressing left will shrink the window’s width.
+#        # Pressing right will grow the window’s width.
+#        # Pressing up will shrink the window’s height.
+#        # Pressing down will grow the window’s height.
+#        bindsym l resize shrink width 10 px or 10 ppt
+#        bindsym h resize grow width 10 px or 10 ppt
+#        bindsym L resize shrink height 10 px or 10 ppt
+#        bindsym H resize grow height 10 px or 10 ppt
+#
+#        # same bindings, but for the arrow keys
+#        bindsym Left resize shrink width 10 px or 10 ppt
+#        bindsym Down resize grow height 10 px or 10 ppt
+#        bindsym Up resize shrink height 10 px or 10 ppt
+#        bindsym Right resize grow width 10 px or 10 ppt
+#
+#        # back to normal: Enter or Escape
+#        bindsym e mode "default"
+#        bindsym Return mode "default"
+#        bindsym Escape mode "default"
+#}
+
+#bindsym $mod+z mode "resize"
+
+# Start i3bar to display a workspace bar (plus the system information i3status
+# finds out, if available)
+bar {
+        status_command i3status
+}
+
+#new_window pixel 1
+workspace_layout auto left
