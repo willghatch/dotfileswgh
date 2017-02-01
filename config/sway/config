@@ -37,7 +37,16 @@ bindsym $mod+$ctl+Return exec vlaunch terminal2
 bindsym $mod+$alt+Return exec vlaunch terminal3
 bindsym $mod+r exec vlaunch launcher
 
-bindsym $mod+q exec vlaunch lockscreen
+bindsym $mod+q exec swaylock -c 012323
+
+# xf86dos doesn't work...
+bindsym XF86DOS exec vlaunch unicode
+bindsym $mod+u exec vlaunch unicode
+
+bindsym $hyp+u exec vlaunch volup
+bindsym $hyp+d exec vlaunch voldown
+bindsym $hyp+m exec vlaunch volmute
+bindsym $hyp+g exec gajim-remote show_next_pending_event
 
 #bindsym $mod+c close
 bindsym $mod+c kill
@@ -105,10 +114,10 @@ bindsym $mod+f fullscreen toggle
 #bindsym $mod+period layout toggle split
 
 # toggle tiling / floating
-#bindsym $mod+$alt+f floating toggle
+bindsym $mod+$ctl+f floating toggle
 
 # change focus between tiling / floating windows
-#bindsym $mod+$ctl+f focus mode_toggle
+bindsym $mod+$alt+f focus mode_toggle
 
 # focus the parent container
 #bindsym $mod+a focus parent
@@ -161,10 +170,15 @@ bindsym $mod+Shift+r restart
 
 #bindsym $mod+z mode "resize"
 
+# rules
+for_window [title="bashrun"] floating enable
+for_window [title="the-unicoder"] floating enable
+
 # Start i3bar to display a workspace bar (plus the system information i3status
 # finds out, if available)
 bar {
         status_command i3status
+        tray_output primary
 }
 
 #new_window pixel 1
