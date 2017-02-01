@@ -1,6 +1,6 @@
 [Appearance]
 ColorScheme=wgh
-Font=DejaVu Sans Mono,10,-1,5,50,0,0,0,0,0
+Font=DejaVu Sans Mono,12,-1,5,50,0,0,0,0,0
 
 [General]
 Name=wgh
