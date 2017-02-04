@@ -61,6 +61,7 @@ clisp \
 alsa-utils \
 pulseaudio \
 pulseaudio-alsa \
+pulseaudio-zeroconf \
 pulseaudio-bluetooth \
 pavucontrol \
 abcde \
