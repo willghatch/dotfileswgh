@@ -28,6 +28,7 @@ pm zathura zathura-pdf-poppler zathura-ps zathura-djvu
 
 pm \
 pkgfile \
+htop \
 the_silver_searcher \
 feh \
 awesome \
