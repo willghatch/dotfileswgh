@@ -128,13 +128,13 @@ bindsym $mod+$alt+f focus mode_toggle
 # switch to workspace
 bindsym $mod+w workspace next_on_output
 bindsym $mod+b workspace prev_on_output
-bindsym $mod+Mod1+w move window to workspace next_on_output
-bindsym $mod+Mod1+b move window to workspace prev_on_output
+bindsym $mod+Mod1+w move window to workspace next_on_output; workspace next_on_output
+bindsym $mod+Mod1+b move window to workspace prev_on_output; workspace prev_on_output
 
 bindsym $mod+n focus output right
 bindsym $mod+p focus output left
-bindsym $mod+Mod1+n move window to output right
-bindsym $mod+Mod1+p move window to output left
+bindsym $mod+Mod1+n move window to output right; focus output right
+bindsym $mod+Mod1+p move window to output left; focus output left
 
 # reload the configuration file
 bindsym $mod+Mod1+r reload
@@ -142,6 +142,7 @@ bindsym $mod+Mod1+r reload
 bindsym $mod+Shift+r restart
 # exit i3 (logs you out of your X session)
 #bindsym $mod+Shift+period exec "i3-nagbar -t warning -m 'You pressed the exit shortcut. Do you really want to exit i3? This will end your X session.' -b 'Yes, exit i3' 'i3-msg exit'"
+bindsym $mod+$ctl+q exit
 
 ## resize window (you can also use the mouse for that)
 #mode "resize" {
