@@ -47,6 +47,7 @@ pm-utils \
 unclutter \
 vorbis-tools \
 vlc \
+libdvdcss \
 wget \
 mpd \
 mpc \
