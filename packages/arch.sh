@@ -46,6 +46,8 @@ xscreensaver \
 pm-utils \
 unclutter \
 vorbis-tools \
+ddrescue \
+gnome-mplayer \
 vlc \
 libdvdcss \
 wget \
