@@ -15,5 +15,8 @@ pm xml2 lzop pngcrush schedtool squashfs-tools lzop imagemagick
 # cyanogenmod/lineage 14 and android 7 switched to java 8, and officially requires openjdk
 pm jdk8-openjdk
 
+# Extra stuff
+pm repo android-tools android-udev
+
 echo "installed official repo packages needed, remember to install AUR packages"
 
