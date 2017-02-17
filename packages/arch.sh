@@ -101,5 +101,6 @@ pm perl-file-mimeinfo
 # because it's decent and small, so it can be the default file manager
 pm pcmanfm
 
-# to build adblock plus
-pm python2-jinja
+# I want common libraries to just be installed.  I don't need to save disk space.
+pm qt5 qt4 gtk3 gtk2
+
