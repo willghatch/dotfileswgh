@@ -32,6 +32,7 @@ htop \
 the_silver_searcher \
 feh \
 awesome \
+lua-socket \
 vicious \
 lxterminal \
 xfce4-terminal \
