@@ -166,6 +166,10 @@ quit emacs."
   (ansi-format-decode (point-min) (point-max))
   (backspace-overstrike-decode (point-min) (point-max)))
 
+(defun racket-launch-macro-stepper ()
+  (interactive)
+  (call-process "raco" nil 0 nil "macro-step" (buffer-file-name)))
+
 (defun light-theme ()
   (interactive)
   (load-theme 'tango)
