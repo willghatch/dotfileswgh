@@ -27,8 +27,22 @@ PATH=$DOTFILESWGH/dotlocal/commands:$WGHHOME/rootgit-dotfiles/commands:/rootgit/
 unset MANPATH # so I can use manpath command at end here
 export MANPATH=/usr/share/man:/usr/local/man:/usr/local/share/man:/usr/X11R6/man:/opt/man:$HROOT/usr/share/man:$HROOT/share/man:$NPM_DIR/share/man:$(manpath)
 
+# Use my custom locale if it's installed (must be done as root...).
+# en_US has a dumb date string (not YYYY-MM-DD), but ISO 8601 (and locales
+# that use it, eg en_DK) uses Monday as the first day of the week.
+# Also, en_US uses imperial units while I want metric, and mine
+# customizes telephone layouts to display as NNN-NNN-NNNN rather than
+# (NNN) NNN-NNNN... though I don't know where that even comes up in 
+# software that uses locale settings...
+if [[ -f /usr/share/i18n/locales/en_US@willghatch ]]; then
+    # maybe I should test with `localectl list-locales`, except I'll have to grep as well.
+    export LANG=en_US@willghatch
+else
+    export LANG=en_US.utf8
+fi
+
 # pacaur alias to stop it from fighting with guix...
-alias pacaur="env EDITOR=vim PATH=/bin LIBRARY_PATH= pacaur"
+alias pacaur="env EDITOR=vim PATH=/bin:/bin/site_perl:/bin/vendor_perl:/bin/core_perl LIBRARY_PATH= pacaur"
 
 # I'll leave these commented for now.  I exported these to build stuff in my
 # $HROOT, but I'm hoping something like guix solves my user packaging issues...
