@@ -34,12 +34,12 @@ export MANPATH=/usr/share/man:/usr/local/man:/usr/local/share/man:/usr/X11R6/man
 # customizes telephone layouts to display as NNN-NNN-NNNN rather than
 # (NNN) NNN-NNNN... though I don't know where that even comes up in 
 # software that uses locale settings...
-if [[ -f /usr/share/i18n/locales/en_US@willghatch ]]; then
-    # maybe I should test with `localectl list-locales`, except I'll have to grep as well.
-    export LANG=en_US@willghatch
-else
-    export LANG=en_US.utf8
-fi
+#if [[ -f /usr/share/i18n/locales/en_US@willghatch ]]; then
+#    # maybe I should test with `localectl list-locales`, except I'll have to grep as well.
+#    export LANG=en_US@willghatch
+#else
+#    export LANG=en_US.utf8
+#fi
 
 # pacaur alias to stop it from fighting with guix...
 alias pacaur="env EDITOR=vim PATH=/bin:/bin/site_perl:/bin/vendor_perl:/bin/core_perl LIBRARY_PATH= pacaur"
