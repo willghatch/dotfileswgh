@@ -69,7 +69,6 @@ pulseaudio-alsa \
 pulseaudio-zeroconf \
 pulseaudio-bluetooth \
 pavucontrol \
-abcde \
 lxappearance \
 fortune-mod \
 cowsay \
@@ -85,6 +84,10 @@ bind-tools \
 libnotify \
 dunst \
 texlive-bin
+
+# cd ripping -- glyr is needed for fetching album art
+# !! also need aur packages
+pm abcde glyr
 
 pm fail2ban
 
