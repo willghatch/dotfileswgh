@@ -14,6 +14,7 @@ dotfiles=(
     vimrc
     gitconfig
     tmux.conf
+    abcde.conf
     muttrc
     makepkg.conf
     inputrc
