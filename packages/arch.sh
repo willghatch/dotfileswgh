@@ -100,6 +100,9 @@ pm fuseiso
 # for keeping encrypted dirs and mounting the decrypted version
 pm encfs
 
+# for flashing infinity ergodox
+pm dfu-util
+
 # for xdg-open type stuff
 pm perl-file-mimeinfo
 # because it's decent and small, so it can be the default file manager
