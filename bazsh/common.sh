@@ -339,7 +339,7 @@ cpost()
 tic -x $DOTFILESWGH/xterm-256color-italic.terminfo
 tic -x $DOTFILESWGH/xterm-24bit.terminfo
 tic -x $DOTFILESWGH/xterm-24bit-italic.terminfo
-if [[ "$TERM" = "xterm" ]]; then
+if [[ "$TERM" = "xterm" || "$TERM" = "xterm-256color" ]]; then
     TERM=xterm-24bit-italic
 fi
 
