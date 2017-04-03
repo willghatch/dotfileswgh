@@ -336,9 +336,11 @@ cpost()
 }
 
 # fix terminal
-tic $DOTFILESWGH/xterm-256color-italic.terminfo
+tic -x $DOTFILESWGH/xterm-256color-italic.terminfo
+tic -x $DOTFILESWGH/xterm-24bit.terminfo
+tic -x $DOTFILESWGH/xterm-24bit-italic.terminfo
 if [[ "$TERM" = "xterm" ]]; then
-    TERM=xterm-256color-italic
+    TERM=xterm-24bit-italic
 fi
 
 lesskey $DOTFILESWGH/lesskey 2>/dev/null

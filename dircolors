@@ -231,3 +231,6 @@ TERM xterm
 TERM vt100
 TERM xterm-256color
 TERM xterm-256color-italic
+TERM xterm-24bit
+TERM xterm-24bit-italic
+TERM rackterm
