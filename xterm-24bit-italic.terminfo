@@ -1,5 +1,5 @@
 # Use semicolon separators.
-xterm-24bit|xterm with 24-bit direct color mode,
+xterm-24bit-italic|xterm with 24-bit direct color mode,
   sitm=\E[3m, ritm=\E[23m,
   use=xterm-24bit,
 
