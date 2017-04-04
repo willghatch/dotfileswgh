@@ -100,6 +100,9 @@ pm fuseiso
 # for keeping encrypted dirs and mounting the decrypted version
 pm encfs
 
+# check hard drive health
+pm smartmontools
+
 # for flashing infinity ergodox
 pm dfu-util
 
