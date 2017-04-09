@@ -101,7 +101,7 @@ export ZDOTDIR=$DOTFILESWGH/zsh
 # v is a wrapper script to launch vim with my settings
 export ALTERNATE_EDITOR=v
 export EDITOR=$ALTERNATE_EDITOR
-export PAGER=less
+export PAGER=premacs-pager
 
 export XDG_DOWNLOAD_DIR="$HOME/dl"
 export VLAUNCHRC="$DOTFILESWGH/vlaunchrc"
@@ -130,7 +130,7 @@ alias ms="mpcl stop"
 
 ####### Editing
 alias em="emacs -nw -l $DOTFILESWGH/emacs/def"
-alias e="$EDITOR"
+alias e="premacs-use-t"
 alias eg="premacs-use -c"
 alias emg="emacs -l $DOTFILESWGH/emacs/def"
 alias emp="emacs -nw -l $DOTFILESWGH/emacs/package-conf.el"
