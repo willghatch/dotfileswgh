@@ -81,5 +81,7 @@ if [ -f $DOTFILESWGH/dotlocal/xinitrc ]; then
     source $DOTFILESWGH/dotlocal/xinitrc
 fi
 
+premacs-init &
+
 exec awesome
 
