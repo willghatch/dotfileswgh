@@ -12,7 +12,12 @@ install: build
 	firefox dactyl/downloads/pentadactyl*.xpi \
 		scrollhighlight/scrollhighlight.xpi \
 		https://addons.mozilla.org/firefox/downloads/latest/ublock-origin/addon-607454-latest.xpi \
-		https://addons.mozilla.org/firefox/downloads/latest/229918/addon-229918-latest.xpi
+		https://addons.mozilla.org/firefox/downloads/latest/session-manager/addon-2324-latest.xpi?src=dp-btn-primary \
+		https://addons.mozilla.org/firefox/downloads/latest/self-destructing-cookies/addon-415846-latest.xpi?src=dp-btn-primary \
+		https://addons.mozilla.org/firefox/downloads/latest/tree-style-tab/addon-5890-latest.xpi?src=dp-btn-primary \
+		https://addons.mozilla.org/firefox/downloads/latest/https-everywhere/addon-229918-latest.xpi?src=dp-btn-primary
+	# other add-on notes:
+	# "Find Bar Tweaks" - makes a circle animation around `find` results, but is incompatible with pentadactyl
 clean:
 	rm -rf dactyl/downloads/
 	rm -f scrollhighlight/*.xpi
