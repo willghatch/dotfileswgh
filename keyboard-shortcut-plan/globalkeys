@@ -1,6 +1,9 @@
 This started out as an exploration of just media keys, but I need to make some sense of my global key situation
 
 categories:
+  input
+    launch unicode entry program (the-unicoder!)
+    mouse keys of some sort?  Controlling the cursor with the keyboard is somewhat awful, but in a pinch I would like to be able to do it.
   media actions -- some global, some local
     !! some of these I will sometimes want to perform for a remote machine (eg media server) instead of local
     volume up
@@ -15,15 +18,19 @@ categories:
     prev song/scene
     rewind a little
     fast forward a little
-  zoom -- local
+  zoom -- local, but I want these to be the same in everything preferably.
     zoom in
     zoom out
     zoom 100%
     zoom full
   notifications -- global
-    clear notifications
+    clear specific notification -- maybe I need a notification window that I can open and control...
+      - probably I want an easy key to clear (both hide the pop-up and clear from any outstanding notifications list) the latest notification, so I can dismiss simple reminders without more thought.
+    clear all notifications -- or maybe just hide pop-ups for them?
     recall old notifications
-  state -- I am increasingly leaning toward keeping some sort of store of state for various things I do and haveing convenient ways to switch the state at a global level.
+    do something about notification
+      - eg. open chat window, etc.  Right now I open the latest thread in Gajim with hyper+g...
+  state -- I am increasingly leaning toward keeping some sort of store of state for various things I do and having convenient ways to switch the state at a global level.
     change global UI state -- set which app should receive media commands, which machine should get volume commands, dark/light theme globally, etc.  
     display state stuff somehow
   
@@ -39,6 +46,6 @@ media issues:
   I might have a keybinding for local volume, and another binding for "alternate", and just hope I never have reason to have more than one alternate configured.
 
 
-perhaps I should have some sort of state file that says which machine and app I'm controlling, and have a convenience program to set machine/app easily?  Then I could just have one keyset for controlling, and just switch the state.
+perhaps I should have some sort of state file that says which machine and app I'm controlling (eg. MPD on localhost vs MPD on media-box vs VLC on localhost...), and have a convenience program to set machine/app easily?  Then I could just have one keyset for controlling, and just switch the state.
 
 
