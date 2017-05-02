@@ -103,6 +103,7 @@ STICKY_OTHER_WRITABLE 45;34;01
 *m4v 38;5;118
 *avi 38;5;118
 *ogv 38;5;118
+*ts 38;5;118
 
 # sound
 .flac 38;5;037
