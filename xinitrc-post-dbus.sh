@@ -5,6 +5,10 @@
 # wrapping the exec to my window manager.  But gnome-terminal doesn't see it
 # if I just launch it in this script.  So I'll use dbus-launch to launch this.
 
+mkdir -p /tmp/$(whoami)
+mkdir -p /tmp/$(whoami)/tty/${LOGIN_TTY}
+echo "DBUS_SESSION_BUS_ADDRESS=${DBUS_SESSION_BUS_ADDRESS}" >"/tmp/$(whoami)/tty/${LOGIN_TTY}/dbus-session-bus-address"
+
 pulseaudio &
 
 # merge xresources first, so other programs in this (xscreensaver) can get settings

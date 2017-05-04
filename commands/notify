@@ -9,5 +9,10 @@ if [ -z "$DISPLAY" ]; then
     export DISPLAY
 fi
 
+if [ -z "$DBUS_SESSION_BUS_ADDRESS" ]; then
+    # get the bus address that I've stashed in xinitrc
+    export "$(cat /tmp/wgh/tty/dev/tty1/dbus-session-bus-address)"
+fi
+
 notify-send "Note" "$*"
 
