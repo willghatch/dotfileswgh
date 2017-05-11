@@ -12,6 +12,9 @@ pa pacaur
 pa xkbset
 #pa trayer-srg
 
+# like `git svn` for mercurial
+pa git-remote-hg-git
+
 # needed for abcde to get metadata...
 pa perl-musicbrainz-discid perl-webservice-musicbrainz
 
