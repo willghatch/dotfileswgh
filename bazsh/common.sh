@@ -15,6 +15,11 @@ i-am-me() {
     fi
 }
 
+if /system/bin/true >/dev/null 2>&1; then
+    # I'm on android... bleh...
+    export ANDROID_TERMUX_MODE=true
+fi
+
 export HROOT=$WGHHOME/hroot
 export NPM_DIR=$DOTFILESWGH/dotlocal/npm
 export NODE_PATH="$NPM_DIR/lib/node_modules"
@@ -49,8 +54,7 @@ alias pacaur="env EDITOR=vim PATH=/bin:/bin/site_perl:/bin/vendor_perl:/bin/core
 #export PKG_CONFIG_PATH=$HROOT/lib/pkgconfig:/usr/local/lib/pkgconfig:/usr/lib/pkgconfig:/lib/pkgconfig
 #export LD_LIBRARY_PATH=$HROOT/lib:/usr/local/lib:/usr/lib:/lib
 
-if /system/bin/true >/dev/null 2>&1; then
-    # I'm on android... bleh...
+if [[ "$ANDROID_TERMUX_MODE" ]]; then
     # Set LD_LIBRARY_PATH for termux
     LD_LIBRARY_PATH=$PREFIX/lib:$LD_LIBRARY_PATH
 fi
@@ -74,11 +78,15 @@ XDG_DATA_DIRS=$DOTFILESWGH/local/share:$XDG_DATA_DIRS:/usr/local/share:/usr/shar
 #XDG_CACHE_HOME=$HOME/.cache
 
 XDG_RUNTIME_DIR="/run/user/$(id -u)"
-if [[ ! -d "$XDG_RUNTIME_DIR" ]]; then
+if [[ "$ANDROID_TERMUX_MODE" ]]; then
+    XDG_RUNTIME_DIR="$HOME/runtime-dir"
+    mkdir -p "$XDG_RUNTIME_DIR"
+elif [[ ! -d "$XDG_RUNTIME_DIR" ]]; then
     XDG_RUNTIME_DIR="/tmp/${USER}_$(id -u)/runtime"
     mkdir -p "$XDG_RUNTIME_DIR"
     chmod 700 "$XDG_RUNTIME_DIR"
 fi
+export XDG_RUNTIME_DIR
 
 
 # themes to ease eye strain
