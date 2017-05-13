@@ -7,8 +7,9 @@ if [[ "none" = "$daemon" ]]; then
     exec emacsclient -nw "$@"
 fi
 
-old=/tmp/$(whoami)/premacs
-new=/tmp/$(whoami)/premacs-tmp
+premaxd=${XDG_RUNTIME_DIR:-/tmp/$(whoami)}/
+old=$premaxd/premacs-list
+new=$premaxd/premacs-tmp
 mv "$old" "$new"
 grep -v "$daemon" "$new" > "$old"
 rm "$new"

@@ -1,9 +1,11 @@
 #!/usr/bin/env bash
 
+premaxf=${XDG_RUNTIME_DIR:-/tmp/$(whoami)}/premacs-list
+
 while read daemon
 do
     emacsclient -e '(kill-emacs)' -s $daemon
-done </tmp/$(whoami)/premacs
+done <"$premaxf"
 
-rm /tmp/$(whoami)/premacs
+rm "$premaxf"
 

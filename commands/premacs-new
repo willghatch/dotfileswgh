@@ -5,6 +5,8 @@
 newId=$RANDOM
 EDIR=$DOTFILESWGH/emacs
 cd $HOME
-mkdir -p /tmp/$(whoami)
-emacs -l $EDIR/def.el -l $EDIR/premacs-run.el --daemon=premacs$newId && \
-echo premacs$newId >> /tmp/$(whoami)/premacs
+premaxd=${XDG_RUNTIME_DIR:-/tmp/$(whoami)}/
+mkdir -p "$premaxd"
+emacs --eval "(setq server-socket-dir \"$premaxd\")" -l $EDIR/def.el -l $EDIR/premacs-run.el "--daemon=premacs-socket-${newId}" && \
+echo premacs-socket-${newId} >> "$premaxd/premacs-list"
+

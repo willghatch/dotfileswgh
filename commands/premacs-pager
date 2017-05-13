@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 export ALTERNATE_EDITOR=less
-dir="/tmp/$(whoami)/premacs-pages"
+dir="${XDG_RUNTIME_DIR:-/tmp/$(whoami)}/premacs-pages"
 mkdir -p "$dir"
 chmod 700 "$dir"
 tmpf="$(mktemp $dir/pager-XXXXXX)"

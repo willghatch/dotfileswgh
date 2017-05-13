@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-premaxf=/tmp/$(whoami)/premacs
+premaxf=${XDG_RUNTIME_DIR:-/tmp/$(whoami)}/premacs-list
 
 if [ -f $premaxf ]
 then

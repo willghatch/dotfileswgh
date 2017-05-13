@@ -1,11 +1,12 @@
 #!/usr/bin/env bash
 
-for daemon in `ls /tmp/emacs*/premacs*`
+rdir=${XDG_RUNTIME_DIR:-/tmp/$(whoami)}
+for daemon in `ls $rdir/premacs-socket*`
 do
     emacsclient -e '(kill-emacs)' -s $daemon
 done
 
 ps aux | grep emacs | grep daemon | grep premacs | awk '{print $2}' | xargs kill -9
 
-rm /tmp/$(whoami)/premacs
+rm $rdir/premacs-list
 
