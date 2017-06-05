@@ -109,7 +109,8 @@ export ZDOTDIR=$DOTFILESWGH/zsh
 # v is a wrapper script to launch vim with my settings
 export ALTERNATE_EDITOR=v
 export EDITOR=$ALTERNATE_EDITOR
-export PAGER=premacs-pager
+#export PAGER=premacs-pager
+export PAGER=less
 
 export XDG_DOWNLOAD_DIR="$HOME/dl"
 export VLAUNCHRC="$DOTFILESWGH/vlaunchrc"
