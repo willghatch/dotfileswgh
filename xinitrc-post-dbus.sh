@@ -53,6 +53,7 @@ tic $DOTFILESWGH/xterm-256color-italic.terminfo
 
 # Notifications
 dunst &
+dunst-lock-monitor &
 
 mpd &
 
