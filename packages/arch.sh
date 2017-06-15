@@ -115,5 +115,8 @@ pm pcmanfm
 pm avahi nss-mdns
 
 # I want common libraries to just be installed.  I don't need to save disk space.
-pm qt5 qt4 gtk3 gtk2
+#pm qt5 qt4 gtk3 gtk2
+
+pm tigervnc
+pm nmap
 
