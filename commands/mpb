@@ -1,5 +1,6 @@
 #!/usr/bin/env bash
 
-mkdir -p $WGHHOME/.prifsb $WGHHOME/prifsb
+mkdir -p $WGHHOME/.prifsb $WGHHOME/prifsb &&
+chmod 700 $WGHHOME/.prifsb $WGHHOME/prifsb &&
 encfs $WGHHOME/.prifsb $WGHHOME/prifsb
 

@@ -88,9 +88,6 @@ function mkSundries() {
     mkdir -p $HOME/.xmonad
     mkdir -p $HOME/.elinks
     mkdir -p $HOME/.themes
-    mkdir -p $HOME/.prifs
-    mkdir -p $HOME/prifs
-    chmod 700 $HOME/.prifs $HOME/prifs
     mkdir -p $dpath/dotlocal/firefox-default-profile/extensions
     # dirs for mpd
     mkdir -p $HOME/.cache/mpd/playlists
