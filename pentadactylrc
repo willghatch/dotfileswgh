@@ -35,11 +35,11 @@ map -count -builtin -modes=n > L
 
 " s-map -- make ss do what S did - search in new tab
 map -builtin -modes=n s <Nop>
-"map -builtin -modes=n ss S
+map -builtin -modes=n ss S
 " color fixing hack -- instead of directly opening a new tab to a search,
 " open a new tab, THEN search.  That way the ColorTransform plugin can
 " load and not have white flashes.
-map -builtin -modes=n ss t<cr>s
+" map -builtin -modes=n ss t<cr>s
 map -builtin -modes=n S s
 map -builtin -modes=n sm m
 map -builtin -modes=n sg `

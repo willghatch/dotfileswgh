@@ -1,0 +1,5 @@
+#!/usr/bin/env bash
+
+mkdir -p $WGHHOME/.prifs $WGHHOME/prifs
+encfs --idle=5 $WGHHOME/.prifs $WGHHOME/prifs
+

@@ -133,10 +133,6 @@ umask 022 # the covenient umask
 ################################################  ALIASES ###############################
 
 
-alias mn="mpcl next"
-alias mp="mpcl toggle"
-alias ms="mpcl stop"
-
 ####### Editing
 alias em="emacs -nw -l $DOTFILESWGH/emacs/def"
 alias e="premacs-use-t"
