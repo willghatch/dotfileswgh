@@ -21,7 +21,8 @@ pm emacs
 
 # next tier of basic things
 pm xorg konsole xterm xorg-xinit arandr bashrun ttf-dejavu xclip
-pm python python2 python-pip python2-pip ghc cabal-install racket nodejs npm
+pm python python2 python-pip python2-pip racket nodejs npm
+pm ghc cabal-install
 pm firefox
 pm sshfs zip unzip tig
 pm zathura zathura-pdf-poppler zathura-ps zathura-djvu
@@ -44,7 +45,6 @@ ccache \
 ninja \
 xterm \
 xscreensaver \
-pm-utils \
 unclutter \
 vorbis-tools \
 ddrescue \
@@ -62,7 +62,6 @@ gnome-keyring \
 blueman \
 mlocate \
 ctags \
-clisp \
 alsa-utils \
 pulseaudio \
 pulseaudio-alsa \
@@ -84,6 +83,8 @@ bind-tools \
 libnotify \
 dunst \
 texlive-bin
+
+pm pm-utils
 
 # cd ripping -- glyr is needed for fetching album art
 # !! also need aur packages
