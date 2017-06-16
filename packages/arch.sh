@@ -119,4 +119,5 @@ pm avahi nss-mdns
 
 pm tigervnc
 pm nmap
+pm borgbackup
 
