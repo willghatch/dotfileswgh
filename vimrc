@@ -17,6 +17,7 @@ set showcmd      " show prefix keys as they are typed
 set laststatus=2 " always show statusbar
 set hidden       " allow switching from dirty buffers without saving or killing changes
 set nostartofline " don't move cursor to the start of line after (some class of commands).  This includes buffer switching.
+set cpoptions+=J " Require 2 spaces after period/punctuation for sentence.
 
 syntax on     " Do syntax highlighting
 
