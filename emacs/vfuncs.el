@@ -179,4 +179,15 @@ quit emacs."
   (load-theme 'wgh)
   (disable-theme 'tango))
 
+(defun quick-in-block ()
+  (interactive)
+  (when (not (evil-visual-state-p))
+    (evil-visual-state))
+  (call-interactively 'evil-textobj-anyblock-inner-block))
+(defun quick-a-block ()
+  (interactive)
+  (when (not (evil-visual-state-p))
+    (evil-visual-state))
+  (call-interactively 'evil-textobj-anyblock-a-block))
+
 (provide 'vfuncs)
