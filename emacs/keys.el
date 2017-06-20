@@ -163,7 +163,7 @@
 (mkmap "g*" 'rmo/evil-search-unbounded-word-forward)
 (mkmap "," 'evil-repeat-find-char-reverse)
 (mkmap "/" 'rmo/evil-search-forward)
-(mkmap ";" 'rmo/evil-repeat-find-char)
+(mkmap ";" 'er/expand-region)
 (mkmap "?" 'rmo/evil-search-backward)
 (mkmap "|" 'evil-goto-column)
 (mkmap "^" 'evil-first-non-blank)
@@ -276,7 +276,10 @@
 ;; More text objects!
 (define-key evil-inner-text-objects-map "a" 'evil-inner-arg)
 (define-key evil-outer-text-objects-map "a" 'evil-outer-arg)
-(define-key evil-inner-text-objects-map "e" 'er/expand-region)
+(define-key evil-inner-text-objects-map "c" 'evil-cp-inner-comment)
+(define-key evil-outer-text-objects-map "c" 'evil-cp-a-comment)
+(define-key evil-inner-text-objects-map "d" 'evil-cp-inner-defun)
+(define-key evil-outer-text-objects-map "d" 'evil-cp-a-defun)
 (define-key evil-inner-text-objects-map "b" 'evil-textobj-anyblock-inner-block)
 (define-key evil-outer-text-objects-map "b" 'evil-textobj-anyblock-a-block)
 

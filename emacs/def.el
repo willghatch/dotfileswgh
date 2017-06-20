@@ -124,6 +124,7 @@
    (dark-theme))
  (setq repeatable-motion-count-needed-prefix "rmo-c/")
  (setq repeatable-motion-definition-prefix "rmo/")
+ (setq repeatable-motion-training-wheels-p t)
  (require 'repeatable-motion)
  )
 
@@ -157,6 +158,7 @@
  ;(require 'evil-args) ; autoloaded
  (require 'evil-surround)
  (global-evil-surround-mode 1)
+ (require 'evil-cleverparens-text-objects)
  (require 'evil-textobj-between)
  (require 'evil-search-highlight-persist)
  (require 'evil-textobj-anyblock)

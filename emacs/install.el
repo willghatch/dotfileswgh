@@ -17,7 +17,10 @@
 (in 'auto-compile)
 (in 'evil-surround)
 (in 'evil-search-highlight-persist)
+;; TODO - eventually targets.el (https://github.com/noctuid/targets.el) should
+;; replace evil-textobj-anyblock.  But it's not ready yet, apparently.
 (in 'evil-textobj-anyblock)
+(in 'evil-cleverparens)
 (in 'evil-terminal-cursor-changer)
 (in 'evil-anzu)
 (in 'yafolding)
@@ -81,8 +84,21 @@
 (in 'keyfreq)
 
 ;; some other packages I don't currently use, but might want to later:
-;; ace-link -- ace jump to navigation links in info, help, eww, or compilation mode
+
 ;; figlet -- make ascii banners
+
+;; Link programs -- to give pentadactyl/vimium style hints to links on page
+;; The most important thing for links is that I can define new ones and new ways of handling them.
+;; Getting to the links I can use any movement command in emacs, so moving to the link is less of
+;; an issue than recognizing and handling the link.
+;;
+;; Ace link doesn't support many modes (eg. it doesn't work in fundamental or markdown mode)
+;; (in ace-link) ; -- ace jump to navigation links in info, help, eww, or compilation mode
+;; link-hint -- I'm not sure there's a good way of defining new link types (eg. define a regex and a handler function).
+;;              Also, it auto-follows a link if there is only one, which I don't like (may be configurable).
+;; (in 'link-hint)
+
+;; 
 
 (message "Done installing packages!")
 
