@@ -2,5 +2,5 @@
 
 mkdir -p $WGHHOME/.prifs $WGHHOME/prifs &&
 chmod 700 $WGHHOME/.prifs $WGHHOME/prifs &&
-encfs --idle=5 $WGHHOME/.prifs $WGHHOME/prifs
+encfs --idle=30 $WGHHOME/.prifs $WGHHOME/prifs
 
