@@ -79,6 +79,9 @@ $DOTFILESWGH/config/awesome/kbd-state-mon.sh &
 # start kdeconnect daemon, let my phone drive
 #kdeconnect-cli
 
+# move the mouse out of the middle of the screen so it won't switch windows for no reason
+xdotool mousemove 100 100
+
 if [ -f $DOTFILESWGH/pri/xinitrc ]; then
     source $DOTFILESWGH/pri/xinitrc
 fi
