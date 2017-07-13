@@ -104,8 +104,8 @@ export MANWIDTH=${MANWIDTH:-80}
 export ZDOTDIR=$DOTFILESWGH/zsh
 
 # v is a wrapper script to launch vim with my settings
-export ALTERNATE_EDITOR=v
-export EDITOR=$ALTERNATE_EDITOR
+export EDITOR=premacs-use-or-create-t
+#export ALTERNAME_EDITOR=v
 #export PAGER=premacs-pager
 export PAGER=less
 
@@ -132,7 +132,7 @@ umask 022 # the covenient umask
 
 ####### Editing
 alias em="emacs -nw -l $DOTFILESWGH/emacs/def"
-alias e="premacs-use-t"
+alias e="premacs-use-or-create-t"
 alias eg="premacs-use -c"
 alias emg="emacs -l $DOTFILESWGH/emacs/def"
 alias emp="emacs -nw -l $DOTFILESWGH/emacs/package-conf.el"
