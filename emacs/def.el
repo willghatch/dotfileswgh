@@ -57,6 +57,8 @@
 (setq auto-save-file-name-transforms '((".*" "~/.cache/automacs/\\1" t))) ; auto-saves (## files) here
 (make-directory "~/.cache/bakmacs/" t)
 (make-directory "~/.cache/automacs/" t)
+;; For now, just don't make backups -- I haven't needed them since I started using git everywhere.
+(setq make-backup-files nil)
 
 ;; mouse settings
 (if (fboundp 'xterm-mouse-mode) (xterm-mouse-mode) nil) ; shift-click for normal xterm mouse behavior

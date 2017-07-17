@@ -45,6 +45,11 @@ if !isdirectory($HOME . "/.cache/vimtmp")
 endif
 set backupdir=$HOME/.cache/vimtmp   " Directory for backup files
 set directory=$HOME/.cache/vimtmp   " Directory for swap files
+" I haven't needed these backups in years, and I don't want to make backups
+" when editing key files and such.  So just don't make them anymore.
+set nobackup
+set nowritebackup
+set noswapfile
 
 
 """ Command window stuff
