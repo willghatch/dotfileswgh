@@ -10,6 +10,17 @@
 
 (add-hook 'after-save-hook 'executable-make-buffer-file-executable-if-script-p)
 
+(defun sensitive-if-prifs ()
+  (let ((real-name (and (buffer-file-name)
+                        (car (process-lines "readlink" "-f" (buffer-file-name))))))
+    (cond
+     ((not real-name) nil)
+     ((string-match "/prifs/" real-name) (sensitive-mode 1))
+     ((string-match "/prifsb/" real-name) (sensitive-mode 1))
+     (t nil))))
+
+(add-hook 'find-file-hook 'sensitive-if-prifs)
+
 (add-hook 'Buffer-menu-mode-hook
           (lambda ()
             (define-prefix-command 'my-buffer-menu-mode-map)

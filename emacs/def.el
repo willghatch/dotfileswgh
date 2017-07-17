@@ -46,6 +46,7 @@
 (nobreak (load custom-file))
 
 ;; backup settings
+(nobreak (load-library "sensitive-mode"))
 (setq
    backup-by-copying t      ; don't clobber symlinks
    backup-directory-alist '(("." . "~/.cache/bakmacs"))    ; don't litter my fs tree
