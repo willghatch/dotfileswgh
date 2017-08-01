@@ -20,7 +20,8 @@ get_unread_count = function()
     end
     local inboxy = 0
     local spammy = 0
-    local mach_school = 0
+    local school = 0
+    local machines = 0
     local racket = 0
     local lists = 0
     local top_feeds = 0
@@ -30,8 +31,8 @@ get_unread_count = function()
        inboxy = incr(inboxy, line:match("INBOX (%d+)"))
        spammy = incr(spammy, line:match("maybe.spam (%d+)"))
        spammy = incr(spammy, line:match("Spam (%d+)"))
-       mach_school = incr(mach_school, line:match("school.lists (%d+)"))
-       mach_school = incr(mach_school, line:match("machines (%d+)"))
+       school = incr(school, line:match("school.lists (%d+)"))
+       machines = incr(machines, line:match("machines (%d+)"))
        racket = incr(racket, line:match("racket (%d+)"))
        lists = incr(lists, line:match("misc.lists (%d+)"))
        top_feeds = incr(top_feeds, line:match("^feeds (%d+)"))
@@ -42,13 +43,14 @@ get_unread_count = function()
     local ecc = "</span>"
     instr:close()
     return green ..
-       "IN ".. cc .. inboxy .. ecc .." "..
-       "MS ".. cc .. mach_school .. ecc .." "..
-       "R ".. cc .. racket .. ecc .." "..
-       "L ".. cc .. lists .. ecc .." "..
-       "F ".. cc .. top_feeds .. ecc .." "..
-       "mF ".. cc .. rfeeds .. ecc .." "..
-       "S ".. cc .. spammy .. ecc .." "..
+       "In ".. cc .. inboxy .. ecc .." "..
+       "Ma ".. cc .. machines .. ecc .." "..
+       "Sc ".. cc .. school .. ecc .." "..
+       --"R ".. cc .. racket .. ecc .." "..
+       --"Li ".. cc .. lists .. ecc .." "..
+       --"F ".. cc .. top_feeds .. ecc .." "..
+       --"mF ".. cc .. rfeeds .. ecc .." "..
+       "Sp ".. cc .. spammy .. ecc .." "..
        ecc .. " "
 end
 set_email_widget = function()
