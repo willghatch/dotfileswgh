@@ -175,12 +175,19 @@
  (require 'flx-ido)
  (flx-ido-mode 1)
 
- ;(require 'linum)
- (global-linum-mode 1) ; add line numbers
- (require 'hlinum)
- (hlinum-activate)
- ;(require 'linum-relative) ;; I don't ever use this...
- ;(linum-relative-toggle) ; turn it off as the default
+ (if (version<= "26.0.50" emacs-version)
+     ;; Supposedly this new one packaged with emacs 26 is faster.
+     ;; It seems worse so far... but it's probably not a huge deal.
+     (global-display-line-numbers-mode)
+   (progn
+     (require 'linum)
+     (global-linum-mode 1)
+     (require 'hlinum)
+     (hlinum-activate)
+     ;; I don't ever use these, but I'll leave them here in case I change my mind.
+     ;;(require 'linum-relative)
+     ;;(linum-relative-toggle) ; turn it off as the default
+     ))
 
  ;(require 'smex) ; autoloaded
  ;(require 'rainbow-delimiters) ; autoloaded
