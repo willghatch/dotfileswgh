@@ -172,6 +172,11 @@ quit emacs."
   (interactive "p")
   (pscroll-down-line (window-text-height)))
 
+(require 'repeatable-motion)
+(repeatable-motion-define-pair 'pscroll-down-line 'pscroll-up-line)
+(repeatable-motion-define-pair 'pscroll-down-half 'pscroll-up-half)
+(repeatable-motion-define-pair 'pscroll-down-full 'pscroll-up-full)
+
 (defun ansi-color-buffer ()
   (interactive)
   (ansi-format-decode (point-min) (point-max))

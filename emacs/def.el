@@ -119,8 +119,6 @@
  (key-chord-mode 1)
  (require 'hydra)
  (setq hydra-lv nil)
- (load-library "keys")
- (load-library "vfuncs")
  (load-library "scribble-funcs")
  (if (equal (getenv "WGH_THEME_DARK_OR_LIGHT") "light")
      (light-theme)
@@ -129,6 +127,8 @@
  (setq repeatable-motion-definition-prefix "rmo/")
  (setq repeatable-motion-training-wheels-p t)
  (require 'repeatable-motion)
+ (load-library "vfuncs")
+ (load-library "keys")
  )
 
 (nobreak

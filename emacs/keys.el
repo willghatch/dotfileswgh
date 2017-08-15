@@ -507,13 +507,13 @@
 (mkmap (kbd "C-z") 'suspend-frame)
 (ikmap (kbd "C-z") 'suspend-frame)
 
-(pkmap " " 'pscroll-down-half)
-(pkmap "j" 'pscroll-down-half)
-(pkmap "k" 'pscroll-up-full)
-(pkmap "J" 'pscroll-down-line)
-(pkmap "K" 'pscroll-up-line)
-(pkmap "sj" 'pscroll-down-full)
-(pkmap "sk" 'pscroll-up-full)
+(pkmap " " 'rmo/pscroll-down-half)
+(pkmap "j" 'rmo/pscroll-down-half)
+(pkmap "k" 'rmo/pscroll-up-full)
+(pkmap "J" 'rmo/pscroll-down-line)
+(pkmap "K" 'rmo/pscroll-up-line)
+(pkmap "sj" 'rmo/pscroll-down-full)
+(pkmap "sk" 'rmo/pscroll-up-full)
 (pkmap "e" 'evil-normal-state)
 ;; if I start in pager mode, this gets remapped to quit
 (pkmap "q" 'evil-normal-state)
@@ -521,8 +521,8 @@
 
 
 ; space map
-(mkmap "sj" 'pscroll-down-half)
-(mkmap "sk" 'pscroll-up-half)
+(mkmap "sj" 'rmo/pscroll-down-half)
+(mkmap "sk" 'rmo/pscroll-up-half)
 (mkmap "sf" 'yafolding-toggle-element)
 (mkmap " sfa" 'yafolding-toggle-all)
 (mkmap " /"
