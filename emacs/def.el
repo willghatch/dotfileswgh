@@ -125,7 +125,7 @@
    (dark-theme))
  (setq repeatable-motion-count-needed-prefix "rmo-c/")
  (setq repeatable-motion-definition-prefix "rmo/")
- (setq repeatable-motion-training-wheels-p t)
+ (setq repeatable-motion-training-wheels-p nil)
  (require 'repeatable-motion)
  (load-library "vfuncs")
  (load-library "keys")
