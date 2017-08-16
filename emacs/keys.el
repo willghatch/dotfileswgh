@@ -605,3 +605,5 @@
 (define-key evil-ex-completion-map "\C-b" 'backward-char)
 (define-key evil-ex-completion-map "\M-r" 'evil-paste-from-register)
 
+(define-key isearch-mode-map "\C-g" 'isearch-abort-abort-gosh-darn-it)
+

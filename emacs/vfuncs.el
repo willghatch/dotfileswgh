@@ -206,4 +206,12 @@ quit emacs."
     (evil-visual-state))
   (call-interactively 'evil-textobj-anyblock-a-block))
 
+(defun isearch-abort-abort-gosh-darn-it ()
+  "If the start of a search query matches but the end doesn't, a single abort will
+just backspace to the part that does match, which is never what I want when I say
+abort."
+  (interactive)
+  (isearch-abort)
+  (isearch-abort))
+
 (provide 'vfuncs)
