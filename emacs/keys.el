@@ -484,6 +484,7 @@
 (mkmap (kbd "M-c") 'smex)
 (global-set-key (kbd "M-c") 'smex)
 (mkmap "sx" 'eval-expression)
+(nkmap "si" 'indent-region)
 
 (vkmap (kbd "C-s") 'yas-insert-with-region)
 
