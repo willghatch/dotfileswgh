@@ -18,3 +18,8 @@ pa git-remote-hg-git
 # needed for abcde to get metadata...
 pa perl-musicbrainz-discid perl-webservice-musicbrainz
 
+#pa vdirsyncer
+#pa khard
+#pa khal
+#pa todoman
+

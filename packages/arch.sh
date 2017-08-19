@@ -125,4 +125,8 @@ pm borgbackup
 
 pm syncthing
 pm syncthing-gtk
+pm offlineimap
+
+# pacaur dependency
+pm expac
 
