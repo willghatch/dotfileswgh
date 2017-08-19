@@ -37,6 +37,7 @@ lua-socket \
 vicious \
 lxterminal \
 xfce4-terminal \
+gnome-terminal \
 chromium \
 android-udev \
 android-tools \
@@ -121,4 +122,7 @@ pm avahi nss-mdns
 pm tigervnc
 pm nmap
 pm borgbackup
+
+pm syncthing
+pm syncthing-gtk
 

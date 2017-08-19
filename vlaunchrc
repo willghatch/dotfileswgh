@@ -2,9 +2,9 @@
 #terminal="konsole --profile ${KONSOLE_PROFILE:-wgh}"
 
 if [ "$WGH_THEME_DARK_OR_LIGHT" = "light" ]; then
-    terminal="gnome-terminal --profile=light"
+    terminal2="gnome-terminal --profile=light"
 else
-    terminal="gnome-terminal --profile=dark"
+    terminal2="gnome-terminal --profile=dark"
 fi
 
 #unicode="racket -l the-unicoder -- --client --path /tmp/the-unicoder_${USER}_${DISPLAY/:/}"
