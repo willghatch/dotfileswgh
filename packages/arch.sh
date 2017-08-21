@@ -127,6 +127,9 @@ pm syncthing
 pm syncthing-gtk
 pm offlineimap
 
+# send key events to xserver
+pm xdotool
+
 # pacaur dependency
 pm expac
 
