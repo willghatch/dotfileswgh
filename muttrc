@@ -135,11 +135,14 @@ bind pager J next-line
 bind pager K previous-line
 bind pager w next-undeleted
 bind pager b previous-undeleted
+bind pager <space> noop
 bind pager <space>j next-page
 bind pager <space>k previous-page
 bind pager G bottom
+bind pager g noop
 bind pager gg top
 bind pager H display-toggle-weed # show headers
+bind pager h noop
 macro pager hh '|elinks -force-html<enter>'
 macro attach hh '|elinks -force-html<enter>'
 macro attach hf "<pipe-entry>cat >/tmp/html-mutt.html && ffx --new-tab /tmp/html-mutt.html<enter>"
@@ -183,6 +186,7 @@ bind index a view-attachments
 bind index A display-address
 bind index f change-folder
 bind index m mail # compose new mail
+bind index <space> noop
 macro index <space>/b /~b<space>
 bind index n search-next
 bind index N search-opposite
