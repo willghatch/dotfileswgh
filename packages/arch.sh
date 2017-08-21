@@ -77,6 +77,7 @@ mutt \
 notmuch \
 pidgin \
 finch \
+gajim \
 tk \
 python2-dbus \
 markdown \
@@ -116,6 +117,9 @@ pm pcmanfm
 
 # zeroconf
 pm avahi nss-mdns
+
+# for utilities like lpr
+pm cups
 
 # I want common libraries to just be installed.  I don't need to save disk space.
 #pm qt5 qt4 gtk3 gtk2
