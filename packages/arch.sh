@@ -127,6 +127,7 @@ pm borgbackup
 pm syncthing
 pm syncthing-gtk
 pm offlineimap
+pm msmtp
 
 # send key events to xserver
 pm xdotool
