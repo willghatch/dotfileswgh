@@ -83,6 +83,7 @@ markdown \
 bind-tools \
 libnotify \
 dunst \
+rlwrap \
 texlive-bin
 
 pm pm-utils
