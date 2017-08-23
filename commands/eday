@@ -1,0 +1,19 @@
+#!/usr/bin/env bash
+
+if [[ "$1" = "--help" ]]; then
+    echo "usage: $0 [today or yesterday]"
+    exit 1
+fi
+
+day="${1:-today}"
+
+if [[ today = "$day" ]]; then
+    exec e $(date +%Y-%m-%d)
+elif [[ yesterday = "$day" ]]; then
+    exec e $(date +%Y-%m-%d --date=yesterday)
+else
+    echo "usage: $0 [today or yesterday]"
+    exit 1
+fi
+
+
