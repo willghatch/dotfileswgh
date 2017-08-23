@@ -16,7 +16,7 @@
 (define browser-setting (cons (string-append browser " ") ""))
 
 (define (get-query-url query)
-  (string-append "file://" (path->string (find-user-doc-dir)) "/search/index.html?q=" query))
+  (string-append "file://" (path->string (find-doc-dir)) "/search/index.html?q=" query))
 
 
 (external-browser browser-setting)

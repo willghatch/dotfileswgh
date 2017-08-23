@@ -91,6 +91,7 @@ function mkSundries() {
     mkdir -p $dpath/dotlocal/firefox-default-profile/extensions
     # dirs for mpd
     mkdir -p $HOME/.cache/mpd/playlists
+    mkdir -p $HOME/.cache/mutt
     mkdir -p $HOME/musc-local
 }
 

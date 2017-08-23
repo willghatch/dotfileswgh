@@ -121,6 +121,9 @@ pm avahi nss-mdns
 # for utilities like lpr
 pm cups
 
+# to inspect keychains and such
+pm seahorse
+
 # I want common libraries to just be installed.  I don't need to save disk space.
 #pm qt5 qt4 gtk3 gtk2
 
