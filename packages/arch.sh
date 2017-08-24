@@ -115,6 +115,9 @@ pm perl-file-mimeinfo
 # because it's decent and small, so it can be the default file manager
 pm pcmanfm
 
+# cron and at
+pm cronie at
+
 # zeroconf
 pm avahi nss-mdns
 
