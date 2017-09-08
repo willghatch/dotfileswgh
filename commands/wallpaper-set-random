@@ -1,4 +1,4 @@
 #!/bin/sh
 
-feh --bg-max --randomize ~/wallpapers
+feh --bg-max --randomize --recursive ~/wallpapers
 
