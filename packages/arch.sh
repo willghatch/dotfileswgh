@@ -142,6 +142,12 @@ pm msmtp
 # send key events to xserver
 pm xdotool
 
+# to see image metadata
+pm exiv2
+
+# image viewer that's easy to edit exif comment tag with, etc
+pm gthumb
+
 # pacaur dependency
 pm expac
 
