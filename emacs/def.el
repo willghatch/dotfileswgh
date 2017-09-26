@@ -228,7 +228,7 @@
  (load-library "windows")
  (setq hl-todo-activate-in-modes '(prog-mode))
  ;(require 'hl-todo)
- (global-hl-todo-mode 1)
+ ;(global-hl-todo-mode 1)
  ;(require 'helm)
  (setq helm-swoop-pre-input-function (lambda () "")) ; disable symbol-at-point nonsense
  (global-anzu-mode 1)
