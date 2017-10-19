@@ -38,7 +38,8 @@ set include   # include message when replying
 set indent_string="> " # how to indent copied lines on reply
 set help      # show help lines
 set mail_check=5 # how often to poll for new mail
-set sort=threads  # how to sort conversation threads
+#set sort=threads  # how to sort conversation threads
+set sort=date  # how to sort conversation threads
 set pager_context=3 # how many lines of context
 set pager_stop=yes # stop at end of message - don't go on to the next by scrolling
 set pager_index_lines=7 # this many lines of the index show while reading email
