@@ -129,6 +129,7 @@ umask 022 # the covenient umask
 
 ################################################  ALIASES ###############################
 
+alias rr="racket -l rash/repl --"
 
 ####### Editing
 alias em="emacs -nw -l $DOTFILESWGH/emacs/def"
