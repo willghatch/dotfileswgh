@@ -1,11 +1,16 @@
 
 #terminal="konsole --profile ${KONSOLE_PROFILE:-wgh}"
 
-if [ "$WGH_THEME_DARK_OR_LIGHT" = "light" ]; then
-    terminal2="gnome-terminal --profile=light"
-else
-    terminal2="gnome-terminal --profile=dark"
-fi
+#if [ "$WGH_THEME_DARK_OR_LIGHT" = "light" ]; then
+#    terminal2="gnome-terminal --profile=light"
+#else
+#    terminal2="gnome-terminal --profile=dark"
+#fi
+
+terminal2="konsole -e zsh"
+
+terminal="konsole -e rash-repl"
+terminal3="rackterm-xterm -e rash-repl"
 
 unicode="racket -l the-unicoder -- --client --path /tmp/the-unicoder_${USER}_${DISPLAY/:/}"
 #unicode_func(){
