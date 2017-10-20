@@ -28,7 +28,7 @@ get_unread_count = function()
     local rfeeds = 0
 
     for line in instr:lines() do
-       inboxy = incr(inboxy, line:match("INBOX (%d+)"))
+       inboxy = incr(inboxy, line:match("main (%d+)"))
        spammy = incr(spammy, line:match("maybe.spam (%d+)"))
        spammy = incr(spammy, line:match("Spam (%d+)"))
        school = incr(school, line:match("school.lists (%d+)"))
