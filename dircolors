@@ -63,47 +63,48 @@ STICKY_OTHER_WRITABLE 45;34;01
 # extensions - list with *ext or .ext, but the . is included in the literal extension
 
 # partially downloaded files
-*part 38;5;196
+*.part 38;5;196
 
 # archives / compressed
-*tar 38;5;094
-*tgz 38;5;094
-*arj 38;5;094
-*taz 38;5;094
-*lzh 38;5;094
-*zip 38;5;094
-*rar 38;5;094
-*7z 38;5;094
-*z 38;5;094
-*Z 38;5;094
-*gz 38;5;094
-*xz 38;5;094
-*bz2 38;5;094
-*deb 38;5;094
-*rpm 38;5;094
+.tar 38;5;094
+.tgz 38;5;094
+.arj 38;5;094
+.taz 38;5;094
+.lzh 38;5;094
+.zip 38;5;094
+.rar 38;5;094
+.7z 38;5;094
+.z 38;5;094
+.Z 38;5;094
+.gz 38;5;094
+.xz 38;5;094
+.bz2 38;5;094
+.deb 38;5;094
+.rpm 38;5;094
 
 # image formats -- yellowish green
-*png 38;5;154
-*bmp 38;5;154
-*ppm 38;5;154
-*tga 38;5;154
-*xbm 38;5;154
-*xpm 38;5;154
-*tif 38;5;154
-*jpg 38;5;154
-*jpeg 38;5;154
-*JPG 38;5;154
+.png 38;5;154
+.bmp 38;5;154
+.ppm 38;5;154
+.tga 38;5;154
+.xbm 38;5;154
+.xpm 38;5;154
+.tif 38;5;154
+.jpg 38;5;154
+.jpeg 38;5;154
+.JPG 38;5;154
+.JEPG 38;5;154
 
 # Video formats -- brighter than images
-*mp4 38;5;118
-*mpg 38;5;118
-*3gp 38;5;118
-*mkv 38;5;118
-*webm 38;5;118
-*m4v 38;5;118
-*avi 38;5;118
-*ogv 38;5;118
-*ts 38;5;118
+.mp4 38;5;118
+.mpg 38;5;118
+.3gp 38;5;118
+.mkv 38;5;118
+.webm 38;5;118
+.m4v 38;5;118
+.avi 38;5;118
+.ogv 38;5;118
+.ts 38;5;118
 
 # sound
 .flac 38;5;037
@@ -120,6 +121,7 @@ STICKY_OTHER_WRITABLE 45;34;01
 # Documentation -- orange
 *README 38;5;202
 *README.md 38;5;202
+*README.rst 38;5;202
 *README.markdown 38;5;202
 *INSTALL 38;5;202
 *HACKING 38;5;202
