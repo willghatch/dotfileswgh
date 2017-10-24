@@ -1,4 +1,43 @@
-;;; Evil package configuration
+;;; Key config
+
+;; Keys I don't really use:
+
+;; Insert mode:
+;; C-o
+;; C-q
+;; maybes
+;; C-r
+;; C-s
+;; non-character symbols?
+;; M- combos? (I like and use them less)
+;; M-a,e,g,i
+;; M-j is something that maybe I should use, but I don't
+;; M-k,l,m,n,o,p,q
+;; M-s,u,v
+;; maybe M-y
+;; M-z
+
+;; M-t -- I think I want to save this for windowing in terminal multiplexer with C-t
+
+;; G- H- (sup- hyp-) combos?  (I need conventions for terminal encodings of these...)
+
+;; Normal mode:
+;; B,W I don't really use, but maybe I should?
+;; E
+;; h,l I have on ec/oc which I'm mostly happy with
+;; H,L,M -- move to top,bottom,middle of window.  I don't really use these.  Should I?
+;; J,K -- aliases for H,L, also not really used
+;; m -- I think I wanted this to be mode-specific -- eg. a fallback to normal emacs keys
+;; O -- I have it as oo
+;; S,T,U,Y -- all no-ops or duplicates, or things I don't use.
+;; z,Z -- these are currently sub-maps, but I don't use them for anything.
+;; non-character symbols?
+;; #, $, comma, +
+;; & I don't really use, maybe I should
+;; also maybe I should use *
+;; []{}
+;; any weird unicode that I have in convenient places
+
 
 ;; the following isn't working...
 ;; these have to be customized.  I'm leaving these comments here too, as an important note.
@@ -85,7 +124,7 @@
 (nkmap "@" 'evil-execute-macro)
 (nkmap "\"" 'evil-use-register)
 (nkmap "~" 'evil-invert-char)
-(nkmap "=" 'evil-indent)
+;(nkmap "=" 'evil-indent)
 (nkmap "<" 'evil-shift-left)
 (nkmap ">" 'evil-shift-right)
 (nkmap "ZZ" 'evil-save-modified-and-close)
@@ -94,6 +133,8 @@
 (nkmap [escape] 'evil-force-normal-state)
 (nkmap [remap cua-paste-pop] 'evil-paste-pop)
 (nkmap [remap yank-pop] 'evil-paste-pop)
+
+(nkmap "=" 'indent-region)
 
 ;; undo
 (nkmap "u" 'undo)
@@ -484,7 +525,6 @@
 (mkmap (kbd "M-c") 'smex)
 (global-set-key (kbd "M-c") 'smex)
 (mkmap "sx" 'eval-expression)
-(nkmap "si" 'indent-region)
 
 (vkmap (kbd "C-s") 'yas-insert-with-region)
 
@@ -551,6 +591,7 @@
 (ikmap (kbd "DEL") 'delete-backward-char) ; remap away from the evil-version backspace
 (ikmap "\C-v" #'quoted-insert) ; more vim-like
 (ikmap "\M-r" 'evil-paste-from-register)
+(ikmap "\M-w" 'evil-window-map)
 
 ;; helm map to match what I've got going in zsh with zaw...
 (define-prefix-command 'meta-space-map)
