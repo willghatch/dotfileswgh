@@ -298,6 +298,8 @@
   ("G" elscreen-kill)
   ("w" elscreen-next)
   ("b" elscreen-previous)
+  ;; TODO - I want m to be "mode" -- IE I want a key to go into the map, but then
+  ;;        have a key inside the map to make it sticky (switch modes).
   ("m" nil)
   ("e" nil)
 )
