@@ -131,11 +131,6 @@ umask 022 # the covenient umask
 
 alias rr="racket -l rash/repl --"
 
-####### Editing
-alias em="emacs -nw -l $DOTFILESWGH/emacs/def"
-alias eg="premacs-use -c"
-alias emg="emacs -l $DOTFILESWGH/emacs/def"
-alias emp="emacs -nw -l $DOTFILESWGH/emacs/package-conf.el"
 
 
 ####### Unix tools, mostly coloring

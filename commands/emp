@@ -1,0 +1,4 @@
+#!/usr/bin/env bash
+
+# emacs with just packaging config
+emacs -nw -l $DOTFILESWGH/emacs/package-conf.el "$@"

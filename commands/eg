@@ -1,0 +1,4 @@
+#!/usr/bin/env bash
+
+# premacs with gui
+premacs-use -c "$@"

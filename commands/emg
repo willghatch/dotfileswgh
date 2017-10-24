@@ -1,0 +1,4 @@
+#!/usr/bin/env bash
+
+# graphical version of em -- no -nw
+emacs -l $DOTFILESWGH/emacs/def "$@"
