@@ -27,6 +27,8 @@ pm firefox
 pm sshfs zip unzip tig
 pm zathura zathura-pdf-poppler zathura-ps zathura-djvu
 
+pm sway i3status
+
 pm \
 pkgfile \
 htop \
