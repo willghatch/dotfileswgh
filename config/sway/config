@@ -33,8 +33,8 @@ floating_modifier $mod
 
 # start a terminal
 bindsym $mod+Return exec vlaunch terminal
-bindsym $mod+$ctl+Return exec vlaunch terminal2
-bindsym $mod+$alt+Return exec vlaunch terminal3
+bindsym $mod+$alt+Return exec vlaunch terminal2
+bindsym $mod+$ctl+Return exec vlaunch terminal3
 bindsym $mod+r exec vlaunch launcher
 
 bindsym $mod+q exec swaylock -c 012323
@@ -142,7 +142,7 @@ bindsym $mod+Mod1+r reload
 bindsym $mod+Shift+r restart
 # exit i3 (logs you out of your X session)
 #bindsym $mod+Shift+period exec "i3-nagbar -t warning -m 'You pressed the exit shortcut. Do you really want to exit i3? This will end your X session.' -b 'Yes, exit i3' 'i3-msg exit'"
-bindsym $mod+$ctl+q exit
+bindsym $mod+$alt+q exit
 
 ## resize window (you can also use the mouse for that)
 #mode "resize" {
@@ -178,7 +178,7 @@ for_window [title="the-unicoder"] floating enable
 # Start i3bar to display a workspace bar (plus the system information i3status
 # finds out, if available)
 bar {
-        status_command i3status
+        status_command i3status -c ~/dotfileswgh/config/sway/i3status.conf
         tray_output primary
         position top
 }
