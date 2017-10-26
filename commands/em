@@ -1,1 +1,3 @@
-premacs-use-or-create-t
+#!/usr/bin/env bash
+
+emacs -nw -l $DOTFILESWGH/emacs/def "$@"
