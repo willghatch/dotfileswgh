@@ -135,6 +135,9 @@
 (nkmap [remap yank-pop] 'evil-paste-pop)
 
 (nkmap "=" 'indent-region)
+(nkmap "\M-\C-\\" (lambda () (interactive) (message "use =")))
+(ikmap "\C-w" 'backward-kill-word)
+(ikmap (kbd "M-DEL") (lambda () (interactive) (message "use C-w")))
 
 ;; undo
 (nkmap "u" 'undo)
