@@ -38,13 +38,19 @@ set include   # include message when replying
 set indent_string="> " # how to indent copied lines on reply
 set help      # show help lines
 set mail_check=5 # how often to poll for new mail
-#set sort=threads  # how to sort conversation threads
-set sort=date  # how to sort conversation threads
 set pager_context=3 # how many lines of context
 set pager_stop=yes # stop at end of message - don't go on to the next by scrolling
 set pager_index_lines=7 # this many lines of the index show while reading email
 set tilde # show ~ after the end of the email, a la vim
 unset resolve # don't try to go to the next message after an operation
+
+
+#set sort=threads  # how to sort conversation threads
+#set sort=date  # how to sort conversation threads
+
+# This is how to have sane sorting
+set sort=threads
+set sort_aux=last-date-received
 
 #set sidebar_visible = yes # show sidebar in patched version
 
@@ -199,8 +205,6 @@ bind index tia change-folder
 bind index tsi flag-message # toggle important/star
 bind index tsr toggle-new
 bind index tsf set-flag
-macro index tst "<enter-command>set sort=threads<enter>"
-macro index tsd "<enter-command>set sort=date<enter>"
 
 # limit filters to mails that match a pattern (in subject/from fields only)
 bind index l limit
