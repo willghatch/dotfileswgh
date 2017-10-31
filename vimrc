@@ -395,6 +395,7 @@ vnoremap <space>yc "+y
 noremap <space>ps "*p
 vnoremap <space>ys "*y
 
+inoremap <c-s> <c-w>
 
 
 " Highlighting

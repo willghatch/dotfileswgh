@@ -7,7 +7,8 @@
 ;; C-q
 ;; maybes
 ;; C-r
-;; C-s
+;; C-w is close window on certain un-customizable browsers and I accidentally
+;;     hit it all the time, so I should not use it.
 ;; non-character symbols?
 ;; M- combos? (I like and use them less)
 ;; M-a,e,g,i
@@ -136,8 +137,8 @@
 
 (nkmap "=" 'indent-region)
 (nkmap "\M-\C-\\" (lambda () (interactive) (message "use =")))
-(ikmap "\C-w" 'backward-kill-word)
-(ikmap (kbd "M-DEL") (lambda () (interactive) (message "use C-w")))
+(ikmap "\C-s" 'backward-kill-word)
+(ikmap (kbd "M-DEL") (lambda () (interactive) (message "use C-s")))
 
 ;; undo
 (nkmap "u" 'undo)

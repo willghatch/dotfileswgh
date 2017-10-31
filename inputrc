@@ -7,6 +7,7 @@ set editing-mode emacs
 set keymap emacs
 "jk": vi-movement-mode
 "kj": vi-movement-mode
+"\C-s": unix-word-rubout
 
 
 

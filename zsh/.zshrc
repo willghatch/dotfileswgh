@@ -274,6 +274,7 @@ toggle-konsole-theme(){
     fi
 }; zle -N toggle-konsole-theme
 
+bindkey -M viins '^s' backward-kill-word
 bindkey -M viins '^[h' completionkey
 bindkey-to-prefix-map completionkey "l" insert-last-word-left-indexed
 bindkey-to-prefix-map completionkey "L" insert-last-word
