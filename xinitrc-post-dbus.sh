@@ -74,7 +74,7 @@ the-unicoder --server --path "$unicoder_socket" &
 $DOTFILESWGH/external/misc/libnotifylog/libnotifylogger.py $HOME/.cache/notifications.log &
 
 # Watch keyboard state for awesome
-$DOTFILESWGH/config/awesome/kbd-state-mon.sh &
+$DOTFILESWGH/xdg-config-ro/awesome/kbd-state-mon.sh &
 
 # start kdeconnect daemon, let my phone drive
 #kdeconnect-cli

@@ -96,7 +96,7 @@ globalstate = {
 }
 
 --beautiful.init(awful.util.get_themes_dir() .. "default/theme.lua")
-beautiful.init(dotfilesdir .. "/config/awesome/theme.lua")
+beautiful.init(dotfilesdir .. "/xdg-config-ro/awesome/theme.lua")
 
 -- This is used later as the default terminal and editor to run.
 terminal = {"vlaunch", "terminal"}
