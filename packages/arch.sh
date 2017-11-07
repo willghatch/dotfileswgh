@@ -2,6 +2,11 @@
 
 # install the packages I generally use on Arch Linux
 
+# TODO - split this into sections
+#      - core things that I want on every system (even phone, cloud host, etc)
+#      - gui things I want on a beefy laptop (everything just works, etc)
+#      - maybe smaller divisions.
+
 pm (){
     pacman -S --needed --noconfirm "$@"
 }
@@ -26,6 +31,7 @@ pm python python2 python-pip python2-pip racket nodejs npm
 pm firefox
 pm sshfs zip unzip tig
 pm zathura zathura-pdf-poppler zathura-ps zathura-djvu
+pm texlive-most
 
 pm sway i3status
 
