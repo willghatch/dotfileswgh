@@ -11,7 +11,8 @@ Name=wgh-light
 Parent=FALLBACK/
 
 [Scrolling]
-HistoryMode=2
+HistoryMode=1
+HistorySize=20000
 
 [Terminal Features]
 BlinkingCursorEnabled=true
