@@ -10,7 +10,8 @@
          (if (and point-at-region-end (not eol))
              (backward-char))))
 (defun xpaste () (interactive)
-       (insert (shell-command-to-string "xclip -o -selection clipboard -silent")))
+       (let ((xclip-select-enable-clipboard t))
+         (insert (xclip-selection-value))))
 
 (defun xpaste-after-char () (interactive)
        (unless (eolp) (forward-char))
