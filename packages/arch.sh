@@ -147,6 +147,10 @@ pm syncthing-gtk
 pm offlineimap
 pm msmtp
 
+# hopefully using this increases battery life...
+pm cpupower
+pm tlp
+
 # send key events to xserver
 pm xdotool
 
