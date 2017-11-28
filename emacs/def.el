@@ -49,14 +49,14 @@
 (nobreak (load-library "sensitive-mode"))
 (setq
    backup-by-copying t      ; don't clobber symlinks
-   backup-directory-alist '(("." . "~/.cache/bakmacs"))    ; don't litter my fs tree
+   backup-directory-alist '(("." . "~/.cache/emacs/bak"))    ; don't litter my fs tree
    delete-old-versions t
    kept-new-versions 8
    kept-old-versions 4
    version-control t)       ; use versioned backups
-(setq auto-save-file-name-transforms '((".*" "~/.cache/automacs/\\1" t))) ; auto-saves (## files) here
-(make-directory "~/.cache/bakmacs/" t)
-(make-directory "~/.cache/automacs/" t)
+(setq auto-save-file-name-transforms '((".*" "~/.cache/emacs/auto/\\1" t))) ; auto-saves (## files) here
+(make-directory "~/.cache/emacs/bak/" t)
+(make-directory "~/.cache/emacs/auto/" t)
 ;; For now, just don't make backups -- I haven't needed them since I started using git everywhere.
 (setq make-backup-files nil)
 
