@@ -163,3 +163,6 @@ pm gthumb
 # pacaur dependency
 pm expac
 
+# time update
+pm ntp
+
