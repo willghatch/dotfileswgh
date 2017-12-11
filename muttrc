@@ -181,6 +181,8 @@ bind index sj next-page
 bind index sk previous-page
 bind index ss save-message
 bind index sc copy-message
+macro index sm "ss\Ca\Ck=misc<enter>y"
+macro index sl "ss\Ca\Ck=lists<enter>y"
 bind index G last-entry
 bind index gg first-entry
 bind index \Chb help
@@ -188,7 +190,7 @@ bind index q quit
 bind index Q exit # don't save changes
 bind index u toggle-new
 bind index dd delete-message
-bind index U undelete-pattern
+bind index U undelete-message
 bind index a view-attachments
 bind index A display-address
 bind index f change-folder
