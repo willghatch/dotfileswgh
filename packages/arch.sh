@@ -166,3 +166,4 @@ pm expac
 # time update
 pm ntp
 
+pm qrencode
