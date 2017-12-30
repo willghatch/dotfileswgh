@@ -76,7 +76,7 @@ export XDG_DATA_DIRS=$DOTFILESWGH/local/share:$XDG_DATA_DIRS:/usr/local/share:/u
 export XDG_CONFIG_DIRS=$DOTFILESWGH/pri/xdg-config-ro:$DOTFILESWGH/xdg-config-ro:$WGHHOME/rootgit-dotfiles/xdg-config-ro
 #XDG_CONFIG_DIRS=/etc/xdg
 # writable cache dir
-#XDG_CACHE_HOME=$HOME/.cache
+export XDG_CACHE_HOME=$HOME/.cache
 
 XDG_RUNTIME_DIR="/run/user/$(id -u)"
 if [[ ! -d "$XDG_RUNTIME_DIR" ]]; then
