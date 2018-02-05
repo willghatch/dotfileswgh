@@ -1,4 +1,5 @@
 
+
 (define-prefix-command 'org-headline-map)
 (define-key org-headline-map "l" 'org-metaright) ;indent heading
 (define-key org-headline-map "h" 'org-metaleft) ;unindent heading
@@ -15,9 +16,12 @@
             (key-chord-define evil-insert-state-local-map (kbd "wm") 'org-headline-map)
             (define-key org-mode-map (kbd "TAB") nil)
             (define-key org-mode-map (kbd "M-h") nil)
-            (org-indent-mode 1)
+            (setq org-hide-leading-stars t)
+            ;; Reload theme so that the stupid hidden asterisks are slightly visible
+            (run-with-timer 1 nil (lambda ()
+                                    ;; It only seems to work when called interactively...
+                                    (call-interactively 'current-theme-reapply)))
             ))
-
 
 
 
