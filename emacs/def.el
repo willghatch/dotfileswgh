@@ -120,9 +120,6 @@
  (require 'hydra)
  (setq hydra-lv nil)
  (load-library "scribble-funcs")
- (if (equal (getenv "WGH_THEME_DARK_OR_LIGHT") "light")
-     (light-theme)
-   (dark-theme))
  (setq repeatable-motion-count-needed-prefix "rmo-c/")
  (setq repeatable-motion-definition-prefix "rmo/")
  (setq repeatable-motion-training-wheels-p nil)
@@ -242,6 +239,12 @@
 
 (let ((file (concat dotfileswgh "/dotlocal/emacs")))
   (if (file-exists-p file) (load-file file) nil))
+
+
+(nobreak
+ (if (equal (getenv "WGH_THEME_DARK_OR_LIGHT") "light")
+     (light-theme)
+   (dark-theme)))
 
 (message "-")
 (message "--")

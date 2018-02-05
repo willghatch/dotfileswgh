@@ -186,14 +186,20 @@ quit emacs."
   (interactive)
   (call-process "raco" nil 0 nil "macro-step" (buffer-file-name)))
 
+(defvar current-theme-reapply-var 'dark-theme)
 (defun light-theme ()
   (interactive)
-  (load-theme 'tango)
+  (setq current-theme-reapply-var 'light-theme)
+  (load-theme 'tango t)
   (disable-theme 'wgh))
 (defun dark-theme ()
   (interactive)
-  (load-theme 'wgh)
+  (setq current-theme-reapply-var 'dark-theme)
+  (load-theme 'wgh t)
   (disable-theme 'tango))
+(defun current-theme-reapply ()
+  (interactive
+   (funcall current-theme-reapply-var)))
 
 (defun quick-in-block ()
   (interactive)

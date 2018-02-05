@@ -72,7 +72,7 @@
  '(mode-line ((t (:background "#161616" :foreground "#00afd7"))))
  '(mode-line-inactive ((t (:inherit mode-line :background "#161616" :foreground "#004747" :box (:line-width -1 :color "#303030") :weight light))))
  '(next-error ((t (:inherit region :foreground "#00cd00"))))
- '(org-hide ((t (:foreground "#252525"))))
+ '(org-hide ((t (:foreground "#353535"))))
  '(outline-1 ((t (:foreground "#5fffcf"))))
  '(outline-2 ((t (:foreground "#00cfff"))))
  '(outline-3 ((t (:foreground "#e040ff"))))

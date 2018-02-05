@@ -21,6 +21,13 @@
 
 (add-hook 'find-file-hook 'sensitive-if-prifs)
 
+(add-hook 'org-mode-hook
+          (lambda ()
+            ;; When org-mode is loaded, it defines faces that I have set in my theme.
+            ;; My theme setting doesn't get applied to them automatically.
+            (current-theme-reapply)
+            ))
+
 (add-hook 'Buffer-menu-mode-hook
           (lambda ()
             (define-prefix-command 'my-buffer-menu-mode-map)
