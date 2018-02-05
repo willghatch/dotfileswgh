@@ -222,7 +222,9 @@ abort."
 
 ;;; Folding
 (setq-default fold-toggle-wgh-fold-func 'yafolding-toggle-element)
+(make-variable-buffer-local 'fold-toggle-wgh-fold-func)
 (setq-default fold-toggle-wgh-fold-all-func 'yafolding-toggle-all)
+(make-variable-buffer-local 'fold-toggle-wgh-fold-all-func)
 (defun fold-toggle-wgh ()
   (interactive)
   (call-interactively fold-toggle-wgh-fold-func))
