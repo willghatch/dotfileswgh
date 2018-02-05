@@ -113,6 +113,7 @@
 ;; keys, keys, keys!!!
 (nobreak
  ;;; these are the most critical loads
+ (load-library "init-helpers")
  (require 'evil)
  (evil-mode 1)
  (require 'key-chord)

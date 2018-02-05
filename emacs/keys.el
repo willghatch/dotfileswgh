@@ -64,19 +64,6 @@
   `(defhydra ,hydra-name (:exit t :foreign-keys warn)
      ,@hydra-keys))
 
-;;; define some short-named functions for the most common types of mappings
-(defun nobreak-define-key (map keys func)
-  (nobreak (define-key map keys func)))
-(defun mkmap (keys func)
-  (nobreak-define-key evil-motion-state-map keys func))
-(defun nkmap (keys func)
-  (nobreak-define-key evil-normal-state-map keys func))
-(defun vkmap (keys func)
-  (nobreak-define-key evil-visual-state-map keys func))
-(defun ikmap (keys func)
-  (nobreak-define-key evil-insert-state-map keys func))
-(defun pkmap (keys func)
-  (nobreak-define-key evil-pager-state-map keys func))
 
 ;; for temporary on-the-fly bindings
 (define-prefix-command 'temp-key-map)
@@ -527,21 +514,21 @@
 (nkmap "sM" 'bookmark-set)
 (nkmap "sg" 'evil-goto-mark)
 (nkmap "sG" 'bookmark-jump)
-(ikmap (kbd "M-c") 'smex)
-(mkmap (kbd "M-c") 'smex)
-(global-set-key (kbd "M-c") 'smex)
+(ikmap (kbd "M-c") 'helm-M-x)
+(mkmap (kbd "M-c") 'helm-M-x)
+(global-set-key (kbd "M-c") 'helm-M-x)
 (mkmap "sx" 'eval-expression)
 
 (vkmap (kbd "C-s") 'yas-insert-with-region)
 
 ;; command modes and macros
-(mkmap "-" 'smex)
+(mkmap "-" 'helm-M-x)
 ;(mkmap "|" 'execute-extended-command)
 (mkmap "|" 'eval-expression)
 (mkmap "_" 'eval-expression)
 (mkmap "Q" 'call-last-kbd-macro)
 ;; Movement
-(nkmap "mm" 'evil-set-marker) ;;;;;;;;;; m will be my prefix for mode-specific bindings
+(nkmap "m" nil) ;;;;;;;;;; m will be my prefix for mode-specific bindings
 ;; everything in motion state is pulled into normal state
 (mkmap "+" 'evil-repeat-find-char)
 (mkmap "~" 'evil-repeat-find-char-reverse)
@@ -570,8 +557,8 @@
 ; space map
 (mkmap "sj" 'rmo/pscroll-down-half)
 (mkmap "sk" 'rmo/pscroll-up-half)
-(mkmap "sf" 'yafolding-toggle-element)
-(mkmap " sfa" 'yafolding-toggle-all)
+(mkmap "sf" 'fold-toggle-wgh)
+(mkmap "sF" 'fold-toggle-wgh-all)
 (mkmap " /"
   (myhydradef search-hydra
               ("s" helm-swoop "swoop")

@@ -220,4 +220,14 @@ abort."
   (isearch-abort)
   (isearch-abort))
 
+;;; Folding
+(setq-default fold-toggle-wgh-fold-func 'yafolding-toggle-element)
+(setq-default fold-toggle-wgh-fold-all-func 'yafolding-toggle-all)
+(defun fold-toggle-wgh ()
+  (interactive)
+  (call-interactively fold-toggle-wgh-fold-func))
+(defun fold-toggle-wgh-all ()
+  (interactive)
+  (call-interactively fold-toggle-wgh-fold-all-func))
+
 (provide 'vfuncs)
