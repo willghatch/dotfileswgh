@@ -26,6 +26,8 @@ pm emacs
 
 # next tier of basic things
 pm xorg konsole xterm xorg-xinit arandr bashrun ttf-dejavu xclip
+# I guess I need vdpau to have hardware acceleration for video
+pm mesa-vdpau
 pm python python2 python-pip python2-pip racket nodejs npm
 #pm ghc cabal-install
 pm firefox
