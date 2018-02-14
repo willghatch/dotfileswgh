@@ -102,6 +102,7 @@ beautiful.init(dotfilesdir .. "/xdg-config-ro/awesome/theme.lua")
 terminal = {"vlaunch", "terminal"}
 terminal2 = {"vlaunch", "terminal2"}
 terminal3 = {"vlaunch", "terminal3"}
+terminal4 = {"vlaunch", "terminal4"}
 --terminal = "xterm"
 editor = os.getenv("EDITOR") or "nano"
 --editor_cmd = terminal .. " -e " .. editor
@@ -387,6 +388,14 @@ globalkeys = awful.util.table.join(
     awful.key({ modkey, altkey    }, "Return", mkspawn(terminal2),
               {description = "open a terminal", group = "launcher"}),
     awful.key({ modkey, ctlkey    }, "Return", mkspawn(terminal3),
+              {description = "open a terminal", group = "launcher"}),
+    awful.key({ modkey,           }, "v", mkspawn(terminal),
+              {description = "open a terminal", group = "launcher"}),
+    awful.key({ modkey, altkey    }, "v", mkspawn(terminal3),
+              {description = "open a terminal", group = "launcher"}),
+    awful.key({ modkey,           }, "s", mkspawn(terminal2),
+              {description = "open a terminal", group = "launcher"}),
+    awful.key({ modkey, altkey    }, "s", mkspawn(terminal4),
               {description = "open a terminal", group = "launcher"}),
     awful.key({ modkey,           }, "r", mkspawn({"vlaunch", "launcher"}),
               {description = "open a launcher", group = "launcher"}),

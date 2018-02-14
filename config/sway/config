@@ -35,6 +35,10 @@ floating_modifier $mod
 bindsym $mod+Return exec vlaunch terminal
 bindsym $mod+$alt+Return exec vlaunch terminal2
 bindsym $mod+$ctl+Return exec vlaunch terminal3
+bindsym $mod+v exec vlaunch terminal
+bindsym $mod+s exec vlaunch terminal2
+bindsym $mod+$alt+v exec vlaunch terminal3
+bindsym $mod+$alt+s exec vlaunch terminal4
 bindsym $mod+r exec vlaunch launcher
 
 bindsym $mod+q exec swaylock -c 012323
