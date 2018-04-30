@@ -2,6 +2,7 @@
 
 # start up new emacs daemon
 
+export SHELL=/bin/sh
 premaxd=${XDG_RUNTIME_DIR:-/tmp/$(whoami)}
 newId=$RANDOM
 daemon=$premaxd/premacs-socket-$newId
