@@ -181,6 +181,9 @@ silver-searcher
 espeak
 mlocate
 
+# easier searching for nix packages
+nox
+
 END_OF_PACKAGES
 
 put "${pkgs[@]}"
