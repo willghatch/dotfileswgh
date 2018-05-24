@@ -1,0 +1,9 @@
+[Unit]
+Description=Do a one-time mail sync
+
+[Service]
+Type=oneshot
+ExecStart=/home/wgh/dotfileswgh/commands/with-dotfileswgh-env if-background-sync-enabled hatchmailsync
+#RemainAfterExit=false
+#ExecStop=
+#StandardOutput=journal

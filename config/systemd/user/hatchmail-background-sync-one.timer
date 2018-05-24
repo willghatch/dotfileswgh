@@ -1,0 +1,11 @@
+[Unit]
+Description=Sync email regularly
+
+[Timer]
+OnBootSec=30s
+OnUnitActiveSec=5m
+# this is inferred by the unit name if unstated
+#Unit=mailsync.service
+
+[Install]
+WantedBy=timers.target

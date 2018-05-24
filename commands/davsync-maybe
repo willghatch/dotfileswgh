@@ -1,6 +1,0 @@
-#!/usr/bin/env bash
-
-if [[ "$(cat $DOTFILESWGH/dotlocal/background-sync)" = "true" ]]; then
-  exec dav sync
-fi
-

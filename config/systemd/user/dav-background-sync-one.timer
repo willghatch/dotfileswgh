@@ -1,0 +1,9 @@
+[Unit]
+Description=Sync dav regularly
+
+[Timer]
+OnBootSec=60s
+OnUnitActiveSec=1h
+
+[Install]
+WantedBy=timers.target

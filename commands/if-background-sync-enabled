@@ -1,0 +1,7 @@
+#!/usr/bin/env bash
+if [[ "$(cat $DOTFILESWGH/dotlocal/background-sync 2>/dev/null)" = "true" ]]; then
+  exec "$@"
+else
+  echo background-sync disabled >&2
+  exit
+fi

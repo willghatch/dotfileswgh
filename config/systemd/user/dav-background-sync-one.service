@@ -1,0 +1,9 @@
+[Unit]
+Description=Do a one-time dav sync
+
+[Service]
+Type=oneshot
+ExecStart=/home/wgh/dotfileswgh/commands/with-dotfileswgh-env if-background-sync-enabled dav sync
+#RemainAfterExit=false
+#ExecStop=
+#StandardOutput=journal
