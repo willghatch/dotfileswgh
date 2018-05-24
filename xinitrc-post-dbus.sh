@@ -66,10 +66,10 @@ xcompmgr &
 nm-applet &
 blueman-applet &
 
-unicoder_socket="/tmp/the-unicoder_${USER}_${DISPLAY/:/}"
-
-rm -f "$unicoder_socket"
-the-unicoder --server --path "$unicoder_socket" &
+#unicoder_socket="/tmp/the-unicoder_${USER}_${DISPLAY/:/}"
+unicoder_socket="5782"
+#rm -f "$unicoder_socket"
+the-unicoder --server --port "$unicoder_socket" &
 
 $DOTFILESWGH/external/misc/libnotifylog/libnotifylogger.py $HOME/.cache/notifications.log &
 

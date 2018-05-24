@@ -12,7 +12,7 @@ terminal2="konsole -e zsh"
 terminal="konsole -e rash-repl"
 terminal3="rackterm-xterm -e rash-repl"
 
-unicode="racket -l the-unicoder -- --client --path /tmp/the-unicoder_${USER}_${DISPLAY/:/}"
+unicode="racket -l the-unicoder -- --client --port 5782"
 #unicode_func(){
 #    echo 'prompt' | socat - UNIX-CONNECT:/tmp/the-unicoder_${USER}_${DISPLAY/:/}
 #}
