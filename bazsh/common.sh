@@ -1,8 +1,8 @@
 # $WGHHOME is set so that I can su to other accounts and keep using my settings
 if [ -z "$WGHHOME" ]; then
     export WGHHOME=$HOME
-    export DOTFILESWGH=$WGHHOME/dotfileswgh
 fi
+export DOTFILESWGH=$WGHHOME/dotfileswgh
 source $DOTFILESWGH/env-more.sh
 
 # When $WGHHOME is not equal to $HOME I've switched to another user, and while I'll
