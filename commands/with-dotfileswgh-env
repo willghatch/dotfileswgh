@@ -1,0 +1,3 @@
+#!/bin/sh
+source $DOTFILESWGH/env-more.sh
+exec "$@"
