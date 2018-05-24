@@ -1,0 +1,2 @@
+#!/bin/sh
+exec vdirsyncer -c $DOTFILESWGH/pri/vdirsyncer.conf "$@"

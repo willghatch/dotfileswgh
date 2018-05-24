@@ -1,8 +1,9 @@
 # $WGHHOME is set so that I can su to other accounts and keep using my settings
 if [ -z "$WGHHOME" ]; then
     export WGHHOME=$HOME
+    export DOTFILESWGH=$WGHHOME/dotfileswgh
 fi
-export DOTFILESWGH=$WGHHOME/dotfileswgh
+source $DOTFILESWGH/env-more.sh
 
 # When $WGHHOME is not equal to $HOME I've switched to another user, and while I'll
 # want to keep using my normal dotfiles and such for most things, some settings will
@@ -20,15 +21,11 @@ if /system/bin/true >/dev/null 2>&1; then
     export ANDROID_TERMUX_MODE=true
 fi
 
-export HROOT=$WGHHOME/hroot
-export NPM_DIR=$DOTFILESWGH/dotlocal/npm
-export NODE_PATH="$NPM_DIR/lib/node_modules"
 export GUIX_PROFILE=$WGHHOME/.guix-profile
 export GUIX_LOCPATH=$GUIX_PROFILE/lib/locale
 if [[ "$USE_GUIX" = "true" && -f "$GUIX_PROFILE/etc/profile" ]]; then
     source "$GUIX_PROFILE/etc/profile"
 fi
-PATH=$DOTFILESWGH/pri/dotlocal/commands:$DOTFILESWGH/dotlocal/commands:$WGHHOME/rootgit-dotfiles/commands:/rootgit/bin.rootgit:/rootgit/tools.rootgit:$DOTFILESWGH/pri/commands:$DOTFILESWGH/pri/commands/aliases:$DOTFILESWGH/commands:$DOTFILESWGH/commands/aliases:$DOTFILESWGH/external/misc/rootgit-tools:$DOTFILESWGH/dotlocal/racket-pkgs-bin:$DOTFILESWGH/dotlocal/racket-bin:$WGHHOME/.cabal/bin:$NPM_DIR/bin:$HROOT/bin:$HROOT/usr/bin:$HROOT/usr/local/bin:$WGHHOME/.local/bin:$WGHHOME/bin:$PATH:/usr/bin:/bin:/usr/local/bin:/sbin:/usr/sbin:/usr/local/sbin
 unset MANPATH # so I can use manpath command at end here
 export MANPATH=/usr/share/man:/usr/local/man:/usr/local/share/man:/usr/X11R6/man:/opt/man:$HROOT/usr/share/man:$HROOT/share/man:$NPM_DIR/share/man:$(manpath)
 
@@ -59,25 +56,6 @@ if [[ "$ANDROID_TERMUX_MODE" ]]; then
     LD_LIBRARY_PATH=$PREFIX/lib:$LD_LIBRARY_PATH
 fi
 
-# XDG basedir spec
-# I'm putting the defaults all here as reference
-# Having the read-only path to search for config and data is *awesome*,
-# but unfortunately most things ignore them and only use data/config_home.
-#
-# writable data location
-## TODO -- add dotfile dirs to CONFIG/DATA_DIRS, but not the ones that are symlinked
-#XDG_DATA_HOME=$HOME/.local/share
-# read-only but searched data locations
-#XDG_DATA_DIRS=/usr/local/share/:/usr/share/
-export XDG_DATA_DIRS=$DOTFILESWGH/local/share:$XDG_DATA_DIRS:/usr/local/share:/usr/share
-# writable config location
-#XDG_CONFIG_HOME=$HOME/.config
-# read-only but searched config locations
-export XDG_CONFIG_DIRS=$DOTFILESWGH/pri/xdg-config-ro:$DOTFILESWGH/xdg-config-ro:$WGHHOME/rootgit-dotfiles/xdg-config-ro
-#XDG_CONFIG_DIRS=/etc/xdg
-# writable cache dir
-export XDG_CACHE_HOME=$HOME/.cache
-
 XDG_RUNTIME_DIR="/run/user/$(id -u)"
 if [[ ! -d "$XDG_RUNTIME_DIR" ]]; then
     XDG_RUNTIME_DIR="/tmp/${USER}_$(id -u)/runtime"
@@ -97,22 +75,6 @@ else
     export GTK_THEME=Adwaita:dark
     export GTK2_RC_FILES=$DOTFILESWGH/gtk2rc-dark
 fi
-export QT_STYLE_OVERRIDE=gtk
-
-## Use a default width of 80 for manpages for more convenient reading
-export MANWIDTH=${MANWIDTH:-80}
-
-export ZDOTDIR=$DOTFILESWGH/zsh
-
-# v is a wrapper script to launch vim with my settings
-export EDITOR=premacs-use-or-create-t
-#export ALTERNAME_EDITOR=v
-#export PAGER=premacs-pager
-export PAGER=less
-
-export XDG_DOWNLOAD_DIR="$HOME/dl"
-export VLAUNCHRC="$DOTFILESWGH/vlaunchrc"
-
 
 # For color in less (for man pages)
 export LESS_TERMCAP_mb=$(printf "\e[1;34m")
@@ -123,12 +85,6 @@ export LESS_TERMCAP_so=$(printf "\e[1;44;33m")
 export LESS_TERMCAP_ue=$(printf "\e[0m")
 # this is supposed to be italic
 export LESS_TERMCAP_us=$(printf "\e[1;3;32m")
-
-export GREP_COLOR="1;32"
-
-export TODOMAN_CONFIG=$DOTFILESWGH/pri/todoman.conf
-export VDIRSYNCER_CONFIG=$DOTFILESWGH/pri/vdirsyncer.conf
-export KHARD_CONFIG=$DOTFILESWGH/pri/khard.conf
 
 umask 022 # the covenient umask
 

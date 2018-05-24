@@ -9,5 +9,5 @@ if [ -z "$WGHHOME" ]; then
     fi
 fi
 export DOTFILESWGH=$WGHHOME/dotfileswgh
-PATH=$DOFTILESWGH/commands:$PATH
+#PATH=$DOTFILESWGH/commands:$DOTFILESWGH/commands/aliases:$PATH
 
