@@ -1,21 +1,16 @@
 #!/usr/bin/env bash
 
-update(){
-  read state
-  if echo $state | grep -q LOCK; then
-    notify-send "DUNST_COMMAND_PAUSE"
-  elif echo $state | grep -q UNBLANK; then
-    notify-send "DUNST_COMMAND_RESUME"
-  elif echo $state | grep -q BLANK; then
-    notify-send "DUNST_COMMAND_PAUSE"
-  else
-    notify-send "dunst-lock-monitor got bad state:" "$state"
-  fi
-}
-
 updateloop(){
-  while true; do
-    update
+  while read state; do
+    if echo $state | grep -q LOCK; then
+      notify-send "DUNST_COMMAND_PAUSE"
+    elif echo $state | grep -q UNBLANK; then
+      notify-send "DUNST_COMMAND_RESUME"
+    elif echo $state | grep -q BLANK; then
+      notify-send "DUNST_COMMAND_PAUSE"
+    else
+      notify-send "dunst-lock-monitor got bad state:" "$state"
+    fi
   done
 }
 

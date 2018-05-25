@@ -96,13 +96,13 @@ globalstate = {
 }
 
 --beautiful.init(awful.util.get_themes_dir() .. "default/theme.lua")
-beautiful.init(dotfilesdir .. "/xdg-config-ro/awesome/theme.lua")
+beautiful.init(dotfilesdir .. "/config/awesome/theme.lua")
 
 -- This is used later as the default terminal and editor to run.
 terminal = {"vlaunch", "terminal"}
 terminal2 = {"vlaunch", "terminal2"}
 terminal3 = {"vlaunch", "terminal3"}
-terminal4 = {"vlaunch", "terminal4"}
+terminal4 = {"xterm"}
 --terminal = "xterm"
 editor = os.getenv("EDITOR") or "nano"
 --editor_cmd = terminal .. " -e " .. editor
@@ -172,7 +172,7 @@ myawesomemenu = {
 }
 
 mymainmenu = awful.menu({ items = { { "awesome", myawesomemenu, beautiful.awesome_icon },
-                                    { "open terminal", terminal }
+                                    { "open terminal", function() awful.spawn({"xterm"}) end}
                                   }
                         })
 

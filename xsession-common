@@ -1,3 +1,6 @@
+#!/bin/sh
+
+source $DOTFILESWGH/env-more.sh
 
 mkdir -p /tmp/$(whoami)
 mkdir -p /tmp/$(whoami)/tty/${LOGIN_TTY}
@@ -66,7 +69,7 @@ the-unicoder --server --port "$unicoder_socket" &
 $DOTFILESWGH/external/misc/libnotifylog/libnotifylogger.py $HOME/.cache/notifications.log &
 
 # Watch keyboard state for awesome
-$DOTFILESWGH/xdg-config-ro/awesome/kbd-state-mon.sh &
+$DOTFILESWGH/config/awesome/kbd-state-mon.sh &
 
 # start kdeconnect daemon, let my phone drive
 #kdeconnect-cli
