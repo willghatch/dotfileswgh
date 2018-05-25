@@ -25,6 +25,7 @@ dotfiles=(
     npmrc
     keynavrc
     xinitrc
+    xsession
 )
 
 function die() {
