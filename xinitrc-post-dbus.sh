@@ -7,8 +7,7 @@
 
 pulseaudio &
 
-# awesome sources .xsession, it seems
-#source $DOTFILESWGH/xsession-common
+source $DOTFILESWGH/xsession-common
 
 
 if [ -f $DOTFILESWGH/pri/xinitrc ]; then
