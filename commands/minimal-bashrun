@@ -1,0 +1,79 @@
+#!/usr/bin/env bash
+#
+# usage: bashrun [geometry] (default: 40x1)
+#
+# NOTE: commands entered will have an '&' appended before being run,
+# so don't append it yourself, it will fail silently.
+#
+# This is a minimal old version of bashrun found here:
+# https://bbs.archlinux.org/viewtopic.php?id=56283
+# and then edited further to simplify and only have what I need.
+#
+# ---------------------------------------------------------------------
+
+GEOM=${1:-60x18}
+
+BASHRUNRC=$DOTFILESWGH/minimal-bashrunrc
+export HISTFILE=$HOME/.cache/minimal-bashrun-history
+export HISTCONTROL=ignoredups:erasedups
+
+XTERM=xterm
+
+error() {
+    if [ `which zenity` ]; then
+        zenity --title bashrun --error --text "$@"
+    elif [ `which kdialog` ]; then
+        kdialog --title bashrun --error "$@"
+    elif [ `which xmessage` ]; then
+        xmessage "$@"
+    fi
+    echo -en "\007"
+    echo $@
+}
+
+# run bash terminal
+if [ "$XTERM" == "xterm" ]; then
+    $XTERM -name 'bashrun' \
+    -title 'bashrun' \
+    -geometry $GEOM \
+    -e "/bin/bash --rcfile $BASHRUNRC -i -t"
+
+elif [[ "$XTERM" == "aterm" || "$XTERM" == "mlterm" ]]; then
+    $XTERM -name 'bashrun' \
+    -title 'bashrun' \
+    -geometry $GEOM +sb \
+    -e /bin/bash --rcfile $BASHRUNRC -i -t
+
+elif [[ "$XTERM" == "urxvt" || "$XTERM" == "rxvt" ]]; then
+    $XTERM -name 'bashrun' \
+    -title 'bashrun' \
+    -geometry $GEOM +sb\
+    -e sh -c "/bin/bash --rcfile $BASHRUNRC -i -t"
+
+elif [ "$XTERM" == "mrxvt" ]; then
+    $XTERM -name 'bashrun' \
+    -title 'bashrun' \
+    -geometry $GEOM +sb -ht \
+    -e sh -c "/bin/bash --rcfile $BASHRUNRC -i -t"
+else
+    error "$XTERM is not supported. Please check $BASHRUNRC"
+    exit 1
+fi
+
+# history cleanup...
+# remove trailing whitespace and '&' from the last history line
+tac $HISTFILE | sed "1s/\&//;s/ *$//" | tac > $HISTFILE
+
+# HISTCONTROL won't work on its own because bash applies the
+# 'ignoredups' and 'erasedups' rules to 'command &'.
+
+# apply 'ignoredups' if set
+if [[ "$HISTCONTROL" =~ "ignoredups" || "$HISTCONTROL" =~ "ignoreboth" ]]; then
+    uniq $HISTFILE $HISTFILE.tmp
+    mv $HISTFILE.tmp $HISTFILE
+fi
+
+# apply 'erasedups' if set
+if [[ "$HISTCONTROL" =~ "erasedups" ]]; then
+    tac $HISTFILE | gawk '!x[$0]++' - | tac > $HISTFILE
+fi

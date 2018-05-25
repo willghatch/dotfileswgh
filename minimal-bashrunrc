@@ -1,0 +1,11 @@
+# which X terminal to use:
+# (xterm|rxvt|urxvt|mrxvt|aterm|mlterm)
+XTERM=xterm
+
+# set a simple prompt
+PS1="¢ "
+
+# ***DO NOT EDIT BEYOND THIS LINE***
+#
+# bind ENTER to add ' &' to command
+bind '"\x0d"':"\" &\n\""

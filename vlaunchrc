@@ -19,6 +19,7 @@ unicode="racket -l the-unicoder -- --client --port 5782"
 #unicode="unicode_func"
 
 screenshot=scrot
+launcher=minimal-bashrun
 
 
 if [ -f $DOTFILESWGH/dotlocal/vlaunchrc ]; then

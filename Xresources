@@ -31,7 +31,12 @@ xterm*color14: rgb:54/fc/fc
 xterm*color15: rgb:fc/fc/fc
 
 xterm*faceName: DejaVu Sans Mono:size=12:antialias=true
+
+! bashrun runs an xterm, but matches on the name bashrun...
 bashrun*faceName: DejaVu Sans Mono:size=13:antialias=true
+bashrun*foreground: rgb:a8/a8/a8
+bashrun*background: rgb:00/00/00
+
 
 URxvt.font: xft:monospace:size=10
 URxvt.foreground: rgb:a8/a8/a8
