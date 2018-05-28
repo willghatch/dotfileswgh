@@ -89,9 +89,10 @@ fluxbox
 # hide mouse cursor
 unclutter
 lxappearance
-awesome
-vicious
-xscreensaver
+#awesome
+#vicious
+#xscreensaver should NOT be used unless the Xorg binary from nix is also used
+#xscreensaver
 #TODO
 #cinnamon
 lxqt-session
