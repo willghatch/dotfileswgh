@@ -79,6 +79,7 @@ pulseaudio-alsa \
 pulseaudio-zeroconf \
 pulseaudio-bluetooth \
 pavucontrol \
+pamixer \
 lxappearance \
 fortune-mod \
 cowsay \

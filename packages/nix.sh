@@ -155,6 +155,7 @@ vorbis-tools
 flac
 alsa-utils
 pavucontrol
+pamixer
 mpd
 mpc
 ncmpc
