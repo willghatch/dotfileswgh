@@ -133,18 +133,36 @@ vicious.register(cpuTextWidget, vicious.widgets.cpu, " | CPU: $1% | ")
 --vicious.register(cpuwidget, vicious.widgets.cpu, "$1")
 
 --volume widget
+--volumewidget = wibox.widget.textbox()
+--volumewidget:set_align("right")
+---- wrapper to make mute status more visible...
+--volume_widget_wrapper = function(...)
+--   ret = vicious.widgets.volume(...)
+--   mutestr = ""
+--   if ret[2] == "♩" then
+--      mutestr = "MUTE"
+--   end
+--   return {ret[1], mutestr}
+--end
+--vicious.register(volumewidget, volume_widget_wrapper, "<span color='#00ffff'> Vol: $1%</span> <span color='#99FF99'>$2 </span>| ", 1, "Master")
+
 volumewidget = wibox.widget.textbox()
-volumewidget:set_align("right")
--- wrapper to make mute status more visible...
-volume_widget_wrapper = function(...)
-   ret = vicious.widgets.volume(...)
-   mutestr = ""
-   if ret[2] == "♩" then
-      mutestr = "MUTE"
-   end
-   return {ret[1], mutestr}
+set_volumewidget = function()
+    local io = { popen = io.popen }
+    local volout = io.popen("pamixer --get-volume")
+    local volstr = volout:read('*l')
+    volout:close()
+    local muteout = io.popen("pamixer --get-mute")
+    local mutestr = muteout:read('*l')
+    muteout:close()
+    local mute_use = (mutestr == "true") and "MUTE" or "♩"
+    volumewidget:set_markup('<span color="#00ffff">Vol: '.. volstr .."%</span><span color='#99ff99'> ".. mute_use .."</span>|")
 end
-vicious.register(volumewidget, volume_widget_wrapper, "<span color='#00ffff'> Vol: $1%</span> <span color='#99FF99'>$2 </span>| ", 1, "Master")
+-- initialize volume widget, then let it run every so often
+set_volumewidget()
+volume_timer = timer({ timeout = 1 })
+volume_timer:connect_signal("timeout", set_volumewidget)
+volume_timer:start()
 
 
 -- battery widget
