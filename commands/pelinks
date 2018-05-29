@@ -1,0 +1,6 @@
+#!/bin/sh
+
+tf=`mktemp /tmp/pelinks_XXXXXXXX.html`
+cat - > "$tf"
+elinks "$tf"
+rm "$tf"

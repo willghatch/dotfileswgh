@@ -150,8 +150,8 @@ bind pager g noop
 bind pager gg top
 bind pager H display-toggle-weed # show headers
 bind pager h noop
-macro pager hh '|elinks -force-html<enter>'
-macro attach hh '|elinks -force-html<enter>'
+macro pager hh '|pelinks<enter>'
+macro attach hh '|pelinks<enter>'
 macro attach hf "<pipe-entry>cat >/tmp/html-mutt.html && ffx --new-tab /tmp/html-mutt.html<enter>"
 macro pager hf "<pipe-entry>cat >/tmp/html-mutt.html && ffx --new-tab /tmp/html-mutt.html<enter>"
 macro attach hv "<pipe-entry>feh -<enter>"
