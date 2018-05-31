@@ -176,7 +176,11 @@
  (if (version<= "26.0.50" emacs-version)
      ;; Supposedly this new one packaged with emacs 26 is faster.
      ;; It seems worse so far... but it's probably not a huge deal.
-     (global-display-line-numbers-mode)
+     (progn
+       ;; don't shrink the line number width
+       (setq display-line-numbers-grow-only t)
+       (global-display-line-numbers-mode)
+       )
    (progn
      (require 'linum)
      (global-linum-mode 1)

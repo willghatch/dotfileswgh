@@ -63,6 +63,8 @@
  '(italic ((t (:slant italic))))
  '(js2-warning ((t (:slant italic))))
  '(lazy-highlight ((t (:background "#0087ff" :foreground "#000000"))))
+ '(line-number ((t (:inherit mode-line :foreground "#309f9f" :underline nil :weight normal))))
+ '(line-number-current-line ((t (:inherit line-number :background "#309f9f" :foreground "#161616" :underline nil :weight normal))))
  '(linum ((t (:inherit mode-line :foreground "#309f9f" :underline nil :weight normal))))
  '(magit-diff-none ((t (:inherit diff-header))))
  '(magit-item-highlight ((t (:background "#232323"))))
