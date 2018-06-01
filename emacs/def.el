@@ -212,6 +212,8 @@
  (yafolding-mode 1)
  (load-library "borrowed")
  (load-library "tty-format")
+ (require 'markchars)
+ (markchars-global-mode t)
 
  ;;; MAKE SCROLLING BE SANE, PLEASE¡
  (setq scroll-step 1)

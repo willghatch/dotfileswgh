@@ -32,6 +32,7 @@
 (in 'rainbow-mode) ; for #123456 colors
 (in 'smartparens)
 (in 'ace-jump-mode)
+(in 'markchars)
 
 (in 'elscreen)
 (in 'xclip)
