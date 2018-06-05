@@ -1,0 +1,28 @@
+Config { bgColor = "black"
+       , fgColor = "grey"
+       --, font = "-*-Fixed-Bold-R-Normal-*-13-*-*-*-*-*-*-*"
+       , position = TopW L 90
+       , allDesktops = True
+       -- for commands, the number after the args list is refresh period, in 1/10ths of seconds
+       , commands =
+                    [ Run Cpu ["-m","2","-L","33","-H","66","-l","green","--normal","yellow","--high","red"] 10
+                    --[ Run MultiCpu ["-t","Cpu: <autototal>","-L","3","-H","50","-l","green","--normal","yellow","--high","red"] 10
+                    --, Run Weather "LJLJ" ["-t"," C","-L","64","-H","77","--normal","green","--high","red","--low","lightblue"] 36000
+                    , Run Network "wlp2s0" ["-m","5","-L","10000","-H","150000","-l","green","--normal","yellow","--high","red"] 10
+                    , Run Network "wlp4s0" ["-m","5","-L","10000","-H","150000","-l","green","--normal","yellow","--high","red"] 10
+                    , Run Network "enp3s0f1" ["-m","5","-L","10000","-H","150000","-l","green","--normal","yellow","--high","red"] 10
+                    , Run Network "enp5s0" ["-m","5","-L","10000","-H","150000","-l","green","--normal","yellow","--high","red"] 10
+                    --, Run DynNetwork ["-L","0","-H","32","--normal","green","--high","red"] 10
+                    , Run Memory ["-m","2","-t","Mem: <usedratio>%", "-h","red","-n","yellow","-l","green"] 10
+                    , Run Swap ["-m","2","-l","green","--normal","yellow","--high","red"] 10
+                    --, Run MPD ["-t", "<composer> <title> (<album>) <track>/<plength> <statei> ", "--", "-P", ">>", "-Z", "|", "-S", "><"] 10
+                    , Run Date "%F %a <fc=cyan>%R</fc>" "date" 10
+                    --, Run Battery ["-t","Batt: % / ","-L","25","-H","75","-h","green","-n","yellow","-l","red","--","-c","energy_full"] 10
+                    --, Run Volume "default" "Master" [] 10
+                    , Run StdinReader
+                    , Run CommandReader "ledmon" "LED"
+                    ]
+       , sepChar = "%"
+       , alignSep = "}{"
+       , template = "%StdinReader% }{ [%LED%] <action=`vlaunch sysmonitor`>%cpu% %memory% %swap%</action> %wlp2s0% %eth0% %eth1% %enp5s0% <action=`vlaunch calendar`>%date%</action>"
+       }

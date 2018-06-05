@@ -1,10 +1,1 @@
-bind main G @git branch "%(prompt Enter branch name:)"
-bind diff G @git branch "%(prompt Enter branch name:)"
-bind main N ?@git checkout -b "%(prompt Enter branch name:)"
-
-bind main B ?!git rebase -i %(commit)
-bind main R ?@git reset --hard %(commit)
-bind main S ?@git reset --soft %(commit)
-bind main D ?@git branch -d %(branch)
-bind main C ?@git checkout %(branch)
-bind main P ?@git cherry-pick %(commit)
+homedir/.tigrc

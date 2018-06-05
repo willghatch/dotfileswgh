@@ -1,0 +1,565 @@
+# -*-muttrc-*-
+#set editor="/usr/bin/vim"
+set text_flowed=yes
+
+
+set header_cache=~/.cache/mutt/headers
+set message_cachedir=~/.cache/mutt/bodies
+set certificate_file=~/.cache/mutt/certificates
+
+set move = no
+
+set mark_old=no # don't differentiate between seen and unseen unread
+
+# Palette for use with the Linux console.  Black background.
+
+color hdrdefault blue black
+color quoted blue black
+color signature blue black
+color attachment red black
+color message brightred black
+color error brightred black
+color indicator black green
+color status brightgreen blue
+color tree white black
+color normal white black
+color markers red black
+color search white black
+color tilde brightmagenta black
+color index brightgreen black ~F # important/star
+color index brightred black "~N|~O" # new or... something
+color index brightgreen red "~N|~O ~F" # new AND important
+
+# color body brightwhite black '\*+[^*]+\*+'
+# color body brightwhite black '_+[^_]+_+'
+
+set copy=yes  # make a copy of outgoing mail
+set include   # include message when replying
+set indent_string="> " # how to indent copied lines on reply
+set help      # show help lines
+set mail_check=5 # how often to poll for new mail
+set pager_context=3 # how many lines of context
+set pager_stop=yes # stop at end of message - don't go on to the next by scrolling
+set pager_index_lines=7 # this many lines of the index show while reading email
+set tilde # show ~ after the end of the email, a la vim
+unset resolve # don't try to go to the next message after an operation
+
+
+#set sort=threads  # how to sort conversation threads
+#set sort=date  # how to sort conversation threads
+
+# This is how to have sane sorting
+set sort=threads
+set sort_aux=last-date-received
+
+#set sidebar_visible = yes # show sidebar in patched version
+
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+#
+# Key bindings
+#
+#	maps:
+#		alias		alias menu
+#		attach		attachment menu
+#		browser		directory browser
+#		compose		compose menu
+#		index		message index
+#		pgp		pgp menu
+#		postpone	postponed message recall menu
+#		generic		generic keymap for all of the above
+#		editor		line editor
+#		pager		text viewer
+#
+
+bind editor <Tab> complete-query
+bind editor ^T complete
+
+# unbind all letters in index - I don't want to accidentally do things
+bind index a noop
+bind index b noop
+bind index c noop
+bind index d noop
+bind index e noop
+bind index f noop
+bind index g noop
+bind index h noop
+bind index i noop
+bind index j noop
+bind index k noop
+bind index l noop
+bind index m noop
+bind index n noop
+bind index o noop
+bind index p noop
+bind index q noop
+bind index r noop
+bind index s noop
+bind index t noop
+bind index u noop
+bind index v noop
+bind index w noop
+bind index x noop
+bind index y noop
+bind index z noop
+bind index A noop
+bind index B noop
+bind index C noop
+bind index D noop
+bind index E noop
+bind index F noop
+bind index G noop
+bind index H noop
+bind index I noop
+bind index J noop
+bind index K noop
+bind index L noop
+bind index M noop
+bind index N noop
+bind index O noop
+bind index P noop
+bind index Q noop
+bind index R noop
+bind index S noop
+bind index T noop
+bind index U noop
+bind index V noop
+bind index W noop
+bind index X noop
+bind index Y noop
+bind index Z noop
+
+bind generic \Chb help
+
+bind pager i noop # was exit, what q now does
+bind pager s noop
+bind pager ss save-message
+bind pager sc copy-message
+bind pager sj next-page
+bind pager sk previous-page
+bind pager j half-down
+bind pager k half-up
+bind pager J next-line
+bind pager K previous-line
+bind pager w next-undeleted
+bind pager b previous-undeleted
+bind pager <space> noop
+bind pager <space>j next-page
+bind pager <space>k previous-page
+bind pager G bottom
+bind pager g noop
+bind pager gg top
+bind pager H display-toggle-weed # show headers
+bind pager h noop
+macro pager hh '|pelinks<enter>'
+macro attach hh '|pelinks<enter>'
+macro attach hf "<pipe-entry>cat >/tmp/html-mutt.html && ffx --new-tab /tmp/html-mutt.html<enter>"
+macro pager hf "<pipe-entry>cat >/tmp/html-mutt.html && ffx --new-tab /tmp/html-mutt.html<enter>"
+macro attach hv "<pipe-entry>feh -<enter>"
+bind pager q exit
+bind pager r noop
+bind pager rr reply
+bind pager ra group-reply
+bind pager rl list-reply
+bind pager n search-next
+bind pager N search-opposite
+bind pager a view-attachments
+bind pager A display-address
+bind pager u mark-as-new
+bind pager U undelete-message
+# defaults include T for toggle quoted, f for forward, d for delete...
+
+
+bind index j next-entry
+bind index k previous-entry
+#bind index j next-undeleted
+#bind index k previous-undeleted
+#bind index J next-page
+#bind index K previous-page
+bind index J next-unread
+bind index K previous-unread
+bind index sj next-page
+bind index sk previous-page
+bind index ss save-message
+bind index sc copy-message
+macro index sm "ss\Ca\Ck=misc<enter>y"
+macro index sl "ss\Ca\Ck=lists<enter>y"
+bind index G last-entry
+bind index gg first-entry
+bind index \Chb help
+bind index q quit
+bind index Q exit # don't save changes
+bind index u toggle-new
+bind index dd delete-message
+bind index U undelete-message
+bind index a view-attachments
+bind index A display-address
+bind index f change-folder
+bind index m mail # compose new mail
+bind index <space> noop
+macro index <space>/b /~b<space>
+bind index n search-next
+bind index N search-opposite
+bind index r imap-fetch-mail # the other fetch-mail uses pop
+bind index tis sync-mailbox
+bind index tie quit # quit saving
+bind index tic exit # quit without saving
+bind index tia change-folder
+bind index tsi flag-message # toggle important/star
+bind index tsr toggle-new
+bind index tsf set-flag
+
+# limit filters to mails that match a pattern (in subject/from fields only)
+bind index l limit
+# 'L' performs a notmuch query, showing only the results
+macro index L "<enter-command>unset wait_key<enter><shell-escape>read -p 'notmuch query: ' x; echo \$x >~/.cache/mutt_terms<enter><limit>~i \"\`notmuch search --output=messages \$(cat ~/.cache/mutt_terms) | head -n 600 | perl -le '@a=<>;chomp@a;s/\^id:// for@a;$,=\"|\";print@a'\`\"<enter>" "show only messages matching a notmuch pattern"
+# 'a' shows all messages again (supersedes default <alias> binding)
+macro index A "<limit>all\n" "show all messages (undo limit)"
+
+
+bind index - enter-command
+bind pager - enter-command
+
+# lame conditional sourcing...
+source `FILE=~/dotfileswgh/pri/mutt/rc; if [ ! -s "$FILE" ]; then FILE=/dev/null; fi; echo "$FILE"`
+source `FILE=~/rootgit-dotfiles/muttrc; if [ ! -s "$FILE" ]; then FILE=/dev/null; fi; echo "$FILE"`
+source `FILE=~/dotfileswgh/dotlocal/muttrc; if [ ! -s "$FILE" ]; then FILE=/dev/null; fi; echo "$FILE"`
+
+
+set status_format="Unread:%u Box:%f Msgs:%m Flagged:%F Boxes-with-new:%b Postponed: %p Bytes-used:%l Pattern:%V Status:%r"
+# variables
+#%b 	number of mailboxes with new mail *
+#%d 	number of deleted messages *
+#%f 	the full pathname of the current mailbox
+#%F 	number of flagged messages *
+#%h 	local hostname
+#%l 	size (in bytes) of the current mailbox *
+#%L 	size (in bytes) of the messages shown (i.e., which match the current limit) *
+#%m 	the number of messages in the mailbox *
+#%M 	the number of messages shown (i.e., which match the current limit) *
+#%n 	number of new messages in the mailbox *
+#%o 	number of old unread messages *
+#%p 	number of postponed messages *
+#%P 	percentage of the way through the index
+#%r 	modified/read-only/won't-write/attach-message indicator, according to $status_chars
+#%s 	current sorting mode ($sort)
+#%S 	current aux sorting method ($sort_aux)
+#%t 	number of tagged messages *
+#%u 	number of unread messages *
+#%v 	Mutt version string
+#%V 	currently active limit pattern, if any *
+#%>X 	right justify the rest of the string and pad with “X”
+#%|X 	pad to the end of the line with “X”
+#%*X 	soft-fill with character “X” as pad 
+
+
+
+
+
+# available commands
+#
+#
+#
+#generic
+#
+#The generic menu is not a real menu, but specifies common functions (such as movement) available in all menus except for pager and editor. Changing settings for this menu will affect the default bindings for all menus (except as noted).
+#
+#bottom-page                L   move to the bottom of the page
+#current-bottom     not bound   move current entry to bottom of page
+#current-middle     not bound   move current entry to middle of page
+#current-top        not bound   move current entry to top of page
+#enter-command              :   enter a muttrc command
+#exit                       q   exit this menu
+#first-entry                =   move to the first entry
+#half-down                  ]   scroll down 1/2 page
+#half-up                    [   scroll up 1/2 page
+#help                       ?   this screen
+#jump                  number   jump to an index number
+#last-entry                 *   move to the last entry
+#middle-page                M   move to the middle of the page
+#next-entry                 j   move to the next entry
+#next-line                  >   scroll down one line
+#next-page                  z   move to the next page
+#previous-entry             k   move to the previous entry
+#previous-line              <   scroll up one line
+#previous-page              Z   move to the previous page
+#refresh                   ^L   clear and redraw the screen
+#search                     /   search for a regular expression
+#search-next                n   search for next match
+#search-opposite    not bound   search for next match in opposite direction
+#search-reverse         ESC /   search backwards for a regular expression
+#select-entry             RET   select the current entry
+#shell-escape               !   run a program in a subshell
+#tag-entry                  t   toggle the tag on the current entry
+#tag-prefix                 ;   apply next command to tagged entries
+#top-page                   H   move to the top of the page
+#
+#index
+#
+#bounce-message             b   remail a message to another user
+#change-folder              c   open a different folder
+#change-folder-readonly ESC c   open a different folder in read only mode
+#check-traditional-pgp  ESC P   check for classic pgp
+#clear-flag                 W   clear a status flag from a message
+#copy-message               C   copy a message to a file/mailbox
+#create-alias               a   create an alias from a message sender
+#decode-copy            ESC C   decode a message and copy it to a file/mailbox
+#decode-save            ESC s   decode a message and save it to a file/mailbox
+#delete-message             d   delete the current entry
+#delete-pattern             D   delete messages matching a pattern
+#delete-subthread       ESC d   delete all messages in subthread
+#delete-thread             ^D   delete all messages in thread
+#display-address            @   display full address of sender
+#display-toggle-weed        h   display message and toggle header weeding
+#display-message          RET   display a message
+#edit                       e   edit the current message
+#edit-type                 ^E   edit the current message's Content-Type
+#exit                       x   exit without saving changes
+#extract-keys              ^K   extract PGP public keys
+#fetch-mail                 G   retrieve mail from POP server
+#flag-message               F   toggle a message's 'important' flag
+#forget-passphrase         ^F   wipe PGP passphrase from memory
+#forward-message            f   forward a message with comments
+#group-reply                g   reply to all recipients
+#limit                      l   show only messages matching a pattern
+#list-reply                 L   reply to specified mailing list
+#mail                       m   compose a new mail message
+#mail-key               ESC k   mail a PGP public key
+#next-new                 TAB   jump to the next new message
+#next-subthread         ESC n   jump to the next subthread
+#next-thread               ^N   jump to the next thread
+#next-undeleted             j   move to the next undeleted message
+#next-unread        not bound   jump to the next unread message
+#parent-message             P   jump to parent message in thread
+#pipe-message               |   pipe message/attachment to a shell command
+#previous-new         ESC TAB   jump to the previous new message
+#previous-page              Z   move to the previous page
+#previous-subthread     ESC p   jump to previous subthread
+#previous-thread           ^P   jump to previous thread
+#previous-undeleted         k   move to the last undelete message
+#previous-unread    not bound   jump to the previous unread message
+#print-message              p   print the current entry
+#query                      Q   query external program for addresses
+#quit                       q   save changes to mailbox and quit
+#read-subthread         ESC r   mark the current subthread as read
+#read-thread               ^R   mark the current thread as read
+#recall-message             R   recall a postponed message
+#reply                      r   reply to a message
+#resend-message         ESC e   resend message and preserve MIME structure
+#save-message               s   save message/attachment to a file
+#set-flag                   w   set a status flag on a message
+#show-version               V   show the Mutt version number and date
+#show-limit             ESC l   show currently active limit pattern, if any
+#sort-mailbox               o   sort messages
+#sort-reverse               O   sort messages in reverse order
+#sync-mailbox               $   save changes to mailbox
+#tag-pattern                T   tag messages matching a pattern
+#tag-thread             ESC t   tag/untag all messages in the current thread
+#toggle-new                 N   toggle a message's 'new' flag
+#toggle-write               %   toggle whether the mailbox will be rewritten
+#undelete-message           u   undelete the current entry
+#undelete-pattern           U   undelete messages matching a pattern
+#undelete-subthread     ESC u   undelete all messages in subthread
+#undelete-thread           ^U   undelete all messages in thread
+#untag-pattern             ^T   untag messages matching a pattern
+#view-attachments           v   show MIME attachments
+#
+#pager
+#
+#bottom             not bound   jump to the bottom of the message
+#bounce-message             b   remail a message to another user
+#change-folder              c   open a different folder
+#change-folder-readonly ESC c   open a different folder in read only mode
+#check-traditional-pgp  ESC P   check for classic pgp
+#copy-message               C   copy a message to a file/mailbox
+#create-alias               a   create an alias from a message sender
+#decode-copy            ESC C   decode a message and copy it to a file/mailbox
+#decode-save            ESC s   decode a message and save it to a file/mailbox
+#delete-message             d   delete the current entry
+#delete-subthread       ESC d   delete all messages in subthread
+#delete-thread             ^D   delete all messages in thread
+#display-address            @   display full address of sender
+#display-toggle-weed        h   display message and toggle header weeding
+#edit                       e   edit the current message
+#edit-type                 ^E   edit the current message's Content-Type
+#enter-command              :   enter a muttrc command
+#exit                       i   return to the main-menu
+#extract-keys              ^K   extract PGP public keys
+#flag-message               F   toggle a message's 'important' flag
+#forget-passphrase         ^F   wipe PGP passphrase from memory
+#forward-message            f   forward a message with comments
+#group-reply                g   reply to all recipients
+#half-up            not bound   move up one-half page
+#half-down          not bound   move down one-half page
+#help                       ?   this screen
+#list-reply                 L   reply to specified mailing list
+#mail                       m   compose a new mail message
+#mail-key               ESC k   mail a PGP public key
+#mark-as-new                N   toggle a message's 'new' flag
+#next-line                RET   scroll down one line
+#next-entry                 J   move to the next entry
+#next-new                 TAB   jump to the next new message
+#next-page                      move to the next page
+#next-subthread         ESC n   jump to the next subthread
+#next-thread               ^N   jump to the next thread
+#next-undeleted             j   move to the next undeleted message
+#next-unread        not bound   jump to the next unread message
+#parent-message             P   jump to parent message in thread
+#pipe-message               |   pipe message/attachment to a shell command
+#previous-line      BackSpace   scroll up one line
+#previous-entry             K   move to the previous entry
+#previous-new       not bound   jump to the previous new message
+#previous-page              -   move to the previous page
+#previous-subthread     ESC p   jump to previous subthread
+#previous-thread           ^P   jump to previous thread
+#previous-undeleted         k   move to the last undelete message
+#previous-unread    not bound   jump to the previous unread message
+#print-message              p   print the current entry
+#quit                       Q   save changes to mailbox and quit
+#read-subthread         ESC r   mark the current subthread as read
+#read-thread               ^R   mark the current thread as read
+#recall-message             R   recall a postponed message
+#redraw-screen             ^L   clear and redraw the screen
+#reply                      r   reply to a message
+#save-message               s   save message/attachment to a file
+#search                     /   search for a regular expression
+#search-next                n   search for next match
+#search-opposite    not bound   search for next match in opposite direction
+#search-reverse         ESC /   search backwards for a regular expression
+#search-toggle              \   toggle search pattern coloring
+#shell-escape               !   invoke a command in a subshell
+#show-version               V   show the Mutt version number and date
+#skip-quoted                S   skip beyond quoted text
+#sync-mailbox               $   save changes to mailbox
+#tag-message                t   tag a message
+#toggle-quoted              T   toggle display of quoted text
+#top                        ^   jump to the top of the message
+#undelete-message           u   undelete the current entry
+#undelete-subthread     ESC u   undelete all messages in subthread
+#undelete-thread           ^U   undelete all messages in thread
+#view-attachments           v   show MIME attachments
+#
+#alias
+#
+#search                     /   search for a regular expression
+#search-next                n   search for next match
+#search-reverse         ESC /   search backwards for a regular expression
+#
+#query
+#
+#create-alias               a   create an alias from a message sender
+#mail                       m   compose a new mail message
+#query                      Q   query external program for addresses
+#query-append               A   append new query results to current results
+#search                     /   search for a regular expression
+#search-next                n   search for next match
+#search-opposite    not bound   search for next match in opposite direction
+#search-reverse         ESC /   search backwards for a regular expression
+#
+#attach
+#
+#bounce-message             b   remail a message to another user
+#collapse-parts             v   toggle display of subparts
+#delete-entry               d   delete the current entry
+#display-toggle-weed        h   display message and toggle header weeding
+#edit-type                 ^E   edit the current entry's Content-Type
+#extract-keys              ^K   extract PGP public keys
+#forward-message            f   forward a message with comments
+#group-reply                g   reply to all recipients
+#list-reply                 L   reply to specified mailing list
+#pipe-entry                 |   pipe message/attachment to a shell command
+#print-entry                p   print the current entry
+#reply                      r   reply to a message
+#resend-message         ESC e   resend message and preserve MIME structure
+#save-entry                 s   save message/attachment to a file
+#undelete-entry             u   undelete the current entry
+#view-attach              RET   view attachment using mailcap entry if necessary
+#view-mailcap               m   force viewing of attachment using mailcap
+#view-text                  T   view attachment as text
+#
+#compose
+#
+#attach-file                a   attach a file(s) to this message
+#attach-message             A   attach message(s) to this message
+#attach-key             ESC k   attach a PGP public key
+#copy-file                  C   save message/attachment to a file
+#detach-file                D   delete the current entry
+#display-toggle-weed        h   display message and toggle header weeding
+#edit-bcc                   b   edit the BCC list
+#edit-cc                    c   edit the CC list
+#edit-description           d   edit attachment description
+#edit-encoding             ^E   edit attachment transfer-encoding
+#edit-fcc                   f   enter a file to save a copy of this message in
+#edit-from              ESC f   edit the from: field
+#edit-file               ^X e   edit the file to be attached
+#edit-headers               E   edit the message with headers
+#edit                       e   edit the message
+#edit-mime                  m   edit attachment using mailcap entry
+#edit-reply-to              r   edit the Reply-To field
+#edit-subject               s   edit the subject of this message
+#edit-to                    t   edit the TO list
+#edit-type                 ^T   edit attachment type
+#filter-entry               F   filter attachment through a shell command
+#forget-passphrase         ^F   wipe PGP passphrase from memory
+#ispell                     i   run ispell on the message
+#new-mime                   n   compose new attachment using mailcap entry
+#pgp-menu                   p   show PGP options
+#pipe-entry                 |   pipe message/attachment to a shell command
+#postpone-message           P   save this message to send later
+#print-entry                l   print the current entry
+#rename-file                R   rename/move an attached file
+#send-message               y   send the message
+#toggle-unlink              u   toggle whether to delete file after sending it
+#view-attach              RET   view attachment using mailcap entry if necessary
+#write-fcc                  w   write the message to a folder
+#
+#postpone
+#
+#delete-entry               d   delete the current entry
+#undelete-entry             u   undelete the current entry
+#
+#browser
+#
+#change-dir                 c   change directories
+#check-new                TAB   check mailboxes for new mail
+#enter-mask                 m   enter a file mask
+#search                     /   search for a regular expression
+#search-next                n   search for next match
+#search-reverse         ESC /   search backwards for a regular expression
+#select-new                 N   select a new file in this directory
+#sort                       o   sort messages
+#sort-reverse               O   sort messages in reverse order
+#toggle-mailboxes         TAB   toggle whether to browse mailboxes or all files
+#view-file              SPACE   view file
+#subscribe                  s   subscribe to current mailbox (IMAP Only)
+#unsubscribe                u   unsubscribe to current mailbox (IMAP Only)
+#toggle-subscribed          T   toggle view all/subscribed mailboxes (IMAP Only)
+#
+#pgp
+#
+#view-name                  %   view the key's user id
+#verify-key                 c   verify a PGP public key
+#
+#editor
+#
+#backspace          BackSpace   delete the char in front of the cursor
+#backward-char             ^B   move the cursor one character to the left
+#backward-word          ESC b   move the cursor to the previous word
+#bol                       ^A   jump to the beginning of the line
+#buffy-cycle            Space   cycle among incoming mailboxes
+#capitalize-word        ESC c   uppercase the first character in the word
+#complete                 TAB   complete filename or alias
+#complete-query            ^T   complete address with query
+#delete-char               ^D   delete the char under the cursor
+#downcase-word          ESC l   lowercase all characters in current word
+#eol                       ^E   jump to the end of the line
+#forward-char              ^F   move the cursor one character to the right
+#forward-word           ESC f   move the cursor to the next word
+#history-down       not bound   scroll down through the history list
+#history-up         not bound   scroll up through the history list
+#kill-eol                  ^K   delete chars from cursor to end of line
+#kill-eow               ESC d   delete chars from cursor to end of word
+#kill-line                 ^U   delete all chars on the line
+#kill-word                 ^W   delete the word in front of the cursor
+#quote-char                ^V   quote the next typed key
+#transpose-chars    not bound   transpose character under cursor with previous
+#upcase-word            ESC u   uppercase all characters in current word

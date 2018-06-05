@@ -1,0 +1,138 @@
+"1.1
+
+loadplugins '\.(js|penta)$'
+group user
+
+map -count -modes=i jk <Esc>
+map -count -modes=i kj <Esc>
+
+map -count -modes=n -builtin a i
+
+" switch yanks -- now capital is for current URL, lowercase is selection or current word
+map -count -builtin -modes=n y Y
+map -count -builtin -modes=n Y y
+
+map -count -builtin -modes=v c s
+map -count -builtin -modes=n <C-w> <Nop>
+
+map -count -builtin -modes=n <Space> <Nop>
+map -count -builtin -modes=n <Space>h <PageDown>
+map -count -builtin -modes=n <Space>t <PageUp>
+map -count -builtin -modes=n sj <C-f>
+map -count -builtin -modes=n sk <C-b>
+" These are half-page scrollers
+map -count -builtin -modes=n j <C-d>
+map -count -builtin -modes=n k <C-u>
+map -count -builtin -modes=n J j
+map -count -builtin -modes=n K k
+map -count -builtin -modes=n h 8h
+map -count -builtin -modes=n l 8l
+map -count -builtin -modes=n H h
+map -count -builtin -modes=n L l
+" history
+map -count -builtin -modes=n < H
+map -count -builtin -modes=n > L
+
+" s-map -- make ss do what S did - search in new tab
+map -builtin -modes=n s <Nop>
+map -builtin -modes=n ss S
+" color fixing hack -- instead of directly opening a new tab to a search,
+" open a new tab, THEN search.  That way the ColorTransform plugin can
+" load and not have white flashes.
+" map -builtin -modes=n ss t<cr>s
+map -builtin -modes=n S s
+map -builtin -modes=n sm m
+map -builtin -modes=n sg `
+map -builtin -modes=n sh :!
+map -builtin -modes=n s<Space>m M
+map -builtin -modes=n s<Space>g go
+map -builtin -modes=n sM :bmark<Space>
+map -builtin -modes=n sG :bmarks<Space>
+
+map -modes=n -builtin tis :emenu File.Save Page As…
+
+" t-map
+map -builtin -modes=n t <Nop>
+map -builtin -modes=n tt t
+" tab switch
+map -count -modes=n -ex w tabnext
+map -count -modes=n -ex b tabprevious
+map -count -modes=n -ex W tabmove! +1
+map -count -modes=n -ex B tabmove! -1
+" make c kill tabs instead of d
+map -builtin -modes=n c d
+map -builtin -modes=n C D
+map -builtin -modes=n d <Nop>
+map -builtin -modes=n D <Nop>
+
+" e for extended hints
+map -builtin -modes=n e ;
+map -builtin -modes=n E g;
+
+" goto buffer (L2-style window) by name
+map -builtin -modes=n tha b
+map -count -modes=n -ex thj tabnext
+map -count -modes=n -ex thk tabprevious
+" <U0060> is backtick
+map -builtin -modes=n thb <C-S-U0060>
+map -builtin -modes=n thw <C-U0060>
+map -builtin -modes=n the :tgroup-switch<Space>
+
+map -builtin -modes=n tgs :tgroup-switch<Space>
+map -builtin -modes=n tgn :tgroup-new<Space>
+map -builtin -modes=n tgd :tgroup-delete<Space>
+map -builtin -modes=n tgm :tgroup-move<Space>
+map -builtin -modes=n tgg :tgroup-get<Space>
+map -builtin -modes=n tgo :tgroup-open<Space>
+map -builtin -modes=n tgt :tgroup-title<Space>
+
+map -modes=n -ex tlk listkeys
+map -modes=n -ex tlc listcommands
+map -modes=n -ex tlo listoptions
+map -modes=n -builtin tlb B " list buffers
+map -modes=n -ex tlm bmarks
+map -modes=n -builtin tlM :bmarks<Space>
+map -modes=n -builtin tls gF " view source
+map -modes=n -builtin tlS <C-v><C-u> " default firefox view-source
+
+" toggle bookmark state
+map -modes=n -builtin tsm A
+
+map -builtin -modes=n,v,c <C-g> <Esc>
+
+" C-S-u toggles modes in the "Color toggle" extension
+map -builtin -modes=n sb <C-S-u>
+" Launch dev console
+map -builtin -modes=n sc <C-S-k>
+
+" menu mode
+"map -builtin -modes=menu j <Down>
+"map -builtin -modes=menu k <Up>
+
+" keep the menu bars, address bar...
+set guioptions=bCrsT
+" Use text-edit-mode rather than input mode
+"set noinsertmode
+
+map -builtin -modes=n -- - :
+" zoom in/out is still on zi/zo
+
+set hintkeys='aoeuhtnsidpgcrmk'
+" do not require <CR> when in hints mode
+"set followhints=0
+"set hinttimeout=0
+
+set defsearch=duckduckgo
+
+set runtimepath+="$DOTFILESWGH/external/pentadactyl/"
+
+source $DOTFILESWGH/pentadactylrc.usercss
+source $DOTFILESWGH/external/pentadactyl/pentadactyl-solarized/colors/solarized-dark.penta
+
+
+highlight -append Hint font:2em; font-weight:bold; font-family: Courier, monospace;
+highlight -append Hint[active] font:2em; font-weight:bold; font-family: Courier, monospace;
+highlight -append CompItem background-color: #073642;
+highlight -append Preview color: green !important;
+
+" vim: set ft=pentadactyl:

@@ -1,1 +1,1 @@
-(dynamic-require 'xrepl #f)
+homedir/.racketrc
