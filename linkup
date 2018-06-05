@@ -3,7 +3,7 @@
 # Script to put symlinks for dotfiles
 # assumes my dotfiles git repo is at $HOME/dotfileswgh
 
-function mklink() {
+mklink() {
     # $1 is the file and $2 is the symlink name
     if [ -e $2 ]
     then
@@ -15,7 +15,7 @@ function mklink() {
 
 
 
-function dostuff() {
+dostuff() {
     stow --no-folding --restow homedir
     # Make sundry directories and files so things (especially vim) don't complain
     # and stuff that I just like to be there in general
