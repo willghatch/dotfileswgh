@@ -21,6 +21,9 @@ unicode="racket -l the-unicoder -- --client --port 5782"
 screenshot=scrot
 launcher=minimal-bashrun
 
+brightup="laptop-backlight +5"
+brightdown="laptop-backlight -5"
+
 
 if [ -f $DOTFILESWGH/dotlocal/vlaunchrc ]; then
     source $DOTFILESWGH/dotlocal/vlaunchrc

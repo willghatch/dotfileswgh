@@ -3,5 +3,6 @@
 *.elc
 pri
 dotlocal
+compiled
 # with my ZDOTDIR in here, this will be less effort to ignore than to move
 zsh/.zcompdump

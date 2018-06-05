@@ -1,0 +1,25 @@
+#!/usr/bin/env racket
+#lang rash
+
+(require
+ rash/demo/setup
+ racket/cmdline
+ )
+
+(define change-percent
+  (string->number
+   (command-line #:args (change+direction) change+direction)))
+(define dir "/sys/class/backlight/intel_backlight")
+(define max-val #{cat $dir/max_brightness |> read})
+(define cur-val #{cat $dir/brightness |> read})
+(define change-amount
+  (* 0.01 change-percent max-val))
+(define new-amount (inexact->exact
+                    (round (max 0 (min (+ change-amount cur-val)
+                                       max-val)))))
+(define new-ratio (/ new-amount max-val))
+
+echo new brightness: (inexact->exact (round (* 100 new-ratio)))
+echo $new-amount &>! $dir/brightness
+
+
