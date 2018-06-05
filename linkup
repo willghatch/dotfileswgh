@@ -1,0 +1,48 @@
+#!/bin/sh
+
+# Script to put symlinks for dotfiles
+# assumes my dotfiles git repo is at $HOME/dotfileswgh
+
+function mklink() {
+    # $1 is the file and $2 is the symlink name
+    if [ -e $2 ]
+    then
+        mv $2 ${2}.prelink
+    fi
+    mkdir -p $(dirname "$2")
+    ln -s -f $1 $2
+}
+
+
+
+function dostuff() {
+    stow --no-folding --restow homedir
+    # Make sundry directories and files so things (especially vim) don't complain
+    # and stuff that I just like to be there in general
+    mkdir -p $HOME/.cache/vimtmp
+    # the cache could hold sensitive stuff
+    chmod 700 $HOME/.cache
+    mkdir -p $HOME/dl # my default download directory
+    mkdir -p $HOME/vserv-mount
+    mklink vserv-mount/vsvr $HOME/vsvr
+    mkdir -p $HOME/tmp
+    mkdir -p $HOME/.themes
+    mkdir -p $HOME/.config
+    mkdir -p $HOME/.themes
+    # dirs for mpd
+    mkdir -p $HOME/.cache/mpd/playlists
+    mkdir -p $HOME/.cache/mutt
+    mkdir -p $HOME/musc-local
+}
+
+
+#######################################
+
+if [ "s-$1" = "s-do" ]
+then
+    dostuff
+else
+    echo "usage: linkup.bash < do >"
+    echo "       Be sure to run this IN the dotfileswgh directory."
+fi
+
