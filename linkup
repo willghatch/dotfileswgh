@@ -3,18 +3,6 @@
 # Script to put symlinks for dotfiles
 # assumes my dotfiles git repo is at $HOME/dotfileswgh
 
-mklink() {
-    # $1 is the file and $2 is the symlink name
-    if [ -e $2 ]
-    then
-        mv $2 ${2}.prelink
-    fi
-    mkdir -p $(dirname "$2")
-    ln -s -f $1 $2
-}
-
-
-
 dostuff() {
     stow --no-folding --restow homedir
     # Make sundry directories and files so things (especially vim) don't complain
@@ -24,7 +12,6 @@ dostuff() {
     chmod 700 $HOME/.cache
     mkdir -p $HOME/dl # my default download directory
     mkdir -p $HOME/vserv-mount
-    mklink vserv-mount/vsvr $HOME/vsvr
     mkdir -p $HOME/tmp
     mkdir -p $HOME/.themes
     mkdir -p $HOME/.config
