@@ -18,6 +18,7 @@ pm openssh net-tools wpa_supplicant networkmanager wireless_tools
 
 # get my basic tools
 pm git
+pm stow
 pm zsh
 pm vim
 pm tmux

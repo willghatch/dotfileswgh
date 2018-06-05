@@ -44,6 +44,8 @@ unzip
 #unrar
 #7z
 
+stow
+
 # git and friends
 git
 tig

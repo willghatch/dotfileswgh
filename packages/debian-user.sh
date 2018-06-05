@@ -7,6 +7,7 @@ i(){
 }
 
 i git
+i stow
 i vim
 i emacs-nox
 i zsh
