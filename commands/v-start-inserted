@@ -1,5 +1,0 @@
-#!/bin/sh
-
-# wrapper for EDITOR when I want to start in insert mode
-
-exec v +star "$@"
