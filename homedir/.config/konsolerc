@@ -2,18 +2,18 @@
 DefaultProfile=wgh.profile
 
 [Favorite Profiles]
-Favorites=bigtext.profile,hugetext.profile,wgh.profile,wgh-light.profile
+Favorites=bigtext.profile,wgh.profile,hugetext.profile,wgh-light.profile
 
 [KonsoleWindow]
 ShowMenuBarByDefault=false
 
 [MainWindow]
-Height 1080=524
+Height 1080=1054
 Height 600=1055
 MenuBar=Disabled
 State=AAAA/wAAAAD9AAAAAAAAA7oAAAQeAAAABAAAAAQAAAAIAAAACPwAAAAA
 ToolBarsMovable=Disabled
-Width 1920=954
+Width 1920=1914
 Width 800=1914
 
 [Profile Shortcuts]
