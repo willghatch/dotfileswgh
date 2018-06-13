@@ -1,0 +1,8 @@
+#!/bin/sh
+if test -n "$TMUX"; then
+    cd ~
+    TMUX="" tmux -f $DOTFILESWGH/tmux.conf new-session -d -s "$@"
+    tmux -f $DOTFILESWGH/tmux.conf switch-client -t "$@"
+else
+    exec tmux -f $DOTFILESWGH/tmux.conf new-session -s "$@"
+fi

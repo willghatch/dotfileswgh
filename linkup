@@ -22,6 +22,11 @@ dostuff() {
     mkdir -p $HOME/.cache/mpd/playlists
     mkdir -p $HOME/.cache/mutt
     mkdir -p $HOME/musc-local
+
+    # get terminfo set up
+    tic -x xterm-256color-italic.terminfo
+    tic -x xterm-24bit.terminfo
+    tic -x xterm-24bit-italic.terminfo
 }
 
 

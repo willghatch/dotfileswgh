@@ -90,86 +90,12 @@ umask 022 # the covenient umask
 
 ################################################  ALIASES ###############################
 
-alias rr="racket -l rash/repl --"
-
-
 
 ####### Unix tools, mostly coloring
-alias ls="ls --color=auto"
-alias d="ls --color=auto"
-alias lg="ls | grep -i"
-alias ll="ls --color=auto -aF"
-alias lls="ls --color=auto -laFh"
-alias di="ls --color=auto -laFh"
-alias igrep="grep -i"
-alias pg="less"
-alias textprint="lp -o cpi=15 -o lpi=9 -o page-top=72 -o page-right=72 -o page-left=72 -o page-bottom=72 "
 alias cp="cp -a -i" # archive mode, to preserve timestamps, interactive check when overwriting
 alias mv="mv -i" # ask before overwriting something else
-alias ag="ag --color-match '1;36'"
-alias ags="ag --color-match '1;36' --smart-case"
-alias pyg="pygmentize -g --" # colored cat, with pygments installed with pip
-alias feh="feh --scale-down" # think this is always the default I want...
-alias atcat="at -c"
-alias o="xdg-open"
-
-alias make="time nice make" # this is always what I actually want
-# parallel make
-export NUMCPUS=$(grep -c '^processor' /proc/cpuinfo 2>/dev/null || echo 2)
-alias pmake="time nice make -j$NUMCPUS --load-average=$NUMCPUS"
-
-alias xclipo="xclip -o -selection clipboard"
-alias xclipi="xclip -i -selection clipboard"
 
 ####### Miscellaneous
-alias gka="gitk --all"
-alias gta="tig --all"
-alias gunadd="git reset HEAD"
-# I never use ghost script
-alias gs="git status"
-alias greb="git rebase"
-alias gru="git remote update"
-alias grur="git remote update && git rebase"
-alias grurp="git remote update && git rebase && git push"
-grebi(){
-    git rebase -i HEAD~${1}
-}
-# I never use the gc command
-alias gc="git commit"
-alias gco="git checkout"
-alias gcob="git checkout -b"
-alias gclone="git clone --recursive"
-alias gp="git push"
-alias gd="git diff"
-alias ga="git add"
-
-alias hloc="locate --database $HOME/.cache/hloc.db"
-alias hupdb="updatedb --output $HOME/.cache/hloc.db --database-root $HOME --require-visibility no --add-prunepaths $HOME/.snapshot"
-export LOCATE_PATH=$HOME/.cache/hloc.db
-
-alias arx="archive-command extract"
-alias arl="archive-command list"
-alias arc="archive-command create"
-
-alias tm="tmux -f $DOTFILESWGH/tmux.conf"
-alias tma="tmux -f $DOTFILESWGH/tmux.conf attach-session -t"
-alias tmad="tmux -f $DOTFILESWGH/tmux.conf attach-session -d -t"
-alias tml="tmux -f $DOTFILESWGH/tmux.conf list-sessions"
-alias tmr="tmux -f $DOTFILESWGH/tmux.conf rename-session"
-alias tmrw="tmux -f $DOTFILESWGH/tmux.conf rename-window"
-alias tmd="tmux -f $DOTFILESWGH/tmux.conf detach"
-function tmn()
-{
-    if test -n "$TMUX"
-    then
-        pushd ~
-        TMUX="" tmux -f $DOTFILESWGH/tmux.conf new-session -d -s $@
-        tmux -f $DOTFILESWGH/tmux.conf switch-client -t $@
-        popd
-    else
-        tmux -f $DOTFILESWGH/tmux.conf new-session -s $@
-    fi
-}
 
 c(){
     builtin cd "$@" && \
@@ -182,10 +108,6 @@ ak(){
     a $@
     exit
 }
-
-## recent versions of Libre Office in Arch Linux don't work without this, because they
-## switched to the upstream default of gtk3, which doesn't work because reasons.
-alias libreoffice="env SAL_USE_VCLPLUGIN=gtk libreoffice"
 
 
 #################################### Functions ###########################################
@@ -299,12 +221,6 @@ fi
 lesskey $DOTFILESWGH/lesskey 2>/dev/null
 
 source $DOTFILESWGH/bazsh/grml-funcs.sh
-
-UNAME=$(uname)
-if [[ $UNAME = FreeBSD || $UNAME = Darwin ]]
-then
-    source $DOTFILESWGH/bazsh/bsd.sh
-fi
 
 ######## Add private stuff #######
 bazsh_common_pri=$DOTFILESWGH/pri/bazshrc

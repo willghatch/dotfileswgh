@@ -97,6 +97,7 @@ bind-tools \
 libnotify \
 dunst \
 rlwrap \
+pygmentize \
 texlive-bin
 
 pm pm-utils

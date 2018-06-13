@@ -1,0 +1,3 @@
+#!/bin/sh
+# colored cat, pygments can be installed with pip
+exec pygmentize -g -- "$@"
