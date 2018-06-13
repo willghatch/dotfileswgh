@@ -1,0 +1,51 @@
+#!/usr/bin/env racket
+#lang rash
+(require
+ rash/demo/setup
+ racket/cmdline
+ (for-syntax
+  syntax/parse
+  ))
+
+(define-values (raco install-dir)
+  (command-line
+   #:args (raco-binary install-dir)
+   (values (path->complete-path (expand-user-path raco-binary))
+           install-dir)))
+
+(define hub "https://github.com/willghatch")
+
+(define-for-syntax do-git
+  (syntax-parser
+    [(dg gitname:id) (do-git #'(dg gitname gitname))]
+    [(_ gitname:id installname:id)
+     #'(=unix-pipe= git clone
+                    ;; It is annoying that I can't do $hub/$gitname because it won't match the pattern...
+                    (format "~a/~a" hub 'gitname)
+                    (format "~a/~a" install-dir 'installname))]))
+(define-pipeline-alias get do-git)
+
+(define-line-macro install
+  (syntax-parser
+    [(_ path:id)
+     ;; I would like to use k&r-style bracing on this, but I also want to use auto-indent...
+     #'{in-dir (format "~a/~a" install-dir 'path) \
+               {$raco pkg install --batch --deps search-auto}}]))
+
+mkdir -p $install-dir
+$raco pkg config --scope installation --set name pkgdev
+get racket-basedir basedir
+install basedir
+get racket-udelim udelim
+install udelim
+get racket-rash rash
+install rash/shell-pipeline
+install rash/linea
+install rash/rash
+get rackterm
+install rackterm
+get the-unicoder
+install the-unicoder
+get calen-derf
+install calen-derf
+

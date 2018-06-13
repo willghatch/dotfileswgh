@@ -39,8 +39,17 @@ stty ixoff # enable sending (to app) of start/stop characters
 stty ixany # let any character restart output, not only start character
 
 
+pcolor(){
+    echo -ne "\[\e[${1}m\]"
+}
 
-export PS1="\[$(tput bold)\]\[$(tput setaf 6)\]\A \[$(tput setaf 7)\][\[$(tput setaf 2)\]\u\[$(tput setaf 7)\]@\[$(tput setaf 4)\]\h\[$(tput setaf 7)\]] \[$(tput setaf 4)\]\w \[$(tput setaf 7)\]\\$\[$(tput sgr0)\] "
+#export PS1="\[$(tput bold)\]\[$(tput setaf 6)\]\A \[$(tput setaf 7)\][\[$(tput setaf 2)\]\u\[$(tput setaf 7)\]@\[$(tput setaf 4)\]\h\[$(tput setaf 7)\]] \[$(tput setaf 4)\]\w \[$(tput setaf 7)\]\\$\[$(tput sgr0)\] "
+PS1_time="$(pcolor 0)$(pcolor 1)$(pcolor 36)\A"
+PS1_devmode="$(pcolor 0)$(pcolor 1)$(pcolor 31)$CURRENT_DEV_MODE"
+PS1_userhost="$(pcolor 0)[$(pcolor 32)\u$(pcolor 0)@$(pcolor 36)\h$(pcolor 0)]"
+PS1_dir="$(pcolor 0)$(pcolor 1)$(pcolor 34)\w"
+PS1_promptchar="$(pcolor 0)\$"
+export PS1="$PS1_time $PS1_devmode $PS1_userhost $PS1_dir $PS1_promptchar "
 
 
 sourceIfExists $WGHHOME/rootgit-dotfiles/bashrc
