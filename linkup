@@ -10,6 +10,8 @@ dostuff() {
     mkdir -p $HOME/.cache/vimtmp
     # the cache could hold sensitive stuff
     chmod 700 $HOME/.cache
+    # konsole is always changing this, and it's annoying.
+    chmod 444 config/konsolerc
     mkdir -p $HOME/dl # my default download directory
     mkdir -p $HOME/vserv-mount
     mkdir -p $HOME/tmp
