@@ -230,11 +230,6 @@ if [[ "$WGH_THEME_DARK_OR_LIGHT" = "light" ]]; then
     MEGAPROMPT_STYLES[git_behind_mark]="%b%F{grey}▼%F{cyan}"
     MEGAPROMPT_STYLES[git_no_remote_tracking_mark]=" %b%F{grey}N"
     MEGAPROMPT_GIT_STYLES[master]="%b%F{grey}"
-
-    ## TODO - make dark and light dircolors
-    eval $(dircolors -b $DOTFILESWGH/dircolors)
-else
-    eval $(dircolors -b $DOTFILESWGH/dircolors)
 fi
 
 foreground(){

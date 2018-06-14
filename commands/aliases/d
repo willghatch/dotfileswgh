@@ -1,6 +1,7 @@
 #!/bin/sh
 UNAME=`uname`
-if [ "$UNAME" = FreeBSD || "$UNAME" = Darwin ]; then
+eval `dircolors -b $DOTFILESWGH/dircolors`
+if test "$UNAME" = FreeBSD -o "$UNAME" = Darwin; then
     exec ls -G "$@"
 else
     exec ls --color=auto "$@"
