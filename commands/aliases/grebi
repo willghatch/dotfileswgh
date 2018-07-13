@@ -1,2 +1,2 @@
 #!/bin/sh
-exec git rebase "HEAD~${1}"
+exec git rebase --interactive "HEAD~${1}"
