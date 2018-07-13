@@ -150,10 +150,10 @@ volumewidget = wibox.widget.textbox()
 set_volumewidget = function()
     local io = { popen = io.popen }
     local volout = io.popen("pamixer --get-volume")
-    local volstr = volout:read('*l')
+    local volstr = volout:read('*l') or "??"
     volout:close()
     local muteout = io.popen("pamixer --get-mute")
-    local mutestr = muteout:read('*l')
+    local mutestr = muteout:read('*l') or "??"
     muteout:close()
     local mute_use = (mutestr == "true") and "MUTE" or "♩"
     volumewidget:set_markup('<span color="#00ffff">Vol: '.. volstr .."%</span><span color='#99ff99'> ".. mute_use .."</span>|")
