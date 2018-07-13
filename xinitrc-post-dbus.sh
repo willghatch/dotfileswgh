@@ -5,7 +5,7 @@
 # wrapping the exec to my window manager.  But gnome-terminal doesn't see it
 # if I just launch it in this script.  So I'll use dbus-launch to launch this.
 
-pulseaudio &
+#pulseaudio &
 
 source $DOTFILESWGH/xsession-common
 

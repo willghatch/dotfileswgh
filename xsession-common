@@ -8,6 +8,13 @@ if [ -z "$XSESSION_COMMON_RUN_P" ]; then
   mkdir -p /tmp/$(whoami)/tty/${LOGIN_TTY}
   echo "DBUS_SESSION_BUS_ADDRESS=${DBUS_SESSION_BUS_ADDRESS}" >"/tmp/$(whoami)/tty/${LOGIN_TTY}/dbus-session-bus-address"
 
+  # hack to fix pulseaudio, which doesn't seem to work for some reason...
+  {
+    killall pulseaudio
+    sleep 4
+    pulseaudio
+  } &
+
   # merge xresources first, so other programs in this (xscreensaver) can get settings
   xrdb $DOTFILESWGH/Xresources
 
