@@ -1,2 +1,4 @@
 #!/bin/sh
-exec racket -l errortrace -t "$@"
+file="$1"
+shift
+exec racket -l errortrace -t "$file" -- "$@"
