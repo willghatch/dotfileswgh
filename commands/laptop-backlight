@@ -7,8 +7,9 @@
  )
 
 (define change-percent
-  (string->number
-   (command-line #:args (change+direction) change+direction)))
+  (command-line
+   #:usage-help "Give zero to print the current value, negative or positive to change"
+   #:args (change+direction) (string->number change+direction)))
 (define dir "/sys/class/backlight/intel_backlight")
 (define max-val #{cat $dir/max_brightness |> read})
 (define cur-val #{cat $dir/brightness |> read})
@@ -19,7 +20,11 @@
                                        max-val)))))
 (define new-ratio (/ new-amount max-val))
 
-echo new brightness: (inexact->exact (round (* 100 new-ratio)))
-echo $new-amount &>! $dir/brightness
+(if (zero? change-percent)
+    (displayln (round (/ (* 100 cur-val) max-val)))
+    {
+     echo new brightness: (inexact->exact (round (* 100 new-ratio)))
+     echo $new-amount &>! $dir/brightness
+     })
 
 
