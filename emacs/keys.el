@@ -118,6 +118,7 @@
 (nkmap "ZZ" 'evil-save-modified-and-close)
 (nkmap "ZQ" 'evil-quit)
 (nkmap (kbd "DEL") 'rmo/evil-backward-char)
+(nkmap (kbd "<deletechar>") 'rmo/evil-forward-char)
 (nkmap [escape] 'evil-force-normal-state)
 (nkmap [remap cua-paste-pop] 'evil-paste-pop)
 (nkmap [remap yank-pop] 'evil-paste-pop)
