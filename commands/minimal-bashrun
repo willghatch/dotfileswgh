@@ -36,25 +36,25 @@ if [ "$XTERM" == "xterm" ]; then
     $XTERM -name 'bashrun' \
     -title 'bashrun' \
     -geometry $GEOM \
-    -e "/bin/bash --rcfile $BASHRUNRC -i -t"
+    -e "bash --rcfile $BASHRUNRC -i -t"
 
 elif [[ "$XTERM" == "aterm" || "$XTERM" == "mlterm" ]]; then
     $XTERM -name 'bashrun' \
     -title 'bashrun' \
     -geometry $GEOM +sb \
-    -e /bin/bash --rcfile $BASHRUNRC -i -t
+    -e bash --rcfile $BASHRUNRC -i -t
 
 elif [[ "$XTERM" == "urxvt" || "$XTERM" == "rxvt" ]]; then
     $XTERM -name 'bashrun' \
     -title 'bashrun' \
     -geometry $GEOM +sb\
-    -e sh -c "/bin/bash --rcfile $BASHRUNRC -i -t"
+    -e sh -c "bash --rcfile $BASHRUNRC -i -t"
 
 elif [ "$XTERM" == "mrxvt" ]; then
     $XTERM -name 'bashrun' \
     -title 'bashrun' \
     -geometry $GEOM +sb -ht \
-    -e sh -c "/bin/bash --rcfile $BASHRUNRC -i -t"
+    -e sh -c "bash --rcfile $BASHRUNRC -i -t"
 else
     error "$XTERM is not supported. Please check $BASHRUNRC"
     exit 1
