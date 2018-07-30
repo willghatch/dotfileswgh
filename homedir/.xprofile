@@ -1,4 +1,8 @@
 #!/bin/sh
 export WGHHOME=$HOME
 export DOTFILESWGH=$HOME/dotfileswgh
-source $DOTFILESWGH/env-more.sh
+if test -f $DOTFILESWGH/dotlocal/xsession-full; then
+    source $DOTFILESWGH/xsession-common
+else
+    source $DOTFILESWGH/env-more.sh
+fi
