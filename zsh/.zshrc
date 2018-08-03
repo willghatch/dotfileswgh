@@ -27,6 +27,7 @@ compinit(){}
 HISTSIZE=1000
 SAVEHIST=1000
 
+HELP_KEY="\033^H"
 VZSH_REMAP_KEYS_P=true
 
 ZSH_HIGHLIGHT_HIGHLIGHTERS=(main brackets pattern cursor)
