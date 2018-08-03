@@ -3,7 +3,8 @@ Description=Do a one-time dav sync
 
 [Service]
 Type=oneshot
-ExecStart=/home/wgh/dotfileswgh/commands/aliases/with-dotfileswgh-env if-background-sync-enabled dav sync
+# use the system profile to fight NixOS starting jobs in an empty environment...
+ExecStart=/home/wgh/dotfileswgh/commands/aliases/with-system-profile /home/wgh/dotfileswgh/commands/aliases/with-dotfileswgh-env if-background-sync-enabled dav sync
 #RemainAfterExit=false
 #ExecStop=
 #StandardOutput=journal

@@ -3,7 +3,8 @@ Description=Do a one-time mail sync
 
 [Service]
 Type=oneshot
-ExecStart=/home/wgh/dotfileswgh/commands/aliases/with-dotfileswgh-env if-background-sync-enabled hatchmailsync
+# use the system profile to fight NixOS starting jobs in an empty environment...
+ExecStart=/home/wgh/dotfileswgh/commands/aliases/with-system-profile /home/wgh/dotfileswgh/commands/aliases/with-dotfileswgh-env if-background-sync-enabled hatchmailsync
 #RemainAfterExit=false
 #ExecStop=
 #StandardOutput=journal
