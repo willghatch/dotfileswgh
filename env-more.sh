@@ -2,7 +2,7 @@
 
 export HROOT=$WGHHOME/hroot
 
-export RACKET_PKG_DEV_PATH=$WGHHOME/mk/racket-pkgdev/bin:$WGHHOME/.racket/pkgdev/bin
+export RACKET_PKG_DEV_PATH=$WGHHOME/mk/racket-pkgdev/racket/bin:$WGHHOME/mk/racket-pkgdev/bin:$WGHHOME/.racket/pkgdev/bin
 export RACKET_CORE_DEV_PATH=$WGHHOME/mk/racket-coredev/racket/bin
 
 # CURRENT_DEV_PATH may be set by various commands.

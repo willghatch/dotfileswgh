@@ -1,51 +1,29 @@
-#!/usr/bin/env racket
-#lang rash
-(require
- rash/demo/setup
- racket/cmdline
- (for-syntax
-  syntax/parse
-  ))
+#!/bin/sh
 
-(define-values (raco install-dir)
-  (command-line
-   #:args (raco-binary install-dir)
-   (values (path->complete-path (expand-user-path raco-binary))
-           install-dir)))
+# use bourne shell because I need to do this *in* the environment where I'm checking out packages, where I don't yet have rash.
 
-(define hub "https://github.com/willghatch")
+if test "$1" = "--help" -o -z "$1"; then
+  echo "Usage: $0 <raco-path> <release-number>"
+  echo "Sets the catalog path for the given raco to be pinned to the given release."
+  echo "Then clones all my repos in the current directory."
+  exit 1
+fi
 
-(define-for-syntax do-git
-  (syntax-parser
-    [(dg gitname:id) (do-git #'(dg gitname gitname))]
-    [(_ gitname:id installname:id)
-     #'(=unix-pipe= git clone
-                    ;; It is annoying that I can't do $hub/$gitname because it won't match the pattern...
-                    (format "~a/~a" hub 'gitname)
-                    (format "~a/~a" install-dir 'installname))]))
-(define-pipeline-alias get do-git)
-
-(define-line-macro install
-  (syntax-parser
-    [(_ path:id)
-     ;; I would like to use k&r-style bracing on this, but I also want to use auto-indent...
-     #'{in-dir (format "~a/~a" install-dir 'path) \
-               {$raco pkg install --batch --deps search-auto}}]))
-
-mkdir -p $install-dir
+raco="$1"
+release="$2"
+$raco pkg config --scope installation --set catalogs \
+  "https://download.racket-lang.org/releases/$release/catalog/" \
+  "https://pkgs.racket-lang.org" \
+  "https://planet-compats.racket-lang.org"
 $raco pkg config --scope installation --set name pkgdev
-get racket-basedir basedir
-install basedir
-get racket-udelim udelim
-install udelim
-get racket-rash rash
-install rash/shell-pipeline
-install rash/linea
-install rash/rash
+get(){
+  $raco pkg install --auto --multi-clone convert --clone "$1" "$1"
+}
+get basedir
+get udelim
+get rash
 get rackterm
-install rackterm
 get the-unicoder
-install the-unicoder
-get calen-derf
-install calen-derf
+
+# other repos: calen-derf, xsmith
 

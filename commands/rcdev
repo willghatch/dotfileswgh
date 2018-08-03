@@ -1,17 +1,9 @@
-#!/usr/bin/env racket
-#lang rash
-(require
- racket/cmdline)
+#!/bin/sh
+# TODO - this is a copy of rpdev, and should be merged...
 
-(define commands
-  (command-line
-   ;; default to a different shell than Rash, because when I'm working on
-   ;; packages my development rash might be broken, and it would be good to
-   ;; see a different prompt anyway to clue me in to being in development.
-   #:args ([command "bash"] . rest)
-   (cons command rest)))
+if test -f /etc/NIXOS; then
+  exec nix-shell '<nixpkgs>' --command rcdev.rkt --packages bashInteractive racket cairo fontconfig glib gmp gtk2 libedit libjpeg libpng mpfr openssl pango poppler readline sqlite coreutils readline
+else
+  exec rcdev.rkt "$@"
+fi
 
-env CURRENT_DEV_PATH=$RACKET_CORE_DEV_PATH \
-    PATH=$RACKET_CORE_DEV_PATH:$PATH \
-    CURRENT_DEV_MODE=racket-core \
-    $commands
