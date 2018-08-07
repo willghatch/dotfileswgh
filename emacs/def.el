@@ -214,6 +214,8 @@
  (load-library "tty-format")
  (require 'markchars)
  (markchars-global-mode t)
+ ;; highlight literal tab characters and trailing whitespace
+ (setq whitespace-style '(face tabs trailing))
 
  ;;; MAKE SCROLLING BE SANE, PLEASE¡
  (setq scroll-step 1)

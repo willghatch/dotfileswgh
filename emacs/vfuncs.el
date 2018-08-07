@@ -1,10 +1,4 @@
 
-(defun whitespace ()
-  (interactive)
-  ;; These two highlighters kill the formatting of
-  ;; list-faces-display... and I don't know why
-  (hc-toggle-highlight-tabs)
-  (hc-toggle-highlight-trailing-whitespace))
 
 (defun file-visiting-buffer-list ()
   (remove-if-not 'buffer-file-name (buffer-list)))

@@ -105,6 +105,8 @@
  '(sp-show-pair-match-face ((t (:background "#363636"))))
  '(tool-bar ((t (:foreground "#00ff00" :box (:line-width 1 :style released-button)))))
  '(web-mode-html-tag-bracket-face ((t (:foreground "#c5a535"))))
+ '(whitespace-tab ((t (:background "#000019"))))
+ '(whitespace-trailing ((t (:background "#252525"))))
  '(yafolding-ellipsis-face ((t (:background "#ff00ff"))) t)
  '(yas-field-highlight-face ((t (:background "#001d00"))))
  )
