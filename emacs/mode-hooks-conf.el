@@ -21,6 +21,14 @@
 
 (add-hook 'find-file-hook 'sensitive-if-prifs)
 
+(add-hook 'hexl-mode-hook
+          (lambda ()
+            ;; These first two are in the default hook, but add-hook seems to be
+            ;; replacing rather than adding...
+            (hexl-follow-line)
+            (hexl-activate-ruler)
+            (display-line-numbers-mode 0)))
+
 (add-hook 'Buffer-menu-mode-hook
           (lambda ()
             (define-prefix-command 'my-buffer-menu-mode-map)
