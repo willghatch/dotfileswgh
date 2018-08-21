@@ -4,9 +4,6 @@
 [submodule "external/vim/Vundle.vim"]
 	path = external/vim/Vundle.vim
 	url = https://github.com/gmarik/Vundle.vim.git
-[submodule "external/pentadactyl/pentadactyl-solarized"]
-	path = external/pentadactyl/pentadactyl-solarized
-	url = https://github.com/claytron/pentadactyl-solarized.git
 [submodule "external/zsh/zgen"]
 	path = external/zsh/zgen
 	url = https://github.com/tarjoilija/zgen.git
@@ -16,9 +13,6 @@
 [submodule "external/misc/hatchak"]
 	path = external/misc/hatchak
 	url = https://github.com/willghatch/hatchak.git
-[submodule "external/misc/keynav"]
-	path = external/misc/keynav
-	url = https://github.com/jordansissel/keynav.git
 [submodule "external/misc/rootgit-tools"]
 	path = external/misc/rootgit-tools
 	url = https://github.com/willghatch/rootgit-tools
