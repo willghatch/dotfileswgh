@@ -7,9 +7,9 @@
 #    terminal2="gnome-terminal --profile=dark"
 #fi
 
-terminal2="qterminal -e zsh"
+terminal2="konsole -e zsh"
 
-terminal="qterminal -e rash-repl"
+terminal="konsole -e rash-repl"
 terminal3="rackterm-xterm -e rash-repl"
 
 unicode="racket -l the-unicoder -- --client --port 5782"
