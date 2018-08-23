@@ -70,6 +70,7 @@
 (in 'haskell-mode)
 (in 'racket-mode)
 (in 'scribble-mode)
+(in 'clojure-mode)
 (in 'markdown-mode)
 (in 'slime)
 (in 'lua-mode)
