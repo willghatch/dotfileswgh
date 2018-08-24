@@ -1,0 +1,54 @@
+"All the defaults are here: https://github.com/cmcaine/tridactyl/blob/9c68598/src/config.ts#L34
+
+" Make Tridactyl work on more sites at the expense of some security
+" csp is Content Security Policy, and apparently helps prevent XSS and data injection attacks...
+"set csp clobber
+"fixamo_quiet
+"fixamo
+
+" This also needs browser.autofocus turned off in about:config
+set allowautofocus false
+
+" remove normal gui stuff
+" the guiset commands edit the $profile/chrome/userChrome.css file, and they seem to just append every time they are run.  Just run them once...
+"guiset_quiet gui none
+"guiset_quiet hoverlink top-left
+
+set searchengine duckduckgo
+set profiledir /home/wgh/dotfileswgh/dotlocal/firefox-default-profile/
+" about:blank can be modified by dark-mode addons
+set newtab about:blank
+
+set theme dark
+
+unbind t
+" t is originally bound to fillcmdline tabopen
+" T is originally bound to current_url tabopen
+unbind s
+" s is originally bound to fillcmdline open search
+" S is originally bound to fillcmdline tabopen search
+unbind d
+
+bind c tabclose
+bind w tabnext
+bind b tabprev
+bind tt fillcmdline tabopen
+bind ss fillcmdline tabopen search
+"bind <less> back
+"bind <greater> forward
+bind n findnext
+bind N findnext -1
+bind j scrollpage 0.5
+bind k scrollpage -0.5
+bind J scrollline 5
+bind K scrollline -5
+bind Y clipboard yank
+
+" by default f and F are reversed
+bind f hint -b
+bind F hint
+
+" what `b` used to be bound to
+bind tia fillcmdline buffer
+
+"bind <C-g> hidecmdline
