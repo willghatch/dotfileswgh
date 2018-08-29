@@ -29,8 +29,7 @@ get_unread_count = function()
 
     for line in instr:lines() do
        inboxy = incr(inboxy, line:match("main (%d+)"))
-       spammy = incr(spammy, line:match("maybe.spam (%d+)"))
-       spammy = incr(spammy, line:match("Spam (%d+)"))
+       spammy = incr(spammy, line:match("spam.caught (%d+)"))
        school = incr(school, line:match("school.lists (%d+)"))
        machines = incr(machines, line:match("machines (%d+)"))
        racket = incr(racket, line:match("racket (%d+)"))

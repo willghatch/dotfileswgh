@@ -44,9 +44,8 @@ bind J scrollline 5
 bind K scrollline -5
 bind Y clipboard yank
 
-" by default f and F are reversed
-bind f hint -b
-bind F hint
+bind f hint
+bind F hint -b
 
 " what `b` used to be bound to
 bind tia fillcmdline buffer
