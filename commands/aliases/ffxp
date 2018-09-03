@@ -1,0 +1,3 @@
+#!/usr/bin/env bash
+FFX=${FFX:-firefox}
+exec nice -n 5 $FFX -P noaddon "$@"
