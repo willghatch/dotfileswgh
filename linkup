@@ -23,6 +23,7 @@ dostuff() {
     mkdir -p $HOME/.cache/mutt
     mkdir -p $HOME/musc-local
     mkdir -p dotlocal/firefox-default-profile
+    mkdir -p dotlocal/firefox-noaddon-profile
 
     # get terminfo set up
     tic -x xterm-256color-italic.terminfo
