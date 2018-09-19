@@ -10,6 +10,9 @@ DefaultEncoding=UTF-8
 Name=wgh
 Parent=FALLBACK/
 
+[Keyboard]
+KeyBindings=wgh-keys
+
 [Scrolling]
 HistoryMode=1
 HistorySize=20000

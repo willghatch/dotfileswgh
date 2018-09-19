@@ -1,0 +1,6 @@
+keyboard "wgh-keys"
+key Tab : "\t"
+key J+Shift+Ctrl : "scrollDownPage"
+key K+Shift+Ctrl : "scrollUpPage"
+key Del : "\E[3~"
+key Backspace : "\x7f"

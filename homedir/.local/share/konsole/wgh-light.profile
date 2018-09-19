@@ -1,4 +1,5 @@
 [Appearance]
+AntiAliasFonts=true
 ColorScheme=BlackOnWhite
 Font=DejaVu Sans Mono,10,-1,5,50,0,0,0,0,0
 UseFontLineChararacters=false
@@ -9,6 +10,9 @@ DefaultEncoding=UTF-8
 [General]
 Name=wgh-light
 Parent=FALLBACK/
+
+[Keyboard]
+KeyBindings=wgh-keys
 
 [Scrolling]
 HistoryMode=1

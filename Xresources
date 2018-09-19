@@ -38,7 +38,6 @@ bashrun*foreground: rgb:a8/a8/a8
 bashrun*background: rgb:00/00/00
 
 
-URxvt.font: xft:monospace:size=10
 URxvt.foreground: rgb:a8/a8/a8
 URxvt.background: rgb:00/00/00
 URxvt.color0: rgb:00/00/00
@@ -58,6 +57,30 @@ URxvt.color13: rgb:fc/54/fc
 URxvt.color14: rgb:54/fc/fc
 URxvt.color15: rgb:fc/fc/fc
 URxvt.colorBD: rgb:fc/fc/fc
+! do not scroll with output
+URxvt*scrollTtyOutput: false
+! scroll in relation to buffer (with mouse scroll or Shift+Page Up)
+URxvt*scrollWithBuffer: true
+! scroll back to the bottom on keypress
+URxvt*scrollTtyKeypress: true
+! disable scrolling in secondary screen
+URxvt.secondaryScreen: 1
+URxvt.secondaryScroll: 0
+URxvt.scrollColor: #434343
+URxvt.troughColor: #232323
+URxvt.scrollBar_right: true
+! scroll bar width in pixels
+!URxvt.thickness: 20
+! size of scrollback history
+URxvt.saveLines: 20000
+! urxvt has no 24-bit color support!  At least today...
+!URxvt.termName: xterm-24bit-italic
+!URxvt.font: xft:monospace:size=10
+URxvt.font: xft:DejaVu Sans Mono:size=12
+! change font dynamically
+! in key bindings, “I” is short for ISOLevel3
+URxvt.keysym.M-C-b: command:\033]710;xft:DejaVu Sans Mono:size=20\007
+URxvt.keysym.M-C-s: command:\033]710;xft:DejaVu Sans Mono:size=12\007
 
 
 !!!!! xscreensaver
