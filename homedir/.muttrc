@@ -130,6 +130,12 @@ bind index Z noop
 
 bind generic \Chb help
 
+# Mouse scroll wheel events are received as arrow key presses.
+bind pager <up> previous-line
+bind pager <down> next-line
+bind pager <left> noop
+bind pager <right> noop
+
 bind pager i noop # was exit, what q now does
 bind pager s noop
 bind pager ss save-message
