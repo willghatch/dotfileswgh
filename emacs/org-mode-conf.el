@@ -1,4 +1,33 @@
 
+(defun wgh/org-forward-slurp-heading ()
+  (interactive)
+  (let ((start-line (line-number-at-pos))
+        (line-at-next-heading (save-excursion
+                                (org-forward-heading-same-level 1)
+                                (line-number-at-pos))))
+    (if (equalp start-line line-at-next-heading)
+        nil
+      (save-excursion
+        (org-forward-heading-same-level 1)
+        (org-demote-subtree)))))
+
+(defun wgh/org-forward-barf-heading ()
+  (interactive)
+  (let ((next-heading-loc (save-excursion
+                            (org-forward-heading-same-level 1)
+                            (point))))
+    (save-excursion
+      (outline-next-heading)
+      (if (equal (point) next-heading-loc)
+          nil
+        ;; go to last child heading
+        (letrec ((loop (lambda (pt)
+                         (org-forward-heading-same-level 1)
+                         (if (equalp pt (point))
+                             nil
+                           (funcall loop (point))))))
+          (funcall loop (point))
+          (org-promote-subtree))))))
 
 
 (add-hook 'org-mode-hook
@@ -8,6 +37,9 @@
             (lnkmap "oh" 'org-backward-heading-same-level)
             (lnkmap "og" 'outline-up-heading)
             (lnkmap "eg" 'outline-up-heading)
+
+            (lnkmap "eus" 'wgh/org-forward-slurp-heading)
+            (lnkmap "eub" 'wgh/org-forward-barf-heading)
 
             (lnkmap "ml" 'org-metaright)
             (lnkmap "mh" 'org-metaleft)
