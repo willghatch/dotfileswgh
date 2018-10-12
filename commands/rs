@@ -1,0 +1,14 @@
+#!/usr/bin/env racket
+#lang rash
+(require racket/cmdline)
+(define all? #f)
+(define docs? '(--no-docs))
+(define packages
+  (command-line
+   #:once-each
+   [("--docs") "setup docs" (set! docs? '())]
+   [("--all") "setup all packages (implies docs)" (set! all? #t)]
+   #:args packages packages))
+(cond [all? {raco setup}]
+      [(null? packages) {echo specify packages or --all} (exit 1)]
+      [else {raco setup $docs? --pkgs $packages}])
