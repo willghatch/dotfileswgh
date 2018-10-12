@@ -1,4 +1,4 @@
 #!/bin/sh
 #exec gitk --all "$@"
 # Use gitg instead, just because gitk only available in Nixos by customizing the git package, which means you can't get a cached one and have to build it, which is a pain.
-exec gitg --all "$@"
+exec gitg --all "$@" 2>/dev/null
