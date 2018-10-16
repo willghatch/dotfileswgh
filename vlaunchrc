@@ -9,8 +9,9 @@
 
 terminal2="konsole -e zsh"
 
-terminal="konsole -e rash-repl"
-terminal3="rackterm-xterm -e rash-repl"
+#terminal="konsole -e rash-repl"
+terminal="konsole -e rr"
+terminal3="rackterm-xterm -e rr"
 
 unicode="racket -l the-unicoder -- --client --port 5782"
 #unicode_func(){
@@ -24,6 +25,11 @@ launcher=minimal-bashrun
 brightup="laptop-backlight +5"
 brightdown="laptop-backlight -5"
 
+musictoggle="mpcl toggle"
+musicpause="mpcl pause"
+musicplay="mpcl play"
+musicnext="mpcl next"
+musicprev="mpcl prev"
 
 if [ -f $DOTFILESWGH/dotlocal/vlaunchrc ]; then
     source $DOTFILESWGH/dotlocal/vlaunchrc

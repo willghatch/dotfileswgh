@@ -416,6 +416,10 @@ globalkeys = awful.util.table.join(
     awful.key({ hypkey,         }, "m", mkNonRep(mkspawn({"vlaunch", "volmute"}, {description = "", group = "launcher"}))),
     awful.key({ hypkey,         }, "u", mkNonRep(mkspawn({"vlaunch", "volup"}, {description = "", group = "launcher"}))),
     awful.key({ hypkey,         }, "d", mkNonRep(mkspawn({"vlaunch", "voldown"}, {description = "", group = "launcher"}))),
+    awful.key({ hypkey, supkey }, "t", mkNonRep(mkspawn({"vlaunch", "musictoggle"}, {description = "", group = "launcher"}))),
+    awful.key({ hypkey, supkey }, "s", mkNonRep(mkspawn({"vlaunch", "musicpause"}, {description = "", group = "launcher"}))),
+    awful.key({ hypkey, supkey }, "n", mkNonRep(mkspawn({"vlaunch", "musicnext"}, {description = "", group = "launcher"}))),
+    awful.key({ hypkey, supkey }, "p", mkNonRep(mkspawn({"vlaunch", "musicprev"}, {description = "", group = "launcher"}))),
     awful.key({ hypkey,         }, "r", function() nnotify("pressed hyp+r") end),
 --    ----- Set keys on level 3 and level 4 shift for top row
     awful.key({ hypkey,         }, "Tab", mkNonRep(mkspawn({"set-xkb-key-from-primary 12 3"}))),
