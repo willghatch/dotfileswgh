@@ -177,6 +177,8 @@ bind pager U undelete-message
 
 bind index j next-entry
 bind index k previous-entry
+bind index ^n next-thread
+bind index ^p previous-thread
 #bind index j next-undeleted
 #bind index k previous-undeleted
 #bind index J next-page
