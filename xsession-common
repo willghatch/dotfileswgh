@@ -4,9 +4,9 @@ if [ -z "$XSESSION_COMMON_RUN_P" ]; then
 
   source $DOTFILESWGH/env-more.sh
 
-  mkdir -p /tmp/$(whoami)
-  mkdir -p /tmp/$(whoami)/tty/${LOGIN_TTY}
-  echo "DBUS_SESSION_BUS_ADDRESS=${DBUS_SESSION_BUS_ADDRESS}" >"/tmp/$(whoami)/tty/${LOGIN_TTY}/dbus-session-bus-address"
+  busdir=$XDG_RUNTIME_DIR/dbus-session-bus-addresses/
+  mkdir -p $busdir
+  echo "${DBUS_SESSION_BUS_ADDRESS}" >"$busdir/tty_${LOGIN_TTY}"
 
   # hack to fix pulseaudio, which doesn't seem to work for some reason...
   {
