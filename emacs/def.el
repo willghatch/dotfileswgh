@@ -202,7 +202,7 @@
  (load-library "company-conf")
  (load-library "auto-complete-conf")
  (load-library "hippie-expand-conf")
- (load-library "popwin-conf")
+ ;(load-library "popwin-conf")
  ;(load-library "projectile-conf")
  (load-library "scratch-message")
  ;(winner-mode 1)
