@@ -1,9 +1,6 @@
 [submodule "external/emacs/tarao-evil-plugins"]
 	path = external/emacs/tarao-evil-plugins
 	url = https://github.com/tarao/evil-plugins.git
-[submodule "external/vim/Vundle.vim"]
-	path = external/vim/Vundle.vim
-	url = https://github.com/gmarik/Vundle.vim.git
 [submodule "external/zsh/zgen"]
 	path = external/zsh/zgen
 	url = https://github.com/tarjoilija/zgen.git

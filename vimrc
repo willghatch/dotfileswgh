@@ -75,109 +75,113 @@ endif
 filetype off " required for vundle, supposedly
 set rtp+=$DOTFILESWGH/external/vim/Vundle.vim,$DOTFILESWGH/vim
 
-if filereadable($DOTFILESWGH . "/external/vim/Vundle.vim/README.md")
-    call vundle#begin($DOTFILESWGH . "/dotlocal/vim")
-    Plugin 'kana/vim-submode'
-    Plugin 'tpope/vim-rsi'
-    Plugin 'tpope/vim-repeat'
-    Plugin 'tpope/vim-surround'
-    "Plugin 'tpope/vim-speeddating'
-    Plugin 'tpope/vim-markdown'
-    Plugin 'tpope/vim-tbone'
-    Plugin 'tpope/vim-eunuch'
-    Plugin 'tpope/vim-sleuth'
-    Plugin 'kana/vim-textobj-user'
-    Plugin 'rhysd/vim-textobj-anyblock'
-    "Plugin 'tpope/vim-afterimage'
-    "Plugin 'tpope/vim-commentary'
-    "Plugin 'tpope/vim-abolish'
-    "Plugin 'chrisbra/csv.vim'
-    Plugin 'bling/vim-airline'
-    "Plugin 'Lokaltog/vim-easymotion'
-    "Plugin 'ap/vim-css-color'
-    " syntastic seems broken on nixos, and I don't care enough to fix it
-    "Plugin 'scrooloose/syntastic'
-    "Plugin 'ervandew/supertab'
-    "Plugin 'msanders/snipmate.vim'
-    "Plugin 'camelcasemotion'
-    "Plugin 'AndrewRadev/sideways.vim'
-    "Plugin 'vim-scripts/paredit.vim'
-    "Plugin 'luochen1990/rainbow'
-    "Plugin 'pelodelfuego/vim-swoop'
-    "Plugin 'terryma/vim-multiple-cursors'
-    call vundle#end()
-    " to run the vundle installer, run :PluginInstall
-
-    " Sometimes I can't see the parens.  It might work better when terminal vim
-    " supports true color well.
-    "Plugin 'kien/rainbow_parentheses.vim'
-    "au VimEnter * RainbowParenthesesToggle
-    "au Syntax * RainbowParenthesesLoadRound
-    "au Syntax * RainbowParenthesesLoadSquare
-    "au Syntax * RainbowParenthesesLoadBraces
-
-    let g:airline#extensions#tabline#enabled = 1
-    let g:airline_left_sep = '▶'
-    let g:airline_right_sep = '◀'
-
-    let g:rainbow_active = 1
-
-    filetype plugin indent on
-
-    " easymotion -- like acejump
-    nmap gc <Plug>(easymotion-s2)
-    nmap gtc <Plug>(easymotion-t2)
-    map  g/ <Plug>(easymotion-sn)
-    omap g/ <Plug>(easymotion-tn)
-    "map <Leader>l <Plug>(easymotion-lineforward)
-    "map <Leader>j <Plug>(easymotion-j)
-    "map <Leader>k <Plug>(easymotion-k)
-    "map <Leader>h <Plug>(easymotion-linebackward)
-    let g:EasyMotion_startofline = 0 " keep cursor colum when JK motion
-    let g:EasyMotion_smartcase = 1
-    " these can be bound maybe...
-    "<Plug>(easymotion-next)
-    "<Plug>(easymotion-prev)
-
-    let g:submode_always_show_submode = 1
-    let g:submode_keyseqs_to_leave = ['<esc>', '<C-g>']
-    let g:submode_timeout = 0
-    let g:submode_timeoutlen = 9999
-    call submode#enter_with('windowing', 'n', '', 'th', '<NOP>')
-    call submode#leave_with('windowing', 'n', '', 'e')
-    call submode#map('windowing', 'n', '', 'j', '<C-w>w')
-    call submode#map('windowing', 'n', '', 'k', '<C-w>W')
-    call submode#map('windowing', 'n', '', 's', '<C-w>s')
-    call submode#map('windowing', 'n', '', 'v', '<C-w>v')
-    call submode#map('windowing', 'n', '', '=', '<C-w>=')
-    call submode#map('windowing', 'n', '', 'c', '<C-w>c')
-    call submode#map('windowing', 'n', '', 'h', ':vertical resize -5<CR>')
-    call submode#map('windowing', 'n', '', 'l', ':vertical resize +5<CR>')
-    call submode#map('windowing', 'n', '', 'H', ':resize -5<CR>')
-    call submode#map('windowing', 'n', '', 'L', ':resize +5<CR>')
-    call submode#map('windowing', 'n', '', 'g', ':tabnew<cr>')
-    call submode#map('windowing', 'n', '', 'G', ':tabclose<cr>')
-    call submode#map('windowing', 'n', '', 'w', 'gt')
-    call submode#map('windowing', 'n', '', 'b', 'gT')
-
-    call submode#enter_with('pager', 'n', '', 'to', '<NOP>')
-    call submode#leave_with('pager', 'n', '', 'e')
-    call submode#map('pager', 'n', '', 'j', '<C-d>')
-    call submode#map('pager', 'n', '', 'k', '<C-u>')
-    call submode#map('pager', 'n', '', 'J', '<C-e>')
-    call submode#map('pager', 'n', '', 'K', '<C-y>')
-    call submode#map('pager', 'n', '', 'sj', '<pagedown>')
-    call submode#map('pager', 'n', '', 'sk', '<pageup>')
-    call submode#map('pager', 'n', '', 'tic', ':call BufDelOrQuit()<cr>')
-
-    let g:multi_cursor_use_default_mapping=0
-    let g:multi_cursor_start_key='<C-e>'
-    let g:multi_cursor_next_key='<C-e>'
-    let g:multi_cursor_prev_key='<C-o>'
-    let g:multi_cursor_skip_key='<C-a>'
-    let g:multi_cursor_quit_key='<C-k>'
-
-endif
+"" Vim plugins can't hold a candle to emacs plugins.
+"" While I still use vim sometimes for quick edits, I'm going to give up on the
+"" pretense of keeping my configuration even somewhat in sync, since I only use
+"" vim for quick edits!
+""if filereadable($DOTFILESWGH . "/external/vim/Vundle.vim/README.md")
+""    ""call vundle#begin($DOTFILESWGH . "/dotlocal/vim")
+""    ""Plugin 'kana/vim-submode'
+""    ""Plugin 'tpope/vim-rsi'
+""    ""Plugin 'tpope/vim-repeat'
+""    ""Plugin 'tpope/vim-surround'
+""    """Plugin 'tpope/vim-speeddating'
+""    ""Plugin 'tpope/vim-markdown'
+""    ""Plugin 'tpope/vim-tbone'
+""    ""Plugin 'tpope/vim-eunuch'
+""    ""Plugin 'tpope/vim-sleuth'
+""    "Plugin 'kana/vim-textobj-user'
+""    """Plugin 'rhysd/vim-textobj-anyblock'
+""    "Plugin 'tpope/vim-afterimage'
+""    """Plugin 'tpope/vim-commentary'
+""    "Plugin 'tpope/vim-abolish'
+""    """Plugin 'chrisbra/csv.vim'
+""    "Plugin 'bling/vim-airline'
+""    """Plugin 'Lokaltog/vim-easymotion'
+""    "Plugin 'ap/vim-css-color'
+""    """ syntastic seems broken on nixos, and I don't care enough to fix it
+""    "Plugin 'scrooloose/syntastic'
+""    """Plugin 'ervandew/supertab'
+""    "Plugin 'msanders/snipmate.vim'
+""    """Plugin 'camelcasemotion'
+""    "Plugin 'AndrewRadev/sideways.vim'
+""    """Plugin 'vim-scripts/paredit.vim'
+""    "Plugin 'luochen1990/rainbow'
+""    """Plugin 'pelodelfuego/vim-swoop'
+""    "Plugin 'terryma/vim-multiple-cursors'
+""    ""call vundle#end()
+""    " to run the vundle installer, run :PluginInstall
+""
+""    " Sometimes I can't see the parens.  It might work better when terminal vim
+""    " supports true color well.
+""    "Plugin 'kien/rainbow_parentheses.vim'
+""    "au VimEnter * RainbowParenthesesToggle
+""    "au Syntax * RainbowParenthesesLoadRound
+""    "au Syntax * RainbowParenthesesLoadSquare
+""    "au Syntax * RainbowParenthesesLoadBraces
+""
+""    "let g:airline#extensions#tabline#enabled = 1
+""    ""let g:airline_left_sep = '▶'
+""    ""let g:airline_right_sep = '◀'
+""
+""    let g:rainbow_active = 1
+""
+""    filetype plugin indent on
+""
+""    " easymotion -- like acejump
+""    ""nmap gc <Plug>(easymotion-s2)
+""    ""nmap gtc <Plug>(easymotion-t2)
+""    ""map  g/ <Plug>(easymotion-sn)
+""    ""omap g/ <Plug>(easymotion-tn)
+""    "map <Leader>l <Plug>(easymotion-lineforward)
+""    "map <Leader>j <Plug>(easymotion-j)
+""    "map <Leader>k <Plug>(easymotion-k)
+""    "map <Leader>h <Plug>(easymotion-linebackward)
+""    ""let g:EasyMotion_startofline = 0 " keep cursor colum when JK motion
+""    ""let g:EasyMotion_smartcase = 1
+""    " these can be bound maybe...
+""    "<Plug>(easymotion-next)
+""    "<Plug>(easymotion-prev)
+""
+""    ""let g:submode_always_show_submode = 1
+""    ""let g:submode_keyseqs_to_leave = ['<esc>', '<C-g>']
+""    ""let g:submode_timeout = 0
+""    ""let g:submode_timeoutlen = 9999
+""    ""call submode#enter_with('windowing', 'n', '', 'th', '<NOP>')
+""    ""call submode#leave_with('windowing', 'n', '', 'e')
+""    ""call submode#map('windowing', 'n', '', 'j', '<C-w>w')
+""    ""call submode#map('windowing', 'n', '', 'k', '<C-w>W')
+""    ""call submode#map('windowing', 'n', '', 's', '<C-w>s')
+""    ""call submode#map('windowing', 'n', '', 'v', '<C-w>v')
+""    ""call submode#map('windowing', 'n', '', '=', '<C-w>=')
+""    ""call submode#map('windowing', 'n', '', 'c', '<C-w>c')
+""    ""call submode#map('windowing', 'n', '', 'h', ':vertical resize -5<CR>')
+""    ""call submode#map('windowing', 'n', '', 'l', ':vertical resize +5<CR>')
+""    ""call submode#map('windowing', 'n', '', 'H', ':resize -5<CR>')
+""    ""call submode#map('windowing', 'n', '', 'L', ':resize +5<CR>')
+""    ""call submode#map('windowing', 'n', '', 'g', ':tabnew<cr>')
+""    ""call submode#map('windowing', 'n', '', 'G', ':tabclose<cr>')
+""    ""call submode#map('windowing', 'n', '', 'w', 'gt')
+""    ""call submode#map('windowing', 'n', '', 'b', 'gT')
+""
+""    ""call submode#enter_with('pager', 'n', '', 'to', '<NOP>')
+""    ""call submode#leave_with('pager', 'n', '', 'e')
+""    ""call submode#map('pager', 'n', '', 'j', '<C-d>')
+""    ""call submode#map('pager', 'n', '', 'k', '<C-u>')
+""    ""call submode#map('pager', 'n', '', 'J', '<C-e>')
+""    ""call submode#map('pager', 'n', '', 'K', '<C-y>')
+""    ""call submode#map('pager', 'n', '', 'sj', '<pagedown>')
+""    ""call submode#map('pager', 'n', '', 'sk', '<pageup>')
+""    ""call submode#map('pager', 'n', '', 'tic', ':call BufDelOrQuit()<cr>')
+""
+""    ""let g:multi_cursor_use_default_mapping=0
+""    ""let g:multi_cursor_start_key='<C-e>'
+""    ""let g:multi_cursor_next_key='<C-e>'
+""    ""let g:multi_cursor_prev_key='<C-o>'
+""    ""let g:multi_cursor_skip_key='<C-a>'
+""    ""let g:multi_cursor_quit_key='<C-k>'
+""
+""endif
 
 filetype plugin indent on
 autocmd FileType * setlocal formatoptions-=r formatoptions-=o
@@ -399,7 +403,7 @@ inoremap <c-s> <c-w>
 function! SetDarkTheme()
     "colorscheme elflord
     colorscheme wgh-dark
-    let g:airline_theme='wghdark'
+    "let g:airline_theme='wghdark'
     "call airline#switch_theme('vairl')
     "highlight Normal cterm=NONE ctermfg=253 ctermbg=233
     "highlight Comment cterm=italic
@@ -424,6 +428,8 @@ if $WGH_THEME_DARK_OR_LIGHT == "light"
 else
     call SetDarkTheme()
 endif
+
+highlight StatusLine ctermfg=17 ctermbg=164
 
 
 if filereadable($DOTFILESWGH . "/dotlocal/vimrc")
