@@ -124,7 +124,7 @@ lazy_source zgen $DOTFILESWGH/external/zsh/zgen/zgen.zsh
 if ! source "$ZGEN_DIR/init.zsh"; then
     echo "zgen not set up -- cloning repos"
     zgen load zsh-users/zsh-history-substring-search
-    zgen load hchbaw/opp.zsh
+    #zgen load hchbaw/opp.zsh
     zgen load willghatch/zsh-cdr
     zgen load zsh-users/zaw
     zgen load willghatch/zsh-zaw-mpd
@@ -135,15 +135,15 @@ if ! source "$ZGEN_DIR/init.zsh"; then
     zgen load willghatch/zsh-snippets
     zgen load willghatch/zsh-grml-funcs
     zgen load willghatch/vzsh
-    zgen load termoshtt/zaw-systemd
+    #zgen load termoshtt/zaw-systemd
     #zgen load junkblocker/calibre-zaw-source
     #zgen load tarrasch/zsh-colors
     #zgen load tarrasch/zsh-bd
     #zgen load tarrasch/zsh-functional
     #zgen load jocelynmallon/zshmarks
-    zgen load skx/sysadmin-util
+    #zgen load skx/sysadmin-util
     #zgen load ehamberg/zsh-cabal-completion
-    zgen load zsh-users/zsh-syntax-highlighting . 0.4.0
+    zgen load zsh-users/zsh-syntax-highlighting
     zgen load racket/shell-completion
     # this one doesn't seem to work...
     #zgen load RobSis/zsh-reentry-hook
