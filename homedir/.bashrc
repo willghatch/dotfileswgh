@@ -54,6 +54,8 @@ if test -n "$CURRENT_DEV_MODE"; then
 fi
 
 
+sourceIfExists $WGHHOME/rootgit-dotfiles/env.sh
+sourceIfExists $WGHHOME/rootgit-dotfiles/bazshrc
 sourceIfExists $WGHHOME/rootgit-dotfiles/bashrc
 sourceIfExists $DOTFILESWGH/dotlocal/bashrc
 

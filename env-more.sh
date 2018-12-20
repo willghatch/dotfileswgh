@@ -6,7 +6,7 @@ export RACKET_PKG_DEV_PATH=$WGHHOME/mk/racket-pkgdev/racket/bin:$WGHHOME/mk/rack
 export RACKET_CORE_DEV_PATH=$WGHHOME/mk/racket-coredev/racket/bin
 
 # CURRENT_DEV_PATH may be set by various commands.
-export PATH=$CURRENT_DEV_PATH:$DOTFILESWGH/pri/dotlocal/commands:$DOTFILESWGH/dotlocal/commands:$WGHHOME/rootgit-dotfiles/commands:/rootgit/bin.rootgit:/rootgit/tools.rootgit:$DOTFILESWGH/pri/commands:$DOTFILESWGH/pri/commands/aliases:$DOTFILESWGH/commands:$DOTFILESWGH/commands/aliases:$DOTFILESWGH/external/misc/rootgit-tools:$DOTFILESWGH/dotlocal/racket-pkgs-bin:$DOTFILESWGH/dotlocal/racket-bin:$WGHHOME/.cabal/bin:$HROOT/bin:$HROOT/usr/bin:$HROOT/usr/local/bin:$WGHHOME/.local/bin:$WGHHOME/bin:$PATH:/usr/bin:/bin:/usr/local/bin:/sbin:/usr/sbin:/usr/local/sbin
+export PATH=/$CURRENT_DEV_PATH:$DOTFILESWGH/pri/dotlocal/commands:$DOTFILESWGH/dotlocal/commands:$WGHHOME/rootgit-dotfiles/commands:/rootgit/bin.rootgit:/rootgit/tools.rootgit:$DOTFILESWGH/pri/commands:$DOTFILESWGH/pri/commands/aliases:$DOTFILESWGH/commands:$DOTFILESWGH/commands/aliases:$DOTFILESWGH/external/misc/rootgit-tools:$DOTFILESWGH/dotlocal/racket-pkgs-bin:$DOTFILESWGH/dotlocal/racket-bin:$WGHHOME/.cabal/bin:$HROOT/bin:$HROOT/usr/bin:$HROOT/usr/local/bin:$WGHHOME/.local/bin:$WGHHOME/bin:$PATH:/usr/bin:/bin:/usr/local/bin:/sbin:/usr/sbin:/usr/local/sbin
 
 # XDG basedir spec
 # I'm putting the defaults all here as reference
@@ -18,7 +18,7 @@ export PATH=$CURRENT_DEV_PATH:$DOTFILESWGH/pri/dotlocal/commands:$DOTFILESWGH/do
 #XDG_DATA_HOME=$HOME/.local/share
 # read-only but searched data locations
 #XDG_DATA_DIRS=/usr/local/share/:/usr/share/
-export XDG_DATA_DIRS=$DOTFILESWGH/local/share:$XDG_DATA_DIRS:/usr/local/share:/usr/share:$XDG_DATA_DIRS
+export XDG_DATA_DIRS=$DOTFILESWGH/local/share:$XDG_DATA_DIRS:/usr/local/share:/usr/share
 # writable config location
 #XDG_CONFIG_HOME=$HOME/.config
 # read-only but searched config locations

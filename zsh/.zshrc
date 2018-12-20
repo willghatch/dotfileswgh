@@ -392,6 +392,16 @@ if [[ -z "$KONSOLE_DBUS_SESSION" ]]; then
     export KONSOLE_DBUS_SESSION=/dev/null
 fi
 
+tf=$WGHHOME/rootgit-dotfiles/env.sh
+if [ -f "$tf" ]
+then
+    source $tf
+fi
+tf=$WGHHOME/rootgit-dotfiles/bazshrc
+if [ -f "$tf" ]
+then
+    source $tf
+fi
 tf=$WGHHOME/rootgit-dotfiles/zshrc
 if [ -f "$tf" ]
 then
