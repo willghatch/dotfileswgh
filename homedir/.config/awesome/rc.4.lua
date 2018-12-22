@@ -334,6 +334,165 @@ function mkNonRep(f)
    return innerMkNonRep(f)
 end
 
+-- List of XF86 keys:
+---------------------
+--XF86AddFavorite
+--XF86ApplicationLeft
+--XF86ApplicationRight
+--XF86AudioForward
+--XF86AudioLowerVolume
+--XF86AudioMedia
+--XF86AudioMicMute
+--XF86AudioMute
+--XF86AudioNext
+--XF86AudioPause
+--XF86AudioPlay
+--XF86AudioPrev
+--XF86AudioRaiseVolume
+--XF86AudioRecord
+--XF86AudioRewind
+--XF86AudioStop
+--XF86Away
+--XF86Back
+--XF86BackForward
+--XF86Battery
+--XF86Bluetooth
+--XF86Book
+--XF86BrightnessAdjust
+--XF86Calculator
+--XF86Calendar
+--XF86CD
+--XF86Clear
+--XF86_ClearGrab
+--XF86Close
+--XF86Community
+--XF86Config
+--XF86ContrastAdjust
+--XF86Copy
+--XF86Cut
+--XF86Display
+--XF86Documents
+--XF86DOS
+--XF86Eject
+--XF86Excel
+--XF86Explorer
+--XF86Favorites
+--XF86Finance
+--XF86Forward
+--XF86Game
+--XF86Go
+--XF86Hibernate
+--XF86History
+--XF86HomePage
+--XF86HotLinks
+--XF86iTouch
+--XF86KbdBrightnessDown
+--XF86KbdBrightnessUp
+--XF86KbdLightOnOff
+--XF86Keyboard
+--XF86Launch0
+--XF86Launch1
+--XF86Launch2
+--XF86Launch3
+--XF86Launch4
+--XF86Launch5
+--XF86Launch6
+--XF86Launch7
+--XF86Launch8
+--XF86Launch9
+--XF86LaunchA
+--XF86LaunchB
+--XF86LaunchC
+--XF86LaunchD
+--XF86LaunchE
+--XF86LaunchF
+--XF86LightBulb
+--XF86LogGrabInfo
+--XF86LogOff
+--XF86LogWindowTree
+--XF86Mail
+--XF86MailForward
+--XF86Market
+--XF86Meeting
+--XF86MenuKB
+--XF86MenuPB
+--XF86Messenger
+--XF86ModeLock
+--XF86MonBrightnessDown
+--XF86MonBrightnessUp
+--XF86Music
+--XF86MyComputer
+--XF86New
+--XF86News
+--XF86_Next_VMode
+--XF86OfficeHome
+--XF86Open
+--XF86OpenURL
+--XF86Paste
+--XF86Phone
+--XF86Pictures
+--XF86PowerOff
+--XF86_Prev_VMode
+--XF86Q
+--XF86Reload
+--XF86Reply
+--XF86RFKill
+--XF86RotateWindows
+--XF86RotationKB
+--XF86RotationPB
+--XF86Save
+--XF86ScreenSaver
+--XF86ScrollClick
+--XF86ScrollDown
+--XF86ScrollUp
+--XF86Search
+--XF86Send
+--XF86Shop
+--XF86Sleep
+--XF86Spell
+--XF86SplitScreen
+--XF86Standby
+--XF86Start
+--XF86Stop
+--XF86Support
+--XF86Suspend
+--XF86_Switch_VT_1
+--XF86_Switch_VT_10
+--XF86_Switch_VT_11
+--XF86_Switch_VT_12
+--XF86_Switch_VT_2
+--XF86_Switch_VT_3
+--XF86_Switch_VT_4
+--XF86_Switch_VT_5
+--XF86_Switch_VT_6
+--XF86_Switch_VT_7
+--XF86_Switch_VT_8
+--XF86_Switch_VT_9
+--XF86TaskPane
+--XF86Terminal
+--XF86ToDoList
+--XF86Tools
+--XF86TouchpadOff
+--XF86TouchpadOn
+--XF86TouchpadToggle
+--XF86Travel
+--XF86_Ungrab
+--XF86User1KB
+--XF86User2KB
+--XF86UserPB
+--XF86VendorHome
+--XF86Video
+--XF86WakeUp
+--XF86WebCam
+--XF86WLAN
+--XF86Word
+--XF86WWAN
+--XF86WWW
+--XF86Xfer
+--XF86ZoomIn
+--XF86ZoomOut
+
+
 -- {{{ Key bindings
 globalkeys = awful.util.table.join(
 --    awful.key({ modkey,           }, "s",      hotkeys_popup.show_help,
@@ -411,6 +570,22 @@ globalkeys = awful.util.table.join(
               {description = "bright down", group = "launcher"}),
     awful.key({ }, "XF86MonBrightnessUp", mkspawn({"vlaunch", "brightup"}),
               {description = "bright up", group = "launcher"}),
+    awful.key({ }, "XF86AudioPrev", mkspawn({"vlaunch", "musicprev"}),
+              {description = "media prev", group = "launcher"}),
+    awful.key({ }, "XF86AudioNext", mkspawn({"vlaunch", "musicnext"}),
+              {description = "media next", group = "launcher"}),
+    awful.key({ }, "XF86AudioPlay", mkspawn({"vlaunch", "musictoggle"}),
+              {description = "media play", group = "launcher"}),
+    awful.key({ }, "XF86AudioPause", mkspawn({"vlaunch", "musicpause"}),
+              {description = "media pause", group = "launcher"}),
+    awful.key({ }, "XF86AudioStop", mkspawn({"vlaunch", "musicpause"}),
+              {description = "media stop", group = "launcher"}),
+    awful.key({ }, "XF86AudioLowerVolume", mkspawn({"vlaunch", "voldown"}),
+              {description = "volume down", group = "launcher"}),
+    awful.key({ }, "XF86AudioRaiseVolume", mkspawn({"vlaunch", "volup"}),
+              {description = "volume up", group = "launcher"}),
+    awful.key({ }, "XF86AudioMute", mkspawn({"vlaunch", "volmute"}),
+              {description = "volume up", group = "launcher"}),
     awful.key({ hypkey,         }, "s", mkNonRep(mkspawn({"vlaunch", "screenshot"}, {description = "", group = "launcher"}))),
     awful.key({ hypkey,         }, "g", mkNonRep(mkspawn({"gajim-remote", "show_next_pending_event"}, {description = "", group = "launcher"}))),
     awful.key({ hypkey,         }, "m", mkNonRep(mkspawn({"vlaunch", "volmute"}, {description = "", group = "launcher"}))),
