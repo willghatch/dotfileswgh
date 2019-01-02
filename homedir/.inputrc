@@ -63,3 +63,6 @@ set keymap vi-command
 # go back to emacs, because it seems python starts up with whatever is the last
 # keymap to be edited...
 set keymap emacs
+
+# When completing symlinks to directories, add the trailing slash
+set mark-symlinked-directories on
