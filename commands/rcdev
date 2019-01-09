@@ -1,9 +1,8 @@
 #!/bin/sh
-# TODO - this is a copy of rpdev, and should be merged...
 
 if test -f /etc/NIXOS; then
-  exec nix-shell '<nixpkgs>' --command rcdev.rkt --packages bashInteractive racket cairo fontconfig glib gmp gtk2 libedit libjpeg libpng mpfr openssl pango poppler readline sqlite coreutils readline emacs
+  exec nix-shell /rootgit/base.rootgit/nixos/racket-env.nix --command rcdev.rkt
 else
-  exec rcdev.rkt "$@"
+  exec rcdev.rkt
 fi
 

@@ -1,9 +1,8 @@
 #!/bin/sh
 
 if test -f /etc/NIXOS; then
-  exec nix-shell '<nixpkgs>' --command rpdev.rkt --packages bashInteractive racket cairo fontconfig glib gmp gtk2 libedit libjpeg libpng mpfr openssl pango poppler readline sqlite coreutils readline emacs
+  exec nix-shell /rootgit/base.rootgit/nixos/racket-env.nix --command rpdev.rkt
 else
   exec rpdev.rkt
 fi
-
 
