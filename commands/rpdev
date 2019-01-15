@@ -1,8 +1,4 @@
 #!/bin/sh
-
-if test -f /etc/NIXOS; then
-  exec nix-shell /rootgit/base.rootgit/nixos/racket-env.nix --command rpdev.rkt
-else
-  exec rpdev.rkt
-fi
-
+export CURRENT_DEV_PATH=$RACKET_PKG_DEV_PATH
+export CURRENT_DEV_MODE=racket-packages
+exec racket-dev-environment.sh

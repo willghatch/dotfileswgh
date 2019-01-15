@@ -2,11 +2,17 @@
 
 export HROOT=$WGHHOME/hroot
 
+export RACKET_NO_DEV_PATH=$DOTFILESWGH/dotlocal/racket-pkgs-bin:$DOTFILESWGH/dotlocal/racket-bin
 export RACKET_PKG_DEV_PATH=$WGHHOME/mk/racket-pkgdev/racket/bin:$WGHHOME/mk/racket-pkgdev/bin:$WGHHOME/.racket/pkgdev/bin
 export RACKET_CORE_DEV_PATH=$WGHHOME/mk/racket-coredev/racket/bin
 
+DOTFILESWGH_COMMAND_PATH=$DOTFILESWGH/pri/dotlocal/commands:$DOTFILESWGH/dotlocal/commands:$WGHHOME/rootgit-dotfiles/commands:/rootgit/bin.rootgit:/rootgit/tools.rootgit:$DOTFILESWGH/pri/commands:$DOTFILESWGH/pri/commands/aliases:$DOTFILESWGH/commands:$DOTFILESWGH/commands/aliases
+
+HROOT_PATH=$HROOT/bin:$HROOT/usr/bin:$HROOT/usr/local/bin
+COMMON_PATHS=$WGHHOME/.local/bin:/usr/bin:/bin:/usr/local/bin:/sbin:/usr/sbin:/usr/local/sbin
+
 # CURRENT_DEV_PATH may be set by various commands.
-export PATH=/$CURRENT_DEV_PATH:$DOTFILESWGH/pri/dotlocal/commands:$DOTFILESWGH/dotlocal/commands:$WGHHOME/rootgit-dotfiles/commands:/rootgit/bin.rootgit:/rootgit/tools.rootgit:$DOTFILESWGH/pri/commands:$DOTFILESWGH/pri/commands/aliases:$DOTFILESWGH/commands:$DOTFILESWGH/commands/aliases:$DOTFILESWGH/external/misc/rootgit-tools:$DOTFILESWGH/dotlocal/racket-pkgs-bin:$DOTFILESWGH/dotlocal/racket-bin:$WGHHOME/.cabal/bin:$HROOT/bin:$HROOT/usr/bin:$HROOT/usr/local/bin:$WGHHOME/.local/bin:$WGHHOME/bin:$PATH:/usr/bin:/bin:/usr/local/bin:/sbin:/usr/sbin:/usr/local/sbin
+export PATH=${CURRENT_DEV_PATH:-$RACKET_NO_DEV_PATH}:$DOTFILESWGH_COMMAND_PATH:$HROOT_PATH:$PATH
 
 # XDG basedir spec
 # I'm putting the defaults all here as reference
