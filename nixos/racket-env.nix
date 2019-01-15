@@ -28,6 +28,9 @@ stdenv.mkDerivation {
     pp.coreutils
     pp.readline
 
+    pp.pkgconfig
+    #pp.racket
+
     # These are for convenience when entering the environment
     bashInteractive
     zsh
