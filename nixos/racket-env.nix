@@ -37,5 +37,13 @@ stdenv.mkDerivation {
     coreutils
     emacs
     man
+    git
+    tig
+    silver-searcher
+    # poor man's gitk...
+    gitg
+    meld
+    # for raco docs
+    firefox
   ];
 }
