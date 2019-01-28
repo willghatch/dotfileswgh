@@ -8,9 +8,10 @@ let pp = let pinnedPackages = fetchFromGitHub {
     };
     in import pinnedPackages {};
 in
-stdenv.mkDerivation {
+(pkgs.buildFHSUserEnv {
   name = "racket-dev-environment";
-  buildInputs = [
+  # targetPkgs instead of buildInputs, and as function instead of list...
+  targetPkgs = pkgs: [
     pp.cairo
     pp.fontconfig
     pp.glib
@@ -32,18 +33,20 @@ stdenv.mkDerivation {
     #pp.racket
 
     # These are for convenience when entering the environment
-    bashInteractive
-    zsh
-    coreutils
-    emacs
-    man
-    git
-    tig
-    silver-searcher
+    pkgs.bashInteractive
+    pkgs.zsh
+    pkgs.coreutils
+    pkgs.emacs
+    pkgs.man
+    pkgs.git
+    pkgs.tig
+    pkgs.silver-searcher
     # poor man's gitk...
-    gitg
-    meld
+    pkgs.gitg
+    pkgs.meld
     # for raco docs
-    firefox
+    pkgs.firefox
   ];
-}
+
+  runScript = "bash";
+}).env
