@@ -46,7 +46,8 @@ in
     pkgs.meld
     # for raco docs
     pkgs.firefox
+    # for tic command
+    pkgs.ncurses
   ];
 
-  runScript = "bash";
 }).env

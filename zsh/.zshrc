@@ -373,6 +373,13 @@ prompt-dev-environment(){
 }
 MEGAPROMPT_PRE_FUNCTION=prompt-dev-environment
 
+if [[ -n "$CURRENT_DEV_MODE" ]]; then
+    # In my NixOS racket dev environment, a non-ascii character here messes
+    # up the buffer when I use completion
+    MEGAPROMPT_STYLES[prompt_char]=":"
+fi
+
+
 if [[ "$HOME" = /data/data/com.termux/files/home ]]; then
     # zsh on termux lacks the pcre module
     MEGAPROMPT_DISPLAY_P[branch_style_regex]=false
