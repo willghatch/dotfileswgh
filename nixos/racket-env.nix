@@ -29,8 +29,15 @@ in
     pp.coreutils
     pp.readline
 
+    pp.libffi
+
     pp.pkgconfig
     #pp.racket
+
+    pkgs.gnumake
+    pkgs.gcc
+    # binutils has the `ar` command, and if `ar` is not present, a Racket build fails with an unhelpful message.
+    pkgs.binutils
 
     # These are for convenience when entering the environment
     pkgs.bashInteractive
