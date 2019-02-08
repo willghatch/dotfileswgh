@@ -26,6 +26,7 @@ get_unread_count = function()
     local lists = 0
     local top_feeds = 0
     local rfeeds = 0
+    local presort = 0
 
     for line in instr:lines() do
        inboxy = incr(inboxy, line:match("main (%d+)"))
@@ -36,6 +37,7 @@ get_unread_count = function()
        lists = incr(lists, line:match("misc.lists (%d+)"))
        top_feeds = incr(top_feeds, line:match("^feeds (%d+)"))
        rfeeds = incr(rfeeds, line:match("many.feeds (%d+)"))
+       presort = incr(presort, line:match("^pre.sort.post.process (%d+)"))
     end
     local green = "<span color='green'>"
     local cc = "<span color='#99ff66'>"
@@ -50,6 +52,7 @@ get_unread_count = function()
        --"F ".. cc .. top_feeds .. ecc .." "..
        --"mF ".. cc .. rfeeds .. ecc .." "..
        "Sp ".. cc .. spammy .. ecc .." "..
+       "Ps ".. cc .. presort .. ecc .." "..
        ecc .. " "
 end
 set_email_widget = function()
