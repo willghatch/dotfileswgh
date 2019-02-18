@@ -127,6 +127,10 @@ quit emacs."
     (mark-whole-buffer)
     (call-interactively 'delete-trailing-whitespace)))
 
+(defun copy-buffer ()
+  (interactive)
+  (copy-region-as-kill 1 (+ 1 (buffer-size))))
+
 (defun file->string (file)
   (with-temp-buffer
     (insert-file-contents file)

@@ -9,6 +9,11 @@
          (call-interactively 'evil-normal-state)
          (if (and point-at-region-end (not eol))
              (backward-char))))
+
+(defun xcopy-buffer () (interactive)
+       (xclip-set-selection 'clipboard
+                            (filter-buffer-substring 1 (+ 1 (buffer-size)))))
+
 (defun xpaste () (interactive)
        (let ((xclip-select-enable-clipboard t))
          (insert (xclip-selection-value))))
