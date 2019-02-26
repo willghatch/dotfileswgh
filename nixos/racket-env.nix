@@ -39,6 +39,7 @@ in
     # binutils has the `ar` command, and if `ar` is not present, a Racket build fails with an unhelpful message.
     pkgs.binutils
 
+
     # These are for convenience when entering the environment
     pkgs.bashInteractive
     pkgs.zsh
@@ -55,6 +56,11 @@ in
     pkgs.firefox
     # for tic command
     pkgs.ncurses
+    pkgs.which
+
+    # These are for convenience in other non-racket things that I'm putting here for convenience...
+    pkgs.gnum4
+    pkgs.autoconf
   ];
 
 }).env
