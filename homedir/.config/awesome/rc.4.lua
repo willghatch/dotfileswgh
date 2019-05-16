@@ -172,7 +172,9 @@ myawesomemenu = {
 }
 
 mymainmenu = awful.menu({ items = { { "awesome", myawesomemenu, beautiful.awesome_icon },
-                                    { "open terminal", function() awful.spawn({"xterm"}) end}
+                                    { "open terminal", function() awful.spawn({"xterm"}) end},
+                                    { "qw", function() awful.spawn({"qw"}) end},
+                                    { "hkk", function() awful.spawn({"hkk"}) end},
                                   }
                         })
 
