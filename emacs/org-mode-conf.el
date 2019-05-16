@@ -29,6 +29,17 @@
           (funcall loop (point))
           (org-promote-subtree))))))
 
+(defun wgh/org-add-heading-below ()
+  (interactive)
+  (end-of-line)
+  (org-insert-heading)
+  (evil-insert-state))
+(defun wgh/org-add-heading-above ()
+  (interactive)
+  (beginning-of-line)
+  (org-insert-heading)
+  (evil-insert-state))
+
 
 (add-hook 'org-mode-hook
           (lambda ()
@@ -37,6 +48,9 @@
             (lnkmap "oh" 'org-backward-heading-same-level)
             (lnkmap "og" 'outline-up-heading)
             (lnkmap "eg" 'outline-up-heading)
+
+            (lnkmap "eH" 'wgh/org-add-heading-below)
+            (lnkmap "oH" 'wgh/org-add-heading-above)
 
             (lnkmap "eus" 'wgh/org-forward-slurp-heading)
             (lnkmap "eub" 'wgh/org-forward-barf-heading)
