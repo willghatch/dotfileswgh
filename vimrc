@@ -423,7 +423,7 @@ function! SetLightTheme()
 endfunction
 command! -nargs=0 LightTheme call SetLightTheme()
 
-if $WGH_THEME_DARK_OR_LIGHT == "light"
+if system("lightdark-status") == "light\n"
     call SetLightTheme()
 else
     call SetDarkTheme()

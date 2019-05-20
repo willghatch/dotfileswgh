@@ -77,8 +77,9 @@ mkspawn = function(cmd)
          l_or_d = "light"
       end
       local cmdwrapper = {l_or_d}
-      local full_command = table_concat(cmdwrapper, cmd)
-      awful.spawn(full_command)
+      --local full_command = table_concat(cmdwrapper, cmd)
+      --awful.spawn(full_command)
+      awful.spawn(cmd)
    end
 end
 

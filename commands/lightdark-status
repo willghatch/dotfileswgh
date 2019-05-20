@@ -1,0 +1,30 @@
+#!/usr/bin/env bash
+
+help() {
+    echo "Usage: $0 [dark|light]"
+    echo "Gives status if called with no argument."
+    echo "Sets status if called wath an argument."
+    exit 1
+}
+
+ldfile="/tmp/${USER}-lightdark"
+lightdark="$WGH_THEME_DARK_OR_LIGHT"
+lightdark="${lightdark:-$(cat $ldfile 2>/dev/null)}"
+lightdark=${lightdark:-dark}
+
+if [[ "$#" = 0 ]]; then
+    exec echo "$lightdark"
+elif [[ "$#" = 1 ]]; then
+    if [[ "$1" = "light" || "$1" = "dark" ]]; then
+        exec echo "$1" > "$ldfile"
+    elif [[ "$1" = "toggle" ]]; then
+        if [[ "$lightdark" = "light" ]]; then
+            exec echo "dark" > "$ldfile"
+        else
+            exec echo "light" > "$ldfile"
+        fi
+    fi
+fi
+
+
+help

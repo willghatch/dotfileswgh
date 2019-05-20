@@ -251,7 +251,8 @@
 
 
 (nobreak
- (if (equal (getenv "WGH_THEME_DARK_OR_LIGHT") "light")
+ (if (equal (string-trim (shell-command-to-string "lightdark-status"))
+            "light")
      (light-theme)
    (dark-theme)))
 

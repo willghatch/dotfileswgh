@@ -1,0 +1,9 @@
+#!/usr/bin/env bash
+
+lightdark=$(lightdark-status)
+theme=wgh
+if [[ "$lightdark" = "light" ]]; then
+  theme=wgh-light
+fi
+
+exec konsole --profile "$theme" "$@"
