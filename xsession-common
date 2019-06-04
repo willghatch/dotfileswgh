@@ -8,6 +8,11 @@ if [ -z "$XSESSION_COMMON_RUN_P" ]; then
   mkdir -p $busdir
   echo "${DBUS_SESSION_BUS_ADDRESS}" >"$busdir/tty_${LOGIN_TTY}"
 
+  # I need a better way to do theming and change themes dynamically...
+  export GTK_THEME=Adwaita:dark
+  export GTK2_RC_FILES=$DOTFILESWGH/gtk2rc-dark
+
+
   # hack to fix pulseaudio, which doesn't seem to work for some reason...
   {
     killall pulseaudio
