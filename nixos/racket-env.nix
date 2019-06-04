@@ -28,6 +28,7 @@ in
     pp.sqlite
     pp.coreutils
     pp.readline
+    pp.libuuid
 
     pp.libffi
 
@@ -39,6 +40,11 @@ in
     # binutils has the `ar` command, and if `ar` is not present, a Racket build fails with an unhelpful message.
     pkgs.binutils
 
+    # for chez scheme
+    #pp.cctools
+    pp.ncurses
+    pp.libiconv
+    pp.xorg.libX11
 
     # These are for convenience when entering the environment
     pkgs.bashInteractive
