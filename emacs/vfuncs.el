@@ -188,20 +188,33 @@ quit emacs."
   (interactive)
   (call-process "raco" nil 0 nil "macro-step" (buffer-file-name)))
 
+
+(defun get-background-mode ()
+  (frame-parameter nil 'background-mode))
+(defun set-background-mode (type)
+  (if (equalp type 'auto)
+      (setq frame-background-mode nil)
+    (setq frame-background-mode type)))
+
 (defvar current-theme-reapply-var 'dark-theme)
 (defun light-theme ()
   (interactive)
+  (set-background-mode 'light)
   (setq current-theme-reapply-var 'light-theme)
-  (load-theme 'tango t)
-  (disable-theme 'wgh))
+  (load-theme 'wgh t)
+  ;(disable-theme 'wgh)
+  )
 (defun dark-theme ()
   (interactive)
+  (set-background-mode 'dark)
   (setq current-theme-reapply-var 'dark-theme)
   (load-theme 'wgh t)
-  (disable-theme 'tango))
+  ;(disable-theme 'wgh-light)
+  )
 (defun current-theme-reapply ()
   (interactive
    (funcall current-theme-reapply-var)))
+
 
 (defun quick-in-block ()
   (interactive)
