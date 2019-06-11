@@ -36,10 +36,12 @@ if which pamixer >/dev/null 2>&1; then
     scmd volup "pamixer --increase 5"
     scmd voldown "pamixer --decrease 5"
     scmd volmute "pamixer --toggle-mute"
+    scmd volcurrent "pamixer --get-volume"
 else
     scmd volup "amixer -q sset Master 5%+"
     scmd voldown "amixer -q sset Master 5%-"
     scmd volmute "amixer -q sset Master toggle"
+    scmd volcurrent "amixer sget Master"
 fi
 scmd volupS "amixer -q sset Master 5%+"
 scmd voldownS "amixer -q sset Master 5%-"

@@ -1,0 +1,122 @@
+#!/usr/bin/env racket
+#lang racket/base
+
+#|
+This is a little script to handle all the global state of my desktop in one place, rather than scattered in several other scripts.
+In fact the implementation of this state info is in those other scripts, but this puts them all into one combined interface.
+|#
+
+(require
+ racket/match
+ racket/system
+ )
+
+(define spec-table
+  `(
+    [volume [get (pamixer --get-volume)]
+            [set (pamixer --set-volume [number])]
+            [inc (pamixer --increase 5)]
+            [dec (pamixer --decrease 5)]]
+    [mute [get (pamixer --get-mute)]
+          [toggle (pamixer --toggle-mute)]]
+    [lightdark [get (lightdark-status)]
+               [set (lightdark-status [symbols light dark])]
+               [toggle (lightdark-status toggle)]]
+    ;[audiosink TODO]
+    [current-mpc [get (get-current-mpc)]
+                 [set (get-current-mpc [string])]]
+    ;[mail-syncing TODO]
+    ;[keyboard-layout TODO]
+    ;[media-status TODO]
+    [backlight [get (laptop-backlight 0)]
+               [inc (laptop-backlight +5)]
+               [dec (laptop-backlight -5)]]
+    )
+  )
+
+
+(define (->symbol x)
+  (if (symbol? x) x (string->symbol x)))
+
+(define (reduce-commands command-list arg-list)
+  (define (match-arg-symbols options arg)
+    (define sym (->symbol arg))
+    (if (member sym options)
+        sym
+        (error "expected one of: ~a, got ~a\n" options sym)))
+  (define (string->number/erroring n-str)
+    (or (string->number n-str) (error "expecting number, got: ~a" n-str)))
+  (let loop ([cmds command-list]
+             [args arg-list])
+    (match cmds
+      [(list) '()]
+      [(list (and datum (or (? symbol?)
+                            (? number?)))
+             others ...)
+       (cons datum (loop others args))]
+      [(list (list 'symbols options ...) others ...)
+       (when (null? args)
+         (error "Not enough arguments.  Expected ~a" `(or ,@options)))
+       (cons (match-arg-symbols options (car args))
+             (loop others (cdr args)))]
+      [(list (list 'number) others ...)
+       (when (null? args)
+         (error "Not enough arguments.  Expected a number."))
+       (cons (string->number/erroring (car args))
+             (loop others (cdr args)))]
+      [(list (list 'string) others ...)
+       (when (null? args)
+         (error "Not enough arguments.  Expected a string."))
+       (cons (car args) (loop others (cdr args)))]
+      )))
+
+(define (get-command-spec command subcommand)
+  (define command-spec
+    (findf (λ (spec) (eq? (car spec) command)) spec-table))
+  (when (not command-spec) (error "Not a valid command: ~a" command))
+  (define subcommand-spec
+    (findf (λ (subspec) (eq? (car subspec) subcommand)) (cdr command-spec)))
+  (when (not subcommand-spec) (error "Not a valid subcommand: ~a" subcommand))
+  (cadr subcommand-spec))
+
+(define (args->command command subcommand+args)
+  (define subcommand (match subcommand+args
+                       [(list) 'get]
+                       [(list str others ...) (->symbol str)]))
+  (define args (match subcommand+args
+                 [(list) '()]
+                 [(list _ others ...) others]))
+  (define spec (get-command-spec command subcommand))
+  (reduce-commands spec args))
+
+(define (display-help)
+  (printf "usage: <this-script> <command> <subcommand> <args>\n")
+  (for ([cmd-spec spec-table])
+    (define indent (+ 2 (string-length (symbol->string (car cmd-spec)))))
+    (printf "~a: \n" (car cmd-spec))
+    (for ([subcmd-spec (cdr cmd-spec)])
+      (for ([i (in-range indent)]) (display " "))
+      (printf "~a ~a\n" (car subcmd-spec) (cadr subcmd-spec)))))
+
+(define (shellout argl)
+  (define str-argl (map (λ (x) (format "~a" x)) argl))
+  (define command-path (find-executable-path (car str-argl)))
+  (apply system* (cons command-path (cdr str-argl))))
+
+(define (get-all)
+  (for ([cmd-spec spec-table])
+    (printf "~a:\n" (car cmd-spec))
+    (shellout (args->command (car cmd-spec) '(get)))
+    (printf "\n")))
+
+(module+ main
+  (define argl (vector->list (current-command-line-arguments)))
+  (when (member "--help" argl)
+    (display-help)
+    (exit 1))
+  (void
+   (match argl
+     [(list) (get-all)]
+     [(list cmd sub+args ...) (shellout (args->command (->symbol cmd) sub+args))]))
+  )
+
