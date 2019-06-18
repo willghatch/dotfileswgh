@@ -29,15 +29,22 @@
           (funcall loop (point))
           (org-promote-subtree))))))
 
-(defun wgh/org-add-heading-below ()
-  (interactive)
-  (end-of-line)
-  (org-insert-heading)
-  (evil-insert-state))
+(defun wgh/org-add-heading-above/no-insert ()
+  (when (not (org-at-heading-p))
+    (org-up-element))
+  (beginning-of-line)
+  (org-insert-heading))
+
 (defun wgh/org-add-heading-above ()
   (interactive)
-  (beginning-of-line)
-  (org-insert-heading)
+  (wgh/org-add-heading-above/no-insert)
+  (evil-insert-state))
+
+(defun wgh/org-add-heading-below ()
+  (interactive)
+  (wgh/org-add-heading-above/no-insert)
+  (evil-normal-state)
+  (org-metadown)
   (evil-insert-state))
 
 
@@ -46,14 +53,28 @@
             (message "doing org-mode-hook")
             (lnkmap "eh" 'org-forward-heading-same-level)
             (lnkmap "oh" 'org-backward-heading-same-level)
-            (lnkmap "og" 'outline-up-heading)
-            (lnkmap "eg" 'outline-up-heading)
+            ;; outline-up-heading skips the immediate parent heading if called
+            ;; from text underneath a heading.
+            (lnkmap "og" 'org-up-element)
+            (lnkmap "eg" 'org-up-element)
 
             (lnkmap "eH" 'wgh/org-add-heading-below)
             (lnkmap "oH" 'wgh/org-add-heading-above)
 
             (lnkmap "eus" 'wgh/org-forward-slurp-heading)
             (lnkmap "eub" 'wgh/org-forward-barf-heading)
+
+            ;; This group is a duplicate of the above but using the `m` prefix.
+            ;; It would be good if in some mode I could have both org/outline
+            ;; functions AND smartparens functions...
+            (lnkmap "meh" 'org-forward-heading-same-level)
+            (lnkmap "moh" 'org-backward-heading-same-level)
+            (lnkmap "mog" 'org-up-element)
+            (lnkmap "meg" 'org-up-element)
+            (lnkmap "meo" 'wgh/org-add-heading-below)
+            (lnkmap "moo" 'wgh/org-add-heading-above)
+            (lnkmap "meus" 'wgh/org-forward-slurp-heading)
+            (lnkmap "meub" 'wgh/org-forward-barf-heading)
 
             (lnkmap "ml" 'org-metaright)
             (lnkmap "mh" 'org-metaleft)
