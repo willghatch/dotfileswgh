@@ -17,6 +17,12 @@
 ["sat" . "⊨"]
 ["unsat" . "⊭"]
 
+;; turnstile is "right tack"
+;; There are left, right, up, down varieties of tacks, but unicode calls double tacks double turnstiles.  So the naming is inconsistent.
+;; TODO - I should make a consistent naming scheme for entering mathematical and logical symbols, and I should memorize the names.
+;; eg. square union/intersect, less/greater/less+equal/greater+equal, round less/greater/etc,
+;; TODO - is there a combining slash character (eg for not equal, etc)
+["turnstile" . "⊢"]
 
 ["lte" . "≤"]
 ["gte" . "≥"]
