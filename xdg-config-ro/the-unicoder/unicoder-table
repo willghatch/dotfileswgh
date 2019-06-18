@@ -1,4 +1,5 @@
 #hash{
+;; combining accents
 ["ctilde" . "\u0303"]
 
 ["cacute" . "\u0301"]
@@ -11,22 +12,7 @@
 
 ["ccircum" . "\u0302"]
 
-["land" . "∧"]
-["lor" . "∨"]
-
-["sat" . "⊨"]
-["unsat" . "⊭"]
-
-;; turnstile is "right tack"
-;; There are left, right, up, down varieties of tacks, but unicode calls double tacks double turnstiles.  So the naming is inconsistent.
-;; TODO - I should make a consistent naming scheme for entering mathematical and logical symbols, and I should memorize the names.
-;; eg. square union/intersect, less/greater/less+equal/greater+equal, round less/greater/etc,
-;; TODO - is there a combining slash character (eg for not equal, etc)
-["turnstile" . "⊢"]
-
-["lte" . "≤"]
-["gte" . "≥"]
-
+;; vowels with combined accents
 ["a" . "a\u0301"]
 ["e" . "e\u0301"]
 ["i" . "i\u0301"]
@@ -41,5 +27,50 @@
 ["U" . "U\u0301"]
 ["Ue" . "U\u0308"]
 ["N" . "N\u0303"]
+
+
+;; Mathy symbols
+
+;; turnstile is "right tack"
+;; There are left, right, up, down varieties of tacks, but unicode calls double tacks double turnstiles.  So the naming is inconsistent.
+;; TODO - I should make a consistent naming scheme for entering mathematical and logical symbols, and I should memorize the names.
+;; TODO - is there a combining slash character (eg for not equal, etc)?
+["turnstile" . "⊢"]
+
+["lte" . "≤"]
+["gte" . "≥"]
+["lte approx" . "≲"]
+["gte approx" . "≳"]
+;; Unicode calls these subset, superset, subseteq, etc
+["lt round" . "⊂"]
+["lte round" . "⊆"]
+["gt round" . "⊃"]
+["gte round" . "⊇"]
+;; Unicode calls these sqsubset, sqsuperset, sqsubseteq, etc
+["lt square" . "⊏"]
+["lte square" . "⊑"]
+["gt square" . "⊐"]
+["gte square" . "⊒"]
+
+["lt sharp" . "≺"]
+["lte sharp" . "≼"]
+["lte sharp approx" . "≾"]
+["gt sharp" . "≻"]
+["gte sharp" . "≽"]
+["gte sharp approx" . "≿"]
+
+["square intersect" . "⊓"]
+["square union" . "⊔"]
+
+["land" . "∧"]
+["lor" . "∨"]
+
+["sat" . "⊨"]
+["unsat" . "⊭"]
+
+
+["qed" . "∎"]
+
+
 }
 
