@@ -29,23 +29,17 @@
           (funcall loop (point))
           (org-promote-subtree))))))
 
-(defun wgh/org-add-heading-above/no-insert ()
+(defun wgh/org-add-heading-above ()
+  (interactive)
   (when (not (org-at-heading-p))
     (org-up-element))
   (beginning-of-line)
   (org-insert-heading))
 
-(defun wgh/org-add-heading-above ()
-  (interactive)
-  (wgh/org-add-heading-above/no-insert)
-  (evil-insert-state))
-
 (defun wgh/org-add-heading-below ()
   (interactive)
-  (wgh/org-add-heading-above/no-insert)
-  (evil-normal-state)
-  (org-metadown)
-  (evil-insert-state))
+  (wgh/org-add-heading-above)
+  (org-metadown))
 
 
 (add-hook 'org-mode-hook
