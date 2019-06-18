@@ -12,6 +12,7 @@ terminal="konsole-lightdark -e rr"
 terminal3="rackterm-xterm -e rr"
 
 unicode="racket -l the-unicoder -- --client --port 5782"
+unicode_reload="racket -l the-unicoder -- --client --port 5782 --command reload"
 #unicode_func(){
 #    echo 'prompt' | socat - UNIX-CONNECT:/tmp/the-unicoder_${USER}_${DISPLAY/:/}
 #}
