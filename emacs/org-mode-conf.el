@@ -41,16 +41,19 @@
   (wgh/org-add-heading-above)
   (org-metadown))
 
+(require 'repeatable-motion)
+(repeatable-motion-define-pair 'org-forward-heading-same-level 'org-backward-heading-same-level)
+(repeatable-motion-define 'org-up-element nil)
 
 (add-hook 'org-mode-hook
           (lambda ()
             (message "doing org-mode-hook")
-            (lnkmap "eh" 'org-forward-heading-same-level)
-            (lnkmap "oh" 'org-backward-heading-same-level)
+            (lnkmap "eh" 'rmo/org-forward-heading-same-level)
+            (lnkmap "oh" 'rmo/org-backward-heading-same-level)
             ;; outline-up-heading skips the immediate parent heading if called
             ;; from text underneath a heading.
-            (lnkmap "og" 'org-up-element)
-            (lnkmap "eg" 'org-up-element)
+            (lnkmap "og" 'rmo/org-up-element)
+            (lnkmap "eg" 'rmo/org-up-element)
 
             (lnkmap "eH" 'wgh/org-add-heading-below)
             (lnkmap "oH" 'wgh/org-add-heading-above)
@@ -61,10 +64,10 @@
             ;; This group is a duplicate of the above but using the `m` prefix.
             ;; It would be good if in some mode I could have both org/outline
             ;; functions AND smartparens functions...
-            (lnkmap "meh" 'org-forward-heading-same-level)
-            (lnkmap "moh" 'org-backward-heading-same-level)
-            (lnkmap "mog" 'org-up-element)
-            (lnkmap "meg" 'org-up-element)
+            (lnkmap "meh" 'rmo/org-forward-heading-same-level)
+            (lnkmap "moh" 'rmo/org-backward-heading-same-level)
+            (lnkmap "mog" 'rmo/org-up-element)
+            (lnkmap "meg" 'rmo/org-up-element)
             (lnkmap "meo" 'wgh/org-add-heading-below)
             (lnkmap "moo" 'wgh/org-add-heading-above)
             (lnkmap "meus" 'wgh/org-forward-slurp-heading)
