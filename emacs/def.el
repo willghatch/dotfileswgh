@@ -212,8 +212,8 @@
  (yafolding-mode 1)
  (load-library "borrowed")
  (load-library "tty-format")
- (require 'markchars)
- (markchars-global-mode t)
+ ;(require 'markchars)
+ ;(markchars-global-mode t)
  ;; highlight literal tab characters and trailing whitespace
  (setq whitespace-style '(face tabs trailing))
 
