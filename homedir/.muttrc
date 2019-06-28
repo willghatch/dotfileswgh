@@ -1,4 +1,5 @@
 # -*-muttrc-*-
+set folder="/var/spool/mail/$USER"
 #set editor="/usr/bin/vim"
 set text_flowed=yes
 
