@@ -64,6 +64,11 @@
 ;(in 'helm-company)
 (in 'helm-descbinds)
 
+;; Let's try ivy and friends
+(in 'ivy)
+(in 'swiper)
+(in 'counsel)
+
 
 ;(in 'js2-mode)
 ;(in 'js2-refactor)
