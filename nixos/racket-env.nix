@@ -29,6 +29,8 @@ in
     pp.coreutils
     pp.readline
     pp.libuuid
+    # apparently `buildInputs` automatically adds `.dev`, but buildFHSUserEnv doesn't.
+    pp.libuuid.dev
 
     pp.libffi
 
