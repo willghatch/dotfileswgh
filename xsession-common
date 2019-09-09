@@ -80,7 +80,7 @@ if [ -z "$XSESSION_COMMON_RUN_P" ]; then
   #rm -f "$unicoder_socket"
   the-unicoder --server --port "$unicoder_socket" &
 
-  $DOTFILESWGH/external/misc/libnotifylog/libnotifylogger.py $HOME/.cache/notifications.log &
+  #libnotifylogger.py $HOME/.cache/notifications.log &
 
   # Watch keyboard state for awesome
   $DOTFILESWGH/config/awesome/kbd-state-mon.sh &
