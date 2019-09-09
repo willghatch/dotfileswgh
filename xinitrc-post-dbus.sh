@@ -9,13 +9,5 @@
 
 source $DOTFILESWGH/xsession-common
 
-
-if [ -f $DOTFILESWGH/pri/xinitrc ]; then
-    source $DOTFILESWGH/pri/xinitrc
-fi
-if [ -f $DOTFILESWGH/dotlocal/xinitrc ]; then
-    source $DOTFILESWGH/dotlocal/xinitrc
-fi
-
 exec awesome
 

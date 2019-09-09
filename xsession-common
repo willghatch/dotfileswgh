@@ -93,5 +93,13 @@ if [ -z "$XSESSION_COMMON_RUN_P" ]; then
 
   premacs-init &
 
+
+  if [ -f $DOTFILESWGH/pri/xinitrc ]; then
+      source $DOTFILESWGH/pri/xinitrc
+  fi
+  if [ -f $DOTFILESWGH/dotlocal/xinitrc ]; then
+      source $DOTFILESWGH/dotlocal/xinitrc
+  fi
+
 fi
 export XSESSION_COMMON_RUN=true
