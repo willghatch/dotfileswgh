@@ -54,7 +54,7 @@ in
     pkgs.coreutils
     pkgs.emacs
     pkgs.man
-    pkgs.git
+    pkgs.gitAndTools.gitFull
     pkgs.tig
     pkgs.silver-searcher
     # poor man's gitk...
