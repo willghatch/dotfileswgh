@@ -8,11 +8,11 @@ fi
 day="${1:-today}"
 
 if [[ today = "$day" ]]; then
-    exec e $(date +%Y-%m-%d)
+    exec e $(date +%Y-%m-%d).org
 elif [[ yesterday = "$day" ]]; then
-    exec e $(date +%Y-%m-%d --date=yesterday)
+    exec e $(date +%Y-%m-%d --date=yesterday).org
 elif [[ tomorrow = "$day" ]]; then
-    exec e $(date +%Y-%m-%d --date=tomorrow)
+    exec e $(date +%Y-%m-%d --date=tomorrow).org
 else
     echo "usage: $0 [today or yesterday or tomorrow]"
     exit 1
