@@ -41,6 +41,11 @@
   (wgh/org-add-heading-above)
   (org-metadown))
 
+(defun wgh/org-update-cookies ()
+  (interactive)
+  ;; update ALL cookies in the file without the extra argument
+  (org-update-statistics-cookies t))
+
 (require 'repeatable-motion)
 (repeatable-motion-define-pair 'org-forward-heading-same-level 'org-backward-heading-same-level)
 (repeatable-motion-define 'org-up-element nil)
