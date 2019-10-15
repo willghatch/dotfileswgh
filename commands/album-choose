@@ -10,7 +10,7 @@ mpc=$(state current-mpc)
 
 # Cache directory list
 #list_file="$music_home/.music-choose-list-file"
-list_file="${XDG_RUNTIME_DIR:-/tmp}/.music-choose-list-file"
+list_file="${XDG_RUNTIME_DIR:-/tmp}/album-choose-list-file"
 if [ ! -f "$list_file" ]; then
     find "$music_home" -type d | cut -c $(echo $music_home | wc -c)- > "$list_file"
 fi
