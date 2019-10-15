@@ -36,6 +36,7 @@
   #{find $orig-music-dir -type f -name (string-append "*." extension) |> port->lines})
 
 (define oggfiles (find-with-ext "ogg"))
+(define opusfiles (find-with-ext "opus"))
 (define mp3files (find-with-ext "mp3"))
 (define flacfiles (find-with-ext "flac"))
 
@@ -80,6 +81,7 @@
 
 (define job-thunks (append
                     (map ogg/mp3->do-thunk oggfiles)
+                    (map ogg/mp3->do-thunk opusfiles)
                     (map ogg/mp3->do-thunk mp3files)
                     (map flac->do-thunk flacfiles)))
 
