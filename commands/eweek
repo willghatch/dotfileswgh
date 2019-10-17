@@ -1,0 +1,27 @@
+#!/usr/bin/env racket
+#lang rash
+(require
+ gregor
+ racket/cmdline
+ )
+
+(define spec
+  (command-line #:args ([spec "0"])
+                spec))
+
+(define week-n (string->number spec))
+
+(define t (+weeks (today) week-n))
+
+(define start-of-week (-days t (->wday t)))
+(define end-of-week (+days t (- 6 (->wday t))))
+
+(define (date->str d)
+  (~t d "YYYY-MM-dd"))
+
+(define filename (format "~a_to_~a.org"
+                         (date->str start-of-week)
+                         (date->str end-of-week)))
+
+
+e $filename
