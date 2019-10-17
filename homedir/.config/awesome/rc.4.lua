@@ -309,6 +309,18 @@ awful.screen.connect_for_each_screen(function(s)
 end)
 -- }}}
 
+function toggleBar(to)
+   for s in screen do
+      newval = to
+      if newval == nil then
+         newval = (not s.mywibox.visible)
+      end
+      s.mywibox.visible = newval
+   end
+   return
+end
+
+
 -- {{{ Mouse bindings
 root.buttons(awful.util.table.join(
     awful.button({ }, 3, function () mymainmenu:toggle() end),
