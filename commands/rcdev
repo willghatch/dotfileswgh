@@ -1,4 +1,4 @@
 #!/bin/sh
 export CURRENT_DEV_PATH=$RACKET_CORE_DEV_PATH
 export CURRENT_DEV_MODE=racket-core
-exec racket-dev-environment.sh
+exec racket-dev-environment.sh "$@"
