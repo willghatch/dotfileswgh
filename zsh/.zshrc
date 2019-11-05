@@ -368,7 +368,7 @@ fi
 MEGAPROMPT_DISPLAY_P[tty]=false
 prompt-dev-environment(){
     if [[ -n "$CURRENT_DEV_MODE" ]]; then
-        echo -e "Dev: \033[35m$CURRENT_DEV_MODE \033[0m"
+        echo -e "Dev: \033[35m$CURRENT_DEV_MODE\n\033[0m"
     fi
 }
 MEGAPROMPT_PRE_FUNCTION=prompt-dev-environment
