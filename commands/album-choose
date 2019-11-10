@@ -17,7 +17,7 @@ fi
 
 # Ask the user
 #chosen=`cat $list_file | rofi -dmenu`
-chosen=`cat $list_file | dmenu`
+chosen=`cat $list_file | shuf | dmenu`
 
 echo chose: $chosen
 # Add it to mpd
