@@ -13,3 +13,6 @@
 [submodule "external/misc/kbd-state-mon"]
 	path = external/misc/kbd-state-mon
 	url = https://github.com/willghatch/kbd-state-mon
+[submodule "external/emacs/sexp-rewrite"]
+	path = external/emacs/sexp-rewrite
+	url = https://github.com/rmculpepper/sexp-rewrite

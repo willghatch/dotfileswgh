@@ -10,7 +10,15 @@
 (setq scratch-useful-message
 "
 
-;; Useful notes for run-time definitions:
+;;;; Useful notes for run-time definitions:
+
+;; s-expression rewriting: sexprw
+;; Full docs at: $DOTFILESWGH/external/emacs/sexp-rewrite/REFERENCE.md
+;;; Define a tactic and function sexprw-tactic/NAME
+;;(define-sexprw-tactic/func NAME
+;;  PATTERN
+;;  RESULT)
+
 ;;(define-key evil-normal-state-map \"a\" 'evil-append)
 ;;(defalias 'eb 'eval-buffer)
 ;; [m,n,i,v,w,t]kmap
