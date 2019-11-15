@@ -26,8 +26,8 @@ export GUIX_LOCPATH=$GUIX_PROFILE/lib/locale
 if [[ "$USE_GUIX" = "true" && -f "$GUIX_PROFILE/etc/profile" ]]; then
     source "$GUIX_PROFILE/etc/profile"
 fi
-unset MANPATH # so I can use manpath command at end here
-export MANPATH=/usr/share/man:/usr/local/man:/usr/local/share/man:/usr/X11R6/man:/opt/man:$HROOT/usr/share/man:$HROOT/share/man:$NPM_DIR/share/man:$(manpath)
+#unset MANPATH # so I can use manpath command at end here
+#export MANPATH=/usr/share/man:/usr/local/man:/usr/local/share/man:/usr/X11R6/man:/opt/man:$HROOT/usr/share/man:$HROOT/share/man:$NPM_DIR/share/man:$(manpath)
 
 # Use my custom locale if it's installed (must be done as root...).
 # en_US has a dumb date string (not YYYY-MM-DD), but ISO 8601 (and locales
