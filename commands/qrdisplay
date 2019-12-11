@@ -1,0 +1,3 @@
+#!/usr/bin/env bash
+# reads from stdin
+qrencode -o - | feh -
