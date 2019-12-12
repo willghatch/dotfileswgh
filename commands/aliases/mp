@@ -1,6 +1,10 @@
 #!/usr/bin/env bash
 
-mkdir -p $WGHHOME/.prifs $WGHHOME/prifs &&
-chmod 700 $WGHHOME/.prifs $WGHHOME/prifs &&
+if [ '!' -d $WGHHOME/.prifs ]; then
+  mkdir -p $WGHHOME/.prifs $WGHHOME/prifs &&
+  chmod 700 $WGHHOME/.prifs $WGHHOME/prifs ||
+  exit 1
+fi
+
 encfs --idle=40 $WGHHOME/.prifs $WGHHOME/prifs
 

@@ -1,6 +1,9 @@
 #!/usr/bin/env bash
 
-mkdir -p $WGHHOME/.prifsb $WGHHOME/prifsb &&
-chmod 700 $WGHHOME/.prifsb $WGHHOME/prifsb &&
+if [ '!' -d $WGHHOME/.prifsb ]; then
+  mkdir -p $WGHHOME/.prifsb $WGHHOME/prifsb &&
+  chmod 700 $WGHHOME/.prifsb $WGHHOME/prifsb ||
+  exit 1
+fi
 encfs $WGHHOME/.prifsb $WGHHOME/prifsb
 
