@@ -64,6 +64,7 @@ pkgs.mkShell {
     cp.meld
     # for raco docs
     cp.firefox
+    cp.elinks
     # for tic command
     cp.ncurses
     cp.which
