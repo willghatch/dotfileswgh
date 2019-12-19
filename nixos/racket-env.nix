@@ -74,5 +74,8 @@ pkgs.mkShell {
     cp.gnum4
     cp.autoconf
 
+    # This makes locales and unicode work.
+    cp.glibcLocales
+
   ];
 }
