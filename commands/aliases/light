@@ -3,5 +3,6 @@
 env WGH_THEME_DARK_OR_LIGHT="light" \
   GTK_THEME=Adwaita:light \
   GTK2_RC_FILES=$DOTFILESWGH/gtk2rc-light \
+  QT_STYLE_OVERRIDE=Adwaita \
   "$@"
 
