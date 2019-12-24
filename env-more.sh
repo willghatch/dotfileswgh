@@ -35,7 +35,6 @@ export XDG_CACHE_HOME=$HOME/.cache
 
 
 export MANWIDTH=80
-export QT_STYLE_OVERRIDE=gtk
 
 export ZDOTDIR=$DOTFILESWGH/zsh
 
