@@ -20,7 +20,9 @@ export HISTCONTROL=ignoredups:erasedups
 XTERM=lxterminal
 
 error() {
-    if [ `which zenity` ]; then
+    if [ `which notify-send` ]; then
+        notify-send "minimal-bashrun" "$@"
+    elif [ `which zenity` ]; then
         zenity --title bashrun --error --text "$@"
     elif [ `which kdialog` ]; then
         kdialog --title bashrun --error "$@"
