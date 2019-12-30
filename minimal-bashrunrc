@@ -1,7 +1,3 @@
-# which X terminal to use:
-# (xterm|rxvt|urxvt|mrxvt|aterm|mlterm)
-XTERM=xterm
-
 # set a simple prompt
 PS1="¢ "
 
