@@ -17,7 +17,7 @@ BASHRUNRC=$DOTFILESWGH/minimal-bashrunrc
 export HISTFILE=$HOME/.cache/minimal-bashrun-history
 export HISTCONTROL=ignoredups:erasedups
 
-XTERM=xterm
+XTERM=lxterminal
 
 error() {
     if [ `which zenity` ]; then
@@ -37,6 +37,12 @@ if [ "$XTERM" == "xterm" ]; then
     -title 'bashrun' \
     -geometry $GEOM \
     -e "bash --rcfile $BASHRUNRC -i -t"
+
+elif [[ "$XTERM" == "lxterminal" ]]; then
+    $XTERM \
+    --title='bashrun' \
+    --geometry=$GEOM \
+    -e bash --rcfile $BASHRUNRC -i -t
 
 elif [[ "$XTERM" == "aterm" || "$XTERM" == "mlterm" ]]; then
     $XTERM -name 'bashrun' \
