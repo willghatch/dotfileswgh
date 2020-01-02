@@ -247,4 +247,12 @@ abort."
   (interactive)
   (call-interactively fold-toggle-wgh-fold-all-func))
 
+;;; checklist helpers
+(defun wgh/increment-number-at-end-of-line ()
+  (interactive)
+  (require 'org)
+  (save-excursion
+    (end-of-line)
+    (org-increase-number-at-point)))
+
 (provide 'vfuncs)

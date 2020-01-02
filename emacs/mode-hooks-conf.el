@@ -119,3 +119,6 @@
 ;edebug-mode-map
 
 
+(define-derived-mode wgh-checklist-mode text-mode "wgh-checklist-mode"
+  (nkmap "m" 'wgh/increment-number-at-end-of-line))
+
