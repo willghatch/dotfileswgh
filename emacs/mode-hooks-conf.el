@@ -121,4 +121,5 @@
 
 (define-derived-mode wgh-checklist-mode text-mode "wgh-checklist-mode"
   (nkmap "m" 'wgh/increment-number-at-end-of-line))
+(add-to-list 'auto-mode-alist '("\\.checklist" . wgh-checklist-mode))
 
