@@ -65,9 +65,10 @@
 (in 'helm-descbinds)
 
 ;; Let's try ivy and friends
-(in 'ivy)
-(in 'swiper)
-(in 'counsel)
+;; On second thought, ivy requires that the snippets you type are in order, which is usually not what I want.  So I prefer Helm's functionality.
+;(in 'ivy)
+;(in 'swiper)
+;(in 'counsel)
 
 
 ;(in 'js2-mode)

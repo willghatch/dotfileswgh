@@ -166,16 +166,12 @@
  (global-evil-search-highlight-persist 1)
  (require 'on-parens)
 
- (require 'ivy)
- (ivy-mode 1)
-
- ;; TODO - get rid of this ido stuff if I decide to stick with ivy
- ;(load-library "ido-conf")
- ;(ido-mode 1)
- ;(setq ido-enable-flex-matching t
- ;      ido-everywhere t)
- ;(require 'flx-ido)
- ;(flx-ido-mode 1)
+ (load-library "ido-conf")
+ (ido-mode 1)
+ (setq ido-enable-flex-matching t
+       ido-everywhere t)
+ (require 'flx-ido)
+ (flx-ido-mode 1)
 
  (if (version<= "26.0.50" emacs-version)
      ;; Supposedly this new one packaged with emacs 26 is faster.
