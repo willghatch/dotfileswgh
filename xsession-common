@@ -73,7 +73,7 @@ if [ -z "$XSESSION_COMMON_RUN_P" ]; then
   # good trayer command
   #trayer --edge top --align right --width 10 --height 12 --transparent true --alpha 255 &
   nm-applet &
-  blueman-applet &
+  #blueman-applet &
 
   #unicoder_socket="/tmp/the-unicoder_${USER}_${DISPLAY/:/}"
   unicoder_socket="5782"
