@@ -67,13 +67,9 @@ export XDG_RUNTIME_DIR
 
 # themes to ease eye strain
 if [[ "$(lightdark-status)" = "light" ]]; then
-    #export WGH_THEME_DARK_OR_LIGHT="light"
-    export GTK_THEME=Adwaita:light
-    export GTK2_RC_FILES=$DOTFILESWGH/gtk2rc-light
+    source $DOTFILESWGH/env-light.sh
 else
-    #export WGH_THEME_DARK_OR_LIGHT="dark"
-    export GTK_THEME=Adwaita:dark
-    export GTK2_RC_FILES=$DOTFILESWGH/gtk2rc-dark
+    source $DOTFILESWGH/env-dark.sh
 fi
 
 # For color in less (for man pages)

@@ -1,8 +1,3 @@
 #!/usr/bin/env bash
-
-env WGH_THEME_DARK_OR_LIGHT="dark" \
-  GTK_THEME=Adwaita:dark \
-  GTK2_RC_FILES=$DOTFILESWGH/gtk2rc-dark \
-  QT_STYLE_OVERRIDE=Adwaita-Dark \
-  "$@"
-
+source $DOTFILESWGH/env-dark.sh
+exec "$@"
