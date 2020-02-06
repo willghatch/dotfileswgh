@@ -1,0 +1,3 @@
+#!/bin/sh
+export LANG=es_MX.UTF-8
+exec "$@"
