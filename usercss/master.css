@@ -1,0 +1,20 @@
+/*
+I can't get this to work to any good effect on most sites.
+I get white bars on the edge, etc.
+This basically only works on sites with no CSS or other weird HTML crap.
+It doesn't even work properly on the view-source page.
+But at least a few intrepid bloggers don't bother with any JS and CSS garbage!
+*/
+
+@media (prefers-color-scheme: dark), (prefers-color-scheme: no-preference) {
+    /* can use domain(), url(), or url-prefix() */
+    @-moz-document
+    /*url-prefix(view-source:),*/
+    /*url-prefix(https://hckrnews.com/),*/
+    domain(danluu.com)
+    {
+        a{background: #101010; color: #a5a5f5 !important;}
+        html, article, header, div, p, *
+        {background: #101010; color: #c5c5c5 !important;}
+    }
+}

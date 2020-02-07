@@ -23,6 +23,8 @@ dostuff() {
     mkdir -p $HOME/.cache/mutt
     mkdir -p $HOME/musc-local
     mkdir -p dotlocal/firefox-default-profile
+    ln -sf ../../../usercss dotlocal/firefox-default-profile/chrome/usercss
+    echo '@import url("./usercss/master.css")' > dotlocal/firefox-default-profile/chrome/userContent.css
     mkdir -p dotlocal/firefox-noaddon-profile
 
     # get terminfo set up
