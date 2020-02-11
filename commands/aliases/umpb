@@ -1,4 +1,4 @@
 #!/usr/bin/env bash
 
-fusermount -u $WGHHOME/prifsb
+fusermount -u $WGHHOME/prifs/boot
 

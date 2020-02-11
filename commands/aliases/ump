@@ -1,4 +1,4 @@
 #!/usr/bin/env bash
 
-fusermount -u $WGHHOME/prifs
+fusermount -u $WGHHOME/prifs/misc
 
