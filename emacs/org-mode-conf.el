@@ -86,6 +86,8 @@
             (lnkmap "mk" 'org-move-subtree-up)
             (lnkmap "mj" 'org-move-subtree-down)
 
+            (lnkmap "mtt" 'org-todo)
+
 
             ;; org-mark-element highlights the current-line and its subtree
                                         ;(lnkmap "mh" 'org-mark-element)
