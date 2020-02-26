@@ -255,4 +255,10 @@ abort."
     (end-of-line)
     (org-increase-number-at-point)))
 
+(defun wgh/lisp-indent-region ()
+  (interactive)
+  (if (< (point) (mark))
+      (lisp-indent-region (point) (mark))
+    (lisp-indent-region (mark) (point))))
+
 (provide 'vfuncs)
