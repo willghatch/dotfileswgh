@@ -36,8 +36,8 @@ bindsym $mod+Return exec vlaunch terminal
 bindsym $mod+$alt+Return exec vlaunch terminal2
 bindsym $mod+$ctl+Return exec vlaunch terminal3
 bindsym $mod+v exec vlaunch terminal
-bindsym $mod+s exec vlaunch terminal2
-bindsym $mod+$alt+v exec vlaunch terminal3
+bindsym $mod+$alt+v exec vlaunch terminal2
+bindsym $mod+s exec vlaunch terminal3
 bindsym $mod+$alt+s exec vlaunch terminal4
 bindsym $mod+r exec vlaunch launcher
 
@@ -192,4 +192,6 @@ bar {
 # start graphical programs -- there is no xinitrc with wayland
 exec --no-startup-id sway-startup-programs.sh
 
-workspace_layout auto left
+#workspace_layout auto left
+workspace_layout default
+
