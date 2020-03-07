@@ -43,3 +43,12 @@ ffmpeg -i $input -crf $crf $tune-flag -preset $speed $output
 ; medium: 25:42, 1.8G
 ; slow: 38:35, 1.6G
 ; slower: 1:07:45, 1.6G
+
+; bluray notes
+; original file: 27G, ~150m
+; crf 19, veryslow: 3.2G
+; crf 21, veryslow: 2.4G
+; crf 23, veryslow: 1.9G
+; crf 25, veryslow: 1.5G
+; crf 27, veryslow: 1.3G
+;; All of these up to 27 frankly had good enough quality for my taste.  I didn't try anything past 27.  It seems that if the original input is high quality, ffmpeg can make a high quality compressed version at even very high compression rates.
