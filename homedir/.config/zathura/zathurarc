@@ -13,6 +13,9 @@ set recolor true
 
 set scrollbar-fg "#333333"
 
+# use CLIPBOARD, not PRIMARY
+set selection-clipboard clipboard
+
 # guioptions --
 # c = command line
 # s = statusbar
