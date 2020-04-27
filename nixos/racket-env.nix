@@ -2,14 +2,20 @@
 let pp = let pinnedPackages = pkgs.fetchFromGitHub {
       owner = "NixOS";
       repo = "nixpkgs-channels";
-      # nixos-unstable as of 2019-11-04
-      rev = "7827d3f4497ed722fedca57fd4d5ca1a65c38256";
-      sha256 = "1131z88p359bq0djjmqah9i25cgxabrfkw4a4a7qq6j0d6djkfig";
+      # nixos-20.03 as of 2020-04-27
+      rev = "9137f05564eb50cc6f7042039aa9549a2e6e2340";
+      sha256 = "0yh2fnywhiyhzrkdlccp0l3bmdrqj0y1gysln6x7xfl2zj3aij7z";
     };
     in import pinnedPackages {};
-    cp = pkgs;
 in
-pkgs.mkShell {
+let
+#cp = pkgs;
+cp = pp;
+in
+# I think the problem I was having before was probably using pkgs.mkShell
+# instead of pp.mkShell here.  I think mkShell probably pulls in some core
+# packages from the version of pkgs that hosts it.
+pp.mkShell {
   buildInputs = [
 
     pp.cairo
