@@ -119,6 +119,8 @@
  (require 'key-chord)
  (key-chord-mode 1)
  (require 'hydra)
+ (require 'mouse)
+ (require 'mwheel)
  (setq hydra-lv nil)
  (load-library "scribble-funcs")
  (setq repeatable-motion-count-needed-prefix "rmo-c/")

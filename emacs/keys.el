@@ -436,6 +436,20 @@
 (mkmap "eup" 'on-parens-splice)
 (mkmap "oup" 'on-parens-splice)
 
+
+;; Mouse keys...
+;; mouse-1 is left-click.  There is also drag-mouse-1 and double-mouse-1
+;; drag-mouse-1 is left-click drag.
+;; mouse-3 is right-click
+;; mouse-4 is scroll-wheel up
+;; mouse-5 is scroll-wheel down
+;; You can also do combos with special regions where the mouse is, eg. [mode-line mouse-1] to bind to something different when clicking in the mode-line.
+(mkmap [mouse-4] 'mwheel-scroll)
+(mkmap [mouse-5] 'mwheel-scroll)
+;(global-set-key [mouse-4] (lambda () (interactive) (scroll-down 4)))
+;(global-set-key [mouse-5] (lambda () (interactive) (scroll-up 4)))
+
+
 (mkmap "f" 'repeatable-motion-forward)
 (mkmap "F" 'repeatable-motion-backward)
 
@@ -626,10 +640,6 @@
 (setq evil-emacs-state-modes nil)
 (setq evil-insert-state-modes (cons 'racket-repl-mode evil-insert-state-modes))
 
-
-;; Mouse keys...
-;(global-set-key [mouse-4] (lambda () (interactive) (scroll-down 4)))
-;(global-set-key [mouse-5] (lambda () (interactive) (scroll-up 4)))
 
 (define-key tty-menu-navigation-map "j" 'tty-menu-next-item)
 (define-key tty-menu-navigation-map "k" 'tty-menu-prev-item)
