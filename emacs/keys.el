@@ -438,7 +438,7 @@
 
 
 ;; Mouse keys...
-;; mouse-1 is left-click.  There is also drag-mouse-1 and double-mouse-1
+;; mouse-1 is left-click.  There is also drag-mouse-1, double-mouse-1, triple-mouse-1
 ;; drag-mouse-1 is left-click drag.
 ;; mouse-3 is right-click
 ;; mouse-4 is scroll-wheel up
