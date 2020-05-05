@@ -76,6 +76,9 @@ pp.mkShell {
     cp.which
     cp.less
 
+    # for scribble --pdf
+    #pp.texlive.combined.scheme-full
+
     # These are for convenience in other non-racket things that I'm putting here for convenience...
     cp.gnum4
     cp.autoconf
