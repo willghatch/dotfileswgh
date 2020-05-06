@@ -124,7 +124,7 @@
 (nkmap [remap yank-pop] 'evil-paste-pop)
 
 (nkmap "=" 'indent-region)
-(nkmap "≠" 'wgh/lisp-indent-region)
+(nkmap "≠" 'wgh/racket-indent-region)
 (nkmap "\M-\C-\\" (lambda () (interactive) (message "use =")))
 (ikmap "\C-s" 'backward-kill-word)
 (ikmap (kbd "M-DEL") (lambda () (interactive) (message "use C-s")))

@@ -261,4 +261,15 @@ abort."
       (lisp-indent-region (point) (mark))
     (lisp-indent-region (mark) (point))))
 
+(defun wgh/racket-indent-region ()
+  (interactive)
+  (require 'racket-mode)
+  (let ((mm major-mode)
+        (reverse (< (mark) (point))))
+    (racket-mode)
+    (if reverse
+        (indent-region (mark) (point))
+      (indent-region (point) (mark)))
+    (funcall mm)))
+
 (provide 'vfuncs)
