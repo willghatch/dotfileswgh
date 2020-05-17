@@ -175,23 +175,9 @@
  (require 'flx-ido)
  (flx-ido-mode 1)
 
- (if (version<= "26.0.50" emacs-version)
-     ;; Supposedly this new one packaged with emacs 26 is faster.
-     ;; It seems worse so far... but it's probably not a huge deal.
-     (progn
-       ;; don't shrink the line number width
-       (setq display-line-numbers-grow-only t)
-       (global-display-line-numbers-mode)
-       )
-   (progn
-     (require 'linum)
-     (global-linum-mode 1)
-     (require 'hlinum)
-     (hlinum-activate)
-     ;; I don't ever use these, but I'll leave them here in case I change my mind.
-     ;;(require 'linum-relative)
-     ;;(linum-relative-toggle) ; turn it off as the default
-     ))
+ ;; don't shrink the line number width
+ (setq display-line-numbers-grow-only t)
+ (global-display-line-numbers-mode)
 
  ;(require 'smex) ; autoloaded
  ;(require 'rainbow-delimiters) ; autoloaded
