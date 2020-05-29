@@ -9,6 +9,12 @@ set keymap emacs
 "kj": vi-movement-mode
 "\C-s": unix-word-rubout
 
+# In case I end up in this mode somehow, at least be sure I have the
+# same keybinding to get back to movement mode.
+set keymap vi-insert
+"jk": vi-movement-mode
+"kj": vi-movement-mode
+"\C-s": unix-word-rubout
 
 
 
@@ -21,6 +27,8 @@ set keymap vi-command
 "I": "oli"
 "a": "i\C-f"
 "A": "ela"
+"C": "Da"
+# I'm not sure how to fix `c<arg>`, so... they'll just have a worse map...
 
 "gg": beginning-of-history
 "G": end-of-history
