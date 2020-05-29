@@ -1,0 +1,121 @@
+;; -*- mode: Racket -*-
+
+(require
+ rash/demo/demo-rc
+ readline/readline
+ racket/list
+ shell/utils/bourne-expansion-utils
+ racket/stxparam
+ (rename-in k-infix [$ k-infix])
+ (for-syntax
+  racket/base
+  syntax/parse
+  ))
+
+;; Turn off c-q/c-s flow control!
+stty -ixon
+
+(when (member (envar TERM) '("xterm" "xterm-256color"))
+  (envar TERM "xterm-24bit-italic"))
+
+
+(define-pipeline-operator =k-infix=
+  #:start (syntax-parser [(_ arg ...) #'(object-pipeline-member-spec
+                                         (λ () (k-infix arg ...)))])
+  #:joint (syntax-parser [(_ arg ...) #'(object-pipeline-member-spec
+                                         (λ (x) (syntax-parameterize
+                                                    ([current-pipeline-argument
+                                                      (syntax-parser [_ #'x])])
+                                                  (k-infix arg ...))))]))
+
+(pipeop =unix-or-k-infix=
+        [(_ arg1:number arg ...) #'(=k-infix= arg1 arg ...)]
+        [(_ arg ...) #'(=unix-pipe= arg ...)])
+
+set-default-pipeline-starter! =unix-or-k-infix=
+
+
+(define-line-macro rfor
+  (syntax-parser
+    #:datum-literals (in do)
+    ;; TODO -- a string should dollar expand, a parenthesized form should not.  What about an identifier??  I feel like it could go either way.
+    [(_ x:id in list-str:str do do-expr:expr ...+)
+     #`(for/list
+           ([x (flatten
+                (list #,(dollar-expand-syntax #'list-str
+                                              #:glob-expand? #t)))])
+         do-expr ...)]
+    [(_ x:id in list-id:id do do-expr:expr ...+)
+     #`(for/list
+           ([x (flatten
+                (list #,(dollar-expand-syntax #'list-id
+                                              #:glob-expand? #t)))])
+         do-expr ...)]
+    [(_ x:id in list-expr:expr do do-expr:expr ...+)
+     #'(for/list ([x list-expr])
+         do-expr ...)]))
+
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;;; Below here are mostly demos that people wanted at some point, not things
+;;;;; I actually use.
+
+
+(require racket/require-syntax)
+(define-require-syntax (here stx)
+  (syntax-parse stx
+    [(_ path:str)
+     (datum->syntax stx `(file ,(string-append (path->string (current-directory))
+                                               (syntax->datum #'path))))]))
+
+(define-syntax (req-here stx)
+  (syntax-parse stx
+    [(_ path:str)
+     (datum->syntax stx `(require
+                          (file ,(string-append
+                                  (path->string (current-directory))
+                                  (syntax->datum #'path)))))]))
+
+
+; allows defining aliases in the form of
+; alias x = y
+(define-line-macro alias
+  (syntax-parser
+    [(_ name (~datum =) body ...+)
+     #'(define-simple-pipeline-alias name body ...)]))
+
+
+
+(define-line-macro in-dec
+  (syntax-parser [(in-dec num) #'(in-dec num 16)]
+                 [(_ num base)
+                  #'(string->number (format "~a" num) base)]))
+(require racket/format)
+(define-line-macro to-base
+  (syntax-parser [(_ num base)
+                  #'(~r #:base base num)]))
+
+
+;; example for someone who asked on email
+(define-line-macro cl
+  (syntax-parser
+    [(_ arg ...)
+     #'{
+         cd arg ...
+         ls
+       }]))
+
+;; again, an email example
+(define-line-macro define-wrapper-line-macro
+  (syntax-parser
+    [(_ command-name function)
+     #'(define-line-macro command-name
+         (syntax-parser
+           ;; the (... ...) is because it is ... but for the *inner* macro.
+           [(_ arg (... ...))
+            #'(function arg (... ...))]
+           [as-identifier-macro
+            #'function]))]))
+
+define-wrapper-line-macro rf-ls directory-list
+define-wrapper-line-macro plus +
