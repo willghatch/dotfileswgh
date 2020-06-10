@@ -28,6 +28,7 @@ dostuff() {
     ln -sf ../../../usercss dotlocal/firefox-default-profile/chrome/usercss
     echo '@import url("./usercss/master.css")' > dotlocal/firefox-default-profile/chrome/userContent.css
     mkdir -p dotlocal/firefox-noaddon-profile
+    mkdir -p dotlocal/firefox-slack-profile
 
     # get terminfo set up
     tic -x xterm-256color-italic.terminfo
