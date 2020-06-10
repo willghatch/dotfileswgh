@@ -1,2 +1,3 @@
 #!/usr/bin/env bash
-exec firefox --profile $DOTFILESWGH/dotlocal/firefox-slack-profile
+FFX=${FFX:-firefox}
+exec nice -n 5 $FFX --profile $DOTFILESWGH/dotlocal/firefox-slack-profile "$@"
