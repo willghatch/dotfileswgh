@@ -1,3 +1,6 @@
 #!/usr/bin/env bash
 FFX=${FFX:-firefox}
+# The profile doesn't actually need to be listed in the
+# `~/.mozilla/firefox/profiles.ini` file to work.  You just need a path
+# to a profile directory (the directory must exist).
 exec nice -n 5 $FFX --profile $DOTFILESWGH/dotlocal/firefox-default-profile "$@"
