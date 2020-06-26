@@ -423,6 +423,8 @@
 (mkmap "eB" 'evil-next-line-1-first-non-blank)
 (mkmap "eO" 'rmo/forward-symbol)
 (mkmap "oO" 'rmo/backward-symbol)
+(mkmap "ei" 'rmo/wgh/next-line-same-indent-in-block)
+(mkmap "oi" 'rmo/wgh/previous-line-same-indent-in-block)
 (mkmap "ej" 'rmo/evil-jump-forward)
 (mkmap "oj" 'rmo/evil-jump-backward)
 ;; eu/ou for destructive subcommands!

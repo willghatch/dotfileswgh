@@ -179,6 +179,31 @@ quit emacs."
 (repeatable-motion-define-pair 'pscroll-down-half 'pscroll-up-half)
 (repeatable-motion-define-pair 'pscroll-down-full 'pscroll-up-full)
 
+(defun wgh/next-line-same-indent-in-block (num)
+  (interactive "p")
+  (let ((start-indent (current-indentation))
+        (start-column (current-column))
+        (backtrack-pos (point))
+        (direction (if (< 0 num) 1 -1))
+        (times (abs num))
+        (index 0))
+    (while (and (< index times)
+                (setq index (+ 1 index)))
+      (while (and (zerop (forward-line (or direction 1)))
+                  (not (<= (current-indentation) start-indent))))
+      (if (< (current-indentation) start-indent)
+          (goto-char backtrack-pos)
+        (progn
+          ;;(evil-goto-column start-column)
+          (back-to-indentation)
+          (setq backtrack-pos (point)))))))
+(defun wgh/previous-line-same-indent-in-block (direction)
+  (interactive "p")
+  (wgh/next-line-same-indent-in-block (* -1 (or direction 1))))
+(repeatable-motion-define-pair 'wgh/previous-line-same-indent-in-block
+                               'wgh/next-line-same-indent-in-block)
+
+
 (defun ansi-color-buffer ()
   (interactive)
   (ansi-format-decode (point-min) (point-max))
