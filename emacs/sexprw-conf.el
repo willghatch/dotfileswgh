@@ -22,4 +22,4 @@
   (wp*/r $str !SL $parser))
 
 
-(require racket-rewrites)
+(require 'racket-rewrites)
