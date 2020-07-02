@@ -1,2 +1,2 @@
 #!/bin/sh
-exec tmux -f $DOTFILESWGH/tmux.conf detach "$@"
+exec tm detach "$@"

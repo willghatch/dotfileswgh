@@ -1,2 +1,2 @@
 #!/bin/sh
-exec tmux -f $DOTFILESWGH/tmux.conf attach-session -d -t "$@"
+exec tm attach-session -d -t "$@"

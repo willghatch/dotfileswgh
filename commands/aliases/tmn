@@ -1,8 +1,9 @@
 #!/bin/sh
-if test -n "$TMUX"; then
+if test "blue" = "$TMUX_COLOR"; then
     cd ~
-    TMUX="" tmux -f $DOTFILESWGH/tmux.conf new-session -d -s "$@"
-    tmux -f $DOTFILESWGH/tmux.conf switch-client -t "$@"
+    TMUX="" tm new-session -d -s "$@"
+    tm switch-client -t "$@"
 else
-    exec tmux -f $DOTFILESWGH/tmux.conf new-session -s "$@"
+    unset TMUX
+    exec tm new-session -s "$@"
 fi

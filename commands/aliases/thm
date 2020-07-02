@@ -1,0 +1,2 @@
+#!/bin/sh
+exec tmux -L red -f $DOTFILESWGH/tmux-red.conf "$@"

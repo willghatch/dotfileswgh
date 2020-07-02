@@ -1,2 +1,2 @@
 #!/bin/sh
-exec tmux -f $DOTFILESWGH/tmux.conf rename-session "$@"
+exec tm rename-session "$@"
