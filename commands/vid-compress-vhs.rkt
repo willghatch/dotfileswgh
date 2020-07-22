@@ -28,7 +28,9 @@
    (values in out)))
 
 ; ffmpeg [global_ops] [input-file-ops] -i input-file [out-file-ops] out-file
-ffmpeg -i $input -crf $crf $tune-flag -preset $speed $output
+; The -map 0 tells it that the following options are for input 0 (I think)
+; The -c:v/a/s selects which kind of stream the following options work on.  So -c:a copy and -c:s copy mean copy all audio and subtitle streams unmodified.
+ffmpeg -i $input -map 0 -c:v libx264 -crf $crf $tune-flag -preset $speed -c:a copy -c:s copy $output
 
 ; TODO - get times for conversion on slow, slower, and very slow
 ; For example file, crf 25:
