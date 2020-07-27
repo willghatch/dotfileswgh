@@ -16,7 +16,7 @@
 
 (require 'package)
 (setq package-archives '(
-                         ("melpa" . "http://melpa.milkbox.net/packages/")
+                         ("melpa" . "http://melpa.org/packages/")
                          ("gnu" . "http://elpa.gnu.org/packages/")
                          ;("marmalade" . "http://marmalade-repo.org/packages/")
                          ))
