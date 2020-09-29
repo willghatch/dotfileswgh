@@ -8,6 +8,8 @@ in
 # I think the problem I was having before was probably using pkgs.mkShell
 # instead of pp.mkShell here.  I think mkShell probably pulls in some core
 # packages from the version of pkgs that hosts it.
-pp.mkShell {
-  buildInputs = import ./racket-env-packages.nix {};
-}
+(pp.buildFHSUserEnv {
+  name = "racket-fhs-env";
+  targetPkgs = pkgs: import ./racket-env-packages.nix {};
+  runScript = ./racket-post-env.sh;
+}).env
