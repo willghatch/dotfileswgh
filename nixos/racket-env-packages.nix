@@ -75,8 +75,4 @@ in [
   # This makes locales and unicode work.
   cp.glibcLocales
 
-  # temporarily, for a fuzzing project
-  cp.afl
-  cp.lua
-  cp.clang
 ]
