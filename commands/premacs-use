@@ -17,6 +17,7 @@ rm "$new"
 premacs-new >/dev/null 2>&1 &
 
 emacsclient -e "(setenv \"PWD\" \"$PWD\")" -s "$daemon" >/dev/null
+emacsclient -e "(cd \"$PWD\")" -s "$daemon" >/dev/null
 if [[ "$(lightdark-status)" = "light" ]]; then
     emacsclient -e "(light-theme)" -s "$daemon" >/dev/null
 else

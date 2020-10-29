@@ -9,6 +9,6 @@ daemon=$premaxd/premacs-socket-$newId
 EDIR=$DOTFILESWGH/emacs
 cd $HOME
 mkdir -p "$premaxd"
-emacs -l $EDIR/def.el -l $EDIR/premacs-run.el "--daemon=$daemon" && \
+emacs "--chdir=$HOME" -l $EDIR/def.el -l $EDIR/premacs-run.el "--daemon=$daemon" && \
 echo $daemon >> "$premaxd/premacs-list"
 
