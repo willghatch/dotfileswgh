@@ -69,6 +69,7 @@
  evil-intercept-maps nil
  evil-overriding-maps nil
  evil-emacs-state-modes nil
+ evil-undo-system 'undo-tree
  rainbow-identifiers-faces-to-override '(font-lock-variable-name-face
                                          font-lock-builtin-face
                                          font-lock-keyword-face
@@ -116,6 +117,8 @@
  (load-library "init-helpers")
  (require 'evil)
  (evil-mode 1)
+ (require 'undo-tree)
+ (global-undo-tree-mode 1)
  (require 'key-chord)
  (key-chord-mode 1)
  (require 'hydra)

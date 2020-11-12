@@ -131,7 +131,7 @@
 
 ;; undo
 (nkmap "u" 'undo)
-(nkmap "\C-r" 'redo)
+(nkmap "\C-r" 'evil-redo)
 
 ;;; Motion state
 
