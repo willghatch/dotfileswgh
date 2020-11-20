@@ -4,6 +4,7 @@
 
 if [[ -z "$1" || "--help" = "$1" ]]; then
   echo "usage: $0 <symbol-to-find>"
+  exit
 fi
 
 scanelf -l -s "$1" | grep "$1"
