@@ -17,6 +17,7 @@
  ;(require 'company-eclim)
  ;(require 'xref)
  ;(require 'etags)
+ (require 'magit)
  (message "----------- premacs load done -----------")
  (kill-buffer "*premacs-setup*")
  )
