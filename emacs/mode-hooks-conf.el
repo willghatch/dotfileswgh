@@ -87,6 +87,46 @@
             (setcdr dired-mode-map nil)
             ))
 
+(add-hook 'magit-log-mode-hook
+          (lambda ()
+            ;; Don't override my evil-mode keymap with your default bindings.
+            (setcdr magit-log-mode-map nil)
+            (setq magit-log-margin
+                  (list
+                   ;; show margin initially
+                   t
+                   ;; time as a string for format-time-string, or 'age or 'age-abbreviated
+                   ;;"%Y-%m-%d@%H:%M %z"
+                   ;; Less precise, but shorter
+                   "%Y-%m-%d@%H:%M"
+                   ;; “don't change”
+                   'magit-log-margin-width
+                   ;; show author
+                   t
+                   ;; author width, default 18
+                   12
+                   ))
+            ;; TODO - what operations do I want handy in log view?
+            ;; • magit refresh
+            ;; • create branch (on commit at point, prompt for name)
+            ;; • rename branch
+            ;; • create tag
+            ;; • delete branch (no confirmation when merged in other branches)
+            ;; • delete remote branch (with confirmation)
+            ;; • delete remote tag (with confirmation)
+            ;; • push branch/tag to remote
+            ;; • cherry pick commit onto current branch
+            ;; • diff selected commit vs current branch (or HEAD)
+            ;; • view commit details
+            ;; • revert selected commit
+            ;; • merge selected commit/branch into current branch
+            ;; • reset current branch to selected commit (hard/mixed/soft)
+            ;; • copy commit hash
+            ;; • mark commit to use as “current” commit for other operations, like diff with commit at point.  I can do this by checking out a detatched head at point and then doing the diff, but a mark without checking out would be nice.
+            (define-key magit-log-mode-map "C-l" 'magit-refresh)
+            (define-key magit-log-mode-map "mco" 'magit-checkout)
+            ))
+
 ;; so it doesn't barf when it's not set!
 (setq start-on-pager-state nil)
 (add-hook 'server-switch-hook
