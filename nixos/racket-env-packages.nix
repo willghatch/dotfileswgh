@@ -64,6 +64,7 @@ in [
   cp.less
   # Note that my `premacs` emacs preloader plays poorly with `nix-shell`.  TODO - I should maybe add `premacs` commands to my dev environments so that it doesn't use a preloaded emacs.
   cp.par
+  cp.hyperfine
 
   # for scribble --pdf
   #pp.texlive.combined.scheme-full
