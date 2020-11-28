@@ -87,46 +87,85 @@
             (setcdr dired-mode-map nil)
             ))
 
-(add-hook 'magit-log-mode-hook
-          (lambda ()
-            ;; Don't override my evil-mode keymap with your default bindings.
-            (setcdr magit-log-mode-map nil)
-            (setq magit-log-margin
-                  (list
-                   ;; show margin initially
-                   t
-                   ;; time as a string for format-time-string, or 'age or 'age-abbreviated
-                   ;;"%Y-%m-%d@%H:%M %z"
-                   ;; Less precise, but shorter
-                   "%Y-%m-%d@%H:%M"
-                   ;; “don't change”
-                   'magit-log-margin-width
-                   ;; show author
-                   t
-                   ;; author width, default 18
-                   12
-                   ))
-            ;; TODO - what operations do I want handy in log view?
-            ;; • magit refresh
-            ;; • create branch (on commit at point, prompt for name)
-            ;; • rename branch
-            ;; • create tag
-            ;; • delete branch (no confirmation when merged in other branches)
-            ;; • delete remote branch (with confirmation)
-            ;; • delete remote tag (with confirmation)
-            ;; • push branch/tag to remote
-            ;; • cherry pick commit onto current branch
-            ;; • diff selected commit vs current branch (or HEAD)
-            ;; • view commit details
-            ;; • revert selected commit
-            ;; • merge selected commit/branch into current branch
-            ;; • reset current branch to selected commit (hard/mixed/soft)
-            ;; • copy commit hash
-            ;; • mark commit to use as “current” commit for other operations, like diff with commit at point.  I can do this by checking out a detatched head at point and then doing the diff, but a mark without checking out would be nice.
-            (define-key magit-log-mode-map "C-l" 'magit-refresh)
-            (define-key magit-log-mode-map "mco" 'magit-checkout)
-            ))
 
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;; magit
+
+(defun wgh/magit-keys-setup ()
+  ;; set up some keymaps that don't cleanly belong to a particular mode
+  ;; TODO - do some checks to only run this once, some time after magit loads.
+  ;; TODO - I should figure out what interesting stuff the default map holds,
+  ;; but bind it to keys I'll use in my keymap that don't override with my motion
+  ;; keys, etc.
+  ;; Don't override my evil-mode keymap with your default bindings.
+  (setcdr magit-hunk-section-map nil)
+  (setcdr magit-file-section-map nil)
+  )
+
+(add-hook
+ 'magit-revision-mode-hook
+ (lambda ()
+   ;; Don't override my evil-mode keymap with your default bindings.
+   (setcdr magit-revision-mode-map nil)
+   (wgh/magit-keys-setup)
+  ))
+(add-hook
+ 'magit-diff-mode-hook
+ (lambda ()
+   ;; Don't override my evil-mode keymap with your default bindings.
+   (setcdr magit-diff-mode-map nil)
+   (wgh/magit-keys-setup)
+  ))
+
+(add-hook
+ 'magit-log-mode-hook
+ (lambda ()
+   ;; Don't override my evil-mode keymap with your default bindings.
+   (load-library "magit-conf")
+   (setcdr magit-log-mode-map nil)
+   (setq magit-log-margin
+         (list
+          ;; show margin initially
+          t
+          ;; time as a string for format-time-string, or 'age or 'age-abbreviated
+          ;;"%Y-%m-%d@%H:%M %z"
+          ;; Less precise, but shorter
+          "%Y-%m-%d@%H:%M"
+          ;; “don't change”
+          'magit-log-margin-width
+          ;; show author
+          t
+          ;; author width, default 18
+          12
+          ))
+   ;; TODO - what operations do I want handy in log view?
+   ;; • delete remote branch (with confirmation)
+   ;; • delete remote tag (with confirmation)
+   ;; • push branch/tag to remote
+   ;; • cherry pick commit onto current branch
+   ;; • diff selected commit vs current branch (or HEAD)
+   ;; • view commit details
+   ;; • merge selected commit/branch into current branch
+   ;; • copy commit hash
+   ;; • mark commit to use as “current” commit for other operations, like diff with commit at point.  I can do this by checking out a detatched head at point and then doing the diff, but a mark without checking out would be nice.
+   ;; • stash operations
+   (setq wgh/magit-log-m-keymap (make-sparse-keymap))
+   (define-key magit-log-mode-map "m" wgh/magit-log-m-keymap)
+   (define-key magit-log-mode-map "C-l" 'magit-refresh)
+   (define-key magit-log-mode-map (kbd "RET") 'magit-show-commit)
+   (define-key wgh/magit-log-m-keymap "v" 'magit-show-commit)
+   (define-key wgh/magit-log-m-keymap "co" 'wgh/magit-checkout-at-point)
+   (define-key wgh/magit-log-m-keymap "bo" 'wgh/magit-branch-checkout-at-point)
+   (define-key wgh/magit-log-m-keymap "bc" 'wgh/magit-branch-create-at-point)
+   (define-key wgh/magit-log-m-keymap "bd" 'wgh/magit-branch-delete-at-point)
+   (define-key wgh/magit-log-m-keymap "bn" 'wgh/magit-branch-rename-at-point)
+   (define-key wgh/magit-log-m-keymap "tc" 'wgh/magit-tag-create-at-point)
+   ;;(define-key wgh/magit-log-m-keymap "td" 'wgh/magit-tag-delete-at-point)
+   (define-key wgh/magit-log-m-keymap "brs" 'wgh/magit-current-branch-reset-soft-at-point)
+   (define-key wgh/magit-log-m-keymap "brh" 'wgh/magit-current-branch-reset-hard-at-point)
+   (define-key wgh/magit-log-m-keymap "brm" 'wgh/magit-current-branch-reset-mixed-at-point)
+   ))
+;
 ;; so it doesn't barf when it's not set!
 (setq start-on-pager-state nil)
 (add-hook 'server-switch-hook

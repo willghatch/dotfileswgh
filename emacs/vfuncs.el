@@ -83,12 +83,18 @@ buffer, it will call the next-buffer-func once more if advance-on-failure-p."
   (insert-string (shell-command-to-string cmd)))
 
 (require 'cl-lib)
+;; List of buffers that will keep emacs from closing when I use kill-buffer-or-quit-emacs
+(setq wgh/kill-block-buffer-list nil)
+(defun wgh/add-buffer-to-kill-block-list (buffer)
+  (setq wgh/kill-block-buffer-list
+        (cons buffer wgh/kill-block-buffer-list)))
 (defun do-kill-buffer-or-quit-emacs ()
   (kill-buffer (current-buffer))
   (when (and
          (or (not (buffer-modified-p (get-buffer "*scratch*")))
              (not (get-buffer "*scratch*")))
-         (cl-notany 'buffer-file-name (buffer-list)))
+         (cl-notany 'buffer-file-name (buffer-list))
+         (cl-notany 'buffer-live-p wgh/kill-block-buffer-list))
     (evil-quit-all)))
 (defun kill-buffer-or-quit-emacs ()
   "Kill buffer and, if there are no more file buffers and scratch is unmodified,
