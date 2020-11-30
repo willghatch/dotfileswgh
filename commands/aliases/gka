@@ -1,5 +1,7 @@
 #!/bin/sh
-exec gitk --all "$@"
+#exec gitk --all "$@"
+# Break the habit of using gitk, use magit instead
+exec gva "$@"
 # Use gitg instead, just because gitk only available in Nixos by customizing the git package, which means you can't get a cached one and have to build it, which is a pain.
 # Except that gitg is not as good as gitk, it turns out.  I wish it were just a separate package, though.
 #exec gitg --all "$@" 2>/dev/null
