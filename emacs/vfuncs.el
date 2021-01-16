@@ -303,4 +303,13 @@ abort."
       (indent-region (point) (mark)))
     (funcall mm)))
 
+(defun wgh/face-at-point ()
+  (interactive)
+  ;; This gives a bunch of info, including face info.
+  ;; So the face-at-point name is not quite right, but
+  ;; I think I'll mostly use it when I want to know a face,
+  ;; so I'll remember (or find) the name.
+  (what-cursor-position t))
+
+
 (provide 'vfuncs)

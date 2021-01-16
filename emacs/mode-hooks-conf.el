@@ -52,10 +52,12 @@
     (racket-insert-closing)))
 (add-hook 'racket-mode-hook
           (lambda ()
+            (setq racket-show-functions '(racket-show-echo-area))
             (define-key racket-mode-map "[" nil)
             (define-key racket-mode-map ")" 'racket-close-paren-hack)
             (define-key racket-mode-map "]" nil)
             (define-key racket-mode-map "}" nil)
+            (racket-xp-mode 1)
             ))
 (add-hook 'python-mode-hook
           (lambda ()
