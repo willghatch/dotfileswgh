@@ -59,6 +59,21 @@
             (define-key racket-mode-map "}" nil)
             (racket-xp-mode 1)
             ))
+;; remove usage highlighting in racket-xp-mode
+;; TODO - I should make a function/binding to toggle it.
+;; It's pretty cool, but for normal programming the constant flashing of
+;; definition/use highlighting is distracting and annoying.
+;; I should also figure out how to stop just the highlighting -- the
+;; automatic showing of eg. where a binding is from is awesome and not at
+;; all distracting.
+(add-hook 'racket-xp-mode-hook
+          (lambda ()
+            (remove-hook 'pre-redisplay-functions
+                         #'racket-xp-pre-redisplay
+                         t)))
+
+
+
 (add-hook 'python-mode-hook
           (lambda ()
             (electric-indent-mode -1)

@@ -92,6 +92,7 @@
  '(outline-7 ((((background dark)) (:foreground "#a01003"))))
  '(outline-8 ((((background dark)) (:foreground "#904000"))))
  '(racket-xp-def-face ((((background dark)) (:inherit match))))
+ '(racket-xp-error-face ((((background dark)) (:background "#190505"))))
  '(rainbow-delimiters-depth-1-face ((((background dark)) (:foreground "#ff00ff"))
                                     (((background light)) (:foreground "#502090"))))
  '(rainbow-delimiters-depth-2-face ((((background dark)) (:foreground "#00ffff"))
