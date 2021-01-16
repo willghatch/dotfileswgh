@@ -42,7 +42,7 @@
             (rainbow-delimiters-mode-enable)
             (rainbow-identifiers-mode 1)
             (whitespace-mode 1)
-            ;(company-mode 1)
+            (company-mode 1)
             ;(projectile-mode 1)
             ))
 (defun racket-close-paren-hack (&optional arg)

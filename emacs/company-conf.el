@@ -12,7 +12,9 @@
 (defun company-complete-common-wgh () (interactive)
   (if company-completing-wgh
       (company-complete-common)
-    (setq company-completing-wgh t)))
+    (progn
+      (setq company-completing-wgh t)
+      (company-manual-begin))))
 
 (defadvice company-cancel (after company-wgh-style activate protect)
   (setq company-completing-wgh nil))
@@ -34,9 +36,17 @@
 (global-set-key [company-prefix] company-active-map)
 (define-key company-active-map (kbd "C-d b") (lambda () (interactive) (describe-bindings [company-prefix])))
 
-(setq company-frontends '(company-preview-frontend company-pseudo-tooltip-wgh-frontend company-echo-metadata-frontend))
+(setq company-frontends
+      '(
+        company-preview-frontend
+        company-pseudo-tooltip-wgh-frontend
+        company-echo-metadata-frontend
+        ))
 
 (setq company-minimum-prefix-length 2)
-(setq company-idle-delay 0.4)
+;; company-idle-delay is the delay before automatically showing a completion candidate.
+;; Setting it to nil means no auto idle completion.
+;(setq company-idle-delay 0.4)
+(setq company-idle-delay nil)
 
 
