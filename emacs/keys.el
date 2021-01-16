@@ -345,11 +345,11 @@
 (mkmap "gr" 'evil-ace-jump-word-mode)
 (mkmap "gc" 'evil-ace-jump-char-mode)
 (mkmap "gf" 'evil-ace-jump-line-mode)
-;; TODO - I should have a binding for “go to definition in this frame”
-;;        as well as “go to definition in other frame”.  It's nice to
-;;        start in a different frame from my work, but then probably stay
-;;        in that frame for chasing down a series of definitions...
-(mkmap "gdd" 'xref-find-definitions-other-frame)
+;; TODO - I should have a binding for “go to definition in this window”
+;;        as well as “go to definition in other window”.  It's nice to
+;;        start in a different window from my work, but then probably stay
+;;        in that window for chasing down a series of definitions...
+(mkmap "gdd" 'xref-find-definitions-other-window)
 (mkmap "gdp" 'pop-tag-mark)
 (nkmap " yc" 'xcopy)
 (nkmap " Pc" 'xpaste)
