@@ -225,7 +225,11 @@ quit emacs."
 (defun set-background-mode (type)
   (if (equal type 'auto)
       (setq frame-background-mode nil)
-    (setq frame-background-mode type)))
+    (setq frame-background-mode type))
+  ;; When setting frame-background-mode, you need to call the function
+  ;; frame-set-background-mode for each frame for the update to actually
+  ;; take effect.
+  (mapc 'frame-set-background-mode (frame-list)))
 
 (defvar current-theme-reapply-var 'dark-theme)
 (defun light-theme ()
