@@ -12,10 +12,15 @@
                args)))
 (nobreak
  (setq dotfileswgh (getenv "DOTFILESWGH"))
+ (setq local-emacs.d-path
+       (let ((emacs.d-path (getenv "EMACS_DOT_D_PATH")))
+         (if emacs.d-path
+             emacs.d-path
+           (concat dotfileswgh "/dotlocal/emacs.d"))))
 
- (setq package-user-dir (concat dotfileswgh "/dotlocal/emacs.d/elpa"))
+ (setq package-user-dir (concat local-emacs.d-path "/elpa"))
  ;; Set up load path for requires
- (let ((default-directory (concat dotfileswgh "/dotlocal/emacs.d")))
+ (let ((default-directory local-emacs.d-path))
    (normal-top-level-add-subdirs-to-load-path))
  (let ((default-directory "/usr/share/emacs/site-lisp"))
    (normal-top-level-add-subdirs-to-load-path))

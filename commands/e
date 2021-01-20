@@ -1,1 +1,7 @@
-premacs-use-or-create-t
+#!/usr/bin/env bash
+
+if [[ -z "$CURRENT_DEV_MODE" ]]; then
+    exec premacs-use-or-create-t "$@"
+fi
+
+exec em "$@"

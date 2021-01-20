@@ -1,4 +1,5 @@
 #!/bin/sh
 export CURRENT_DEV_PATH=$RACKET_PKG_DEV_PATH
 export CURRENT_DEV_MODE=racket-packages
+export EMACS_DOT_D_PATH=$DOTFILESWGH/dotlocal/emacs.d_racket-packages-dev
 exec racket-dev-environment.sh "$@"

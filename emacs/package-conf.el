@@ -4,11 +4,14 @@
   (when (file-exists-p local-f)
     (with-demoted-errors "Warning: %S" (load-file local-f))))
 
-(let ((local-e-d (concat (getenv "DOTFILESWGH") "/dotlocal/emacs.d")))
-  (make-directory local-e-d t)
-  (setq package-user-dir (concat local-e-d "/elpa"))
+(let ((local-emacs.d-path (let ((emacs.d-path (getenv "EMACS_DOT_D_PATH")))
+                            (if emacs.d-path
+                                emacs.d-path
+                              (concat (getenv "DOTFILESWGH") "/dotlocal/emacs.d")))))
+  (make-directory local-emacs.d-path t)
+  (setq package-user-dir (concat local-emacs.d-path "/elpa"))
 
-  (let ((default-directory local-e-d))
+  (let ((default-directory local-emacs.d-path))
     (normal-top-level-add-subdirs-to-load-path))
   (let ((default-directory "~/.emacs.d"))
     (normal-top-level-add-subdirs-to-load-path))
