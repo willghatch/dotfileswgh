@@ -5,7 +5,7 @@
         (line-at-next-heading (save-excursion
                                 (org-forward-heading-same-level 1)
                                 (line-number-at-pos))))
-    (if (equalp start-line line-at-next-heading)
+    (if (equal start-line line-at-next-heading)
         nil
       (save-excursion
         (org-forward-heading-same-level 1)
@@ -23,7 +23,7 @@
         ;; go to last child heading
         (letrec ((loop (lambda (pt)
                          (org-forward-heading-same-level 1)
-                         (if (equalp pt (point))
+                         (if (equal pt (point))
                              nil
                            (funcall loop (point))))))
           (funcall loop (point))

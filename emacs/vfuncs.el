@@ -223,7 +223,7 @@ quit emacs."
 (defun get-background-mode ()
   (frame-parameter nil 'background-mode))
 (defun set-background-mode (type)
-  (if (equalp type 'auto)
+  (if (equal type 'auto)
       (setq frame-background-mode nil)
     (setq frame-background-mode type)))
 
