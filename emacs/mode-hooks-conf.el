@@ -45,32 +45,6 @@
             (company-mode 1)
             ;(projectile-mode 1)
             ))
-(defun racket-close-paren-hack (&optional arg)
-  (interactive "p")
-  (if (on-parens-on-close?)
-      (self-insert-command arg)
-    (racket-insert-closing)))
-(add-hook 'racket-mode-hook
-          (lambda ()
-            (setq racket-show-functions '(racket-show-echo-area))
-            (define-key racket-mode-map "[" nil)
-            (define-key racket-mode-map ")" 'racket-close-paren-hack)
-            (define-key racket-mode-map "]" nil)
-            (define-key racket-mode-map "}" nil)
-            (racket-xp-mode 1)
-            ))
-;; remove usage highlighting in racket-xp-mode
-;; TODO - I should make a function/binding to toggle it.
-;; It's pretty cool, but for normal programming the constant flashing of
-;; definition/use highlighting is distracting and annoying.
-;; I should also figure out how to stop just the highlighting -- the
-;; automatic showing of eg. where a binding is from is awesome and not at
-;; all distracting.
-(add-hook 'racket-xp-mode-hook
-          (lambda ()
-            (remove-hook 'pre-redisplay-functions
-                         #'racket-xp-pre-redisplay
-                         t)))
 
 
 
