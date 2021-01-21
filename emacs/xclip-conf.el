@@ -1,5 +1,6 @@
 
 (require 'xclip)
+(setq xclip-method 'xclip)
 
 (defun xcopy (beg end) (interactive "r")
        (xclip-set-selection 'clipboard
