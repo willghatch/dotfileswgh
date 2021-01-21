@@ -13,6 +13,7 @@
 (in 'repeatable-motion)
 (in 'on-parens)
 (in 'key-chord)
+(in 'undo-tree)
 (in 'hydra)
 (in 'auto-compile)
 (in 'evil-surround)
