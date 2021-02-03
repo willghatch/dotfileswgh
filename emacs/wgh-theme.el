@@ -122,6 +122,7 @@
  '(tool-bar ((((background dark)) (:foreground "#00ff00" :box (:line-width 1 :style released-button)))))
  '(web-mode-html-tag-bracket-face ((((background dark)) (:foreground "#c5a535"))))
  '(whitespace-tab ((((background dark)) (:background "#000019"))))
+ '(whitespace-final-newline ((((background dark)) (:background "#252595" :foreground "#c5a3c5"))))
  '(whitespace-trailing ((((background dark)) (:background "#252525"))))
  '(yafolding-ellipsis-face ((((background dark)) (:background "#ff00ff"))) t)
  '(yas-field-highlight-face ((((background dark)) (:background "#001d00"))))

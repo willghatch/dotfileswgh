@@ -16,3 +16,6 @@
 [submodule "external/emacs/sexp-rewrite"]
 	path = external/emacs/sexp-rewrite
 	url = https://github.com/rmculpepper/sexp-rewrite
+[submodule "external/emacs/whitespace-final-newline"]
+	path = external/emacs/whitespace-final-newline
+	url = https://github.com/adamsmd/whitespace-final-newline
