@@ -197,7 +197,7 @@ bind index G last-entry
 bind index gg first-entry
 bind index \Chb help
 bind index q quit
-bind index Q exit # don't save changes
+bind index QQQQQ exit # don't save changes
 bind index u toggle-new
 bind index dd delete-message
 bind index U undelete-message
