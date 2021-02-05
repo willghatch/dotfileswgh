@@ -37,6 +37,7 @@ eval "$(fasd --init auto >/dev/null 2>&1)"
 
 source $WGHHOME/dotfileswgh/bazshrc
 typeset -U PATH
+fpath=($fpath /run/current-system/sw/share/zsh/site-functions)
 fpath=($fpath $DOTFILESWGH/zsh/completion/)
 
 xclip-to-zsh(){
