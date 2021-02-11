@@ -33,13 +33,13 @@
   '((t (:foreground "magenta" :bold t)))
   "face for buffer name")
 
-(defface wevil-dirty-face
+(defface wevil-unsaved-face
   '((t (:foreground "#5f0000" :background "red" :bold t)))
-  "buffer dirty (unsaved) face")
+  "buffer unsaved (unsaved) face")
 
-(defface wevil-dirty-global-face
+(defface wevil-unsaved-global-face
   '((t (:foreground "#5f0000" :background "magenta" :bold t)))
-  "face for marker for when any file-visiting buffer is dirty")
+  "face for marker for when any file-visiting buffer is unsaved")
 
 (defface wevil-ro-face
   '((t (:foreground "black" :background "yellow" :bold t)))
@@ -118,7 +118,7 @@
        "["
        ;; was this buffer modified since the last save?
        '(:eval (when (buffer-modified-p)
-                 (propertize "DIRTY" 'face 'wevil-dirty-face)))
+                 (propertize "EDITED" 'face 'wevil-unsaved-face)))
 
        ;; was any buffer modified since the last save?
        '(:eval (when
@@ -130,7 +130,7 @@
                                  (and (buffer-file-name)
                                       (buffer-modified-p)))))
                      (buffer-list) :initial-value nil))
-                 (propertize "DB" 'face 'wevil-dirty-global-face)))
+                 (propertize "EB" 'face 'wevil-unsaved-global-face)))
 
        ;; is this buffer read-only?
        '(:eval (when buffer-read-only
