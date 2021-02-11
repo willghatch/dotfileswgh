@@ -89,6 +89,7 @@
 (in 'hl-todo)
 (in 'git-commit)
 (in 'systemd)
+(in 'lsp-java)
 
 (in 'keyfreq)
 

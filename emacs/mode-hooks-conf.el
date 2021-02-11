@@ -61,6 +61,16 @@
             (require 'sgml-mode)
             ))
 
+(add-hook 'java-mode-hook
+          (lambda ()
+            (setq lsp-headerline-breadcrumb-enable nil)
+            (require 'lsp-mode)
+            (require 'lsp-java)
+            ;; This lsp download url should work with openjdk11.
+            (setq lsp-java-jdt-download-url  "https://download.eclipse.org/jdtls/milestones/0.57.0/jdt-language-server-0.57.0-202006172108.tar.gz")
+            (lsp)
+            ))
+
 (add-to-hooks
  (lambda ()
    (define-key evil-motion-state-local-map "gdd" 'elisp-slime-nav-find-elisp-thing-at-point)
