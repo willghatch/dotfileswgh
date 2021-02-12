@@ -7,8 +7,19 @@ xterm*termName: xterm-256color
 XTerm*metaSendsEscape: true
 Xterm*saveLines: 4096
 
+! Some Xterm options suggested at https://aduros.com/blog/xterm-its-better-than-you-thought/
+XTerm.vt100.locale: false
+XTerm.vt100.utf8: true
+XTerm.vt100.scrollTtyOutput: false
+XTerm.vt100.scrollKey: true
+XTerm.vt100.bellIsUrgent: true
+XTerm.vt100.boldMode: false
+XTerm.vt100.internalBorder: 4
+!XTerm.borderWidth: 0
+
 ! Make xterm not interpret backspace as ^H
 xterm.*backarrowKey: false
+
 
 !XTerm*reverseVideo: on
 xterm*foreground: rgb:a8/a8/a8
@@ -31,6 +42,31 @@ xterm*color14: rgb:54/fc/fc
 xterm*color15: rgb:fc/fc/fc
 
 xterm*faceName: DejaVu Sans Mono:size=12:antialias=true
+
+XTerm.vt100.scrollBar: true
+XTerm.vt100.rightScrollBar: true
+
+! This sets a command (IE program on path) to send window text to when using the
+! print() command.
+XTerm.vt100.printerCommand: xterm-select-url.sh
+
+! These actions are listed in the Actions section of the man page.
+! Note that some actions I am setting as insert() or insert-eight-bit() to
+! avoid a translation (binding) that is troublesome.
+XTerm.vt100.translations: #override \n\
+    <Key> L: insert() \n\
+    <Key> S: insert() \n\
+    <Key> Z: insert() \n\
+    Alt <Key> Return: insert() \n\
+    !Ctrl Shift <Key>N: scroll-back(1, halfpage) \n\
+    !Ctrl Shift <Key>T: scroll-forw(1, halfpage) \n\
+    !Ctrl <Key> +: larger-vt-font() \n\
+    !Ctrl <Key> -: larger-vt-font() \n\
+    !Ctrl Shift <Key> W: print(noAttrs, noNewLine) \n\
+    !Ctrl Shift <Key>H: set-altscreen(toggle) \n\
+    Ctrl Shift <Key>C: copy-selection(CLIPBOARD) \n\
+    Ctrl Shift <Key>V: insert-selection(CLIPBOARD)
+
 
 ! bashrun runs an xterm, but matches on the name bashrun...
 bashrun*faceName: DejaVu Sans Mono:size=13:antialias=true
