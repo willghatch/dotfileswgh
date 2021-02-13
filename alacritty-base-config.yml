@@ -1,0 +1,75 @@
+# For options see https://raw.githubusercontent.com/alacritty/alacritty/master/alacritty.yml
+
+# TODO - I'm going to write a script that combines sections of alacritty config so I can dynamically change alacritty settings, in particular the color theme, that I don't see ways to do within the config file language.
+
+# TERM defaults to “alacritty”
+# Alacritty ships with a few terminfo files, including “alacritty” and “alacritty-direct”.
+# If term is set to xterm-24bit-italic, emacs lags when starting.
+# However, everything seems great when using alacritty-direct -- italics and 24bit color still work.
+env:
+  #TERM: xterm-24bit-italic
+  TERM: alacritty-direct
+font:
+  size: 11.0
+
+bell:
+  animation: EaseOutExpo
+  duration: 100
+  color: '#ff0000'
+
+#scrolling:
+  # Maximum number of lines in the scrollback buffer.
+  # Specifying '0' will disable scrolling.
+  #history: 10000
+
+  # Scrolling distance multiplier.
+  #multiplier: 3
+
+# If `true`, bold text is drawn using the bright color variants.
+draw_bold_text_with_bright_colors: true
+
+# TODO - how can I have both dark and light colors?
+# I think perhaps the best practical way I can manage it is to have
+# a build-alacritty-config script that cats config snippets together
+# and overwrites the config file location.
+colors:
+  primary:
+    background: '#000000'
+    foreground: '#b2b2b2'
+    bright_foreground: '#ffffff'
+  # Colors which should be used to draw the terminal cursor. If these are
+  # unset, the cursor color will be the inverse of the cell color.
+  #cursor:
+  #  text: '#000000'
+  #  cursor: '#ffffff'
+  normal:
+    black:   '#000000'
+    red:     '#b21818'
+    green:   '#18b218'
+    yellow:  '#b26818'
+    blue:    '#184eb2'
+    magenta: '#b218b2'
+    cyan:    '#18b2b2'
+    white:   '#b2b2b2'
+  bright:
+    black:   '#666666'
+    red:     '#ff5454'
+    green:   '#54ff54'
+    yellow:  '#ffff54'
+    blue:    '#598eff'
+    magenta: '#ff54ff'
+    cyan:    '#54ffff'
+    white:   '#ffffff'
+  # If the dim colors are not set, they will be calculated automatically based
+  # on the `normal` colors.
+  #dim:
+  #  black:   '#000000'
+  #  red:     '#8c3336'
+  #  green:   '#7a8530'
+  #  yellow:  '#97822e'
+  #  blue:    '#506d8f'
+  #  magenta: '#80638e'
+  #  cyan:    '#497e7a'
+  #  white:   '#9a9a9a'
+
+
