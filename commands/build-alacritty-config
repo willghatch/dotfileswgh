@@ -1,0 +1,5 @@
+#!/usr/bin/env bash
+
+lightdark=$(state lightdark)
+CDIR=$DOTFILESWGH/alacritty
+cat $CDIR/base-config.yml $CDIR/theme-${lightdark}.yml > $XDG_RUNTIME_DIR/alacritty-config.yml

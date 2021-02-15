@@ -1,0 +1,6 @@
+#!/usr/bin/env bash
+
+if [[ ! -e $XDG_RUNTIME_DIR/alacritty-config.yml ]]; then
+  build-alacritty-config
+fi
+exec alacritty --live-config-reload --config-file $XDG_RUNTIME_DIR/alacritty-config.yml "$@"

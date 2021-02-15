@@ -5,11 +5,11 @@
 #    terminal2="gnome-terminal --profile=dark"
 #fi
 
-terminal2="konsole-lightdark -e zsh"
+terminal2="myterm -e zsh"
 
 #terminal="konsole-lightdark -e rash-repl"
-terminal="konsole-lightdark -e rr"
-terminal3="rackterm-xterm -e rr"
+terminal="myterm -e rr"
+terminal3="konsole-lightdark -e rr"
 
 unicode="racket -l the-unicoder -- --client --port 5782"
 unicode_reload="racket -l the-unicoder -- --client --port 5782 --command reload"

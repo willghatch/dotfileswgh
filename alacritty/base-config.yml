@@ -1,0 +1,63 @@
+# For options see https://raw.githubusercontent.com/alacritty/alacritty/master/alacritty.yml
+
+# TERM defaults to “alacritty”
+# Alacritty ships with a few terminfo files, including “alacritty” and “alacritty-direct”.
+# If term is set to xterm-24bit-italic, emacs lags when starting.
+# However, everything seems great when using alacritty-direct -- italics and 24bit color still work.
+env:
+  #TERM: xterm-24bit-italic
+  TERM: alacritty-direct
+font:
+  # TODO - 8.0 here gives me the same size as Konsole with font size 12.  I'm not sure why.
+  size: 8.0
+  normal:
+    family: monospace
+    style: Regular
+  bold:
+    family: monospace
+    style: Bold
+  italic:
+    family: monospace
+    style: Italic
+  bold_italic:
+    family: monospace
+    style: Bold Italic
+
+bell:
+  animation: EaseOutExpo
+  duration: 100
+  color: '#ff0000'
+
+#scrolling:
+  # Maximum number of lines in the scrollback buffer.
+  # Specifying '0' will disable scrolling.
+  #history: 10000
+
+  # Scrolling distance multiplier.
+  #multiplier: 3
+
+# If `true`, bold text is drawn using the bright color variants.
+draw_bold_text_with_bright_colors: true
+
+
+key_bindings:
+  - { key: V, mods: Control|Shift, mode: ~Vi,        action: Paste }
+  - { key: C, mods: Control|Shift,                   action: Copy }
+
+  - { key: Add, mods: Control,action: IncreaseFontSize }
+  - { key: Minus, mods: Control,action: DecreaseFontSize }
+  - { key: Key0, mods: Control,action: ResetFontSize }
+  # C-Shift-F searches forward, C-Shift-B searches backward, esc escapes search mode, ret goes to next result
+  # TODO - I think I can probably set up searching to work in vi-mode in a vi-like way (/ starts, type, hit enter to finish, then n/N to cycle through the last thing searched).  But I'm not going to do it right now.
+  - { key: P, mods: Control|Shift, mode: ~Alt, action: ScrollPageUp   }
+  - { key: N, mods: Control|Shift, mode: ~Alt, action: ScrollPageDown }
+  - { key: K, mods: Shift, mode: Vi, action: ScrollPageUp   }
+  - { key: J, mods: Shift, mode: Vi, action: ScrollPageDown }
+
+  - { key: A,  mods: Shift|Control, action: ToggleViMode,
+      #mode: ~Search
+    }
+
+  #- { key: End,      mods: Control|Shift,   action: ScrollToBottom }
+  #- { key: Home,     mods: Control|Shift,   action: ScrollToTop    }
+
