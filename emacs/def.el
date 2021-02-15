@@ -243,7 +243,7 @@
  (require 'whitespace-final-newline)
  (global-whitespace-final-newline-mode 1)
 
- (load-library "keyfreq-conf")
+ ;(load-library "keyfreq-conf")
 )
 
 (let ((file (concat dotfileswgh "/dotlocal/emacs")))
