@@ -17,7 +17,8 @@ BASHRUNRC=$DOTFILESWGH/minimal-bashrunrc
 export HISTFILE=$HOME/.cache/minimal-bashrun-history
 export HISTCONTROL=ignoredups:erasedups
 
-XTERM=lxterminal
+#XTERM=lxterminal
+XTERM=my-alacritty
 
 error() {
     if [ `which notify-send` ]; then
@@ -39,6 +40,14 @@ if [ "$XTERM" == "xterm" ]; then
     -title 'bashrun' \
     -geometry $GEOM \
     -e "bash --rcfile $BASHRUNRC -i -t"
+
+elif [[ "$XTERM" == "my-alacritty" ]]; then
+    cols=$(echo $GEOM | cut -d 'x' -f 1)
+    lines=$(echo $GEOM | cut -d 'x' -f 2)
+    $XTERM \
+    --title 'bashrun' \
+    --dimensions $cols $lines \
+    -e bash --rcfile $BASHRUNRC -i -t
 
 elif [[ "$XTERM" == "lxterminal" ]]; then
     $XTERM \
