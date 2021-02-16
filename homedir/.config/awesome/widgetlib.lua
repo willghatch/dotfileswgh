@@ -19,6 +19,7 @@ get_unread_count = function()
        return v + n
     end
     local inboxy = 0
+    local uac = 0
     local spammy = 0
     local school = 0
     local machines = 0
@@ -32,6 +33,7 @@ get_unread_count = function()
        inboxy = incr(inboxy, line:match("main (%d+)"))
        spammy = incr(spammy, line:match("spam.caught (%d+)"))
        school = incr(school, line:match("school.lists (%d+)"))
+       uac = incr(uac, line:match("uac (%d+)"))
        machines = incr(machines, line:match("machines (%d+)"))
        racket = incr(racket, line:match("racket (%d+)"))
        lists = incr(lists, line:match("misc.lists (%d+)"))
@@ -45,6 +47,7 @@ get_unread_count = function()
     instr:close()
     return green ..
        "In ".. cc .. inboxy .. ecc .." "..
+       "UAC ".. cc .. uac .. ecc .." "..
        "Ma ".. cc .. machines .. ecc .." "..
        "Sc ".. cc .. school .. ecc .." "..
        --"R ".. cc .. racket .. ecc .." "..
