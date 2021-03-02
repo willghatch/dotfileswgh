@@ -17,7 +17,7 @@
 
 (defun xpaste () (interactive)
        (let ((xclip-select-enable-clipboard t))
-         (insert (xclip-selection-value))))
+         (insert (xclip-get-selection 'clipboard))))
 
 (defun xpaste-after-char () (interactive)
        (unless (eolp) (forward-char))
