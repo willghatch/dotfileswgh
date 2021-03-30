@@ -5,11 +5,13 @@
 #    terminal2="gnome-terminal --profile=dark"
 #fi
 
-terminal2="my-alacritty -e zsh"
+terminal="konsole-lightdark -e rash-repl"
+terminal2="konsole-lightdark -e zsh"
 
-#terminal="konsole-lightdark -e rash-repl"
-terminal="my-alacritty -e rr"
-terminal3="konsole-lightdark -e rr"
+#terminal2="my-alacritty -e zsh"
+#terminal="my-alacritty -e rr"
+#terminal="my-alacritty -e rr"
+#terminal3="konsole-lightdark -e rr"
 
 unicode="racket -l the-unicoder -- --client --port 5782"
 unicode_reload="racket -l the-unicoder -- --client --port 5782 --command reload"
