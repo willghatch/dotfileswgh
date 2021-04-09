@@ -1,0 +1,16 @@
+#!/bin/sh
+
+# Yeah, ripgrep is normally `rg`.  But I want my
+# aliases to be related to the function I want to perform.
+# I've already switched from `grep` to `silversearcher-ag`
+# to `ripgrep`.  When I eventually change again, I want my
+# alias to stay the same.
+# And I hate that these projects take short names like `ag`
+# and `rg`, especially when they also have a longer name like
+# `ripgrep`!  Fortunately, none of these are “standard” unix
+# programs like `ls` and friends that have tragically short
+# names that prevent users from being able to reliably use
+# those short names as aliases.  So with NixOS I can easily
+# give ripgrep a proper command name.  But I do want a short
+# alias... just one of my choosing.
+ripgrep "$@"
