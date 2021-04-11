@@ -2,8 +2,8 @@
 #lang rash
 (require racket/cmdline racket/port racket/string)
 
-(define orig-music-dir "/vsvr/vdata/nonprivate-medium/music")
-(define output-dir "/vsvr/musc-compressed")
+(define orig-music-dir "/hold/wgh-data-impersonal/music")
+(define output-dir "/hold/temporary-data/musc-compressed")
 (define max-jobs 8)
 (define verbose? #f)
 (command-line
