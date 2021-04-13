@@ -1,21 +1,24 @@
-#!/usr/bin/env bash
+#!/usr/bin/env racket
+#lang rash
+(require
+ gregor
+ racket/cmdline
+ )
 
-if [[ "$1" = "--help" ]]; then
-    echo "usage: $0 [today or yesterday or tomorrow]"
-    exit 1
-fi
+(define specs
+  (command-line #:args specs
+                specs))
 
-day="${1:-today}"
+(define offsets (if (null? specs)
+                    '(0)
+                    (map string->number specs)))
 
-if [[ today = "$day" ]]; then
-    exec e $(date +%Y-%m-%d).org
-elif [[ yesterday = "$day" ]]; then
-    exec e $(date +%Y-%m-%d --date=yesterday).org
-elif [[ tomorrow = "$day" ]]; then
-    exec e $(date +%Y-%m-%d --date=tomorrow).org
-else
-    echo "usage: $0 [today or yesterday or tomorrow]"
-    exit 1
-fi
+(define dates (map (λ (off) (+days (today) off)) offsets))
+
+(define (date->str d)
+  (~t d "YYYY-MM-dd"))
+
+(define filenames (map (λ (date) (format "~a.org" (date->str date))) dates))
 
 
+e $filenames

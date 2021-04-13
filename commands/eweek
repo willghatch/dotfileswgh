@@ -5,23 +5,28 @@
  racket/cmdline
  )
 
-(define spec
-  (command-line #:args ([spec "0"])
-                spec))
+(define specs
+  (command-line #:args specs
+                specs))
 
-(define week-n (string->number spec))
+(define week-ns (if (null? specs)
+                    '(0)
+                    (map string->number specs)))
 
-(define t (+weeks (today) week-n))
+(define ts (map (λ (week-n) (+weeks (today) week-n)) week-ns))
 
-(define start-of-week (-days t (->wday t)))
-(define end-of-week (+days t (- 6 (->wday t))))
+(define start-of-week (map (λ (t) (-days t (->wday t))) ts))
+(define end-of-week (map (λ (t) (+days t (- 6 (->wday t)))) ts))
 
 (define (date->str d)
   (~t d "YYYY-MM-dd"))
 
-(define filename (format "~a_to_~a.org"
-                         (date->str start-of-week)
-                         (date->str end-of-week)))
+(define filenames (map (λ (start-of-week end-of-week)
+                         (format "~a_to_~a.org"
+                                 (date->str start-of-week)
+                                 (date->str end-of-week)))
+                       start-of-week
+                       end-of-week))
 
 
-e $filename
+e $filenames
