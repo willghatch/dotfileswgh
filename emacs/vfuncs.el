@@ -15,7 +15,9 @@ buffer, it will call the next-buffer-func once more if advance-on-failure-p."
       (funcall advance-on-failure-func))))
 
 (defun np-buffer-no-star (next-buffer-func advance-on-failure-func)
-  (let ((ignore (lambda () (string= "*" (substring (buffer-name) 0 1)))))
+  (let ((ignore (lambda () (or (string= "*" (substring (buffer-name) 0 1))
+                               ;; I hate this buffer name.  Why doesn't it have stars?
+                               (string= "racket-mode-back-end-stderr" (buffer-name))))))
     (np-buffer-conditional next-buffer-func ignore advance-on-failure-func)))
 (defun next-buffer-no-star ()
   (interactive)
