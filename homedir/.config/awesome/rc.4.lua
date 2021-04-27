@@ -724,6 +724,8 @@ clientkeys = awful.util.table.join(
               {description = "close", group = "client"}),
     awful.key({ modkey, altkey    }, "f",  awful.client.floating.toggle                     ,
               {description = "toggle floating", group = "client"}),
+    awful.key({ modkey, altkey    }, "t",  awful.titlebar.toggle                     ,
+              {description = "toggle floating", group = "client"}),
 --    awful.key({ modkey, "Control" }, "Return", function (c) c:swap(awful.client.getmaster()) end,
 --              {description = "move to master", group = "client"}),
 --    awful.key({ modkey,           }, "o",      function (c) c:move_to_screen()               end,
@@ -846,7 +848,7 @@ awful.rules.rules = {
           "AlarmWindow",  -- Thunderbird's calendar.
           "pop-up",       -- e.g. Google Chrome's (detached) Developer Tools.
         }
-      }, properties = { floating = true }},
+      }, properties = { floating = true, titlebars_enabled = true }},
 
     -- Add titlebars to normal clients and dialogs
     { rule_any = {type = { "dialog" }
@@ -874,7 +876,12 @@ client.connect_signal("manage", function (c)
     end
 end)
 
--- Add a titlebar if titlebars_enabled is set to true in the rules.
+-- {{{ Titlebar Configuration
+-- Titlebars can be toggled on a client with
+-- awful.titlebar.toggle(client)
+-- awful.titlebar.show(client)
+-- awful.titlebar.hide(client)
+-- The default state for titlebars is set in the rules with the titlebars_enabled property.
 client.connect_signal("request::titlebars", function(c)
     -- buttons for the titlebar
     local buttons = awful.util.table.join(
@@ -915,6 +922,7 @@ client.connect_signal("request::titlebars", function(c)
         layout = wibox.layout.align.horizontal
     }
 end)
+-- }}}
 
 -- Enable sloppy focus, so that focus follows mouse.
 client.connect_signal("mouse::enter", function(c)
