@@ -18,7 +18,7 @@ export HISTFILE=$HOME/.cache/minimal-bashrun-history
 export HISTCONTROL=ignoredups:erasedups
 
 #XTERM=lxterminal
-XTERM=my-alacritty
+XTERM=xterm
 
 error() {
     if [ `which notify-send` ]; then
