@@ -11,7 +11,8 @@ fi
 
 if [[ "$hasdig" = true && "$ip6" != true ]]; then
     # using dns, if possible.  Note, dig is in the dnsutils package in Arch.
-    dig +short myip.opendns.com @resolver1.opendns.com
+    # Be sure to use ipv4 to make the request, or it will want to respond with ipv6 info.
+    dig -4 +short myip.opendns.com @resolver1.opendns.com
 else
 
     # using web services
