@@ -10,6 +10,9 @@ DefaultEncoding=UTF-8
 Name=wgh
 Parent=FALLBACK/
 
+[Interaction Options]
+CopyTextAsHTML=false
+
 [Keyboard]
 KeyBindings=wgh-keys
 
@@ -18,5 +21,7 @@ HistoryMode=1
 HistorySize=20000
 
 [Terminal Features]
+BellMode=3
+BidiRenderingEnabled=false
 BlinkingCursorEnabled=true
 FlowControlEnabled=false
