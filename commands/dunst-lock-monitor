@@ -3,11 +3,14 @@
 updateloop(){
   while read state; do
     if echo $state | grep -q LOCK; then
-      notify-send "DUNST_COMMAND_PAUSE"
+      #notify-send "DUNST_COMMAND_PAUSE"
+      dunstctl set-paused true
     elif echo $state | grep -q UNBLANK; then
-      notify-send "DUNST_COMMAND_RESUME"
+      #notify-send "DUNST_COMMAND_RESUME"
+      dunstctl set-paused false
     elif echo $state | grep -q BLANK; then
-      notify-send "DUNST_COMMAND_PAUSE"
+      #notify-send "DUNST_COMMAND_PAUSE"
+      dunstctl set-paused true
     else
       notify-send "dunst-lock-monitor got bad state:" "$state"
     fi
