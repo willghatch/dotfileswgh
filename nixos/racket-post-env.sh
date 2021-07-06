@@ -2,7 +2,8 @@
 
 # nix-shell doesn't add LD_LIBRARY_PATH, which means `raco pkg` and other things fail, because Racket can't find libcrypto.so from the openssl package.  This is why I previously used FHSUserEnv.  But it does add NIX_TARGET_LDFLAGS, which has the needed info...
 
-export LD_LIBRARY_PATH="$(env | grep NIX_TARGET_LDFLAGS | sed "s/ -L/:/g" | sed s/NIX_TARGET_LDFLAGS=://):/lib"
+# This was previously NIX_TARGET_LDFLAGS but has changed to NIX_LDFLAGS_FOR_TARGET...
+export LD_LIBRARY_PATH="$(env | grep NIX_LDFLAGS_FOR_TARGET | sed "s/ -L/:/g" | sed s/NIX_LDFLAGS_FOR_TARGET=://):/lib"
 
 # nix-shell sets SSL_CERT_FILE to /no-cert-file.crt
 unset SSL_CERT_FILE
