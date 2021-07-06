@@ -1,9 +1,9 @@
 { pkgs ? import <nixpkgs> {} }:
 let pinnedPackages = pkgs.fetchFromGitHub {
       owner = "NixOS";
-      repo = "nixpkgs-channels";
-      # nixos-20.03 as of 2020-04-27
-      rev = "9137f05564eb50cc6f7042039aa9549a2e6e2340";
-      sha256 = "0yh2fnywhiyhzrkdlccp0l3bmdrqj0y1gysln6x7xfl2zj3aij7z";
+      repo = "nixpkgs";
+      # nixos-21.05 as of 2021-07-06
+      rev = "fefb0df7d2ab2e1cabde7312238026dcdc972441";
+      sha256 = "1ckzhh24mgz6jd1xhfgx0i9mijk6xjqxwsshnvq789xsavrmsc36";
     };
     in import pinnedPackages {}
