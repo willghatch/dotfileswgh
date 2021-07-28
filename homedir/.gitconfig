@@ -6,7 +6,10 @@
 [push]
 	default = current
 [alias]
+        # Get and check out pull requests.
         pr  = "!f() { git fetch -fu ${2:-origin} refs/pull/$1/head:pr/$1 && git checkout pr/$1; }; f"
+        # Gitlab calls them merge-requests and has a different ref name.  Note that remote refs can be listed with `git ls-remote`
+        mr  = "!f() { git fetch -fu ${2:-origin} refs/merge-requests/$1/head:pr/$1 && git checkout pr/$1; }; f"
         pr-clean = "!git for-each-ref refs/heads/pr/* --format='%(refname)' | while read ref ; do branch=${ref#refs/heads/} ; git branch -D $branch ; done"
 	ls = log --oneline --decorate
 	lg = log --graph --all --decorate
