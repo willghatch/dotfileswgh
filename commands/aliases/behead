@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 if [[ -z "$1" ]]; then
     echo "usage, with input from stdin: $0 <num lines to behead>"
