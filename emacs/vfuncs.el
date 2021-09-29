@@ -45,6 +45,7 @@ buffer, it will call the next-buffer-func once more if advance-on-failure-p."
 
 (defalias 'nop 'ignore) ; returns nil
 
+(require 'ffap)
 (defun ffap/no-confirm ()
   (interactive)
   (find-file-at-point (ffap-file-at-point)))
