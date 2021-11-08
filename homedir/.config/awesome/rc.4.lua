@@ -334,11 +334,12 @@ function mkNonRep(f)
    -- So this function is for wrapping callbacks so that they can't be
    -- pressed twice within a certain small time so that the action
    -- is performed once and not twice.
+   local repeatDelay = 50
    function innerMkNonRep(f)
       local lastCall = 0
       return function()
          local cur_ms = socket.gettime()*1000
-         if lastCall + 10 > cur_ms then
+         if lastCall + repeatDelay > cur_ms then
             return
          else
             lastCall = cur_ms
