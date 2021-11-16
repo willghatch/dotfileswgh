@@ -38,7 +38,8 @@ export MANWIDTH=80
 
 export ZDOTDIR=$DOTFILESWGH/zsh
 
-export EDITOR=premacs-use-or-create-t
+export EDITOR=e
+#export EDITOR=premacs-use-or-create-t
 #export ALTERNATE_EDITOR=v
 #export PAGER=premacs-pager
 export PAGER=less
