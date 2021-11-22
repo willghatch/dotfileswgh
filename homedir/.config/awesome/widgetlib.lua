@@ -46,10 +46,10 @@ get_unread_count = function()
     local ecc = "</span>"
     instr:close()
     return green ..
-       "In ".. cc .. inboxy .. ecc .." "..
-       "UAC ".. cc .. uac .. ecc .." "..
+       --"In ".. cc .. inboxy .. ecc .." "..
+       --"UAC ".. cc .. uac .. ecc .." "..
        "Ma ".. cc .. machines .. ecc .." "..
-       "Sc ".. cc .. school .. ecc .." "..
+       --"Sc ".. cc .. school .. ecc .." "..
        --"R ".. cc .. racket .. ecc .." "..
        --"Li ".. cc .. lists .. ecc .." "..
        --"F ".. cc .. top_feeds .. ecc .." "..
