@@ -1,0 +1,5 @@
+#!/bin/sh
+export CURRENT_DEV_PATH=""
+export CURRENT_DEV_MODE=reach-core
+export EMACS_DOT_D_PATH=$DOTFILESWGH/dotlocal/emacs.d_reach-core
+exec reach-dev-environment.sh "$@"
