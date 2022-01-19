@@ -1,3 +1,4 @@
 #!/usr/bin/env bash
+export WGH_THEME_DARK_OR_LIGHT="dark"
 source $DOTFILESWGH/env-dark.sh
 exec "$@"

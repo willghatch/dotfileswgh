@@ -1,0 +1,22 @@
+
+# Palette for use with the Linux console.  Light background.
+
+color normal black white
+color hdrdefault blue white
+color quoted blue white
+color signature blue white
+color attachment red white
+color message brightred white
+color error brightred white
+color indicator black brightyellow
+color status brightgreen blue
+color tree white white
+color markers red white
+color search white white
+color tilde brightmagenta white
+color index green white ~F # important/star
+color index blue white "~N|~O" # new or... something
+color index brightgreen red "~N|~O ~F" # new AND important
+
+# color body brightwhite black '\*+[^*]+\*+'
+# color body brightwhite black '_+[^_]+_+'

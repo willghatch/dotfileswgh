@@ -12,27 +12,6 @@ set move = no
 
 set mark_old=no # don't differentiate between seen and unseen unread
 
-# Palette for use with the Linux console.  Black background.
-
-color hdrdefault blue black
-color quoted blue black
-color signature blue black
-color attachment red black
-color message brightred black
-color error brightred black
-color indicator black green
-color status brightgreen blue
-color tree white black
-color normal white black
-color markers red black
-color search white black
-color tilde brightmagenta black
-color index brightgreen black ~F # important/star
-color index brightred black "~N|~O" # new or... something
-color index brightgreen red "~N|~O ~F" # new AND important
-
-# color body brightwhite black '\*+[^*]+\*+'
-# color body brightwhite black '_+[^_]+_+'
 
 set copy=yes  # make a copy of outgoing mail
 set include   # include message when replying
@@ -229,7 +208,11 @@ macro index A "<limit>all\n" "show all messages (undo limit)"
 bind index - enter-command
 bind pager - enter-command
 
+set shell=bash
 # lame conditional sourcing...
+source `FILE=~/dotfileswgh/mutt-dark-theme; if [[ $(lightdark-status) = "light" ]]; then FILE=~/dotfileswgh/mutt-light-theme; fi; echo "$FILE"`
+
+# TODO - maybe put this pattern in a helper script
 source `FILE=~/dotfileswgh/pri/mutt/rc; if [ ! -s "$FILE" ]; then FILE=/dev/null; fi; echo "$FILE"`
 source `FILE=~/rootgit-dotfiles/muttrc; if [ ! -s "$FILE" ]; then FILE=/dev/null; fi; echo "$FILE"`
 source `FILE=~/dotfileswgh/dotlocal/muttrc; if [ ! -s "$FILE" ]; then FILE=/dev/null; fi; echo "$FILE"`

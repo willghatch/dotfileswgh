@@ -101,7 +101,9 @@ In fact the implementation of this state info is in those other scripts, but thi
 (define (shellout argl)
   (define str-argl (map (λ (x) (format "~a" x)) argl))
   (define command-path (find-executable-path (car str-argl)))
-  (apply system* (cons command-path (cdr str-argl))))
+  (if (not command-path)
+      (eprintf "Command not found: ~a\n" str-argl)
+      (apply system* (cons command-path (cdr str-argl)))))
 
 (define (get-all)
   (for ([cmd-spec spec-table])
