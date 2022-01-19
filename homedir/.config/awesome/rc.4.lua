@@ -122,6 +122,14 @@ sh1key = "Shift"
 sh2key = "Mod5"
 sh4key = "Mod3"
 
+-- By default, the awful.key.ignore_modifiers table includes "Mod2", which is my hyper key.
+-- It also includes "Lock", but really I think I'm happy to just empty it out.
+--awful.key.ignore_modifiers = { "Lock" }
+-- Just setting it like this doesn't seem to work, so let's mutate it instead.
+for k,v in pairs(awful.key.ignore_modifiers) do
+ table.remove(awful.key.ignore_modifiers, k)
+end
+
 -- Table of layouts to cover with awful.layout.inc, order matters.
 awful.layout.layouts = {
     awful.layout.suit.tile,
@@ -602,11 +610,15 @@ globalkeys = awful.util.table.join(
               {description = "volume up", group = "launcher"}),
     awful.key({ }, "XF86AudioMute", mkspawn({"state", "mute", "toggle"}),
               {description = "volume up", group = "launcher"}),
+    awful.key({ hypkey,         }, "z", mkNonRep(mkspawn({"notify", "hyp-z pressed"}, {description = "", group = "launcher"}))),
     awful.key({ hypkey,         }, "s", mkNonRep(mkspawn({"vlaunch", "screenshot"}, {description = "", group = "launcher"}))),
     awful.key({ hypkey,         }, "g", mkNonRep(mkspawn({"gajim-remote", "show_next_pending_event"}, {description = "", group = "launcher"}))),
     awful.key({ hypkey,         }, "m", mkNonRep(mkspawn({"state", "mute", "toggle"}, {description = "", group = "launcher"}))),
     awful.key({ hypkey,         }, "u", mkNonRep(mkspawn({"state", "volume", "inc"}, {description = "", group = "launcher"}))),
     awful.key({ hypkey,         }, "d", mkNonRep(mkspawn({"state", "volume", "dec"}, {description = "", group = "launcher"}))),
+    awful.key({ hypkey,         }, "t", mkNonRep(mkspawn({"dunstctl", "close-all"}, {description = "", group = "launcher"}))),
+    awful.key({ hypkey,         }, "y", mkNonRep(mkspawn({"dunstctl", "context"}, {description = "", group = "launcher"}))),
+    awful.key({ hypkey,         }, "h", mkNonRep(mkspawn({"dunstctl", "history-pop"}, {description = "", group = "launcher"}))),
     awful.key({ hypkey, supkey }, "t", mkNonRep(mkspawn({"vlaunch", "musictoggle"}, {description = "", group = "launcher"}))),
     awful.key({ hypkey, supkey }, "s", mkNonRep(mkspawn({"vlaunch", "musicpause"}, {description = "", group = "launcher"}))),
     awful.key({ hypkey, supkey }, "n", mkNonRep(mkspawn({"vlaunch", "musicnext"}, {description = "", group = "launcher"}))),
