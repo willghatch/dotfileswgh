@@ -26,7 +26,7 @@ in [
   cp.vim
   cp.emacs-nox
   #cp.man
-  #cp.gitAndTools.gitFull
+  cp.gitAndTools.gitFull
   #cp.tig
   #cp.silver-searcher
   #cp.meld

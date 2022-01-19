@@ -5,7 +5,8 @@
 , fetchpatch
 , ncurses
 , python3
-, fmt_8
+# I feel like there should be a way to make it use this instead of having Cmake download a copy, but I'm not sure how.
+#, fmt_8
 , z3Support ? true
 , z3 ? null
 , cvc4Support ? gccStdenv.isLinux
