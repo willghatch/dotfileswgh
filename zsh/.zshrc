@@ -215,7 +215,7 @@ if [[ -n "$ZSH_HIGHLIGHT_STYLES" ]]; then
 fi
 
 
-if [[ "$WGH_THEME_DARK_OR_LIGHT" = "light" ]]; then
+if [[ "$(lightdark-status)" = "light" ]]; then
     if [[ -n "$ZSH_HIGHLIGHT_STYLES" ]]; then
         ZSH_HIGHLIGHT_STYLES[command]="fg=green"
         ZSH_HIGHLIGHT_STYLES[bracket-level-2]="fg=green"

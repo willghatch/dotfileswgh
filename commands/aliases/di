@@ -1,6 +1,11 @@
 #!/bin/sh
 UNAME=`uname`
-eval `dircolors -b $DOTFILESWGH/dircolors`
+DIRCOLORS_FILE="$DOTFILESWGH/dircolors-dark"
+if test "$(lightdark-status)" = "light"; then
+    DIRCOLORS_FILE="$DOTFILESWGH/dircolors-light"
+fi
+
+eval `dircolors -b $DIRCOLORS_FILE`
 if test "$UNAME" = FreeBSD -o "$UNAME" = Darwin; then
     exec ls -GlaFH "$@"
 else
