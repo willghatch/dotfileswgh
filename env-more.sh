@@ -9,10 +9,11 @@ export RACKET_CORE_DEV_PATH=$WGHHOME/mk/racket-coredev/racket/bin
 DOTFILESWGH_COMMAND_PATH=$DOTFILESWGH/pri/dotlocal/commands:$DOTFILESWGH/dotlocal/commands:$WGHHOME/rootgit-dotfiles/commands:/rootgit/bin.rootgit:/rootgit/tools.rootgit:$DOTFILESWGH/pri/commands:$DOTFILESWGH/pri/commands/aliases:$DOTFILESWGH/commands:$DOTFILESWGH/commands/aliases
 
 HROOT_PATH=$HROOT/bin:$HROOT/usr/bin:$HROOT/usr/local/bin
-COMMON_PATHS=$WGHHOME/.local/bin:/usr/bin:/bin:/usr/local/bin:/sbin:/usr/sbin:/usr/local/sbin
+COMMON_PATHS=/usr/bin:/bin:/usr/local/bin:/sbin:/usr/sbin:/usr/local/sbin
+COMMON_HOME_PATHS=$HOME/.local/bin
 
 # CURRENT_DEV_PATH may be set by various commands.
-export PATH=${CURRENT_DEV_PATH:-$RACKET_NO_DEV_PATH}:$DOTFILESWGH_COMMAND_PATH:$HROOT_PATH:$PATH
+export PATH=${CURRENT_DEV_PATH:-$RACKET_NO_DEV_PATH}:$DOTFILESWGH_COMMAND_PATH:$HROOT_PATH:$PATH:$COMMON_HOME_PATHS
 
 # XDG basedir spec
 # I'm putting the defaults all here as reference
