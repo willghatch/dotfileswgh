@@ -1,0 +1,46 @@
+# XScreenSaver Preferences File
+# 
+# 
+
+mode:		blank
+timeout:	0:10:00
+cycle:		0:10:00
+lock:		True
+lockTimeout:	0:02:00
+passwdTimeout:	0:00:30
+
+
+dpmsEnabled:	True
+dpmsQuickOff:	False
+dpmsStandby:	0:10:00
+dpmsSuspend:	0:15:00
+dpmsOff:	0:30:00
+
+visualID:	default
+installColormap:    True
+verbose:	False
+splash:		False
+splashDuration:	0:00:05
+demoCommand:	xscreensaver-demo
+nice:		10
+fade:		False
+unfade:		False
+fadeSeconds:	0:00:01
+ignoreUninstalledPrograms:False
+grabDesktopImages:  False
+grabVideoFrames:    False
+chooseRandomImages: False
+imageDirectory:	
+
+# Which screensaver is selected.  Since we just blank it doesn't matter.
+selected:	-1
+
+textMode:	file
+textLiteral:	XScreenSaver
+textFile:	
+textProgram:	fortune
+textURL:	https://en.wikipedia.org/w/index.php?title=Special:NewPages&feed=rss
+
+pointerHysteresis:  10
+authWarningSlack:   20
+
