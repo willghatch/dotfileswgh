@@ -12,19 +12,31 @@ lightdark="$WGH_THEME_DARK_OR_LIGHT"
 lightdark="${lightdark:-$(cat $ldfile 2>/dev/null)}"
 lightdark=${lightdark:-dark}
 
+update(){
+    lightdark-konsole-dbus-update
+}
+
 if [[ "$#" = 0 ]]; then
     exec echo "$lightdark"
+    exit 0
 elif [[ "$#" = 1 ]]; then
     if [[ "$1" = "light" || "$1" = "dark" ]]; then
-        exec echo "$1" > "$ldfile"
+        echo "$1" > "$ldfile"
+        update
+        exit 0
     elif [[ "$1" = "toggle" ]]; then
         if [[ "$lightdark" = "light" ]]; then
-            exec echo "dark" > "$ldfile"
+            echo "dark" > "$ldfile"
+            update
+            exit 0
         else
-            exec echo "light" > "$ldfile"
+            echo "light" > "$ldfile"
+            update
+            exit 0
         fi
     fi
 fi
 
+# Print help if argument wasn't one of "light", "dark", or "toggle".
 
 help

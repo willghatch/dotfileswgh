@@ -1,0 +1,14 @@
+#!/usr/bin/env bash
+
+new_profile=wgh
+if [[ light = $(lightdark-status) ]]; then
+    new_profile=wgh-light
+fi
+
+# get list of available interfaces on session bus, filter for kde konsole instances
+konsoles=$(dbus-send --session --dest=org.freedesktop.DBus  --type=method_call --print-reply /org/freedesktop/DBus org.freedesktop.DBus.ListNames | grep '"org.kde.konsole-.*"' -o | tr -d '"')
+
+for konsole in $(echo "$konsoles"); do
+    # set profile
+    dbus-send --session --dest="$konsole" --type=method_call /Sessions/1 org.kde.konsole.Session.setProfile string:"$new_profile"
+done

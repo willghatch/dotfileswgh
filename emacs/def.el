@@ -256,6 +256,7 @@
             "light")
      (light-theme)
    (dark-theme)))
+(nobreak (lightdark-update-theme-watch))
 
 (message "-")
 (message "--")

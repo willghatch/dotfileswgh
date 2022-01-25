@@ -252,6 +252,19 @@ quit emacs."
 (defun current-theme-reapply ()
   (interactive
    (funcall current-theme-reapply-var)))
+(defun lightdark-update-theme ()
+  (interactive)
+  (if (string-equal "light"
+                    (string-trim
+                     (shell-command-to-string "lightdark-status")))
+      (light-theme)
+    (dark-theme)))
+(defun lightdark-update-theme-watch ()
+  (file-notify-add-watch (concat "/tmp/" (getenv "USER") "-lightdark")
+                         (list 'change)
+                         (lambda (event)
+                           (lightdark-update-theme)))
+  (message "Watching theme file for light/dark changes..."))
 
 
 (defun quick-in-block ()
