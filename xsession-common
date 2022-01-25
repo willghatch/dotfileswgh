@@ -9,11 +9,11 @@ if [ -z "$XSESSION_COMMON_RUN_P" ]; then
   echo "${DBUS_SESSION_BUS_ADDRESS}" >"$busdir/tty_${LOGIN_TTY}"
 
   ### light/dark theming
-  # To have gnome programs dynamically switch between light and dark we need gnome-settings-daemon `gsd-xsettings` running.
-  # The gsd-xsettings binary is usually in /usr/libexec/gsd-xsettings, but nixos doesn't normally expose that.
-  # Annoying.
-  # Anyway, let's assume a binary is on our path somewhere.
-  gsd-xsettings &
+  # Gnome programs can dynamically switch between light and dark if an xsettings daemon is running.
+  # By default in gnome this is gsd-xsettings, but xsettingsd can be used with other window managers.
+  # I'm not sure how to do this on wayland.
+  xsettingsd-reload --settings-only
+  xsettingsd &
   # Now let's set our default theme to be dark this way.
   darklight-status dark
 

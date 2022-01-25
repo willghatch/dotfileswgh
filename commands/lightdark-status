@@ -17,7 +17,9 @@ update(){
     lightdark-konsole-dbus-update
     # gsettings dynamically sets running gtk3 programs that are connected to the gsd-xsettings daemon (gnome-settings-daemon)
     # The well-supported dark/light themes are Yaru-dark and Yaru-light
-    gsettings set org.gnome.desktop.interface gtk-theme Yaru-$1
+    #gsettings set org.gnome.desktop.interface gtk-theme Yaru-$1
+    # Alternatively, we can set that theme using xsettings instead.
+    xsettingsd-reload
 }
 
 if [[ "$#" = 0 ]]; then
