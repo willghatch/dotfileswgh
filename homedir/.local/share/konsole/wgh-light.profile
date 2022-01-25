@@ -1,8 +1,7 @@
 [Appearance]
 AntiAliasFonts=true
 ColorScheme=BlackOnWhite
-Font=DejaVu Sans Mono,10,-1,5,50,0,0,0,0,0
-UseFontLineChararacters=false
+Font=Monospace,12,-1,5,50,0,0,0,0,0
 
 [Encoding Options]
 DefaultEncoding=UTF-8
