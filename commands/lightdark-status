@@ -7,13 +7,19 @@ help() {
     exit 1
 }
 
-ldfile="/tmp/${USER}-lightdark"
+# Using a user-specific directory is annoying when I run stuff with sudo.  So let's just use a global file for all users, because realistically it's just me.
+#lddir="${XDG_RUNTIME_DIR:-/tmp/$USER}"
+lddir="/tmp"
+mkdir -p $lddir
+ldfile="$lddir/lightdark"
 lightdark="$WGH_THEME_DARK_OR_LIGHT"
 lightdark="${lightdark:-$(cat $ldfile 2>/dev/null)}"
 lightdark=${lightdark:-dark}
 
 update(){
     # $1 is either "light" or "dark"
+    mkdir -p $lddir
+    echo "$1" > "$ldfile"
     lightdark-konsole-dbus-update
     # gsettings dynamically sets running gtk3 programs that are connected to the gsd-xsettings daemon (gnome-settings-daemon)
     # The well-supported dark/light themes are Yaru-dark and Yaru-light
@@ -27,16 +33,13 @@ if [[ "$#" = 0 ]]; then
     exit 0
 elif [[ "$#" = 1 ]]; then
     if [[ "$1" = "light" || "$1" = "dark" ]]; then
-        echo "$1" > "$ldfile"
         update "$1"
         exit 0
     elif [[ "$1" = "toggle" ]]; then
         if [[ "$lightdark" = "light" ]]; then
-            echo "dark" > "$ldfile"
             update dark
             exit 0
         else
-            echo "light" > "$ldfile"
             update light
             exit 0
         fi

@@ -260,7 +260,11 @@ quit emacs."
       (light-theme)
     (dark-theme)))
 (defun lightdark-update-theme-watch ()
-  (file-notify-add-watch (concat "/tmp/" (getenv "USER") "-lightdark")
+  (file-notify-add-watch (concat
+                          ;; Keep this path synced with the lightdark-status script
+                          ;;(getenv "XDG_RUNTIME_DIR")
+                          "/tmp"
+                          "/lightdark")
                          (list 'change)
                          (lambda (event)
                            (lightdark-update-theme)))
