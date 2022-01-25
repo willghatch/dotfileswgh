@@ -1,0 +1,44 @@
+#!/usr/bin/env bash
+
+if [[ 0 = "$#" ]]; then
+    echo "Usage: mp [--new] name"
+    exit 1
+fi
+
+new=0
+name="$1"
+if [[ "--new" = "$name" ]]; then
+    new=1
+    name="$2"
+fi
+
+if [[ "$new" = 1 ]]; then
+    mkdir -p $WGHHOME/prifs/$name $WGHHOME/prifs/.enc/$name
+fi
+
+if [[ ! -d $WGHHOME/prifs/.enc/$name ]]; then
+    echo "Error, prifs enc doesn't exist for: $name"
+    exit 1
+fi
+if [[ ! -d $WGHHOME/prifs/$name ]]; then
+    echo "Error, prifs mount doesn't exist for: $name"
+    exit 1
+fi
+
+idle="--idle=40"
+if [[ "$name" = "boot" ]]; then
+    idle=""
+fi
+idle_opt=$(cat $DOTFILESWGH/pri/prifs-idle-options 2>/dev/null | grep "^$name" | awk '{print $2}')
+if [[ -n "$idle_opt" ]]; then
+    idle="--idle=$idle_opt"
+fi
+if [[ "$idle_opt" = "no" ]]; then
+    idle=""
+fi
+
+
+# Note that $idle is purposely not in quotes to splice away when empty.
+chmod 700 $WGHHOME/prifs/$name $WGHHOME/prifs/.enc/$name &&
+encfs $idle $WGHHOME/prifs/.enc/$name $WGHHOME/prifs/$name
+

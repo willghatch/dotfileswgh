@@ -1,6 +1,0 @@
-#!/usr/bin/env bash
-
-mkdir -p $WGHHOME/prifs/misc $WGHHOME/prifs/.enc/misc &&
-chmod 700 $WGHHOME/prifs/misc $WGHHOME/prifs/.enc/misc &&
-encfs --idle=40 $WGHHOME/prifs/.enc/misc $WGHHOME/prifs/misc
-
