@@ -8,8 +8,14 @@ if [ -z "$XSESSION_COMMON_RUN_P" ]; then
   mkdir -p $busdir
   echo "${DBUS_SESSION_BUS_ADDRESS}" >"$busdir/tty_${LOGIN_TTY}"
 
-  # I need a better way to do theming and change themes dynamically...
-  source $DOTFILESWGH/env-dark.sh
+  ### light/dark theming
+  # To have gnome programs dynamically switch between light and dark we need gnome-settings-daemon `gsd-xsettings` running.
+  # The gsd-xsettings binary is usually in /usr/libexec/gsd-xsettings, but nixos doesn't normally expose that.
+  # Annoying.
+  # Anyway, let's assume a binary is on our path somewhere.
+  gsd-xsettings &
+  # Now let's set our default theme to be dark this way.
+  darklight-status dark
 
 
   # hack to fix pulseaudio, which doesn't seem to work for some reason...

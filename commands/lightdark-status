@@ -13,7 +13,11 @@ lightdark="${lightdark:-$(cat $ldfile 2>/dev/null)}"
 lightdark=${lightdark:-dark}
 
 update(){
+    # $1 is either "light" or "dark"
     lightdark-konsole-dbus-update
+    # gsettings dynamically sets running gtk3 programs that are connected to the gsd-xsettings daemon (gnome-settings-daemon)
+    # The well-supported dark/light themes are Yaru-dark and Yaru-light
+    gsettings set org.gnome.desktop.interface gtk-theme Yaru-$1
 }
 
 if [[ "$#" = 0 ]]; then
@@ -22,16 +26,16 @@ if [[ "$#" = 0 ]]; then
 elif [[ "$#" = 1 ]]; then
     if [[ "$1" = "light" || "$1" = "dark" ]]; then
         echo "$1" > "$ldfile"
-        update
+        update "$1"
         exit 0
     elif [[ "$1" = "toggle" ]]; then
         if [[ "$lightdark" = "light" ]]; then
             echo "dark" > "$ldfile"
-            update
+            update dark
             exit 0
         else
             echo "light" > "$ldfile"
-            update
+            update light
             exit 0
         fi
     fi

@@ -616,6 +616,7 @@ globalkeys = awful.util.table.join(
     awful.key({ hypkey,         }, "m", mkNonRep(mkspawn({"state", "mute", "toggle"}, {description = "", group = "launcher"}))),
     awful.key({ hypkey,         }, "u", mkNonRep(mkspawn({"state", "volume", "inc"}, {description = "", group = "launcher"}))),
     awful.key({ hypkey,         }, "d", mkNonRep(mkspawn({"state", "volume", "dec"}, {description = "", group = "launcher"}))),
+    awful.key({ hypkey,         }, "l", mkNonRep(mkspawn({"lightdark-status", "toggle"}, {description = "", group = "launcher"}))),
     awful.key({ hypkey,         }, "t", mkNonRep(mkspawn({"dunstctl", "close-all"}, {description = "", group = "launcher"}))),
     awful.key({ hypkey,         }, "y", mkNonRep(mkspawn({"dunstctl", "context"}, {description = "", group = "launcher"}))),
     awful.key({ hypkey,         }, "h", mkNonRep(mkspawn({"dunstctl", "history-pop"}, {description = "", group = "launcher"}))),
