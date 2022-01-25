@@ -1,4 +1,9 @@
 #!/usr/bin/env bash
 
-fusermount -u $WGHHOME/prifs/misc
+if [[ 0 = "$#" ]]; then
+    fusermount -u $WGHHOME/prifs/misc
+    exit 0
+fi
+
+fusermount -u $WGHHOME/prifs/"$1"
 
