@@ -1,0 +1,15 @@
+#!/usr/bin/env bash
+
+configdir=${XDG_RUNTIME_DIR:-/tmp/$USER/xsettingsd}
+
+themeconfig=$DOTFILESWGH/xsettingsd-$(lightdark-status)
+mkdir -p $configdir
+cat $DOTFILESWGH/xsettingsd-base $themeconfig >$configdir/xsettingsd-config
+
+if [[ "$1" = "--start" ]]; then
+    exec xsettingsd -c $configdir/xsettingsd-config
+else
+    # xsettingsd reloads its settings when it gets SIGHUP
+    killall -HUP xsettingsd
+fi
+

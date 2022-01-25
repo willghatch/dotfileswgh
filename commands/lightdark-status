@@ -19,7 +19,7 @@ update(){
     # The well-supported dark/light themes are Yaru-dark and Yaru-light
     #gsettings set org.gnome.desktop.interface gtk-theme Yaru-$1
     # Alternatively, we can set that theme using xsettings instead.
-    xsettingsd-reload
+    xsettingsd-wrapper
 }
 
 if [[ "$#" = 0 ]]; then
