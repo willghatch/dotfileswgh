@@ -1,8 +1,5 @@
 #!/usr/bin/env bash
 
-if [[ "none" = $(premacs-get-next-daemon) ]]; then
-    premacs-init
-fi
-
+premacs-init
 exec premacs-use "$@"
 

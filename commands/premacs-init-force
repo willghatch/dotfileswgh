@@ -1,7 +1,10 @@
 #!/usr/bin/env bash
 
 # script to pre-launch emacs daemons to speed up start time
-if [[ "none" = $(premacs-get-next-daemon) ]]; then
-    premacs-init-force
-fi
+
+premacs-new &
+premacs-new &
+premacs-new
+
+echo "premacs ready!"
 
