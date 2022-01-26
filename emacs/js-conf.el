@@ -6,6 +6,8 @@
   (defun js-maybe-semicolon ()
     (if js-want-semicolon ";" ""))
 
+  ;(setq js-indent-level 2)
+
   (require 'sgml-mode)
   (require 'js2-mode)
   (js2-minor-mode 1)
