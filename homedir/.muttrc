@@ -210,7 +210,7 @@ bind pager - enter-command
 
 set shell=bash
 # lame conditional sourcing...
-source `FILE=~/dotfileswgh/mutt-dark-theme; if [[ $(lightdark-status) = "light" ]]; then FILE=~/dotfileswgh/mutt-light-theme; fi; echo "$FILE"`
+source `FILE=~/dotfileswgh/mutt-dark-theme; if [ $(lightdark-status) = "light" ]; then FILE=~/dotfileswgh/mutt-light-theme; fi; echo "$FILE"`
 
 # TODO - maybe put this pattern in a helper script
 source `FILE=~/dotfileswgh/pri/mutt/rc; if [ ! -s "$FILE" ]; then FILE=/dev/null; fi; echo "$FILE"`
