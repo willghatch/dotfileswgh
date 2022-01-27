@@ -1,3 +1,4 @@
+;; TODO - emacs 27 apparently ships with a native display-fill-column-mode or something.
 (require 'fill-column-indicator)
 (setq-default fci-rule-color "#153040")
 (fci-mode 1) ; this only activates it in *scratch*, my mode hooks add it to others
