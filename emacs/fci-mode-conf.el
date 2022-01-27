@@ -9,7 +9,22 @@
 (global-fci-mode 1)
 (setq-default fci-mode-use-p t)
 (defun auto-fci-mode (&optional unused)
-  (if (and fci-mode-use-p (> (window-width) fci-rule-column))
+  (if (and fci-mode-use-p
+           (> (- (window-width)
+                 ;; Window width includes gutter stuff like line numbers.
+                 ;; My line number style uses N+2 columns, where N is the
+                 ;; number of digits needed to display the line number
+                 ;; in base 10.
+                 ;; Let's round so that buffers that dance between being
+                 ;; over or under 100 or 1000 lines don't have weirdness.
+                 (+ (round (log (line-number-at-pos (point-max))
+                                10))
+                    2)
+                 ;; A rightmost column will be used for showing that a line
+                 ;; continues.
+                 1
+                 )
+              fci-rule-column))
       (fci-mode 1)
     (fci-mode 0))
   )
