@@ -48,6 +48,8 @@
 ;;; First, blow up maps so they don't map things like t/T and
 ;;; insert mode stuff
 (setcdr evil-insert-state-map nil)
+(setcdr evil-replace-state-map nil)
+(set-keymap-parent evil-replace-state-map evil-insert-state-map)
 (setcdr evil-normal-state-map nil)
 (setcdr evil-motion-state-map nil)
 
