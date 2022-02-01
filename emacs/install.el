@@ -54,6 +54,7 @@
 (in 'magit)
 
 (in 'helm)
+(in 'helm-lsp)
 (in 'helm-swoop)
 (in 'helm-ag)
 (in 'helm-ag-r)
@@ -75,6 +76,8 @@
 ;(in 'js2-mode)
 ;(in 'js2-refactor)
 (in 'haskell-mode)
+(in 'lsp-haskell)
+(in 'lsp-ui)
 (in 'racket-mode)
 (in 'scribble-mode)
 (in 'clojure-mode)

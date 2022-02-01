@@ -196,6 +196,7 @@
  (load-library "fci-mode-conf")
  (load-library "mode-hooks-conf")
  (load-library "racket-mode-conf")
+ (load-library "haskell-mode-conf")
  (load-library "company-conf")
  (load-library "auto-complete-conf")
  (load-library "hippie-expand-conf")
