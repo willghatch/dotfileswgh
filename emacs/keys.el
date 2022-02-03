@@ -350,6 +350,7 @@
 (mkmap "gf" 'evil-ace-jump-line-mode)
 (mkmap "gdd" 'xref-find-definitions)
 (mkmap "gdD" 'xref-find-definitions-other-window)
+(mkmap "gdr" 'xref-find-references)
 (mkmap "gdi" 'lsp-describe-thing-at-point)
 (mkmap "gdp" 'pop-tag-mark)
 (nkmap " yc" 'xcopy)

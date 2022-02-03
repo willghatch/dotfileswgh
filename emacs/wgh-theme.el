@@ -32,7 +32,7 @@
  '(flycheck-error ((((background dark)) (:inherit error))))
  '(flycheck-info ((((background dark)) (:foreground "#369636"))))
  '(flycheck-warning ((((background dark)) (:inherit warning))))
- '(flymake-note ((((background dark)) (:inherit font-lock-comment-face))))
+ '(flymake-note ((((background dark)) (:forefround "#468636"))))
  '(flyspell-duplicate ((((background dark)) (:inherit warning))))
  '(font-lock-builtin-face ((((background dark)) (:foreground "#476cab"))))
  '(font-lock-comment-delimiter-face ((((background dark)) (:foreground "#683d8b"))))
