@@ -1,0 +1,3 @@
+#!/usr/bin/env bash
+openssl x509 -text -in "$@"
+
