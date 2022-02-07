@@ -4,7 +4,7 @@
 (switch-to-buffer "*premacs-setup*")
 (nobreak
  (org-mode)
- (racket-mode)
+ ;(racket-mode)
  ;(js-mode)
  ;(python-mode)
  ;(c-mode)
