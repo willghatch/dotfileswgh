@@ -226,6 +226,7 @@ updateColorStyle(){
             ZSH_HIGHLIGHT_STYLES[assign]="fg=blue"
             ZSH_HIGHLIGHT_STYLES[double-quoted-argument]="fg=red"
             ZSH_HIGHLIGHT_STYLES[single-quoted-argument]="fg=red,bold"
+            ZSH_HIGHLIGHT_STYLES[commandseparator]="fg=yellow"
         fi
         MEGAPROMPT_STYLES[git_ahead_mark]="%b%F{grey}▲%F{cyan}"
         MEGAPROMPT_STYLES[git_behind_mark]="%b%F{grey}▼%F{cyan}"
