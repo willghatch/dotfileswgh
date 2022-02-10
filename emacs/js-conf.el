@@ -1,4 +1,7 @@
 
+(add-to-list 'auto-mode-alist '("\\.mjs\\'" . js-mode))
+(add-to-list 'auto-mode-alist '("\\.rsh\\'" . js-mode))
+
 (defun js-conf-setup ()
   ;; Define whether I want to end everything with semicolons,
   ;; for my snippets to know whether to add them
@@ -6,7 +9,8 @@
   (defun js-maybe-semicolon ()
     (if js-want-semicolon ";" ""))
 
-  ;(setq js-indent-level 2)
+  ;; This really ought to be set per-file or per-project, but the ways of doing that aren't 
+  (setq js-indent-level 2)
 
   (require 'sgml-mode)
   (require 'js2-mode)
