@@ -65,13 +65,6 @@ fi
 export XDG_RUNTIME_DIR
 
 
-# themes to ease eye strain
-if [[ "$(lightdark-status)" = "light" ]]; then
-    source $DOTFILESWGH/env-light.sh
-else
-    source $DOTFILESWGH/env-dark.sh
-fi
-
 # For color in less (for man pages)
 export LESS_TERMCAP_mb=$(printf "\e[1;34m")
 export LESS_TERMCAP_md=$(printf "\e[1;31m")
