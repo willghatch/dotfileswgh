@@ -12,14 +12,9 @@ dostuff() {
     chmod 700 $HOME/.cache
     mkdir -p $HOME/prifs
     chmod 700 $HOME/prifs
-    # konsole is always changing this, and it's annoying.
-    chmod 444 config/konsolerc
     mkdir -p $HOME/dl # my default download directory
-    mkdir -p $HOME/vserv-mount
-    mkdir -p $HOME/tmp
     mkdir -p $HOME/.themes
     mkdir -p $HOME/.config
-    mkdir -p $HOME/.themes
     # dirs for mpd
     mkdir -p $HOME/.cache/mpd/playlists
     mkdir -p $HOME/.cache/mutt
@@ -28,13 +23,16 @@ dostuff() {
     mkdir -p dotlocal/firefox-default-profile/chrome
     ln -sf ../../../usercss dotlocal/firefox-default-profile/chrome/usercss
     echo '@import url("./usercss/master.css")' > dotlocal/firefox-default-profile/chrome/userContent.css
-    mkdir -p dotlocal/firefox-noaddon-profile
-    mkdir -p dotlocal/firefox-slack-profile
 
     # get terminfo set up
     tic -x xterm-256color-italic.terminfo
     tic -x xterm-24bit.terminfo
     tic -x xterm-24bit-italic.terminfo
+
+    # Some programs like to modify config files without asking me about it.  Usually the diffs are for very unimportant things, or they can't keep separation between proper config and state (eg. last UI state) that they want to save.  Let's make some files read-only to stop getting stupid git changes.
+    chmod 444 config/konsolerc
+    chmod 444 config/htop/htoprc
+    chmod 444 homedir/.mozilla/firefox/profiles.ini
 }
 
 

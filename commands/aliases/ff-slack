@@ -1,3 +1,5 @@
 #!/usr/bin/env bash
 FFX=${FFX:-firefox}
-exec nice -n 5 $FFX --profile $DOTFILESWGH/dotlocal/firefox-slack-profile "$@"
+profile=$DOTFILESWGH/dotlocal/firefox-slack-profile
+mkdir -p $profile
+exec nice -n 5 $FFX --profile $profile "$@"

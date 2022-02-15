@@ -1,3 +1,5 @@
 #!/usr/bin/env bash
 FFX=${FFX:-firefox}
+profile=$DOTFILESWGH/dotlocal/firefox-noaddon-profile
+mkdir -p $profile
 exec nice -n 5 $FFX --profile $DOTFILESWGH/dotlocal/firefox-noaddon-profile "$@"
