@@ -415,7 +415,7 @@ endfunction
 command! -nargs=0 DarkTheme call SetDarkTheme()
 
 function! SetLightTheme()
-    colorscheme morning
+    colorscheme peachpuff
     "call airline#switch_theme('light')
     highlight Comment cterm=italic
     highlight CursorLine cterm=NONE ctermbg=247
