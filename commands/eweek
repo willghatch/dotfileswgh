@@ -1,8 +1,9 @@
 #!/usr/bin/env racket
-#lang rash
+#lang racket/base
 (require
  gregor
  racket/cmdline
+ "../racket-libs/exec/main.rkt"
  )
 
 (define specs
@@ -29,4 +30,4 @@
                        end-of-week))
 
 
-e $filenames
+(apply execv (find-executable-path "e") filenames)

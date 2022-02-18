@@ -1,8 +1,9 @@
 #!/usr/bin/env racket
-#lang rash
+#lang racket/base
 (require
  gregor
  racket/cmdline
+ "../racket-libs/exec/main.rkt"
  )
 
 (define specs
@@ -20,5 +21,4 @@
 
 (define filenames (map (λ (date) (format "~a.org" (date->str date))) dates))
 
-
-e $filenames
+(apply execv (find-executable-path "e") filenames)
