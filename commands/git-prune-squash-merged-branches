@@ -1,0 +1,35 @@
+#!/usr/bin/env bash
+
+for-each-merged-branch() {
+    local f="$1"
+    # I didn't write this, I got it from Stack Overflow: https://stackoverflow.com/questions/43489303/how-can-i-delete-all-git-branches-which-have-been-squash-and-merge-via-github
+    # IE it's licensed under CC BY-SA 4.0 by Stack Overflow user “Clay”.  Thanks Clay!
+    # But I did adapt it a little.
+    # Honestly I don't quite understand how this works because I don't know what all of these git commands do, and I'm not going to read the manual right now.
+    git checkout -q master && git for-each-ref refs/heads/ "--format=%(refname:short)" | while read branch;
+        do
+            mergeBase=$(git merge-base master $branch) && [[ $(git cherry master $(git commit-tree $(git rev-parse "$branch^{tree}") -p $mergeBase -m _)) == "-"* ]] && "$f" "$branch"
+        done
+}
+
+dry-run-handler() {
+    echo "$1"
+}
+
+wet-run-handler() {
+    # This does print something for each branch.
+    git branch -D "$1"
+}
+
+if [[ "--dry" = "$1" ]]; then
+    for-each-merged-branch dry-run-handler
+    exit 0
+elif [[ "--wet" = "$1" ]]; then
+    for-each-merged-branch wet-run-handler
+    exit 0
+else
+    echo usage: "$0" "[--wet|--dry]"
+    exit 1
+fi
+
+
