@@ -1,12 +1,14 @@
 #!/usr/bin/env bash
 
-# nix-shell doesn't add LD_LIBRARY_PATH, which means `raco pkg` and other things fail, because Racket can't find libcrypto.so from the openssl package.  This is why I previously used FHSUserEnv.  But it does add NIX_TARGET_LDFLAGS, which has the needed info...
-
-# This was previously NIX_TARGET_LDFLAGS but has changed to NIX_LDFLAGS_FOR_TARGET...
-export LD_LIBRARY_PATH="$(env | grep NIX_LDFLAGS_FOR_TARGET | sed "s/ -L/:/g" | sed s/NIX_LDFLAGS_FOR_TARGET=://):/lib"
-
 # nix-shell sets SSL_CERT_FILE to /no-cert-file.crt
 unset SSL_CERT_FILE
 unset NIX_SSL_CERT_FILE
+
+# Make sure `goal` is on $PATH.
+binpath="$XDG_RUNTIME_DIR/$CURRENT_DEV_MODE/bin"
+mkdir -p $binpath
+ln -s "$DEV_MODE_REACH/scripts/goal-devnet" "$binpath/goal"
+PATH=$PATH:$binpath
+
 
 exec zsh

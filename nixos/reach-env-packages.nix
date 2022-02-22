@@ -15,10 +15,9 @@ nixos2105 = import (pkgs.fetchFromGitHub {
 
 in [
 
-  # The stack that comes with nixos tries to use the nix package manager.  Let's get a generic binary stack instead that doesn't do that.
   pp.stack
-  #(pp.callPackage ./haskell-stack-non-nixos.nix {})
   # GHC dependencies for stack
+  # {{{
   pp.gcc
   pp.gnumake
   pp.libffi
@@ -33,6 +32,9 @@ in [
   pp.ncurses5
   pp.ncurses5.dev
   pp.binutils
+  pp.pkgconfig
+  # }}}
+
 
   # The NixOS 21.11 version is older than required for Reach, but current unstable has a new enough version (as of 2022-01-17).
   pp.z3
@@ -49,8 +51,6 @@ in [
   pp.curl
   pp.which
   pp.wget
-  # nixos 21.05 has ghc8104
-  #nixos2105.ghc
 
 
   # These are for convenience when entering the environment

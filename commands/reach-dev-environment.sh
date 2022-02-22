@@ -10,6 +10,7 @@ if test -f /etc/NIXOS; then
          --keep CURRENT_DEV_PATH \
          --keep CURRENT_DEV_MODE \
          --keep EMACS_DOT_D_PATH \
+         --keep DEV_MODE_REACH \
          --keep LANG \
          --command $DOTFILESWGH/nixos/reach-post-env.sh
 else
