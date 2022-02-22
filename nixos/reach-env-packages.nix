@@ -15,6 +15,8 @@ nixos2105 = import (pkgs.fetchFromGitHub {
 
 in [
 
+  # Here is a blog post that discusses using Stack on NixOS in a shell environment: https://vaibhavsagar.com/blog/2018/03/17/faking-non-nixos-stack/
+
   pp.stack
   # GHC dependencies for stack
   # {{{
