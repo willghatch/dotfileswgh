@@ -82,7 +82,7 @@ umask 022 # the covenient umask
 
 ####### Unix tools, mostly coloring
 #alias cp="cp -a -i" # archive mode, to preserve timestamps, interactive check when overwriting
-alias cp="cp -i --preserve=time-stamps,mode" # archive mode, to preserve timestamps, interactive check when overwriting
+alias cp="cp -i --preserve=timestamps,mode" # archive mode, to preserve timestamps, interactive check when overwriting
 alias mv="mv -i" # ask before overwriting something else
 
 ####### Miscellaneous
