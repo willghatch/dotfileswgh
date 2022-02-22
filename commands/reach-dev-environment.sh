@@ -1,9 +1,9 @@
 #!/bin/sh
 
 NIXFILE=$DOTFILESWGH/nixos/reach-env.nix
-#if test "$1" = "fhs"; then
-#    NIXFILE=$DOTFILESWGH/nixos/racket-fhs-env.nix
-#fi
+if test "$1" = "fhs"; then
+    NIXFILE=$DOTFILESWGH/nixos/reach-fhs-env.nix
+fi
 
 if test -f /etc/NIXOS; then
     exec nix-shell $NIXFILE --pure \

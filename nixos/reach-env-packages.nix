@@ -4,12 +4,39 @@ in
 let
 #cp = pkgs;
 cp = pp;
+nixos2105 = import (pkgs.fetchFromGitHub {
+      owner = "NixOS";
+      repo = "nixpkgs";
+      # nixos-21.05 as of 2022-01-21
+      rev = "0fd9ee1aa36ce865ad273f4f07fdc093adeb5c00";
+      sha256 = "1mr2qgv5r2nmf6s3gqpcjj76zpsca6r61grzmqngwm0xlh958smx";
+    }) {};
+
+
 in [
 
+  # The stack that comes with nixos tries to use the nix package manager.  Let's get a generic binary stack instead that doesn't do that.
   pp.stack
+  #(pp.callPackage ./haskell-stack-non-nixos.nix {})
+  # GHC dependencies for stack
+  pp.gcc
+  pp.gnumake
+  pp.libffi
+  pp.libffi.dev
+  pp.zlib
+  pp.zlib.dev
+  pp.gmp
+  pp.gmp.dev
+  # ncurses has libtinfo
+  #pp.ncurses
+  #pp.ncurses.dev
+  pp.ncurses5
+  pp.ncurses5.dev
+  pp.binutils
+
   # The NixOS 21.11 version is older than required for Reach, but current unstable has a new enough version (as of 2022-01-17).
   pp.z3
-  # Mo is not packages in Nixpkgs.  I could contribute this perhaps.  It's a pretty simple package.
+  # Mo is not packaged in Nixpkgs.  I could contribute this perhaps.  It's a pretty simple package.
   (pp.callPackage ./mo.nix {})
   # `solc` - solidity compiler.
   # As of 2022-01-17 the version in NixOS, including unstable, is only 0.8.2, while Reach requires 0.8.9.
@@ -17,6 +44,13 @@ in [
   # On github they distribute a pre-built static binary for Linux, but it doesn't seem to want to execute.  I'm not sure what the missing piece is.
   #(pp.callPackage ./solc-static-linux.nix {})
   (pp.callPackage ./solc-updated.nix {})
+  pp.docker
+  pp.docker-compose
+  pp.curl
+  pp.which
+  pp.wget
+  # nixos 21.05 has ghc8104
+  #nixos2105.ghc
 
 
   # These are for convenience when entering the environment
