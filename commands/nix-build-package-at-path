@@ -1,0 +1,7 @@
+#!/usr/bin/env bash
+if [[ "" = "$1"  || "--help" = "$1" ]]; then
+  echo "usage: $0 <package-path>"
+  exit 1
+fi
+package="$1"
+nix-build -E "with import <nixpkgs> {}; callPackage ${package} {}"
