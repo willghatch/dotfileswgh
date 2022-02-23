@@ -61,24 +61,8 @@ end
 -- }}}
 
 -- {{{ global state stuff
-theme_env_var="WGH_THEME_DARK_OR_LIGHT"
-init_theme_state = os.getenv(theme_env_var) or "dark"
-
-globalstate = {
-   kbdstate = "normal",
-   theme_ld = init_theme_state
-}
-
 mkspawn = function(cmd)
    return function()
-      local l_or_d = "dark"
-      if globalstate.theme_ld == "light" then
-         -- l_or_d should only ever be exactly "light" or "dark"
-         l_or_d = "light"
-      end
-      local cmdwrapper = {l_or_d}
-      --local full_command = table_concat(cmdwrapper, cmd)
-      --awful.spawn(full_command)
       awful.spawn(cmd)
    end
 end
@@ -98,6 +82,19 @@ globalstate = {
 
 --beautiful.init(awful.util.get_themes_dir() .. "default/theme.lua")
 beautiful.init(dotfilesdir .. "/config/awesome/theme.lua")
+
+toggle_lightdark = function()
+   awful.spawn.easy_async({"lightdark-status", "toggle"}, function(stdout, stderr, reason, exit_code)
+         if stdout == "light\n" then
+            -- TODO - this light theme sort-of works, but it's missing a lot.  Also, the theme doesn't update immediately, it needs some element to need an update.  So there is probably a function I need to call to kick the actual update into action.  I think this is not the correct way to update a theme, but I'm not sure what is.
+            --beautiful.init(dotfilesdir .. "/config/awesome/light-theme.lua")
+            beautiful.init(dotfilesdir .. "/config/awesome/theme.lua")
+         else
+            beautiful.init(dotfilesdir .. "/config/awesome/theme.lua")
+         end
+  end)
+end
+
 
 -- This is used later as the default terminal and editor to run.
 terminal = {"vlaunch", "terminal"}
@@ -616,7 +613,7 @@ globalkeys = awful.util.table.join(
     awful.key({ hypkey,         }, "m", mkNonRep(mkspawn({"state", "mute", "toggle"}, {description = "", group = "launcher"}))),
     awful.key({ hypkey,         }, "u", mkNonRep(mkspawn({"state", "volume", "inc"}, {description = "", group = "launcher"}))),
     awful.key({ hypkey,         }, "d", mkNonRep(mkspawn({"state", "volume", "dec"}, {description = "", group = "launcher"}))),
-    awful.key({ hypkey,         }, "l", mkNonRep(mkspawn({"lightdark-status", "toggle"}, {description = "", group = "launcher"}))),
+    awful.key({ hypkey,         }, "l", mkNonRep(toggle_lightdark), {description = "", group = "launcher"}),
     awful.key({ hypkey,         }, "t", mkNonRep(mkspawn({"dunstctl", "close-all"}, {description = "", group = "launcher"}))),
     awful.key({ hypkey,         }, "y", mkNonRep(mkspawn({"dunstctl", "context"}, {description = "", group = "launcher"}))),
     awful.key({ hypkey,         }, "h", mkNonRep(mkspawn({"dunstctl", "history-pop"}, {description = "", group = "launcher"}))),
