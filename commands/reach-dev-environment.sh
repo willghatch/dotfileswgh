@@ -1,8 +1,8 @@
 #!/bin/sh
 
-NIXFILE=$DOTFILESWGH/nixos/reach-env.nix
+NIXFILE=$DOTFILESWGH/nixos/reach/reach-env.nix
 if test "$1" = "fhs"; then
-    NIXFILE=$DOTFILESWGH/nixos/reach-fhs-env.nix
+    NIXFILE=$DOTFILESWGH/nixos/reach/reach-fhs-env.nix
 fi
 
 if test -f /etc/NIXOS; then
@@ -12,7 +12,7 @@ if test -f /etc/NIXOS; then
          --keep EMACS_DOT_D_PATH \
          --keep DEV_MODE_REACH \
          --keep LANG \
-         --command $DOTFILESWGH/nixos/reach-post-env.sh
+         --command $DOTFILESWGH/nixos/reach/reach-post-env.sh
 else
   echo "Now only supporting NixOS..." 1>&2
   exit 1
