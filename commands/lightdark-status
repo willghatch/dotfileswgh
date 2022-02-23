@@ -26,6 +26,7 @@ update(){
     #gsettings set org.gnome.desktop.interface gtk-theme Yaru-$1
     # Alternatively, we can set that theme using xsettings instead.
     xsettingsd-wrapper
+    echo "$1"
 }
 
 if [[ "$#" = 0 ]]; then
