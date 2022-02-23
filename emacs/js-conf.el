@@ -55,3 +55,8 @@
   )
 
 (add-hook 'js-mode-hook 'js-conf-setup)
+
+;;;;;;;;;;;;;; Typescript
+
+(add-to-list 'auto-mode-alist '("\\.ts\\'" . typescript-mode))
+(setq typescript-indent-level 2)
