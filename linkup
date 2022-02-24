@@ -21,7 +21,7 @@ dostuff() {
     mkdir -p $HOME/musc-local
     mkdir -p dotlocal/firefox-default-profile
     mkdir -p dotlocal/firefox-default-profile/chrome
-    ln -sf ../../../usercss dotlocal/firefox-default-profile/chrome/usercss
+    ln -sf ../../../usercss dotlocal/firefox-default-profile/chrome/
     echo '@import url("./usercss/master.css")' > dotlocal/firefox-default-profile/chrome/userContent.css
 
     # get terminfo set up
