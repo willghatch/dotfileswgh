@@ -4,6 +4,8 @@
           (lambda ()
             ;; This could probably be useful, this activates flymake, which gives a bunch of lame Haskell warnings.  These warnings are suspect for pushing point-free style (which can apparently have some efficiency gains in Haskell, but which is poor for reading code).  And I get these warnings for other people's code, which I don't want.  So... let's just not have this at all right now.
             (setq lsp-diagnostics-provider nil)
+
+            ;; TODO - if I haven't yet imported the project, this will not ask which project to load and it will basically fail.  I'm not sure the best way around that.
             (lsp)
 
             ;; Flymake mode is giving me tons of annoying warnings and errors.  Let's turn it off for now.

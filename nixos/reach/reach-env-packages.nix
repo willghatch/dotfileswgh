@@ -38,6 +38,8 @@ in [
   # }}}
 
 
+  (pp.callPackage ./haskell-language-server-for-reach.nix {})
+
   # The NixOS 21.11 version is older than required for Reach, but current unstable has a new enough version (as of 2022-01-17).
   pp.z3
   # Mo is not packaged in Nixpkgs.  I could contribute this perhaps.  It's a pretty simple package.
