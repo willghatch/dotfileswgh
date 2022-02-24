@@ -10,8 +10,8 @@ mkdir -p $binpath
 PATH=$PATH:$binpath
 if [[ -n "$DEV_MODE_REACH" ]]; then
     PATH=$PATH:$DEV_MODE_REACH
-    #ln -sf "$DEV_MODE_REACH/scripts/goal-devnet" "$binpath/goal"
-    echo -e "#!/usr/bin/env bash\nexec $DEV_MODE_REACH/scripts/goal-devnet \"\$@\"" > "$binpath/goal"
+    ln -sf "$DEV_MODE_REACH/scripts/goal-devnet" "$binpath/goal"
+    #echo -e "#!/usr/bin/env bash\nexec $DEV_MODE_REACH/scripts/goal-devnet \"\$@\"" > "$binpath/goal"
 fi
 
 
