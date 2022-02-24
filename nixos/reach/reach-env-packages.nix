@@ -4,15 +4,6 @@ in
 let
 #cp = pkgs;
 cp = pp;
-nixos2105 = import (pkgs.fetchFromGitHub {
-      owner = "NixOS";
-      repo = "nixpkgs";
-      # nixos-21.05 as of 2022-01-21
-      rev = "0fd9ee1aa36ce865ad273f4f07fdc093adeb5c00";
-      sha256 = "1mr2qgv5r2nmf6s3gqpcjj76zpsca6r61grzmqngwm0xlh958smx";
-    }) {};
-
-
 in [
 
   # Here is a blog post that discusses using Stack on NixOS in a shell environment: https://vaibhavsagar.com/blog/2018/03/17/faking-non-nixos-stack/
@@ -43,7 +34,6 @@ in [
   # }}}
 
 
-  (pp.callPackage ./haskell-language-server-for-reach.nix {})
 
   # The NixOS 21.11 version is older than required for Reach, but current unstable has a new enough version (as of 2022-01-17).
   pp.z3
@@ -64,6 +54,9 @@ in [
   pp.wget
 
 
+  ### The below are not necessary for building Reach, but are useful.
+
+  (pp.callPackage ./haskell-language-server-for-reach.nix {})
 
 
   # This makes locales and unicode work.
