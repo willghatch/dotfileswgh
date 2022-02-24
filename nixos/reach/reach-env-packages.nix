@@ -49,7 +49,9 @@ in [
   #pp.solc
   # On github they distribute a pre-built static binary for Linux, but it doesn't seem to want to execute.  I'm not sure what the missing piece is.
   #(pp.callPackage ./solc-static-linux.nix {})
+  # So let's copy the upstream package definition and just update it.  This is another likely candidate for actually sending to Nixpkgs.
   (pp.callPackage ./solc-updated.nix {})
+
   pp.docker
   pp.docker-compose
   pp.curl
@@ -57,7 +59,16 @@ in [
   pp.wget
 
 
-  # These are for convenience when entering the environment
+
+
+  # This makes locales and unicode work.
+  # No nix-shell environment should go without it.
+  cp.glibcLocales
+
+
+
+
+  # These are just for convenience when entering the environment, because I like to have tools available
   cp.bashInteractive
   cp.zsh
   cp.coreutils
@@ -65,20 +76,8 @@ in [
   cp.emacs-nox
   #cp.man
   cp.gitAndTools.gitFull
-  #cp.tig
-  #cp.silver-searcher
-  #cp.meld
-  #cp.firefox
-  #cp.elinks
-  #cp.ncurses
-  #cp.which
-  #cp.less
-  #cp.par
-  #cp.hyperfine
-  #cp.xclip
-
-  # This makes locales and unicode work.
-  cp.glibcLocales
+  cp.tig
+  (cp.callPackage ../misc/ripgrep-renamed.nix {})
 
 
 ]

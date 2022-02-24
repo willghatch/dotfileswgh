@@ -43,6 +43,12 @@ in [
   pp.binutils
 
 
+
+
+  # This makes locales and unicode work.
+  cp.glibcLocales
+
+
   # These are for convenience when entering the environment
   cp.bashInteractive
   cp.zsh
@@ -51,6 +57,7 @@ in [
   cp.man
   cp.gitAndTools.gitFull
   cp.tig
+  (cp.callPackage ../misc/ripgrep-renamed.nix {})
   cp.silver-searcher
   # poor man's gitk...
   cp.gitg
@@ -74,7 +81,5 @@ in [
   cp.gnum4
   cp.autoconf
 
-  # This makes locales and unicode work.
-  cp.glibcLocales
 
 ]
