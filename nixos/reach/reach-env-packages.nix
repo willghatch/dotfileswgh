@@ -17,6 +17,11 @@ in [
 
   # Here is a blog post that discusses using Stack on NixOS in a shell environment: https://vaibhavsagar.com/blog/2018/03/17/faking-non-nixos-stack/
 
+  # For stack to work normally (not trying to leverage nix) in this nix-shell environment, you need some configuration in ~/.stack/config.yaml.  Specifically:
+  # ghc-build: standard
+  # nix:
+  #  enable: false
+
   pp.stack
   # GHC dependencies for stack
   # {{{
