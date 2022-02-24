@@ -7,8 +7,11 @@ unset NIX_SSL_CERT_FILE
 # Make sure `goal` is on $PATH.
 binpath="$XDG_RUNTIME_DIR/$CURRENT_DEV_MODE/bin"
 mkdir -p $binpath
-ln -sf "$DEV_MODE_REACH/scripts/goal-devnet" "$binpath/goal"
 PATH=$PATH:$binpath
+if [[ -n "$DEV_MODE_REACH" ]]; then
+    PATH=$PATH:$DEV_MODE_REACH
+    ln -sf "$DEV_MODE_REACH/scripts/goal-devnet" "$binpath/goal"
+fi
 
 
 exec zsh
