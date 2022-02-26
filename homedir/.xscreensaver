@@ -23,9 +23,9 @@ splash:		False
 splashDuration:	0:00:05
 demoCommand:	xscreensaver-demo
 nice:		10
-fade:		False
+fade:		True
 unfade:		False
-fadeSeconds:	0:00:01
+fadeSeconds:	0:00:10
 ignoreUninstalledPrograms:False
 grabDesktopImages:  False
 grabVideoFrames:    False
