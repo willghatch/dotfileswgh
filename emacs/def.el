@@ -187,6 +187,9 @@
  (setq display-line-numbers-grow-only t)
  (global-display-line-numbers-mode)
 
+ ;; guide on disabling/enabling lsp-mode features: https://emacs-lsp.github.io/lsp-mode/tutorials/how-to-turn-off/
+ (setq lsp-headerline-breadcrumb-enable nil)
+
  ;(require 'smex) ; autoloaded
  ;(require 'rainbow-delimiters) ; autoloaded
  (load-library "package-conf")
