@@ -6,25 +6,38 @@
 [push]
 	default = current
 [alias]
-        # Get and check out pull requests.
-        pr  = "!f() { git fetch -fu ${2:-origin} refs/pull/$1/head:pr/$1 && git checkout pr/$1; }; f"
-        # Gitlab calls them merge-requests and has a different ref name.  Note that remote refs can be listed with `git ls-remote`
-        mr  = "!f() { git fetch -fu ${2:-origin} refs/merge-requests/$1/head:pr/$1 && git checkout pr/$1; }; f"
-        pr-clean = "!git for-each-ref refs/heads/pr/* --format='%(refname)' | while read ref ; do branch=${ref#refs/heads/} ; git branch -D $branch ; done"
-	ls = log --oneline --decorate
-	lg = log --graph --all --decorate
-	ll = log --pretty=format:"%C(yellow)%h%Cred%d\\ %Creset%s%Cblue\\ [%cn]" --decorate --numstat
-	ld = log --pretty=format:"%C(yellow)%h\\ %ad%Cred%d\\ %Creset%s%Cblue\\ [%cn]" --decorate --date=relative
-	lf = log -u
-	lc = ls-files -u | awk '{print $4}' | sort -u
-	shallow = clone --depth 1
-	unshallow = fetch --unshallow
-	untracked = ls-files --other --directory --exclude-standard
+    # Get and check out pull requests.
+    pr  = "!f() { git fetch -fu ${2:-origin} refs/pull/$1/head:pr/$1 && git checkout pr/$1; }; f"
+    # Gitlab calls them merge-requests and has a different ref name.  Note that remote refs can be listed with `git ls-remote`
+    mr  = "!f() { git fetch -fu ${2:-origin} refs/merge-requests/$1/head:pr/$1 && git checkout pr/$1; }; f"
+    pr-clean = "!git for-each-ref refs/heads/pr/* --format='%(refname)' | while read ref ; do branch=${ref#refs/heads/} ; git branch -D $branch ; done"
+    ls = log --oneline --decorate
+    lg = log --graph --all --decorate
+    ll = log --pretty=format:"%C(yellow)%h%Cred%d\\ %Creset%s%Cblue\\ [%cn]" --decorate --numstat
+    ld = log --pretty=format:"%C(yellow)%h\\ %ad%Cred%d\\ %Creset%s%Cblue\\ [%cn]" --decorate --date=relative
+    lf = log -u
+    lc = ls-files -u | awk '{print $4}' | sort -u
+    shallow = clone --depth 1
+    unshallow = fetch --unshallow
+    untracked = ls-files --other --directory --exclude-standard
+    # These are suggested aliases from Jay.  I'll put theme here but not activate them right now.
+    #up = pull --rebase --stat --all
+    #undo-commit = reset --soft HEAD^
+    #svnst = diff --name-status remotes/git-svn
+    #st = status
+    #lol = log --graph --decorate --pretty=oneline --abbrev-commit
+    #lola = log --graph --decorate --pretty=oneline --abbrev-commit --all
+    #ci = commit
+    #co = checkout
+    #svnup = !git svn fetch && git svn rebase
+    #new-branch = checkout -b # NewBranch
+    #better-branch = reset --hard # BetterBranch
 
 [url "https://github.com/"]
 	insteadOf = gh:
 [url "git@github.com:"]
 	insteadOf = ghk:
+	pushInsteadOf = https://github.com/
 
 [include]
 	path = ~/dotfileswgh/pri/gitconfig
