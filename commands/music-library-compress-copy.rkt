@@ -4,7 +4,7 @@
 
 (define orig-music-dir "/hold/wgh-data-impersonal/music")
 (define output-dir "/hold/temporary-data/musc-compressed")
-(define max-jobs 8)
+(define max-jobs 4)
 (define verbose? #f)
 (command-line
  #:once-each
