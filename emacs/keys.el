@@ -499,6 +499,7 @@
     ("h" evil-search-highlight-persist-remove-all "search-highlight-now")
     ("H" evil-search-highlight-persist "search-highlight-ever")
     ("M" menu-bar-mode "menu-bar")
+    ("l" lsp-lens-mode "lsp-lens") ;; lsp-lens is the thing that shows eg. haskell imports in an overlay
     ("m" (lambda () (interactive)
            (menu-bar-mode 1) (menu-bar-open))
      "menu-open")
