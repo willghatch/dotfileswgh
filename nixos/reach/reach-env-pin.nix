@@ -1,4 +1,4 @@
-{ pkgs ? import <nixpkgs> {} }:
+{ pkgs ? import <nixpkgs> {}, overlays ? []}:
 let pinnedPackages = pkgs.fetchFromGitHub {
       owner = "NixOS";
       repo = "nixpkgs";
@@ -9,4 +9,4 @@ let pinnedPackages = pkgs.fetchFromGitHub {
       #rev = "77aa71f66fd05d9e7b7d1c084865d703a8008ab7";
       #sha256 = "1ir7y1aamdvxj9g849c4kc1ansbk3s6xpiwvpfycv2lxi5bnf0k7";
     };
-    in import pinnedPackages {}
+    in import pinnedPackages {overlays = overlays;}

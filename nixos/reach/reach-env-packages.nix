@@ -1,5 +1,8 @@
 { pkgs ? import <nixpkgs> {} }:
-let pp = import ./reach-env-pin.nix {};
+let pp = import ./reach-env-pin.nix { overlays = [
+  # stack GHC complains if libtinfo from ncurses doesn't have this flag
+  (self: super: {ncurses5 = super.ncurses5.overrideAttrs (oldAttrs: {configureFlags = oldAttrs.configureFlags ++ ["--with-versioned-syms"];});})
+  ];};
 in
 let
 #cp = pkgs;
@@ -25,8 +28,6 @@ in [
   pp.gmp
   pp.gmp.dev
   # ncurses has libtinfo
-  #pp.ncurses
-  #pp.ncurses.dev
   pp.ncurses5
   pp.ncurses5.dev
   pp.binutils
