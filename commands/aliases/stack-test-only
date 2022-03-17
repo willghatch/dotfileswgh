@@ -1,0 +1,8 @@
+#!/usr/bin/env bash
+
+if [[ "$#" == 0 || "$1" == "--help" || "$#" > 1 ]]; then
+  echo "Usage: $0 \"test name probably quoted\""
+  exit 1
+fi
+
+exec stack test --fast --test-arguments "-p \"$1\""
