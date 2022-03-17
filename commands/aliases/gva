@@ -1,3 +1,29 @@
-#!/bin/sh
-# calling this non-interactively doesn't seem to give me the branching visual
-exec premacs-use-t --eval "(progn (wgh/add-buffer-to-kill-block-list (call-interactively 'magit-log-all)) (delete-other-windows) )"
+#!/usr/bin/env bash
+
+# I want to see all local and remote refs, except NOT the gh-pages remote branch!!
+# The gh-pages branch tends to take up my whole screen (plus much more) and I never care about it.
+
+#gitRoot="$(git rev-parse --show-toplevel)"
+gitRefsAll="$(git show-ref | cut -d ' ' -f 2 | sed s+refs/heads/++ | sed s+refs/remotes/++ | sed s+refs/tags/++)"
+gitRefsUse="$(echo "$gitRefsAll" | grep -v gh-pages)"
+
+# Note that here-docs can include parameter substitution unless the end tag is quoted
+source=$(cat <<EOSOURCE
+(progn
+  (wgh/add-buffer-to-kill-block-list
+   (magit-log-other
+     ;; refs
+     (mapcar #'symbol-name
+             '($gitRefsUse))
+     ;; display options
+     '("--graph"
+       "--decorate"
+       "-n256"
+       )
+    ))
+  (delete-other-windows)
+  )
+EOSOURCE
+)
+#exec premacs-use-t --eval "(progn (wgh/add-buffer-to-kill-block-list (call-interactively 'magit-log-all)) (delete-other-windows) )"
+exec premacs-use-t --eval "$source"

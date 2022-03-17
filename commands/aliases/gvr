@@ -1,0 +1,3 @@
+#!/bin/sh
+# calling this non-interactively doesn't seem to give me the branching visual
+exec premacs-use-t --eval "(progn (wgh/add-buffer-to-kill-block-list (call-interactively 'magit-log-related)) (delete-other-windows) )"
