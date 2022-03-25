@@ -1,5 +1,16 @@
 ;;; -*- lexical-binding: t; -*-
 
+;; The specifications for this format string is in `man git-log`.
+;; %+b adds the commit message body text
+;; %+N adds “notes”, which is a git feature that I don't think I've ever seen anybody use.
+;; %aN adds author name
+;; %aE adds author email
+;; %cN adds committer name
+;; %cE adds committer email
+;(setq magit-log-revision-headers-format "%+b%+N")
+;(setq magit-log-revision-headers-format "%+b%+N\nA: %aN, C: %cN")
+
+
 (defun wgh/magit-checkout-at-point ()
   (interactive)
   (magit-checkout (magit-branch-or-commit-at-point)))

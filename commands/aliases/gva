@@ -19,6 +19,8 @@ source=$(cat <<EOSOURCE
      '("--graph"
        "--decorate"
        "-n256"
+       ;; adding ++header shows author, committer, and a bit of the commit message (beyond the headline).  More specifically, it shows info based on magit-log-revision-headers-format
+       ;;"++header"
        )
     ))
   (delete-other-windows)
