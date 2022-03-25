@@ -59,6 +59,11 @@ in [
 
   (pp.callPackage ./haskell-language-server-for-reach.nix {})
 
+  # For typescript language server
+  pp.nodejs
+  pp.nodePackages.npm
+  pp.nodePackages.typescript-language-server
+
 
   # This makes locales and unicode work.
   # No nix-shell environment should go without it.
