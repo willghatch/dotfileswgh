@@ -1,0 +1,4 @@
+#!/bin/sh
+
+# one byte per line, with byte offset in hexadecimal followed by decimal byte value
+exec hexdump -e '/1 "%_ax "' -e '/1 "%03u\n"'

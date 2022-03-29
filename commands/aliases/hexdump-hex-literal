@@ -1,0 +1,7 @@
+#!/bin/sh
+
+echo -n "0x"
+# hexdump will read stdin
+hexdump -e '/1 "%02x"'
+# Now let's add a newline.
+echo ""
