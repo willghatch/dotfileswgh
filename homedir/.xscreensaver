@@ -12,8 +12,8 @@ passwdTimeout:	0:00:30
 
 dpmsEnabled:	True
 dpmsQuickOff:	False
-dpmsStandby:	0:10:00
-dpmsSuspend:	0:15:00
+dpmsStandby:	0:15:00
+dpmsSuspend:	0:20:00
 dpmsOff:	0:30:00
 
 visualID:	default
@@ -23,9 +23,9 @@ splash:		False
 splashDuration:	0:00:05
 demoCommand:	xscreensaver-demo
 nice:		10
-fade:		True
+fade:		False
 unfade:		False
-fadeSeconds:	0:00:10
+fadeSeconds:	0:00:03
 ignoreUninstalledPrograms:False
 grabDesktopImages:  False
 grabVideoFrames:    False
