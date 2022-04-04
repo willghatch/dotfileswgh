@@ -122,6 +122,10 @@
  (load-library "init-helpers")
  (require 'evil)
  (evil-mode 1)
+ ;; Don't litter with undo-tree history files everywhere.
+ ;; But maybe I should also look for how to put them in my emacs cache dir?
+ ;; Persistent undo would be useful, but also annoying for when I really want to just get a file to its original state when I opened it.
+ (setq undo-tree-auto-save-history nil)
  (require 'undo-tree)
  (global-undo-tree-mode 1)
  (require 'key-chord)
