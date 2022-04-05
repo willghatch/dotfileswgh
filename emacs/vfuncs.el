@@ -188,6 +188,15 @@ quit emacs."
 (repeatable-motion-define-pair 'pscroll-down-half 'pscroll-up-half)
 (repeatable-motion-define-pair 'pscroll-down-full 'pscroll-up-full)
 
+;;;; start indent tree implementation
+;; Note that it will not work gracefully for improper trees (with
+;; indentation levels skipped for some nodes).  This can only happen
+;; for the first child of any node.
+;; eg:
+;;   root
+;;      indented more than root's next child!
+;;     normal child indentation
+
 (defun wgh/current-line-whitespace-only-p ()
   (string-match-p "^\\s-*$"
                   (buffer-substring (line-beginning-position)
@@ -346,6 +355,7 @@ quit emacs."
          ;; TODO - a custom while loop could exit early if the number given is too high
          (dotimes (i num) (wgh/indent-tree-inorder-traversal-backward-single)))))
 
+;;;; end indent tree implementation
 
 
 
