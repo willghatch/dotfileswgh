@@ -188,6 +188,11 @@ quit emacs."
 (repeatable-motion-define-pair 'pscroll-down-half 'pscroll-up-half)
 (repeatable-motion-define-pair 'pscroll-down-full 'pscroll-up-full)
 
+(defun wgh/current-line-whitespace-only-p ()
+  (string-match-p "^\\s-*$"
+                  (buffer-substring (line-beginning-position)
+                                    (line-end-position))))
+
 (defun wgh/next-line-same-indent-in-block (num)
   (interactive "p")
   (let ((start-indent (current-indentation))
@@ -195,27 +200,22 @@ quit emacs."
         (backtrack-pos (point))
         (direction (if (< 0 num) 1 -1))
         (times (abs num))
-        (index 0)
-        (current-line-blank-p
-         (lambda ()
-           (string-match-p "^\\s-*$"
-                           (buffer-substring (line-beginning-position)
-                                             (line-end-position))))))
+        (index 0))
     (while (and (< index times)
                 (setq index (+ 1 index)))
       (while (and (zerop (forward-line direction))
-                  (or (not (<= (current-indentation) start-indent))
+                  (or (> (current-indentation) start-indent)
                       ;; TODO - maybe this should be configurable as to whether it ignores empty lines and/or lines with indentation but nothing after
                       ;; current-line-empty
                       ;;(equal (line-beginning-position) (line-end-position))
                       ;; white space only line
-                      (funcall current-line-blank-p)
+                      (wgh/current-line-whitespace-only-p)
 
                       )
                   ))
       (if (or (not (= (current-indentation) start-indent))
               ;; TODO - without this, top-level movement can go to a blank line after the last top-level tree.  That could be useful, but violates my intention of making this a tree motion...
-              (funcall current-line-blank-p))
+              (wgh/current-line-whitespace-only-p))
           (goto-char backtrack-pos)
         (progn
           ;;(evil-goto-column start-column)
@@ -226,6 +226,127 @@ quit emacs."
   (wgh/next-line-same-indent-in-block (* -1 (or direction 1))))
 (repeatable-motion-define-pair 'wgh/previous-line-same-indent-in-block
                                'wgh/next-line-same-indent-in-block)
+
+(defun wgh/motion-moved (motion)
+  (let ((start-pos (point)))
+    (funcall motion)
+    (not (= (point) start-pos))))
+
+(defun wgh/indent-tree-forward-to-last-sibling ()
+  (while (wgh/motion-moved (lambda () (wgh/next-line-same-indent-in-block 1)))))
+
+(defun wgh/indent-tree-up-to-parent (num)
+  ;; TODO - this should probably error if num is negative
+  (interactive "p")
+  (let ((start-indent (current-indentation))
+        (start-column (current-column))
+        (backtrack-pos (point))
+        ;;(direction (if (< 0 num) 1 -1))
+        (times (abs num))
+        (index 0))
+    (while (and (< index times)
+                (setq index (+ 1 index)))
+      (while (and (zerop (forward-line -1))
+                  (or (>= (current-indentation) start-indent)
+                      (wgh/current-line-whitespace-only-p))))
+      (if (or (not (< (current-indentation) start-indent))
+              (wgh/current-line-whitespace-only-p))
+          (goto-char backtrack-pos)
+        (progn
+          ;;(evil-goto-column start-column)
+          (back-to-indentation)
+          (setq backtrack-pos (point))
+          (setq start-indent (current-indentation)))))))
+
+(defun wgh/indent-tree-down-to-first-child (num)
+  ;; TODO - this should probably error if num is negative
+  (interactive "p")
+  (let ((start-indent (current-indentation))
+        (start-column (current-column))
+        (backtrack-pos (point))
+        ;;(direction (if (< 0 num) 1 -1))
+        (times (abs num))
+        (index 0)
+        (ret-val t))
+    (while (and (< index times)
+                (setq index (+ 1 index)))
+      (while (and (zerop (forward-line 1))
+                  (wgh/current-line-whitespace-only-p)))
+      (if (or (not (> (current-indentation) start-indent))
+              (wgh/current-line-whitespace-only-p))
+          (progn
+            (setq ret-val nil)
+            (goto-char backtrack-pos))
+        (progn
+          ;;(evil-goto-column start-column)
+          (back-to-indentation)
+          (setq backtrack-pos (point))
+          (setq start-indent (current-indentation)))))
+    ret-val))
+
+(defun wgh/indent-tree-down-to-last-child (num)
+  ;; TODO - this should probably error if num is negative
+  (interactive "p")
+  (let ((start-indent (current-indentation))
+        (start-column (current-column))
+        (backtrack-pos (point))
+        ;;(direction (if (< 0 num) 1 -1))
+        (times (abs num))
+        (index 0))
+    (while (and (< index times)
+                (setq index (+ 1 index)))
+      (and (wgh/motion-moved (lambda () (wgh/indent-tree-down-to-first-child 1)))
+           (wgh/indent-tree-forward-to-last-sibling)))))
+
+(defun wgh/indent-tree-down-to-last-descendant ()
+  (interactive)
+  (while (wgh/motion-moved (lambda () (wgh/indent-tree-down-to-last-child 1)))))
+
+(defun wgh/indent-tree-previous-sibling-last-descendant ()
+  (and (wgh/motion-moved (lambda () (wgh/next-line-same-indent-in-block -1)))
+       (wgh/indent-tree-down-to-last-descendant)))
+
+(defun wgh/indent-tree-last-leaf-forward-in-order ()
+  ;; IE if you're at a leaf with no next sibling,
+  ;; the next motion is to find the nearest
+  ;; ancestor with a next sibling and go to that sibling.
+  (interactive)
+  (let ((backtrack-pos (point))
+        (keep-going-p t)
+        (success-p nil))
+    (while (and keep-going-p (not success-p))
+      (when (not (wgh/motion-moved (lambda () (wgh/indent-tree-up-to-parent 1))))
+        (setq keep-going-p nil))
+      (when (wgh/motion-moved (lambda () (wgh/next-line-same-indent-in-block 1)))
+        (setq success-p t)))
+    (when (not success-p)
+      (goto backtrack-pos))
+    success-p))
+
+(defun wgh/indent-tree-inorder-traversal-forward-single ()
+  (unless (wgh/motion-moved (lambda () (wgh/indent-tree-down-to-first-child 1)))
+    (unless (wgh/motion-moved (lambda () (wgh/next-line-same-indent-in-block 1)))
+      (wgh/motion-moved (lambda () (wgh/indent-tree-last-leaf-forward-in-order))))))
+(defun wgh/indent-tree-inorder-traversal-backward-single ()
+  (unless (wgh/motion-moved #'wgh/indent-tree-previous-sibling-last-descendant)
+    (wgh/indent-tree-up-to-parent 1)))
+
+(defun wgh/indent-tree-inorder-traversal-forward (num)
+  (interactive "p")
+  (cond ((= num 0) t)
+        ((< num 0) (wgh/indent-tree-inorder-traversal-backward (- num)))
+        (t
+         ;; TODO - a custom while loop could exit early if the number given is too high
+         (dotimes (i num) (wgh/indent-tree-inorder-traversal-forward-single)))))
+(defun wgh/indent-tree-inorder-traversal-backward (num)
+  (interactive "p")
+  (cond ((= num 0) t)
+        ((< num 0) (wgh/indent-tree-inorder-traversal-forward (- num)))
+        (t
+         ;; TODO - a custom while loop could exit early if the number given is too high
+         (dotimes (i num) (wgh/indent-tree-inorder-traversal-backward-single)))))
+
+
 
 
 (defun ansi-color-buffer ()

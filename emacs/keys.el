@@ -426,6 +426,8 @@
 (mkmap "oO" 'rmo/backward-symbol)
 (mkmap "ei" 'rmo/wgh/next-line-same-indent-in-block)
 (mkmap "oi" 'rmo/wgh/previous-line-same-indent-in-block)
+(mkmap "eI" 'wgh/indent-tree-down-to-first-child)
+(mkmap "oI" 'wgh/indent-tree-up-to-parent)
 (mkmap "ej" 'rmo/evil-jump-forward)
 (mkmap "oj" 'rmo/evil-jump-backward)
 ;; eu/ou for destructive subcommands!
