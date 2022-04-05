@@ -195,12 +195,27 @@ quit emacs."
         (backtrack-pos (point))
         (direction (if (< 0 num) 1 -1))
         (times (abs num))
-        (index 0))
+        (index 0)
+        (current-line-blank-p
+         (lambda ()
+           (string-match-p "^\\s-*$"
+                           (buffer-substring (line-beginning-position)
+                                             (line-end-position))))))
     (while (and (< index times)
                 (setq index (+ 1 index)))
-      (while (and (zerop (forward-line (or direction 1)))
-                  (not (<= (current-indentation) start-indent))))
-      (if (< (current-indentation) start-indent)
+      (while (and (zerop (forward-line direction))
+                  (or (not (<= (current-indentation) start-indent))
+                      ;; TODO - maybe this should be configurable as to whether it ignores empty lines and/or lines with indentation but nothing after
+                      ;; current-line-empty
+                      ;;(equal (line-beginning-position) (line-end-position))
+                      ;; white space only line
+                      (funcall current-line-blank-p)
+
+                      )
+                  ))
+      (if (or (not (= (current-indentation) start-indent))
+              ;; TODO - without this, top-level movement can go to a blank line after the last top-level tree.  That could be useful, but violates my intention of making this a tree motion...
+              (funcall current-line-blank-p))
           (goto-char backtrack-pos)
         (progn
           ;;(evil-goto-column start-column)
