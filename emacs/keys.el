@@ -505,6 +505,7 @@
     ("m" (lambda () (interactive)
            (menu-bar-mode 1) (menu-bar-open))
      "menu-open")
+    ("n" display-line-numbers-mode "line-numbers")
     ("I" indent-guide-mode "indent-guide")
     ("x" wgh/racket-xp-pre-redisplay-toggle "racket-xp-hl")
     ))
