@@ -57,12 +57,20 @@ in [
 
   ### The below are not necessary for building Reach, but are useful.
 
+  # stuff for scripts in scripts dir
+  pp.jq
+  pp.bat
+
   (pp.callPackage ./haskell-language-server-for-reach.nix {})
 
   # For typescript language server
   pp.nodejs
   pp.nodePackages.npm
   pp.nodePackages.typescript-language-server
+
+  # for `make js-build` in the js/stdlib dir
+  # TODO - this is probably too old, but I'll just go into the docker container to see things for now.
+  pp.nodePackages.typescript
 
 
   # This makes locales and unicode work.
