@@ -321,6 +321,8 @@
 (define-key evil-outer-text-objects-map "d" 'evil-cp-a-defun)
 (define-key evil-inner-text-objects-map "b" 'evil-textobj-anyblock-inner-block)
 (define-key evil-outer-text-objects-map "b" 'evil-textobj-anyblock-a-block)
+(define-key evil-inner-text-objects-map "i" 'wgh/inner-indent-tree)
+(define-key evil-outer-text-objects-map "i" 'wgh/outer-indent-tree)
 
 ;; Normal state switch!
 (key-chord-define evil-insert-state-map (kbd "kj") 'evil-normal-state)

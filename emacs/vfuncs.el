@@ -329,7 +329,7 @@ quit emacs."
       (when (wgh/motion-moved (lambda () (wgh/next-line-same-indent-in-block 1)))
         (setq success-p t)))
     (when (not success-p)
-      (goto backtrack-pos))
+      (goto-char backtrack-pos))
     success-p))
 
 (defun wgh/indent-tree-inorder-traversal-forward-single ()
@@ -354,6 +354,42 @@ quit emacs."
         (t
          ;; TODO - a custom while loop could exit early if the number given is too high
          (dotimes (i num) (wgh/indent-tree-inorder-traversal-backward-single)))))
+
+(defun wgh/inner-indent-tree-for-point_left (start-point)
+  (save-excursion
+    (goto-char start-point)
+    (wgh/indent-tree-up-to-parent 1)
+    (wgh/indent-tree-down-to-first-child 1)
+    (line-beginning-position)))
+(defun wgh/inner-indent-tree-for-point_right (start-point)
+  (save-excursion
+    (goto-char start-point)
+    (wgh/indent-tree-up-to-parent 1)
+    (wgh/indent-tree-down-to-last-descendant)
+    (line-end-position)))
+(defun wgh/outer-indent-tree-for-point_left (start-point)
+  (save-excursion
+    (goto-char start-point)
+    (wgh/indent-tree-up-to-parent 1)
+    (line-beginning-position)))
+
+
+(evil-define-text-object wgh/inner-indent-tree (count &optional beg end type)
+  ;; TODO - This inner object has a problem that it doesn't grow, it's idempotent.
+  (list (min (wgh/inner-indent-tree-for-point_left beg)
+             (wgh/inner-indent-tree-for-point_left end)
+             beg)
+        (max (wgh/inner-indent-tree-for-point_right beg)
+             (wgh/inner-indent-tree-for-point_right end)
+             end)))
+(evil-define-text-object wgh/outer-indent-tree (count &optional beg end type)
+  (list (min (wgh/outer-indent-tree-for-point_left beg)
+             (wgh/outer-indent-tree-for-point_left end)
+             beg)
+        ;; The end point is the same for inner and outer
+        (max (wgh/inner-indent-tree-for-point_right beg)
+             (wgh/inner-indent-tree-for-point_right end)
+             end)))
 
 ;;;; end indent tree implementation
 
