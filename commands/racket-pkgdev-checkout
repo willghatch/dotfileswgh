@@ -3,18 +3,19 @@
 # use bourne shell because I need to do this *in* the environment where I'm checking out packages, where I don't yet have rash.
 
 if test "$1" = "--help" -o -z "$1"; then
-  echo "Usage: $0 <raco-path> <release-number>"
+  #echo "Usage: $0 <raco-path> <release-number>"
+  echo "Usage: $0 <raco-path>"
   echo "Sets the catalog path for the given raco to be pinned to the given release."
   echo "Then clones all my repos in the current directory."
   exit 1
 fi
 
 raco="$1"
-release="$2"
-$raco pkg config --scope installation --set catalogs \
-  "https://download.racket-lang.org/releases/$release/catalog/" \
-  "https://pkgs.racket-lang.org" \
-  "https://planet-compats.racket-lang.org"
+#release="$2"
+#$raco pkg config --scope installation --set catalogs \
+#  "https://download.racket-lang.org/releases/$release/catalog/" \
+#  "https://pkgs.racket-lang.org" \
+#  "https://planet-compats.racket-lang.org"
 $raco pkg config --scope installation --set name pkgdev
 get(){
   $raco pkg install --auto --multi-clone convert --clone "$1" "$1"
