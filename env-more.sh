@@ -3,7 +3,7 @@
 export HROOT=$WGHHOME/hroot
 
 export RACKET_NO_DEV_PATH=$DOTFILESWGH/dotlocal/racket-pkgs-bin:$DOTFILESWGH/dotlocal/racket-bin
-export RACKET_PKG_DEV_PATH=$WGHHOME/s/mk/racket-pkgdev/racket/bin:$WGHHOME/s/mk/racket-pkgdev/bin:$WGHHOME/.racket/pkgdev/bin
+export RACKET_PKG_DEV_PATH=$WGHHOME/s/mk/racket-pkgdev/racket/bin:$WGHHOME/s/mk/racket-pkgdev/bin:$WGHHOME/.local/share/racket/pkgdev/bin
 export RACKET_CORE_DEV_PATH=$WGHHOME/s/mk/racket-coredev/racket/bin
 
 DOTFILESWGH_COMMAND_PATH=$DOTFILESWGH/pri/dotlocal/commands:$DOTFILESWGH/dotlocal/commands:$WGHHOME/rootgit-dotfiles/commands:/rootgit/bin.rootgit:/rootgit/tools.rootgit:$DOTFILESWGH/pri/commands:$DOTFILESWGH/pri/commands/aliases:$DOTFILESWGH/commands:$DOTFILESWGH/commands/aliases
