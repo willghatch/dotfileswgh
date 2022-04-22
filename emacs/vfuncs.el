@@ -196,6 +196,7 @@ quit emacs."
 ;;   root
 ;;      indented more than root's next child!
 ;;     normal child indentation
+(require 'tree-walk)
 
 (defun wgh/current-line-whitespace-only-p ()
   (string-match-p "^\\s-*$"
@@ -292,6 +293,8 @@ quit emacs."
           (setq backtrack-pos (point))
           (setq start-indent (current-indentation)))))
     ret-val))
+(repeatable-motion-define-pair 'wgh/indent-tree-up-to-parent
+                               'wgh/indent-tree-down-to-first-child)
 
 (defun wgh/indent-tree-down-to-last-child (num)
   ;; TODO - this should probably error if num is negative
@@ -306,90 +309,28 @@ quit emacs."
                 (setq index (+ 1 index)))
       (and (wgh/motion-moved (lambda () (wgh/indent-tree-down-to-first-child 1)))
            (wgh/indent-tree-forward-to-last-sibling)))))
+(repeatable-motion-define 'wgh/indent-tree-down-to-last-child
+                          ;; down to last child has the same inverse as down to first child, but up to parent inverses as down to first child
+                          'wgh/indent-tree-up-to-parent)
 
-(defun wgh/indent-tree-down-to-last-descendant ()
-  (interactive)
-  (while (wgh/motion-moved (lambda () (wgh/indent-tree-down-to-last-child 1)))))
+(tree-walk-define-operations
+ :inorder-forward wgh/indent-tree-inorder-traversal-forward
+ :inorder-backward wgh/indent-tree-inorder-traversal-backward
+ :down-to-last-descendant wgh/indent-tree-down-to-last-descendant
+ :no-end-inner-object wgh/indent-tree-inner
+ :no-end-outer-object wgh/indent-tree-outer
 
-(defun wgh/indent-tree-previous-sibling-last-descendant ()
-  (and (wgh/motion-moved (lambda () (wgh/next-line-same-indent-in-block -1)))
-       (wgh/indent-tree-down-to-last-descendant)))
-
-(defun wgh/indent-tree-last-leaf-forward-in-order ()
-  ;; IE if you're at a leaf with no next sibling,
-  ;; the next motion is to find the nearest
-  ;; ancestor with a next sibling and go to that sibling.
-  (interactive)
-  (let ((backtrack-pos (point))
-        (keep-going-p t)
-        (success-p nil))
-    (while (and keep-going-p (not success-p))
-      (when (not (wgh/motion-moved (lambda () (wgh/indent-tree-up-to-parent 1))))
-        (setq keep-going-p nil))
-      (when (wgh/motion-moved (lambda () (wgh/next-line-same-indent-in-block 1)))
-        (setq success-p t)))
-    (when (not success-p)
-      (goto-char backtrack-pos))
-    success-p))
-
-(defun wgh/indent-tree-inorder-traversal-forward-single ()
-  (unless (wgh/motion-moved (lambda () (wgh/indent-tree-down-to-first-child 1)))
-    (unless (wgh/motion-moved (lambda () (wgh/next-line-same-indent-in-block 1)))
-      (wgh/motion-moved (lambda () (wgh/indent-tree-last-leaf-forward-in-order))))))
-(defun wgh/indent-tree-inorder-traversal-backward-single ()
-  (unless (wgh/motion-moved #'wgh/indent-tree-previous-sibling-last-descendant)
-    (wgh/indent-tree-up-to-parent 1)))
-
-(defun wgh/indent-tree-inorder-traversal-forward (num)
-  (interactive "p")
-  (cond ((= num 0) t)
-        ((< num 0) (wgh/indent-tree-inorder-traversal-backward (- num)))
-        (t
-         ;; TODO - a custom while loop could exit early if the number given is too high
-         (dotimes (i num) (wgh/indent-tree-inorder-traversal-forward-single)))))
-(defun wgh/indent-tree-inorder-traversal-backward (num)
-  (interactive "p")
-  (cond ((= num 0) t)
-        ((< num 0) (wgh/indent-tree-inorder-traversal-forward (- num)))
-        (t
-         ;; TODO - a custom while loop could exit early if the number given is too high
-         (dotimes (i num) (wgh/indent-tree-inorder-traversal-backward-single)))))
-
-(defun wgh/inner-indent-tree-for-point_left (start-point)
-  (save-excursion
-    (goto-char start-point)
-    (wgh/indent-tree-up-to-parent 1)
-    (wgh/indent-tree-down-to-first-child 1)
-    (line-beginning-position)))
-(defun wgh/inner-indent-tree-for-point_right (start-point)
-  (save-excursion
-    (goto-char start-point)
-    (wgh/indent-tree-up-to-parent 1)
-    (wgh/indent-tree-down-to-last-descendant)
-    (line-end-position)))
-(defun wgh/outer-indent-tree-for-point_left (start-point)
-  (save-excursion
-    (goto-char start-point)
-    (wgh/indent-tree-up-to-parent 1)
-    (line-beginning-position)))
-
-
-(evil-define-text-object wgh/inner-indent-tree (count &optional beg end type)
-  ;; TODO - This inner object has a problem that it doesn't grow, it's idempotent.
-  (list (min (wgh/inner-indent-tree-for-point_left beg)
-             (wgh/inner-indent-tree-for-point_left end)
-             beg)
-        (max (wgh/inner-indent-tree-for-point_right beg)
-             (wgh/inner-indent-tree-for-point_right end)
-             end)))
-(evil-define-text-object wgh/outer-indent-tree (count &optional beg end type)
-  (list (min (wgh/outer-indent-tree-for-point_left beg)
-             (wgh/outer-indent-tree-for-point_left end)
-             beg)
-        ;; The end point is the same for inner and outer
-        (max (wgh/inner-indent-tree-for-point_right beg)
-             (wgh/inner-indent-tree-for-point_right end)
-             end)))
+ :up-to-parent (lambda () (wgh/indent-tree-up-to-parent 1))
+ :down-to-first-child (lambda () (wgh/indent-tree-down-to-first-child 1))
+ :down-to-last-child (lambda () (wgh/indent-tree-down-to-last-child 1))
+ :next-sibling (lambda () (wgh/next-line-same-indent-in-block 1))
+ :previous-sibling (lambda () (wgh/next-line-same-indent-in-block -1))
+ :no-end-object-left-finalize #'line-beginning-position
+ :no-end-object-right-finalize #'line-end-position
+ )
+(repeatable-motion-define-pair 'wgh/indent-tree-inorder-traversal-forward
+                               'wgh/indent-tree-inorder-traversal-backward)
+(repeatable-motion-define 'wgh/indent-tree-down-to-last-descendant nil)
 
 ;;;; end indent tree implementation
 

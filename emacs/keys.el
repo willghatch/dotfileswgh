@@ -321,8 +321,8 @@
 (define-key evil-outer-text-objects-map "d" 'evil-cp-a-defun)
 (define-key evil-inner-text-objects-map "b" 'evil-textobj-anyblock-inner-block)
 (define-key evil-outer-text-objects-map "b" 'evil-textobj-anyblock-a-block)
-(define-key evil-inner-text-objects-map "i" 'wgh/inner-indent-tree)
-(define-key evil-outer-text-objects-map "i" 'wgh/outer-indent-tree)
+(define-key evil-inner-text-objects-map "i" 'wgh/indent-tree-inner)
+(define-key evil-outer-text-objects-map "i" 'wgh/indent-tree-outer)
 
 ;; Normal state switch!
 (key-chord-define evil-insert-state-map (kbd "kj") 'evil-normal-state)
@@ -395,8 +395,8 @@
 (mkmap "oh" 'rmo/on-parens-backward-sexp)
 (mkmap "em" 'rmo/on-parens-forward-sexp-end)
 (mkmap "om" 'rmo/on-parens-backward-sexp-end)
-(mkmap "en" 'rmo/on-parens-forward-sexp-in-supersexp)
-(mkmap "on" 'rmo/on-parens-backward-sexp-in-supersexp)
+(mkmap "eH" 'rmo/on-parens-forward-sexp-in-supersexp)
+(mkmap "oH" 'rmo/on-parens-backward-sexp-in-supersexp)
 (mkmap "ea" 'rmo/evil-forward-arg)
 (mkmap "oa" 'rmo/evil-backward-arg)
 (mkmap "ew" 'rmo/evil-forward-little-word-begin)
@@ -428,8 +428,8 @@
 (mkmap "oO" 'rmo/backward-symbol)
 (mkmap "ei" 'rmo/wgh/next-line-same-indent-in-block)
 (mkmap "oi" 'rmo/wgh/previous-line-same-indent-in-block)
-(mkmap "eI" 'wgh/indent-tree-down-to-first-child)
-(mkmap "oI" 'wgh/indent-tree-up-to-parent)
+(mkmap "eI" 'rmo/wgh/indent-tree-down-to-first-child)
+(mkmap "oI" 'rmo/wgh/indent-tree-up-to-parent)
 (mkmap "ej" 'rmo/evil-jump-forward)
 (mkmap "oj" 'rmo/evil-jump-backward)
 ;; eu/ou for destructive subcommands!
@@ -442,6 +442,84 @@
 ;; this one doesn't really belong...
 (mkmap "eup" 'on-parens-splice)
 (mkmap "oup" 'on-parens-splice)
+
+;; tree operations "en<op><tree-type>"
+;; TODO - rearrange this in whatever way is necessary to get hints as I go to remember what the options are
+;; TODO - slurp/barf are not the only tree mutation operations I should have, eg. above I have "eu_" as "mutate forward" with things like join, split, splice, ... I should consider other tree operations and how they should fit in.
+;; "ens_" forward slurp
+(mkmap "ensp" 'on-parens-forward-slurp)
+(mkmap "onsp" 'on-parens-backward-slurp)
+; TODO - indent tree slurp
+(mkmap "ensi" 'ignore)
+(mkmap "onsi" 'ignore)
+(mkmap "enso" 'wgh/org-forward-slurp-heading)
+(mkmap "onso" 'ignore)
+;; "enb_" forward barf
+(mkmap "enbp" 'on-parens-forward-barf)
+(mkmap "onbp" 'on-parens-backward-barf)
+; TODO - indent tree barf
+(mkmap "enbi" 'ignore)
+(mkmap "onbi" 'ignore)
+(mkmap "enbo" 'wgh/org-forward-barf-heading)
+(mkmap "onbo" 'ignore)
+;; "enh_" forward sibling
+(mkmap "enhp" 'rmo/on-parens-forward-sexp)
+(mkmap "onhp" 'rmo/on-parens-backward-sexp)
+(mkmap "enhi" 'rmo/wgh/next-line-same-indent-in-block)
+(mkmap "onhi" 'rmo/wgh/previous-line-same-indent-in-block)
+(mkmap "enho" 'rmo/org-forward-heading-same-level)
+(mkmap "onho" 'rmo/org-backward-heading-same-level)
+;; "enm_" forward sibling end
+(mkmap "enmp" 'rmo/on-parens-forward-sexp-end)
+(mkmap "onmp" 'rmo/on-parens-backward-sexp-end)
+; TODO - indent tree moving by end of line
+(mkmap "enmi" 'ignore)
+(mkmap "onmi" 'ignore)
+(mkmap "enmo" 'ignore)
+(mkmap "onmo" 'ignore)
+;; "enc_" down to first child / "onc_" up to parent
+(mkmap "encp" 'rmo/on-parens-down-sexp)
+(mkmap "oncp" 'rmo/on-parens-up-sexp)
+(mkmap "enci" 'rmo/wgh/indent-tree-down-to-first-child)
+(mkmap "onci" 'rmo/wgh/indent-tree-up-to-parent)
+(mkmap "enco" 'rmo/org-down-element)
+(mkmap "onco" 'rmo/org-up-element)
+;; "enC_" down to last child / "onC_" up to parent end -- TODO - these should probably be rethought a bit, it's not a great match
+; TODO - symex down to last child beginning
+(mkmap "enCp" 'ignore)
+(mkmap "onCp" 'rmo/on-parens-up-sexp-end)
+(mkmap "enCi" 'rmo/wgh/indent-tree-down-to-last-child)
+(mkmap "onCi" 'ignore)
+(mkmap "enCo" 'rmo/wgh/org-down-to-last-child)
+(mkmap "onCo" 'ignore)
+;(mkmap "onCi" 'rmo/wgh/indent-tree-up-to-parent) ;; TODO - this doesn't really match the semantics I think I'm going for
+;; TODO - down to end of last child (on-parens-down-sexp-end)
+;; TODO - to end/beginning of current tree element (IE swap between delimiters when available)
+;; TODO - forward/back in parent sibling? (on-parens-forward-sexp-in-supersexp)
+;; "ent_" inorder traversal
+(mkmap "entp" 'ignore)
+(mkmap "ontp" 'ignore)
+(mkmap "enti" 'rmo/wgh/indent-tree-inorder-traversal-forward)
+(mkmap "onti" 'rmo/wgh/indent-tree-inorder-traversal-backward)
+(mkmap "ento" 'rmo/wgh/org-inorder-traversal-forward)
+(mkmap "onto" 'rmo/wgh/org-inorder-traversal-backward)
+;; "end_" down to last descendant
+(mkmap "endp" 'ignore)
+(mkmap "ondp" 'ignore)
+(mkmap "endi" 'rmo/wgh/indent-tree-down-to-last-descendant)
+(mkmap "ondi" 'ignore)
+(mkmap "endo" 'rmo/wgh/org-down-to-last-descendant)
+(mkmap "ondo" 'ignore)
+;; TODO - insertions, like wgh/org-add-heading-above/below
+
+;; TODO - tree text objects
+(define-key evil-inner-text-objects-map "np" 'inner-parens-textobj)
+(define-key evil-outer-text-objects-map "np" 'outer-parens-textobj)
+(define-key evil-inner-text-objects-map "ni" 'wgh/indent-tree-inner)
+(define-key evil-outer-text-objects-map "ni" 'wgh/indent-tree-outer)
+(define-key evil-inner-text-objects-map "no" 'wgh/org-tree-inner)
+(define-key evil-outer-text-objects-map "no" 'wgh/org-tree-outer)
+;;;;
 
 
 ;; Mouse keys...

@@ -30,6 +30,7 @@
 ;; * I delete to the end of the current s-exp.  That might be more complicated with generic trees to know exactly where to delete to for trees without an explicit end delimiter.
 ;; * highlight text objects -- with explicit delimiters there is a clear inner and outer object (inside and outside delimiter), without explicit delimiters the outer object is obvious, but they may have (possibly degenerate) inner objects as well
 ;; * slurp/barf -- sometimes I want to barf a single item out of multiple levels, but that's inconvenient.  I should add a barf operation where the cursor follows the barfee instead of the barfer.
+;; * Down to last descendant is useful when navigating trees that don't have explicit delimiters to see where the end of a tree is, but it would be nice to be paired with an undo-move
 ;;
 ;; What kind of trees do I want to support (where effort allows)?
 ;; * Lisp (s-expressions)
@@ -43,3 +44,188 @@
 ;; Text object operations: <inner/outer-prefix><tree-object-key><tree-type>
 ;; Motion operations: <tree-prefix><motion-type><tree-type>
 ;; Doing the tree type last would allow for an alternate tree prefix for “last tree type” or “saved tree type” to have 2-key combos instead of 3-key.
+
+(require 'cl-lib)
+
+(defun tree-walk--motion-moved (motion)
+  (let ((start-pos (point)))
+    (funcall motion)
+    (not (= (point) start-pos))))
+
+(defun tree-walk--last-leaf-forward-in-order (up next)
+  (lambda ()
+    ;; IE if you're at a leaf with no next sibling,
+    ;; the next motion is to find the nearest
+    ;; ancestor with a next sibling and go to that sibling.
+    (interactive)
+    (let ((backtrack-pos (point))
+          (keep-going-p t)
+          (success-p nil))
+      (while (and keep-going-p (not success-p))
+        (when (not (tree-walk--motion-moved up))
+          (setq keep-going-p nil))
+        (when (tree-walk--motion-moved next)
+          (setq success-p t)))
+      (when (not success-p)
+        (goto-char backtrack-pos))
+      success-p)))
+
+(defun tree-walk--down-to-last-descendant (down-to-last-child)
+  (interactive)
+  (while (tree-walk--motion-moved down-to-last-child)))
+
+(defun tree-walk--previous-sibling-last-descendant (prev last-descendant)
+  (and (tree-walk--motion-moved prev) (funcall last-descendant)))
+
+(defun tree-walk--inorder-traversal-forward-single (down next last-leaf-forward)
+  (lambda ()
+    (unless (tree-walk--motion-moved down)
+      (unless (tree-walk--motion-moved next)
+        (tree-walk--motion-moved last-leaf-forward)))))
+(defun tree-walk--inorder-traversal-backward-single (up prev down-to-last-child)
+  (lambda ()
+    (unless (tree-walk--motion-moved
+             (lambda ()
+               (tree-walk--previous-sibling-last-descendant
+                prev
+                (lambda () (while (tree-walk--motion-moved down-to-last-child))))))
+      (funcall up))))
+
+(defun tree-walk--inorder-traversal-forward (forward1 backward1)
+  (lambda (num)
+    (interactive "p")
+    (cond ((= num 0) t)
+          ((< num 0) (funcall backward1 (- num)))
+          (t
+           ;; TODO - a custom while loop could exit early if the number given is too high
+           (dotimes (i num) (funcall forward1))))))
+(defun tree-walk--inorder-traversal-backward (forward1 backward1)
+  (lambda (num)
+    (interactive "p")
+    (cond ((= num 0) t)
+          ((< num 0) (funcall forward1 (- num)))
+          (t
+           ;; TODO - a custom while loop could exit early if the number given is too high
+           (dotimes (i num) (funcall backward1))))))
+
+
+(defmacro tree-walk-define-inorder-traversal
+    (name-forward
+     name-backward
+     next prev
+     up down down-to-last-child
+     )
+  (let ((forward1 (gensym (format "%s_single_" name-forward)))
+        (backward1 (gensym (format "%s_single_" name-backward)))
+        (leaf-forward (gensym (format "%s_leaf-helper_" name-forward)))
+        )
+    `(progn
+       (setq ,leaf-forward (tree-walk--last-leaf-forward-in-order ,up ,next))
+       (setq ,forward1 (tree-walk--inorder-traversal-forward-single
+                        ,down ,next ,leaf-forward))
+       (setq ,backward1 (tree-walk--inorder-traversal-backward-single
+                         ,up ,prev ,down-to-last-child))
+       (fset ',name-forward
+             (tree-walk--inorder-traversal-forward ,forward1 ,backward1))
+       (fset ',name-backward
+             (tree-walk--inorder-traversal-backward ,forward1 ,backward1)))))
+
+
+
+(defun tree-walk--inner-no-end-tree-for-point_left (up down final)
+  (lambda (start-point)
+    (save-excursion
+      (goto-char start-point)
+      (and (tree-walk--motion-moved up)
+           (funcall down))
+      (funcall final))))
+(defun tree-walk--inner-no-end-tree-for-point_right (up down-to-last-descendant final)
+  (lambda (start-point)
+    (save-excursion
+      (goto-char start-point)
+      (funcall up)
+      (funcall down-to-last-descendant)
+      (funcall final))))
+(defun tree-walk--outer-no-end-tree-for-point_left (up final)
+  (lambda (start-point)
+    (save-excursion
+      (goto-char start-point)
+      (funcall up)
+      (funcall final))))
+
+;; TODO - Both objects assume they are getting the tree whose root is above point.  This works reasonably for the degenerate inner case, but for the more well formed outer case (which I think I will use more), it would be better for the object to assume the line it's on is the top level of the tree.  Changing this would make it initially idempotent, but then I could add a check such that when the region doesn't change it can go up to parent and try once more.
+(defmacro tree-walk-define-text-objects-no-end-tree
+    (inner-name outer-name
+     up down down-to-last-child
+     left-finalize right-finalize)
+  (let ((inner-left (gensym (format "-%s--inner-left" inner-name)))
+        (outer-left (gensym (format "-%s--outer-left" inner-name)))
+        (inout-right (gensym (format "-%s--inout-right" inner-name)))
+        )
+    `(progn
+       (setq ,inner-left
+             (tree-walk--inner-no-end-tree-for-point_left ,up ,down ,left-finalize))
+       (setq ,outer-left
+             (tree-walk--outer-no-end-tree-for-point_left ,up ,left-finalize))
+       (setq ,inout-right
+             (tree-walk--inner-no-end-tree-for-point_right
+              ,up
+              (lambda () (tree-walk--down-to-last-descendant ,down-to-last-child))
+              ,right-finalize))
+       (evil-define-text-object ,inner-name (count &optional beg end type)
+         ;; TODO - This inner object has a problem that it doesn't grow, it's idempotent.
+         (list (min (funcall ,inner-left beg)
+                    (funcall ,inner-left end)
+                    beg)
+               (max (funcall ,inout-right beg)
+                    (funcall ,inout-right end)
+                    end)))
+       (evil-define-text-object ,outer-name (count &optional beg end type)
+         (list (min (funcall ,outer-left beg)
+                    (funcall ,outer-left end)
+                    beg)
+               ;; The end point is the same for inner and outer
+               (max (funcall ,inout-right beg)
+                    (funcall ,inout-right end)
+                    end)))
+       )))
+
+(cl-defmacro tree-walk-define-operations
+    (&key
+     inorder-forward
+     inorder-backward
+     down-to-last-descendant
+     no-end-inner-object
+     no-end-outer-object
+
+     up-to-parent
+     down-to-first-child
+     down-to-last-child
+     next-sibling
+     previous-sibling
+     no-end-object-left-finalize
+     no-end-object-right-finalize
+     )
+  ;; TODO - add error checking to be sure requirements are met for each non-null thing to be defined
+  `(progn
+     ,@(remove-if-not
+        (lambda (x) x)
+        (list
+         (when down-to-last-descendant
+           `(defun ,down-to-last-descendant ()
+              (tree-walk--down-to-last-descendant ,down-to-last-child)))
+         (when (or no-end-inner-object no-end-outer-object)
+           `(tree-walk-define-text-objects-no-end-tree
+             ,no-end-inner-object ,no-end-outer-object
+             ,up-to-parent ,down-to-first-child ,down-to-last-child
+             ,no-end-object-left-finalize ,no-end-object-right-finalize))
+         (when (or inorder-forward inorder-backward)
+           `(tree-walk-define-inorder-traversal
+             ,inorder-forward
+             ,inorder-backward
+             ,next-sibling ,previous-sibling
+             ,up-to-parent ,down-to-first-child ,down-to-last-child
+             ))
+         ))))
+
+(provide 'tree-walk)
