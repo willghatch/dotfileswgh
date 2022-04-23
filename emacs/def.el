@@ -198,6 +198,7 @@
  ;(require 'rainbow-delimiters) ; autoloaded
  (load-library "package-conf")
  (load-library "yasnippet-conf")
+ (require 'indent-tree)
  (load-library "org-mode-conf")
  (setq fill-column 80)
  (load-library "fci-mode-conf")

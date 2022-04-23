@@ -321,8 +321,8 @@
 (define-key evil-outer-text-objects-map "d" 'evil-cp-a-defun)
 (define-key evil-inner-text-objects-map "b" 'evil-textobj-anyblock-inner-block)
 (define-key evil-outer-text-objects-map "b" 'evil-textobj-anyblock-a-block)
-(define-key evil-inner-text-objects-map "i" 'wgh/indent-tree-inner)
-(define-key evil-outer-text-objects-map "i" 'wgh/indent-tree-outer)
+(define-key evil-inner-text-objects-map "i" 'indent-tree-inner)
+(define-key evil-outer-text-objects-map "i" 'indent-tree-outer)
 
 ;; Normal state switch!
 (key-chord-define evil-insert-state-map (kbd "kj") 'evil-normal-state)
@@ -426,10 +426,10 @@
 (mkmap "eB" 'evil-next-line-1-first-non-blank)
 (mkmap "eO" 'rmo/forward-symbol)
 (mkmap "oO" 'rmo/backward-symbol)
-(mkmap "ei" 'rmo/wgh/next-line-same-indent-in-block)
-(mkmap "oi" 'rmo/wgh/previous-line-same-indent-in-block)
-(mkmap "eI" 'rmo/wgh/indent-tree-down-to-first-child)
-(mkmap "oI" 'rmo/wgh/indent-tree-up-to-parent)
+(mkmap "ei" 'rmo/indent-tree-forward-sibling)
+(mkmap "oi" 'rmo/indent-tree-backward-sibling)
+(mkmap "eI" 'rmo/indent-tree-down-to-first-child)
+(mkmap "oI" 'rmo/indent-tree-up-to-parent)
 (mkmap "ej" 'rmo/evil-jump-forward)
 (mkmap "oj" 'rmo/evil-jump-backward)
 ;; eu/ou for destructive subcommands!
@@ -465,8 +465,8 @@
 ;; "enh_" forward sibling
 (mkmap "enhp" 'rmo/on-parens-forward-sexp)
 (mkmap "onhp" 'rmo/on-parens-backward-sexp)
-(mkmap "enhi" 'rmo/wgh/next-line-same-indent-in-block)
-(mkmap "onhi" 'rmo/wgh/previous-line-same-indent-in-block)
+(mkmap "enhi" 'rmo/indent-tree-forward-sibling)
+(mkmap "onhi" 'rmo/indent-tree-backward-sibling)
 (mkmap "enho" 'rmo/org-forward-heading-same-level)
 (mkmap "onho" 'rmo/org-backward-heading-same-level)
 ;; "enm_" forward sibling end
@@ -480,15 +480,15 @@
 ;; "enc_" down to first child / "onc_" up to parent
 (mkmap "encp" 'rmo/on-parens-down-sexp)
 (mkmap "oncp" 'rmo/on-parens-up-sexp)
-(mkmap "enci" 'rmo/wgh/indent-tree-down-to-first-child)
-(mkmap "onci" 'rmo/wgh/indent-tree-up-to-parent)
+(mkmap "enci" 'rmo/indent-tree-down-to-first-child)
+(mkmap "onci" 'rmo/indent-tree-up-to-parent)
 (mkmap "enco" 'rmo/org-down-element)
 (mkmap "onco" 'rmo/org-up-element)
 ;; "enC_" down to last child / "onC_" up to parent end -- TODO - these should probably be rethought a bit, it's not a great match
 ; TODO - symex down to last child beginning
 (mkmap "enCp" 'ignore)
 (mkmap "onCp" 'rmo/on-parens-up-sexp-end)
-(mkmap "enCi" 'rmo/wgh/indent-tree-down-to-last-child)
+(mkmap "enCi" 'rmo/indent-tree-down-to-last-child)
 (mkmap "onCi" 'ignore)
 (mkmap "enCo" 'rmo/wgh/org-down-to-last-child)
 (mkmap "onCo" 'ignore)
@@ -499,14 +499,14 @@
 ;; "ent_" inorder traversal
 (mkmap "entp" 'ignore)
 (mkmap "ontp" 'ignore)
-(mkmap "enti" 'rmo/wgh/indent-tree-inorder-traversal-forward)
-(mkmap "onti" 'rmo/wgh/indent-tree-inorder-traversal-backward)
+(mkmap "enti" 'rmo/indent-tree-inorder-traversal-forward)
+(mkmap "onti" 'rmo/indent-tree-inorder-traversal-backward)
 (mkmap "ento" 'rmo/wgh/org-inorder-traversal-forward)
 (mkmap "onto" 'rmo/wgh/org-inorder-traversal-backward)
 ;; "end_" down to last descendant
 (mkmap "endp" 'ignore)
 (mkmap "ondp" 'ignore)
-(mkmap "endi" 'rmo/wgh/indent-tree-down-to-last-descendant)
+(mkmap "endi" 'rmo/indent-tree-down-to-last-descendant)
 (mkmap "ondi" 'ignore)
 (mkmap "endo" 'rmo/wgh/org-down-to-last-descendant)
 (mkmap "ondo" 'ignore)
@@ -515,8 +515,8 @@
 ;; TODO - tree text objects
 (define-key evil-inner-text-objects-map "np" 'inner-parens-textobj)
 (define-key evil-outer-text-objects-map "np" 'outer-parens-textobj)
-(define-key evil-inner-text-objects-map "ni" 'wgh/indent-tree-inner)
-(define-key evil-outer-text-objects-map "ni" 'wgh/indent-tree-outer)
+(define-key evil-inner-text-objects-map "ni" 'indent-tree-inner)
+(define-key evil-outer-text-objects-map "ni" 'indent-tree-outer)
 (define-key evil-inner-text-objects-map "no" 'wgh/org-tree-inner)
 (define-key evil-outer-text-objects-map "no" 'wgh/org-tree-outer)
 ;;;;

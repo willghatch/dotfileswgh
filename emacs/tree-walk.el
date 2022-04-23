@@ -38,7 +38,7 @@
 ;; * Lines with indentation
 ;; * Common data formats like JSON, XML
 ;; * Source code that can be parsed easily, eg. that has treesitter support
-;; * Somewhere I had a list of a lot more, but I guess I didn't put them here.  Too bad I haven't actually implemented anything yet, I was thinking I had at least implemented a first draft of some by-indentation motions.  But they aren't here.  Oh, they are in vfuncs, just next-line-same-indentation-in-block...  Well, hopefully some day I make time to implement this, because it would be super useful to have common keybindings for tree-based motions but with many different trees.  I want this all the time when editing.
+;; * Somewhere I had a list of a lot more, but I guess I didn't put them here.
 ;;
 ;; Starting key brainstorm:
 ;; Text object operations: <inner/outer-prefix><tree-object-key><tree-type>
@@ -234,6 +234,7 @@
         (list
          (when down-to-last-descendant
            `(defun ,down-to-last-descendant ()
+              (interactive)
               (tree-walk--down-to-last-descendant ,down-to-last-child)))
          (when (or no-end-inner-object no-end-outer-object)
            `(tree-walk-define-text-objects-no-end-tree
