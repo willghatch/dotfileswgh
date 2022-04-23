@@ -44,6 +44,27 @@
 ;; Text object operations: <inner/outer-prefix><tree-object-key><tree-type>
 ;; Motion operations: <tree-prefix><motion-type><tree-type>
 ;; Doing the tree type last would allow for an alternate tree prefix for “last tree type” or “saved tree type” to have 2-key combos instead of 3-key.
+;;
+;; Non-motion operations:
+;; * slurp -- forward turns neigbor sibling into last child, backward turns the previous sibling into the first child... but that makes more sense for s-expressions than eg. indent trees or org-mode.
+;; * join -- splice current node with neighbor (forward or backward) -- for symex, basically delete two inner parens, for indent trees or org-mode it's close to joining lines.
+;; * split -- add parens at point to split current symex into two, meaning it turns a single parent of a subtree into two siblings at the parent level.  So for org/indent it probably means inserting a header/indent at the parent level in the line above/below?
+;; * splice -- IE delete parens for symex so each child becomes a sibling of where the parens were.  When at a paren it splices that paren, but when not on a paren it targets the parent parens.  For org-mode should this mean delete-this-level-and-promote-all-children?  Or promote this and all siblings?
+;; * demote/wrap - opposite of splice, add parens, or add indent/header level.  Should this be demoting while adding a header above for org?  Org-mode has demotion without putting a header above, but that can make wonky trees, and indent trees have this problem even more.  Note that for symex or xml, surrounding requires a choice of which kind of paren or which tag.  Maybe there could be a default (eg. default to paren for lisp, to <TAG></TAG> or some TODO kind of form for xml), and then have another one that lets you select a paren/tag.
+;; * maybe also demote-children, which leaves the current level in place but turns children into grandchildren of a new child?
+;; * rewrap -- eg. change parent paren type, or xml tag type.  This doesn't exist for trees that don't have explicit delimiters.
+;; * raise-sexp - IE replace parent tree with the current node
+;; * transpose - IE swap sibling locations (with all siblings still with original parents).  Some have a difference between transpose and drag, basically where the cursor ends after.  IE for transpose forward does the cursor follow the thing that goes forward or stay in place?  I think moving (dragging) is generally more useful -- transpose twice without moving the cursor is a no-op, and dragging comes up more often than single transposition, I think.
+;; * drag-backward-up - for symex, move current form to be first of siblings if not already, then hoist out of parent form (IE turn to sibling before parent paren), repeat.  For org-mode, it would turn the current heading to the first sibling of its parent, then become a sibling of the parent above it, similar for indent.
+;; * drag-forward-down - not-quite-opposite of backward up, for symex become first child of the next paren.  For org-mode I guess it would be to become the first child of the next heading.  For indent tree, move below next line and dedent.  Many of these operations for indent trees would be useful if they could affect a range, IE a group of lines be dragged around together.
+;; * drag-forward-up/drag-backward-down -- like the previous pair but with direction changed.
+;; * convolute -- for symex, hoist parent and its children to point above grandparent.
+;;   eg. (a b c (d e | f g)) -> (d e (a b c f g))
+;;   So for org-mode it could mean to take the parent and any higher siblings and promote them, put them above grandparent and demote grandparent.  Similar for indent tree.
+;; * delete forward/back -- eg. if point is at the start of a subtree kill it, putting the next subtree in its place.
+;; * delete to parent -- IE in symex delete forward/backward to paren, in org-mode delete subtrees/siblings forward (IE until a non sibling) or backward until (but not including) parent
+;; ** a modification of this is delete-to-parent-or-newline, which I find a little awkward.
+;; * Ryan Culpepper wrote a cool sexp-rewrite package for matching and transforming trees, it's a cool idea that could be generalized, but would be a lot of work.
 
 (require 'cl-lib)
 
