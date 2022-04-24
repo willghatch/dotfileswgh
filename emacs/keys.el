@@ -510,6 +510,13 @@
 (mkmap "ondi" 'ignore)
 (mkmap "endo" 'rmo/wgh/org-down-to-last-descendant)
 (mkmap "ondo" 'ignore)
+;; "enw_" wrap/demote unwrap/promote
+(mkmap "enwp" 'ignore) ;; TODO - wrap with paren, the default wrapper
+(mkmap "onwp" 'ignore) ;; TODO - delete outer paren (of any type?  It's not symmetric, but maybe more useful?)
+(mkmap "enwi" 'indent-tree-demote)
+(mkmap "onwi" 'indent-tree-promote)
+(mkmap "enwo" 'org-demote-subtree)
+(mkmap "onwo" 'org-promote-subtree)
 ;; TODO - insertions, like wgh/org-add-heading-above/below
 
 ;; TODO - tree text objects

@@ -141,4 +141,39 @@
                                'indent-tree-inorder-traversal-backward)
 (repeatable-motion-define 'indent-tree-down-to-last-descendant nil)
 
+;; TODO - for things like python, there is already a variable that this should match, and it should generally be customizable.
+(setq indent-tree--indent-amount 2)
+
+(defun indent-tree--promote-demote-helper (positive-p)
+  (let* ((orig-point (point))
+         (orig-mark (or (mark) (point)))
+         (orig-beg (if (region-active-p) (region-beginning) (point)))
+         (orig-end (if (region-active-p) (region-end) (point)))
+         (tree-highlighted-p
+          (and
+           (region-active-p)
+           (save-mark-and-excursion
+             (goto-char (region-beginning))
+             (set-mark (point))
+             (indent-tree-outer 1 (point) (point))
+             (and (= orig-beg (region-beginning))
+                  (= orig-end (region-end)))))))
+    (save-mark-and-excursion
+      (unless tree-highlighted-p
+        (let ((reg (indent-tree-outer 1 orig-beg orig-end)))
+          (goto-char (car reg))
+          (set-mark (cadr reg))))
+      (indent-rigidly (region-beginning)
+                      (region-end)
+                      (funcall (if positive-p
+                                   (lambda (x) x)
+                                 #'-)
+                               indent-tree--indent-amount)))))
+(defun indent-tree-demote ()
+  (interactive)
+  (indent-tree--promote-demote-helper t))
+(defun indent-tree-promote ()
+  (interactive)
+  (indent-tree--promote-demote-helper nil))
+
 (provide 'indent-tree)
