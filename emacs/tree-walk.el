@@ -167,49 +167,76 @@
       (funcall up)
       (funcall down-to-last-descendant)
       (funcall final))))
-(defun tree-walk--outer-no-end-tree-for-point_left (up final)
+(defun tree-walk--outer-no-end-tree-for-point_left (final)
   (lambda (start-point)
     (save-excursion
       (goto-char start-point)
-      (funcall up)
+      (funcall final))))
+(defun tree-walk--outer-no-end-tree-for-point_right (up down-to-last-descendant final)
+  (lambda (start-point)
+    (save-excursion
+      (goto-char start-point)
+      (funcall down-to-last-descendant)
       (funcall final))))
 
-;; TODO - Both objects assume they are getting the tree whose root is above point.  This works reasonably for the degenerate inner case, but for the more well formed outer case (which I think I will use more), it would be better for the object to assume the line it's on is the top level of the tree.  Changing this would make it initially idempotent, but then I could add a check such that when the region doesn't change it can go up to parent and try once more.
+(defun tree-walk--text-object-no-end-helper (lfunc rfunc up-func)
+  (lambda (beg end)
+    (let* ((get-l (lambda (beg end) (min (funcall lfunc beg)
+                                         (funcall lfunc end)
+                                         beg)))
+           (get-r (lambda (beg end) (max (funcall rfunc beg)
+                                         (funcall rfunc end)
+                                         end)))
+           (l (funcall get-l beg end))
+           (r (funcall get-r beg end)))
+      (if (and (= beg l) (= end r))
+          (let ((new-beg (save-excursion
+                           (goto-char beg)
+                           (funcall up-func)
+                           (point))))
+            (list (funcall get-l new-beg end)
+                  (funcall get-r new-beg end)))
+        (list l
+              r)))))
+
+;; The outer object is the more sensible one, it highlights the tree rooted at the current point, or, if the whole current tree is in the region, it expands to the parent tree.
+;; The inner object is... probably worse semantically but it's the way I could think of making it work and be semi-correct.  It highlights all the children of the parent node, or if that's already covered then it expands to all children of the grandparent.
 (defmacro tree-walk-define-text-objects-no-end-tree
     (inner-name outer-name
      up down down-to-last-child
      left-finalize right-finalize)
   (let ((inner-left (gensym (format "-%s--inner-left" inner-name)))
-        (outer-left (gensym (format "-%s--outer-left" inner-name)))
-        (inout-right (gensym (format "-%s--inout-right" inner-name)))
+        (outer-left (gensym (format "-%s--outer-left" outer-name)))
+        (inner-right (gensym (format "-%s--inner-right" inner-name)))
+        (outer-right (gensym (format "-%s--outer-right" outer-name)))
+        (inner-helper (gensym (format "-%s--helper" inner-name)))
+        (outer-helper (gensym (format "-%s--helper" outer-name)))
         )
     `(progn
        (setq ,inner-left
              (tree-walk--inner-no-end-tree-for-point_left ,up ,down ,left-finalize))
        (setq ,outer-left
-             (tree-walk--outer-no-end-tree-for-point_left ,up ,left-finalize))
-       (setq ,inout-right
+             (tree-walk--outer-no-end-tree-for-point_left ,left-finalize))
+       (setq ,inner-right
              (tree-walk--inner-no-end-tree-for-point_right
               ,up
               (lambda () (tree-walk--down-to-last-descendant ,down-to-last-child))
               ,right-finalize))
+       (setq ,outer-right
+             (tree-walk--outer-no-end-tree-for-point_right
+              ,up
+              (lambda () (tree-walk--down-to-last-descendant ,down-to-last-child))
+              ,right-finalize))
+       (setq ,inner-helper
+             (tree-walk--text-object-no-end-helper ,inner-left ,inner-right ,up))
+       (setq ,outer-helper
+             (tree-walk--text-object-no-end-helper ,outer-left ,outer-right ,up))
        (evil-define-text-object ,inner-name (count &optional beg end type)
-         ;; TODO - This inner object has a problem that it doesn't grow, it's idempotent.
-         (list (min (funcall ,inner-left beg)
-                    (funcall ,inner-left end)
-                    beg)
-               (max (funcall ,inout-right beg)
-                    (funcall ,inout-right end)
-                    end)))
+         ;; TODO - handle count, type
+         (funcall ,inner-helper beg end))
        (evil-define-text-object ,outer-name (count &optional beg end type)
-         (list (min (funcall ,outer-left beg)
-                    (funcall ,outer-left end)
-                    beg)
-               ;; The end point is the same for inner and outer
-               (max (funcall ,inout-right beg)
-                    (funcall ,inout-right end)
-                    end)))
-       )))
+         ;; TODO - handle count, type
+         (funcall ,outer-helper beg end)))))
 
 (cl-defmacro tree-walk-define-operations
     (&key
