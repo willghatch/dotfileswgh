@@ -203,3 +203,13 @@
   (nkmap "m" 'wgh/increment-number-at-end-of-line))
 (add-to-list 'auto-mode-alist '("\\.checklist" . wgh-checklist-mode))
 
+
+(defun wgh/xml-magic-tag-close ()
+  (interactive)
+  (condition-case err
+      (nxml-balanced-close-start-tag-inline)
+    (t (insert ">"))))
+
+(add-hook 'nxml-mode-hook
+          (lambda ()
+            (ikmap ">" 'wgh/xml-magic-tag-close)))
