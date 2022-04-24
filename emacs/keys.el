@@ -323,6 +323,9 @@
 (define-key evil-outer-text-objects-map "b" 'evil-textobj-anyblock-a-block)
 (define-key evil-inner-text-objects-map "i" 'indent-tree-inner)
 (define-key evil-outer-text-objects-map "i" 'indent-tree-outer)
+;; These are also on t, which I'm already used to, but to fix the tree thing...
+(define-key evil-inner-text-objects-map "x" 'evil-inner-tag)
+(define-key evil-outer-text-objects-map "x" 'evil-a-tag)
 
 ;; Normal state switch!
 (key-chord-define evil-insert-state-map (kbd "kj") 'evil-normal-state)
@@ -454,6 +457,8 @@
 (mkmap "onsi" 'ignore)
 (mkmap "enso" 'wgh/org-forward-slurp-heading)
 (mkmap "onso" 'ignore)
+(mkmap "ensx" 'ignore)
+(mkmap "onsx" 'ignore)
 ;; "enb_" forward barf
 (mkmap "enbp" 'on-parens-forward-barf)
 (mkmap "onbp" 'on-parens-backward-barf)
@@ -462,6 +467,8 @@
 (mkmap "onbi" 'ignore)
 (mkmap "enbo" 'wgh/org-forward-barf-heading)
 (mkmap "onbo" 'ignore)
+(mkmap "enbx" 'ignore)
+(mkmap "onbx" 'ignore)
 ;; "enh_" forward sibling
 (mkmap "enhp" 'rmo/on-parens-forward-sexp)
 (mkmap "onhp" 'rmo/on-parens-backward-sexp)
@@ -469,6 +476,9 @@
 (mkmap "onhi" 'rmo/indent-tree-backward-sibling)
 (mkmap "enho" 'rmo/org-forward-heading-same-level)
 (mkmap "onho" 'rmo/org-backward-heading-same-level)
+;; TODO - make rmo versions
+(mkmap "enhx" 'on-xml-forward)
+(mkmap "onhx" 'on-xml-backward)
 ;; "enm_" forward sibling end
 (mkmap "enmp" 'rmo/on-parens-forward-sexp-end)
 (mkmap "onmp" 'rmo/on-parens-backward-sexp-end)
@@ -477,6 +487,8 @@
 (mkmap "onmi" 'ignore)
 (mkmap "enmo" 'ignore)
 (mkmap "onmo" 'ignore)
+(mkmap "enmx" 'on-xml-forward-end)
+(mkmap "onmx" 'on-xml-backward-end)
 ;; "enc_" down to first child / "onc_" up to parent
 (mkmap "encp" 'rmo/on-parens-down-sexp)
 (mkmap "oncp" 'rmo/on-parens-up-sexp)
@@ -484,6 +496,9 @@
 (mkmap "onci" 'rmo/indent-tree-up-to-parent)
 (mkmap "enco" 'rmo/org-down-element)
 (mkmap "onco" 'rmo/org-up-element)
+;; TODO - rearrange the up/up-end/down/down-end/down-last stuff...
+(mkmap "encx" 'ignore)
+(mkmap "oncx" 'on-xml-up)
 ;; "enC_" down to last child / "onC_" up to parent end -- TODO - these should probably be rethought a bit, it's not a great match
 ; TODO - symex down to last child beginning
 (mkmap "enCp" 'ignore)

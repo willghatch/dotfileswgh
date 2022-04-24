@@ -212,4 +212,6 @@
 
 (add-hook 'nxml-mode-hook
           (lambda ()
-            (ikmap ">" 'wgh/xml-magic-tag-close)))
+            (ikmap ">" 'wgh/xml-magic-tag-close)
+            (require 'on-xml)
+            ))
