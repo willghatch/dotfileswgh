@@ -2,10 +2,16 @@
 
 # This is mostly copied from https://github.com/technomancy/dotfiles/blob/master/bin/music-choose
 
-# This example asks the user to pick a directory from ~/music or its
-# first argument and queues up its contents via mpd. http://musicpd.org
+append=false
+if [[ "$1" = "--append" ]]; then
+    append=true
+elif [[ "$1" = "--help" || -n "$1" ]]; then
+    echo "Usage: $0 [--append]"
+    exit 1
+fi
 
-music_home=${1:-"$HOME/musc-local/"}
+# TODO - maybe make this configurable again?
+music_home="$HOME/musc-local/"
 mpc=$(state current-mpc)
 
 # Cache directory list
@@ -22,9 +28,13 @@ chosen=`cat $list_file | shuf | dmenu`
 echo chose: $chosen
 # Add it to mpd
 if [ "$chosen" != "" ]; then
-    $mpc clear
-    $mpc add "$chosen"
-    $mpc play
+    if [[ "$append" = true ]]; then
+        $mpc add "$chosen"
+    else
+        $mpc clear
+        $mpc add "$chosen"
+        $mpc play
+    fi
 fi
 
 # You may find it helpful to bind these commands to keystrokes in
