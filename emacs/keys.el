@@ -447,6 +447,7 @@
 (mkmap "oup" 'on-parens-splice)
 
 ;; tree operations "en<op><tree-type>"
+;; TODO - I should have a wrapper function defined that has various arguments to compose, and the keybinding section should just use that one function composed.  eg. (tree-op 'OP 'TREE-TYPE 'DIRECTION 'ANY-OTHER-INFO) but probably with keyword args, then probably have an extensible table that it looks up.  For any entries that aren't there, instead of using the ignore function I can print a descriptive message about which entries are not yet filled out.
 ;; TODO - rearrange this in whatever way is necessary to get hints as I go to remember what the options are
 ;; TODO - slurp/barf are not the only tree mutation operations I should have, eg. above I have "eu_" as "mutate forward" with things like join, split, splice, ... I should consider other tree operations and how they should fit in.
 ;; "ens_" forward slurp
