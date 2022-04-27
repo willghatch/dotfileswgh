@@ -489,35 +489,37 @@
 (mkmap "onmo" 'ignore)
 (mkmap "enmx" 'on-xml-forward-end)
 (mkmap "onmx" 'on-xml-backward-end)
-;; "enc_" down to first child / "onc_" up to parent
+;; "enp_" up to parent start/end
+(mkmap "enpp" 'rmo/on-parens-up-sexp-end)
+(mkmap "onpp" 'rmo/on-parens-up-sexp)
+(mkmap "enpi" 'ignore)
+(mkmap "onpi" 'rmo/indent-tree-up-to-parent)
+(mkmap "enpo" 'ignore)
+(mkmap "onpo" 'rmo/org-up-element)
+(mkmap "enpx" 'on-xml-up-end)
+(mkmap "onpx" 'on-xml-up)
+;; "enc_" down to first child / "onc_" down to last child
 (mkmap "encp" 'rmo/on-parens-down-sexp)
-(mkmap "oncp" 'rmo/on-parens-up-sexp)
+(mkmap "oncp" 'rmo/on-parens-down-sexp-end)
 (mkmap "enci" 'rmo/indent-tree-down-to-first-child)
-(mkmap "onci" 'rmo/indent-tree-up-to-parent)
+(mkmap "onci" 'rmo/indent-tree-down-to-last-child)
 (mkmap "enco" 'rmo/org-down-element)
-(mkmap "onco" 'rmo/org-up-element)
-;; TODO - rearrange the up/up-end/down/down-end/down-last stuff...
+(mkmap "onco" 'ignore)
 (mkmap "encx" 'ignore)
-(mkmap "oncx" 'on-xml-up)
-;; "enC_" down to last child / "onC_" up to parent end -- TODO - these should probably be rethought a bit, it's not a great match
-; TODO - symex down to last child beginning
-(mkmap "enCp" 'ignore)
-(mkmap "onCp" 'rmo/on-parens-up-sexp-end)
-(mkmap "enCi" 'rmo/indent-tree-down-to-last-child)
-(mkmap "onCi" 'ignore)
-(mkmap "enCo" 'rmo/wgh/org-down-to-last-child)
-(mkmap "onCo" 'ignore)
-;(mkmap "onCi" 'rmo/wgh/indent-tree-up-to-parent) ;; TODO - this doesn't really match the semantics I think I'm going for
+(mkmap "oncx" 'ignore)
 ;; TODO - down to end of last child (on-parens-down-sexp-end)
 ;; TODO - to end/beginning of current tree element (IE swap between delimiters when available)
 ;; TODO - forward/back in parent sibling? (on-parens-forward-sexp-in-supersexp)
 ;; "ent_" inorder traversal
+;; TODO - write inorder traversal for symex and xml
 (mkmap "entp" 'ignore)
 (mkmap "ontp" 'ignore)
 (mkmap "enti" 'rmo/indent-tree-inorder-traversal-forward)
 (mkmap "onti" 'rmo/indent-tree-inorder-traversal-backward)
 (mkmap "ento" 'rmo/wgh/org-inorder-traversal-forward)
 (mkmap "onto" 'rmo/wgh/org-inorder-traversal-backward)
+(mkmap "entx" 'ignore)
+(mkmap "ontx" 'ignore)
 ;; "end_" down to last descendant
 (mkmap "endp" 'ignore)
 (mkmap "ondp" 'ignore)
