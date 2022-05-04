@@ -57,11 +57,11 @@
   (ignore-errors (org-up-element)))
 
 (defun wgh/org-forward-to-last-sibling ()
-  (while (wgh/motion-moved (lambda () (org-forward-heading-same-level 1)))))
+  (while (tree-walk--motion-moved (lambda () (org-forward-heading-same-level 1)))))
 (defun wgh/org-down-to-last-child ()
   ;; TODO - this and others should probably take a number argument
   (interactive)
-  (and (wgh/motion-moved #'wgh/org-down-element)
+  (and (tree-walk--motion-moved #'wgh/org-down-element)
        (wgh/org-forward-to-last-sibling)))
 
 
