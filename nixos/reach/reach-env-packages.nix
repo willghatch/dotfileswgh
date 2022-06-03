@@ -61,6 +61,9 @@ in [
   pp.jq
   pp.bat
 
+  # for visualizations with --intermediate-files compilation
+  pp.graphviz
+
   (pp.callPackage ./haskell-language-server-for-reach.nix {})
 
   # For typescript language server
