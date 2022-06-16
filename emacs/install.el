@@ -97,6 +97,8 @@
 
 (in 'keyfreq)
 
+(in 'fzf)
+
 ;; some other packages I don't currently use, but might want to later:
 
 ;; figlet -- make ascii banners

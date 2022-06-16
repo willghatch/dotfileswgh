@@ -313,5 +313,25 @@ abort."
   ;; so I'll remember (or find) the name.
   (what-cursor-position t))
 
+(defun wgh/fzf-repo ()
+  ;; This more-or-less implements the cool fuzzy find from all files in the repo feature that Jay used in the demo video he showed of his vim setup.  His only searches files of the same extension, which maybe I should try to add at some point.  But this is probably good enough for now.
+  (interactive)
+  (require 'fzf)
+  (require 'projectile)
+  (let ((fzf-rg-prefix "ripgrep --vimgrep --follow --one-file-system --color=always --smart-case")
+        (initial-query "")
+        (action (lambda (line)
+                  (let* ((parts (split-string line ":"))
+                         (full-path (car parts))
+                         (line-number (cadr parts))
+                         (column-number (caddr parts)))
+                    (find-file full-path)
+                    (goto-line (string-to-number line-number))
+                    (move-to-column (1- (string-to-number column-number)))))))
+    (let ((fzf/args (format "--ansi --print-query --bind \"change:reload:%s {q} || true\" --query \"%s\"" fzf-rg-prefix initial-query))
+          (process-environment
+           (cons (concat "FZF_DEFAULT_COMMAND=" fzf-rg-prefix initial-query)
+                 process-environment)))
+      (fzf/start (fzf/resolve-directory) action))))
 
 (provide 'vfuncs)
