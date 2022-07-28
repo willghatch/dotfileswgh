@@ -64,7 +64,32 @@ in [
   # for visualizations with --intermediate-files compilation
   pp.graphviz
 
-  (pp.callPackage ./haskell-language-server-for-reach.nix {})
+  #pp.haskell-language-server
+  #(pp.callPackage ./haskell-language-server-for-reach.nix {})
+  #(pp.callPackage ./haskell-language-server-edit.nix {})
+  # This version of nixpkgs has packaged a version that might work.
+  # And it probably would if I didn't need to use an FHS env.  It complains about /usr/lib/libc being the wrong version.  So this won't work directly without upgrading the version of the FHS builder.
+  #(import (pkgs.fetchFromGitHub {
+  #    owner = "NixOS";
+  #    repo = "nixpkgs";
+  #    # nixos-unstable as of 2022-06-17
+  #    rev = "3d7435c638baffaa826b85459df0fff47f12317d";
+  #    sha256 = "19ahb9ww3r9p1ip9aj7f6rs53qyppbalz3997pzx2vv0aiaq3lz3";
+  #  }) {}).haskell-language-server
+  # Let's use the updated package from newer nixpkgs, but build it with pinned packages.
+  (pp.callPackage (pp.fetchurl {
+    url = "https://raw.githubusercontent.com/NixOS/nixpkgs/3d7435c638baffaa826b85459df0fff47f12317d/pkgs/development/tools/haskell/haskell-language-server/withWrapper.nix";
+    sha256 = "1b8ddvw0i10cnr6vf2sim5dixhkyldf7676qa4kavhdwlsznjkig";
+  }) { supportedGhcVersions = ["902"]; })
+
+
+  (pkgs.fetchFromGitHub {
+      owner = "NixOS";
+      repo = "nixpkgs";
+      # nixos-unstable as of 2022-06-17
+      rev = "3d7435c638baffaa826b85459df0fff47f12317d";
+      sha256 = "19ahb9ww3r9p1ip9aj7f6rs53qyppbalz3997pzx2vv0aiaq3lz3";
+    })
 
   # For typescript language server
   pp.nodejs
@@ -74,6 +99,8 @@ in [
   # for `make js-build` in the js/stdlib dir
   # TODO - this is probably too old, but I'll just go into the docker container to see things for now.
   pp.nodePackages.typescript
+
+  pp.rdkafka
 
 
   # This makes locales and unicode work.
@@ -93,6 +120,7 @@ in [
   cp.gitAndTools.gitFull
   cp.tig
   (cp.callPackage ../misc/ripgrep-renamed.nix {})
+  cp.fzf
 
 
 ]

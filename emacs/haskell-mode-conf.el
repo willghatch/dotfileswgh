@@ -5,6 +5,10 @@
             ;; This could probably be useful, this activates flymake, which gives a bunch of lame Haskell warnings.  These warnings are suspect for pushing point-free style (which can apparently have some efficiency gains in Haskell, but which is poor for reading code).  And I get these warnings for other people's code, which I don't want.  So... let's just not have this at all right now.
             (setq lsp-diagnostics-provider nil)
 
+            ;; The default language server path should be generic, but I find it brittle.  So... Maybe I'll just update this each time I need to use a different GHC version...
+            ;(setq lsp-haskell-server-path "haskell-language-server-wrapper")
+            (setq lsp-haskell-server-path "haskell-language-server-9.0.2")
+
             ;; TODO - if I haven't yet imported the project, this will not ask which project to load and it will basically fail.  I'm not sure the best way around that.
             (lsp)
 

@@ -537,6 +537,9 @@
 (mkmap "onwo" 'org-promote-subtree)
 ;; TODO - insertions, like wgh/org-add-heading-above/below
 
+;; TODO - other useful tree operations:
+;; * make new next sibling (useful in particular for trees without an end delimiter like indent trees or org-mode, especially to easily make a next sibling for the last sibling, because you can't go to its end delimiter.)  I think this means it goes to the sibling's location, enters any necessary stuff (eg. indentation or org-mode header bullets), and maybe enters insert mode.
+
 ;; TODO - tree text objects
 (define-key evil-inner-text-objects-map "np" 'inner-parens-textobj)
 (define-key evil-outer-text-objects-map "np" 'outer-parens-textobj)
@@ -699,6 +702,7 @@
               ("s" helm-swoop "swoop")
               ("a" helm-multi-swoop-all "multi-swoop all")
               ("m" helm-multi-swoop "multi-swoop")
+              ("r" wgh/fzf-repo "fzf-repo")
   ))
 (mkmap " -h" 'helm-M-x)
 (mkmap " &g" 'evil-ex-repeat-global-substitute)
