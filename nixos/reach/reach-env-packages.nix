@@ -37,7 +37,8 @@ in [
 
 
   # The NixOS 21.11 version is older than required for Reach, but current unstable has a new enough version (as of 2022-01-17).
-  pp.z3
+  #pp.z3
+  (pp.callPackage ./z3-updated.nix {}).z3_4_8_17
   # Mo is not packaged in Nixpkgs.  I could contribute this perhaps.  It's a pretty simple package.
   (pp.callPackage ./mo.nix {})
   # `solc` - solidity compiler.
