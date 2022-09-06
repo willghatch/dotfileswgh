@@ -3,7 +3,7 @@ install:
 	echo "remember to get pentadactyl-signed."
 	# Pentadactyl to lose support with Firefox 57 set for November 2017.
 	# It will keep working with firefox-esr (version 52), supported til June 2018.
-	ffx \
+	ff \
 		https://addons.mozilla.org/firefox/downloads/latest/scroll-highlight/addon-452866-latest.xpi \
 		https://addons.mozilla.org/firefox/downloads/latest/ublock-origin/addon-607454-latest.xpi \
 		https://addons.mozilla.org/firefox/downloads/latest/session-manager/addon-2324-latest.xpi \

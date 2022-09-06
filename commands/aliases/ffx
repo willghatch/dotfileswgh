@@ -1,7 +1,14 @@
 #!/usr/bin/env bash
 
-# as a script rather than an alias so I can combine it with other things... (eg dark/light wrappers
-# to set gtk theme).
-FFX=${FFX:-firefox}
+if [[ -z "$1" ]]; then
+    echo "usage: $0 <profile>"
+    exit
+fi
+prof="$1"
+shift
 
-exec nice -n 5 $FFX "$@"
+FFX=${FFX:-firefox}
+profile="$DOTFILESWGH/dotlocal/firefox-profile_$prof"
+mkdir -p "$profile"
+
+exec nice -n 5 $FFX --profile $profile "$@"
