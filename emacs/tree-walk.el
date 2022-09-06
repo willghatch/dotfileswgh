@@ -65,6 +65,7 @@
 ;; * delete to parent -- IE in symex delete forward/backward to paren, in org-mode delete subtrees/siblings forward (IE until a non sibling) or backward until (but not including) parent
 ;; ** a modification of this is delete-to-parent-or-newline, which I find a little awkward.
 ;; * Ryan Culpepper wrote a cool sexp-rewrite package for matching and transforming trees, it's a cool idea that could be generalized, but would be a lot of work.
+;; * new sibling forward/backward -- Eg. for indent tree or org-mode it opens a new line below/above the current element and indents it/bullets it appropriately.  My binding would probably also leave me in insert mode instead of normal/command mode.  For symex it can... well, maybe it can be context sensitive and open a new line when its in a list where each item starts on a new line, or it can move and add spaces to the correct place in a context where all is on one line.  But what to do when there is only one item in the list?  I mostly want this operation for org-mode and indent trees, less for symex.
 
 (require 'cl-lib)
 
