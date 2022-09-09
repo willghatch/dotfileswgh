@@ -339,7 +339,7 @@ function mkNonRep(f)
    -- So this function is for wrapping callbacks so that they can't be
    -- pressed twice within a certain small time so that the action
    -- is performed once and not twice.
-   local repeatDelay = 50
+   local repeatDelay = 100
    function innerMkNonRep(f)
       local lastCall = 0
       return function()
