@@ -39,15 +39,12 @@ in [
   # The NixOS 21.11 version is older than required for Reach, but current unstable has a new enough version (as of 2022-01-17).
   #pp.z3
   (pp.callPackage ./z3-updated.nix {}).z3_4_8_17
+  #(pp.callPackage ./z3-updated.nix {}).z3_4_11_0
   # Mo is not packaged in Nixpkgs.  I could contribute this perhaps.  It's a pretty simple package.
   (pp.callPackage ./mo.nix {})
   # `solc` - solidity compiler.
-  # As of 2022-01-17 the version in NixOS, including unstable, is only 0.8.2, while Reach requires 0.8.9.
-  #pp.solc
-  # On github they distribute a pre-built static binary for Linux, but it doesn't seem to want to execute.  I'm not sure what the missing piece is.
-  #(pp.callPackage ./solc-static-linux.nix {})
-  # So let's copy the upstream package definition and just update it.  This is another likely candidate for actually sending to Nixpkgs.
   (pp.callPackage ./solc-updated.nix {})
+  #(pp.callPackage ./solc-updated.nix {z3 = (pp.callPackage ./z3-updated.nix {}).z3_4_11_0;})
 
   pp.docker
   pp.docker-compose
@@ -101,7 +98,8 @@ in [
   # TODO - this is probably too old, but I'll just go into the docker container to see things for now.
   pp.nodePackages.typescript
 
-  pp.rdkafka
+  # EVM disassembler
+  pp.evmdis
 
 
   # This makes locales and unicode work.
