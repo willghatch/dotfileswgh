@@ -172,14 +172,18 @@
 (add-hook 'server-switch-hook
           (lambda ()
             (when start-on-pager-state
-                (progn
-                  (evil-pager-state)
-                  (pkmap "q" 'kill-buffer-or-quit-emacs-ignore-dirty)
-                  (pkmap "tic" 'kill-buffer-or-quit-emacs-ignore-dirty)
-                  (ansi-color-buffer)
-                  ))))
+              (progn
+                (evil-pager-state)
+                (pkmap "q" 'kill-buffer-or-quit-emacs-ignore-dirty)
+                (pkmap "tic" 'kill-buffer-or-quit-emacs-ignore-dirty)
+                (ansi-color-buffer)
+                ))))
 
- (load-library "js-conf")
+(load-library "js-conf")
+
+(add-hook 'solidity-mode-hook
+          (lambda ()
+            (setq c-basic-offset 2)))
 
 ;; TODO -- these are default values that I should deal with now
 ;evil-overriding-maps
