@@ -94,6 +94,7 @@
 (in 'git-commit)
 (in 'systemd)
 (in 'lsp-java)
+(in 'solidity-mode)
 
 (in 'keyfreq)
 
