@@ -19,3 +19,6 @@
 [submodule "external/emacs/whitespace-final-newline"]
 	path = external/emacs/whitespace-final-newline
 	url = https://github.com/adamsmd/whitespace-final-newline
+[submodule "external/misc/dictionaries"]
+	path = external/misc/dictionaries
+	url = https://github.com/willghatch/dictionaries
