@@ -1,8 +1,19 @@
 { pkgs ? import <nixpkgs> {} }:
-let pp = import ./reach-env-pin.nix { overlays = [
+let ncursesOverlay =
   # stack GHC complains if libtinfo from ncurses doesn't have this flag
-  (self: super: {ncurses5 = super.ncurses5.overrideAttrs (oldAttrs: {configureFlags = oldAttrs.configureFlags ++ ["--with-versioned-syms"];});})
-  ];};
+  (self: super: {ncurses5 = super.ncurses5.overrideAttrs (oldAttrs: {configureFlags = oldAttrs.configureFlags ++ ["--with-versioned-syms"];});});
+in
+let pp = import ./reach-env-pin.nix { overlays = [ncursesOverlay];};
+in
+let hp =
+  #import (pkgs.fetchFromGitHub {
+  #    owner = "NixOS";
+  #    repo = "nixpkgs";
+  #    # nixos-unstable as of 2022-10-17
+  #    rev = "104e8082de1b20f9d0e1f05b1028795ed0e0e4bc";
+  #    sha256 = "sha256-cPe3F7CtnxU9YbJpc3Adl4d9kX+turqTv5FxM98i8vg=";
+  #  }) {overlays = [ncursesOverlay];};
+  pp;
 in
 let
 #cp = pkgs;
@@ -16,22 +27,22 @@ in [
   # nix:
   #  enable: false
 
-  pp.stack
+  hp.stack
   # GHC dependencies for stack
   # {{{
-  pp.gcc
-  pp.gnumake
-  pp.libffi
-  pp.libffi.dev
-  pp.zlib
-  pp.zlib.dev
-  pp.gmp
-  pp.gmp.dev
+  hp.gcc
+  hp.gnumake
+  hp.libffi
+  hp.libffi.dev
+  hp.zlib
+  hp.zlib.dev
+  hp.gmp
+  hp.gmp.dev
   # ncurses has libtinfo
-  pp.ncurses5
-  pp.ncurses5.dev
-  pp.binutils
-  pp.pkgconfig
+  hp.ncurses5
+  hp.ncurses5.dev
+  hp.binutils
+  hp.pkgconfig
   # }}}
 
 
@@ -43,8 +54,9 @@ in [
   # Mo is not packaged in Nixpkgs.  I could contribute this perhaps.  It's a pretty simple package.
   (pp.callPackage ./mo.nix {})
   # `solc` - solidity compiler.
-  (pp.callPackage ./solc-updated.nix {})
-  #(pp.callPackage ./solc-updated.nix {z3 = (pp.callPackage ./z3-updated.nix {}).z3_4_11_0;})
+  #(pp.callPackage ./solc-updated.nix {})
+  #pp.solc
+  (pp.callPackage ./solc-updated.nix {z3 = (pp.callPackage ./z3-updated.nix {}).z3_4_8_17;})
 
   pp.docker
   pp.docker-compose
