@@ -1,6 +1,7 @@
 
 (load-file "~/dotfileswgh/emacs/package-conf.el")
 
+(package-initialize)
 (message "Updating package lists...")
 (package-refresh-contents)
 

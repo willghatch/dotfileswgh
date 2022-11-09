@@ -4,10 +4,16 @@
 (require 'evil-surround)
 (require 'cl-lib)
 
-;; don't treat random characetrs (like guillemets) as sticky
+;; don't treat random characters (like guillemets) as sticky
 (setq sp-sexp-suffix '((racket-mode syntax "")
                        (scheme-mode syntax "")
-                       (emacs-lisp-mode syntax "")))
+                       (emacs-lisp-mode syntax "")
+
+                       ;; For unenlightened, non-lispy syntax, I don't want to slurp these things.
+                       (js-mode syntax ",")
+                       (js-mode syntax ";")
+                       (haskell-mode syntax ",")
+                       ))
 
 ;; remove the pairs that won't be good for lisp
 (sp-pair "'" nil :actions :rem)
