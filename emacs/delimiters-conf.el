@@ -1,7 +1,7 @@
 (require 'smartparens)
-(require 'evil)
-(require 'evil-textobj-anyblock)
-(require 'evil-surround)
+;(require 'evil)
+;(require 'evil-textobj-anyblock)
+;(require 'evil-surround)
 (require 'cl-lib)
 
 ;; don't treat random characters (like guillemets) as sticky
@@ -98,19 +98,19 @@
      ;; add delimiters to evil-surround (eg. `cs]}`)
      (setq
       evil-surround-pairs-alist-addendum
-      '(,@(remove-if 'null
-                     (append
-                      ;; make pairs with both the left and the right delimiters as keys
-                      (mapcar (lambda (delim-list)
-                                (make-evil-surround-pair-maybe (car delim-list)
-                                                               (car delim-list)
-                                                               (cadr delim-list)))
-                              delimiter-lists)
-                      (mapcar (lambda (delim-list)
-                                (make-evil-surround-pair-maybe (cadr delim-list)
-                                                               (car delim-list)
-                                                               (cadr delim-list)))
-                              delimiter-lists))))
+      '(,@(cl-remove-if 'null
+                        (append
+                         ;; make pairs with both the left and the right delimiters as keys
+                         (mapcar (lambda (delim-list)
+                                   (make-evil-surround-pair-maybe (car delim-list)
+                                                                  (car delim-list)
+                                                                  (cadr delim-list)))
+                                 delimiter-lists)
+                         (mapcar (lambda (delim-list)
+                                   (make-evil-surround-pair-maybe (cadr delim-list)
+                                                                  (car delim-list)
+                                                                  (cadr delim-list)))
+                                 delimiter-lists))))
      )))
 
 
@@ -186,12 +186,12 @@
                      '(123 . ("{" . "}"))
                      )
                evil-surround-pairs-alist-addendum
-               (remove-if (lambda (amem)
-                            (or (= (car amem) ?#)
-                                ;; (
-                                (= (car amem) 40)
-                                ;; [
-                                (= (car amem) 41)
-                                ;; {
-                                (= (car amem) 123)))
-                          evil-surround-pairs-alist)))
+               (cl-remove-if (lambda (amem)
+                               (or (= (car amem) ?#)
+                                   ;; (
+                                   (= (car amem) 40)
+                                   ;; [
+                                   (= (car amem) 41)
+                                   ;; {
+                                   (= (car amem) 123)))
+                             evil-surround-pairs-alist)))

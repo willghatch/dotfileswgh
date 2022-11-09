@@ -168,12 +168,12 @@
 
 
 (nobreak
- (load-library "ace-jump-mode-conf")
+ ;(load-library "ace-jump-mode-conf")
  (require 'evil-little-word)
  ;(require 'evil-args) ; autoloaded
  (require 'evil-surround)
  (global-evil-surround-mode 1)
- (require 'evil-cleverparens-text-objects)
+ ;(require 'evil-cleverparens-text-objects)
  (require 'evil-textobj-between)
  (require 'evil-search-highlight-persist)
  (require 'evil-textobj-anyblock)
@@ -195,9 +195,9 @@
  (setq lsp-headerline-breadcrumb-enable nil)
 
  ;(require 'smex) ; autoloaded
- ;(require 'rainbow-delimiters) ; autoloaded
+ (require 'rainbow-delimiters) ; autoloaded
  (load-library "package-conf")
- (load-library "yasnippet-conf")
+ ;(load-library "yasnippet-conf")
  (require 'indent-tree)
  (load-library "org-mode-conf")
  (setq fill-column 80)
@@ -206,7 +206,7 @@
  (load-library "racket-mode-conf")
  (load-library "haskell-mode-conf")
  (load-library "company-conf")
- (load-library "auto-complete-conf")
+ ;(load-library "auto-complete-conf")
  (load-library "hippie-expand-conf")
  ;(load-library "popwin-conf")
  ;(load-library "projectile-conf")
@@ -244,9 +244,10 @@
  ;(global-hl-todo-mode 1)
  ;(require 'helm)
  (setq helm-swoop-pre-input-function (lambda () "")) ; disable symbol-at-point nonsense
- (global-anzu-mode 1)
+ ;(global-anzu-mode 1)
  (setq guide-key/guide-key-sequence '("SPC"))
  (setq guide-key/recursive-key-sequence-flag t)
+ (require 'guide-key)
  (guide-key-mode 1)
  ;(global-git-commit-mode 1)
  (setq whitespace-final-newline-message "\n<-- No final newline")

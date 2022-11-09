@@ -1,7 +1,7 @@
 
 
 (defun file-visiting-buffer-list ()
-  (remove-if-not 'buffer-file-name (buffer-list)))
+  (cl-remove-if-not 'buffer-file-name (buffer-list)))
 
 (defun np-buffer-conditional (next-buffer-func ignore-func advance-on-failure-func)
   "Cycle buffers until one isn't ignored by the ignore-func.  If in reaches the starting

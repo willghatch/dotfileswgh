@@ -105,9 +105,9 @@
        " {"
        '(:eval (mapconcat (lambda (buffer)
                             (buffer-name buffer))
-                          (remove-if (lambda (buffer)
-                                       (equal (buffer-name buffer) (buffer-name)))
-                                     (file-visiting-buffer-list))
+                          (cl-remove-if (lambda (buffer)
+                                          (equal (buffer-name buffer) (buffer-name)))
+                                        (file-visiting-buffer-list))
                           " "))
        "}"
        "%-" ; dashes to end

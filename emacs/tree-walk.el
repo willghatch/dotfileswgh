@@ -257,7 +257,7 @@
      )
   ;; TODO - add error checking to be sure requirements are met for each non-null thing to be defined
   `(progn
-     ,@(remove-if-not
+     ,@(cl-remove-if-not
         (lambda (x) x)
         (list
          (when down-to-last-descendant

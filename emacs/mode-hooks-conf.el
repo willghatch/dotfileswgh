@@ -39,9 +39,12 @@
 (add-hook 'prog-mode-hook
           (lambda ()
             (smartparens-mode 1)
+            (require 'rainbow-delimiters)
             (rainbow-delimiters-mode-enable)
+            (require 'rainbow-identifiers)
             (rainbow-identifiers-mode 1)
             (whitespace-mode 1)
+            (company-conf-init)
             (company-mode 1)
             ;(projectile-mode 1)
             ))
