@@ -60,7 +60,7 @@
 (in 'helm-ag)
 (in 'helm-ag-r)
 (in 'helm-projectile)
-(in 'helm-package)
+;(in 'helm-package)
 (in 'helm-mode-manager)
 (in 'helm-helm-commands)
 ;(in 'helm-c-yasnippet)

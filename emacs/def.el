@@ -243,6 +243,7 @@
  ;(require 'hl-todo)
  ;(global-hl-todo-mode 1)
  ;(require 'helm)
+ (load-library "helm-autoloads")
  (setq helm-swoop-pre-input-function (lambda () "")) ; disable symbol-at-point nonsense
  ;(global-anzu-mode 1)
  (setq guide-key/guide-key-sequence '("SPC"))
