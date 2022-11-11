@@ -17,7 +17,6 @@
     (normal-top-level-add-subdirs-to-load-path))
   )
 
-(require 'package)
 (setq package-archives '(
                          ("melpa" . "http://melpa.org/packages/")
                          ("gnu" . "http://elpa.gnu.org/packages/")
@@ -28,6 +27,7 @@
 
 (defun package-upgrade ()
   (interactive)
+  (require 'package)
   (package-list-packages)
   (package-menu-mark-upgrades)
   (package-menu-execute))

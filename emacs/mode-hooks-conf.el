@@ -8,6 +8,7 @@
 (add-to-list 'auto-mode-alist '("\\.service" . systemd-mode))
 (add-to-list 'auto-mode-alist '("\\.socket" . systemd-mode))
 
+
 (add-hook 'after-save-hook 'executable-make-buffer-file-executable-if-script-p)
 
 (defun sensitive-if-prifs ()

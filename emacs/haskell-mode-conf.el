@@ -1,4 +1,5 @@
 
+(load-library "haskell-mode-autoloads")
 
 (add-hook 'haskell-mode-hook
           (lambda ()

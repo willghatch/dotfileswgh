@@ -1,3 +1,4 @@
+(load-library "racket-mode-autoloads")
 
 (defun racket-close-paren-hack (&optional arg)
   (interactive "p")

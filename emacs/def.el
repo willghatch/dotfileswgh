@@ -157,9 +157,10 @@
    )
 
  ;; elscreen must start before other mode-line stuff, or it wouldn't be this high...
- (require 'elscreen)
- (setq elscreen-display-tab nil)
- (elscreen-start)
+ ;; Elscreen is for making tabs tike I used to use in Vim... but I haven't used it for a long time, so let's disable it.
+ ;(require 'elscreen)
+ ;(setq elscreen-display-tab nil)
+ ;(elscreen-start)
  (load-library "modeline-conf")
  ;; reset the header line in initial buffer, which gets messed up by elscreen
  (setq header-line-format (default-value 'header-line-format))
@@ -175,9 +176,7 @@
  (global-evil-surround-mode 1)
  ;(require 'evil-cleverparens-text-objects)
  (require 'evil-textobj-between)
- (require 'evil-search-highlight-persist)
  (require 'evil-textobj-anyblock)
- (global-evil-search-highlight-persist 1)
  (require 'on-parens)
 
  (load-library "ido-conf")
@@ -216,9 +215,10 @@
  (load-library "sexprw-conf")
  (show-smartparens-global-mode 1)
  ;(require 'yafolding)
- (yafolding-mode 1)
+ ;(yafolding-mode 1)
  (load-library "borrowed")
- (load-library "tty-format")
+ ;; tty-format provides for coloring based on terminal escape codes.  I should set it to autoload at some point, but for now let's disable it.
+ ;(load-library "tty-format")
  ;(require 'markchars)
  ;(markchars-global-mode t)
  ;; highlight literal tab characters and trailing whitespace
