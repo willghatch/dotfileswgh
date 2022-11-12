@@ -98,7 +98,9 @@ buffer, it will call the next-buffer-func once more if advance-on-failure-p."
              (not (get-buffer "*scratch*")))
          (cl-notany 'buffer-file-name (buffer-list))
          (cl-notany 'buffer-live-p wgh/kill-block-buffer-list))
-    (evil-quit-all)))
+    ;(evil-quit-all)
+    (save-buffers-kill-terminal)
+    ))
 (defun kill-buffer-or-quit-emacs ()
   "Kill buffer and, if there are no more file buffers and scratch is unmodified,
 quit emacs."
