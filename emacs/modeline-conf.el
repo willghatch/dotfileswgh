@@ -81,7 +81,7 @@
          (let ((nlines (line-number-at-pos (point-max)))
                (curline (line-number-at-pos (point))))
            (concat
-            (propertize (format "%2d" (/ (* 100 curline)
+            (propertize (format "%3d" (/ (* 100 curline)
                                          nlines))
                         'face 'font-lock-constant-face)
             "%% "
@@ -90,12 +90,19 @@
             (propertize (number-to-string nlines) 'face 'font-lock-constant-face)
             " "
             )))
-       " C:"
-       '(:eval (propertize "%02c" 'face 'font-lock-constant-face))
+       " C0:"
+       '(:eval (propertize "%03c" 'face 'font-lock-constant-face))
+       " P1:"
+       '(:eval (propertize (let* ((ps (format "%s" (point)))
+                                  (len (length (format "%s" (point-max))))
+                                  (lendiff (- len (length ps))))
+                             (concat (make-string lendiff (aref " " 0)) ps))
+                           'face 'font-lock-constant-face))
 
        ;; add the time, with the date and the emacs uptime in the tooltip
-       '(:eval (propertize (format-time-string " %H:%M ")
-                           'face 'font-lock-type-face))
+       ;; Well, I have plenty of clocks, I never look at this one.
+       ;;'(:eval (propertize (format-time-string " %H:%M ")
+       ;;                    'face 'font-lock-type-face))
        '(:eval (let ((coding buffer-file-coding-system))
                  (unless (or (equal coding 'undecided-unix)
                              (equal coding 'utf-8-unix)
