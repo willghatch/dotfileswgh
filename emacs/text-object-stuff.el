@@ -44,7 +44,6 @@
         (let ((bounds-end (if fwd-p
                               (wgh/at-thing-end-p thing)
                             (wgh/at-thing-beginning-p thing))))
-          (message "bounds begin: %s, bounds end %s" bounds-begin bounds-end)
           (when (or
                  ;; If there are no bounds, we have not actually moved to a thing, just moved without finding one.
                  (not bounds-end)
@@ -148,3 +147,17 @@
 (put 'symex 'forward-op 'sp-forward-sexp)
 (wgh/def-move-thing symex)
 
+;; I'm used to vi/evil word definition, it's strange to me that emacs' native word definition skips over punctuation and symbols, as well as blank lines.
+;; TODO - Well this didn't work...  I'll try again later.
+(setq vi-like-word-regexp (rx (or "\\w+"
+                                  (not (any word space))
+                                  "^\\s+$")))
+(defun forward-vi-like-word (&optional count)
+  (setq count (or count 1))
+  (let ((fwd (< 0 count))
+        (count (abs count)))
+    (while (< 0 count)
+      (if fwd
+          (search-forward-regexp vi-like-word-regexp)
+        (search-backward-regexp vi-like-word-regexp)))))
+(wgh/def-move-thing vi-like-word)
