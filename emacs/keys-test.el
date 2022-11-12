@@ -1,0 +1,870 @@
+;; TODO - working on replacing evil-mode with something that keeps cursor BETWEEN instead of ON characters in all modes.  Also hopefully a little lighter.
+;; TODO - what major features do I really want from vim/evil?
+;; * I like vim's colon commands, but I really only use the s/foo/bar/ command.  Maybe I can take that part of evil without bringing in the rest...  Or I could just learn to use the emacs way of doing s/foo/bar/gc...  But I also like the idea of that kind of command line in an editor -- giving arguments inline is very different from the emacs way of specifying a command, then arguments one by one.
+;; * find char forward/backward and repeat with that character
+;; * composable language for composing operations, motions, etc.  But I have something more ambitious than what vim does in mind, much more composable to learn a smaller number of keys yet have way more motions than vim.  But it may take me some time to fully flesh it out and build it, given how often I spend time working towards it...
+;; * marks (set mark, go to mark or line of mark)
+;; * yank/paste with registers
+;; * record keyboard to macro register and apply keyboard macro from register
+;; * overwrite mode?
+;; * replace single character?
+;; * visual mode
+;; * line-based visual mode
+;; * block-based visual mode
+;; * line/block-based visual modes with proper insert/append/edit support to do the operation to each line
+;; * text objects, object/inner/around/etc with growing for nestable objects, and my easy bindings on () keys
+;; * port my tree operations, in particular on-parens, but switching to normal smartparens now should be easy
+;; * TODO - what else?
+
+;; * TODO - improvements (that I could even put in my current config before switching to this)
+;; * move M-x off of minus key so I can easily do negative arguments
+
+
+(message "\n\nIn keys-test.el\n\n")
+
+(require 'estate)
+(estate-mode 1)
+
+(load-library "text-object-stuff")
+
+(setq wgh/isearch-repeat-forward-p t)
+
+(defun emmap (keys func)
+  (nobreak-define-key estate-motion-keymap keys func))
+(defun ecmap (keys func)
+  (nobreak-define-key estate-command-keymap keys func))
+(defun evmap (keys func)
+  (nobreak-define-key estate-visual-keymap keys func))
+(defun epmap (keys func)
+  (nobreak-define-key estate-pager-keymap keys func))
+(defun eimap (keys func)
+  (nobreak-define-key estate-insert-keymap keys func))
+;; TODO - pager mode/state
+
+;; TODOs
+;; * forward/back line keeping column position (including when going through a short line)
+;; * repeat commands
+;; * visual mode
+;; * text objects
+;; ... a lot more
+
+(cl-defun wgh/forward-line-keep-column/qd (&optional count)
+  ;; Well, not as good as evil mode... maybe I'll do this properly later?
+  (interactive "p")
+  (let ((col (current-column)))
+    (forward-line (or count 1))
+    (move-to-column col)))
+(cl-defun wgh/backward-line-keep-column/qd (&optional count)
+  (interactive "p")
+  (wgh/forward-line-keep-column/qd (- (or count 1))))
+
+;(ecmap "j" 'wgh/forward-line-keep-column/qd)
+;(ecmap "k" 'wgh/backward-line-keep-column/qd)
+(repeatable-motion-define-pair 'forward-line 'previous-line)
+(ecmap "i" 'estate-insert-state)
+(ecmap "\M-c" 'execute-extended-command)
+(ecmap "\M-r" 'estate-mode)
+
+(eimap "\C-c" 'estate-command-state)
+(eimap "\C-l" 'estate-command-state)
+(eimap "\M-c" 'execute-extended-command)
+(eimap "a" 'self-insert-command)
+;(eimap "z" 'kill-emacs)
+;; TODO - wean myself off key chords because they are finnicky when there is input lag, they don't work with macros, and they just have issues.
+(key-chord-define estate-insert-keymap (kbd "kj") 'estate-command-state)
+
+
+
+
+
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; dump of my old keys to gradually massage them and see if I will like this...
+
+(defmacro myhydradef (hydra-name &rest hydra-keys)
+  `(defhydra ,hydra-name (:exit t :foreign-keys warn)
+     ,@hydra-keys))
+
+;; for temporary on-the-fly bindings
+(define-prefix-command 'temp-key-map)
+(defun tkmap (keys func)
+  (nobreak-define-key temp-key-map keys func))
+
+(ecmap "a" (lambda () (interactive)
+             (if (region-active-p)
+                 (message "a for visual not really implemented yet")
+               (estate-insert-state))))
+(ecmap "A" (lambda () (interactive)
+             (if (region-active-p)
+                 (progn (goto-char (region-end))
+                        (deactivate-mark)
+                        (estate-insert-state))
+               (progn (move-end-of-line nil) (estate-insert-state)))))
+(ecmap "c" (lambda () (interactive) (if (region-active-p)
+                                        (progn (kill-region (region-beginning)
+                                                            (region-end))
+                                               (estate-insert-state))
+                                      (message "c not really implemented yet"))))
+(ecmap "C" (lambda () (interactive) (if (region-active-p)
+                                        (progn (kill-region (region-beginning)
+                                                            (region-end))
+                                               (estate-insert-state))
+                                      (progn (kill-line) (estate-insert-state)))))
+(ecmap "d" (lambda () (interactive) (if (region-active-p)
+                                        (progn (kill-region (region-beginning)
+                                                            (region-end)))
+                                      (message "d not really implemented yet"))))
+(ecmap "D" (lambda () (interactive) (if (region-active-p)
+                                        (kill-region (region-beginning) (region-end))
+                                      (progn (kill-line) (estate-insert-state)))))
+(ecmap "i" (lambda () (interactive)
+             (if (region-active-p)
+                 (message "i for visual not really implemented yet")
+               (estate-insert-state))))
+(ecmap "I" (lambda () (interactive)
+             (if (region-active-p)
+                 (progn (goto-char (region-beginning))
+                        (deactivate-mark)
+                        (estate-insert-state))
+               (progn (back-to-indentation) (estate-insert-state)))))
+;(ecmap "O" 'baddd-open-above)
+;; I really prefer vim's terminology for copy/paste...
+(ecmap "p" 'yank)
+(ecmap "P" 'yank)
+(ecmap "q" 'baddd-record-macro)
+(ecmap "r" 'baddd-replace)
+(ecmap "R" 'baddd-replace-state)
+(ecmap "x" 'delete-char)
+(defun delete-char-backward (&optional n)
+  (interactive "p")
+  (delete-char (- n)))
+(ecmap "X" 'delete-char-backward)
+(ecmap "y" (lambda () (interactive)
+             (if (region-active-p)
+                 (kill-ring-save (region-beginning) (region-end))
+               (message "y not fully implemented yet"))))
+(ecmap "Y" 'baddd-yank-line)
+(ecmap "&" 'baddd-ex-repeat-substitute)
+(ecmap "gq" 'baddd-fill-and-move)
+(ecmap "gw" 'baddd-fill)
+(ecmap "zo" 'baddd-open-fold)
+(ecmap "zc" 'baddd-close-fold)
+(ecmap "za" 'baddd-toggle-fold)
+(ecmap "zr" 'baddd-open-folds)
+(ecmap "zm" 'baddd-close-folds)
+(ecmap "z=" 'ispell-word)
+(ecmap "\C-n" 'baddd-paste-pop-next)
+(ecmap "\C-p" 'baddd-paste-pop)
+(ecmap "\C-t" 'pop-tag-mark)
+(ecmap (kbd "C-.") 'baddd-repeat-pop)
+(ecmap (kbd "M-.") 'baddd-repeat-pop-next)
+(ecmap "." 'baddd-repeat)
+(ecmap "@" 'baddd-execute-macro)
+(ecmap "\"" 'baddd-use-register)
+(ecmap "~" 'baddd-invert-char)
+;(ecmap "=" 'baddd-indent)
+(ecmap "<" 'baddd-shift-left)
+(ecmap ">" 'baddd-shift-right)
+(ecmap "ZZ" 'baddd-save-modified-and-close)
+(ecmap "ZQ" 'baddd-quit)
+(ecmap (kbd "DEL") 'rmo/backward-char)
+(ecmap (kbd "<deletechar>") 'rmo/forward-char)
+(ecmap [escape] 'baddd-force-normal-state)
+(ecmap [remap cua-paste-pop] 'baddd-paste-pop)
+(ecmap [remap yank-pop] 'baddd-paste-pop)
+
+(ecmap "=" 'indent-region)
+(ecmap "≠" 'wgh/racket-indent-region)
+(ecmap "\M-\C-\\" (lambda () (interactive) (message "use =")))
+(eimap "\C-s" 'backward-kill-word)
+(eimap (kbd "M-DEL") (lambda () (interactive) (message "use C-s")))
+
+;; undo
+(ecmap "u" 'undo)
+(ecmap "\C-r" 'baddd-redo)
+
+;;; Motion state
+
+;; "0" is a special command when called first
+;(baddd-redirect-digit-argument baddd-motion-state-map "0" 'baddd-beginning-of-line)
+(emmap "0" 'baddd-beginning-of-line)
+(emmap "1" 'digit-argument)
+(emmap "2" 'digit-argument)
+(emmap "3" 'digit-argument)
+(emmap "4" 'digit-argument)
+(emmap "5" 'digit-argument)
+(emmap "6" 'digit-argument)
+(emmap "7" 'digit-argument)
+(emmap "8" 'digit-argument)
+(emmap "9" 'digit-argument)
+;; TODO - word begin
+(emmap "b" 'rmo/wgh/backward-word-beginning)
+;(emmap "B" 'rmo/baddd-backward-WORD-begin)
+(emmap "E" 'rmo/baddd-forward-WORD-end)
+(emmap "f" 'rmo/baddd-find-char)
+(emmap "F" 'rmo/baddd-find-char-backward)
+(defun vilish/goto-line/beginning (n)
+  (interactive "p")
+  (if (= n 0) (goto-line 1) (goto-line n)))
+(defun vilish/goto-line/end (n)
+  (interactive "P")
+  (cond ((null n) (goto-line (line-number-at-pos (point-max))))
+        ((numberp n) (goto-line n))
+        ((consp n) (goto-line (car n)))
+        (t (error))))
+(emmap "G" 'vilish/goto-line/end)
+(emmap "h" (lambda () (interactive) (message "use oc")))
+(emmap "H" 'baddd-window-top)
+(emmap "j" 'rmo-c/forward-line)
+(emmap "k" 'rmo-c/previous-line)
+(emmap "l" (lambda () (interactive) (message "use ec")))
+(emmap "K" 'baddd-lookup)
+(emmap "L" 'baddd-window-bottom)
+(emmap "M" 'baddd-window-middle)
+(emmap "n" (lambda (&optional n) (interactive "p") (if wgh/isearch-repeat-forward-p (isearch-repeat-forward n) (isearch-repeat-backward n))))
+(emmap "N" (lambda (&optional n) (interactive "p") (if wgh/isearch-repeat-forward-p (isearch-repeat-backward n) (isearch-repeat-forward n))))
+;; TODO - word begin
+(emmap "w" 'rmo/wgh/forward-word-beginning)
+;(emmap "W" 'rmo/baddd-forward-WORD-begin)
+;(emmap "ge" 'rmo/baddd-backward-word-end)
+;(emmap "gE" 'rmo/baddd-backward-WORD-end)
+(emmap "gg" 'vilish/goto-line/beginning)
+;(emmap "gj" 'baddd-next-visual-line)
+;(emmap "gk" 'baddd-previous-visual-line)
+;(emmap "g0" 'baddd-beginning-of-visual-line)
+;(emmap "g_" 'baddd-last-non-blank)
+;(emmap "g^" 'baddd-first-non-blank-of-visual-line)
+;(emmap "gm" 'baddd-middle-of-visual-line)
+;(emmap "g$" 'baddd-end-of-visual-line)
+(emmap "g\C-]" 'find-tag)
+(emmap "{" 'rmo/wgh/backward-paragraph-beginning)
+(emmap "}" 'rmo/wgh/forward-paragraph-beginning)
+(emmap "#" 'rmo/baddd-search-word-backward)
+(emmap "g#" 'rmo/baddd-search-unbounded-word-backward)
+(emmap "$" 'end-of-line)
+(emmap "%" 'baddd-jump-item)
+(emmap "`" 'baddd-goto-mark)
+(emmap "'" 'baddd-goto-mark-line)
+(emmap "(" 'quick-a-block)
+(emmap ")" 'quick-in-block)
+;(emmap "]]" 'rmo/baddd-forward-section-begin)
+;(emmap "][" 'rmo/baddd-forward-section-end)
+;(emmap "[[" 'rmo/baddd-backward-section-begin)
+;(emmap "[]" 'rmo/baddd-backward-section-end)
+;(emmap "[(" 'rmo/baddd-previous-open-paren)
+;(emmap "])" 'rmo/baddd-next-close-paren)
+;(emmap "[{" 'rmo/baddd-previous-open-brace)
+;(emmap "]}" 'rmo/baddd-next-close-brace)
+(emmap "*" 'rmo/baddd-search-word-forward)
+(emmap "g*" 'rmo/baddd-search-unbounded-word-forward)
+;(emmap "," 'baddd-repeat-find-char-reverse)
+(emmap "/" (lambda () (interactive) (setq wgh/isearch-repeat-forward-p t) (call-interactively 'isearch-forward)))
+(emmap "?" (lambda () (interactive) (setq wgh/isearch-repeat-forward-p nil) (call-interactively 'isearch-backward)))
+(emmap ";" 'er/expand-region)
+(emmap "^" 'baddd-first-non-blank)
+(emmap "+" 'baddd-next-line-first-non-blank)
+(emmap "_" 'baddd-next-line-1-first-non-blank)
+(emmap "-" 'baddd-previous-line-first-non-blank)
+(emmap "\C-w" 'baddd-window-map)
+(emmap "\C-]" 'baddd-jump-to-tag)
+(emmap (kbd "C-b") 'baddd-scroll-page-up)
+(emmap (kbd "C-d") 'baddd-scroll-down)
+(emmap (kbd "C-e") 'baddd-scroll-line-down)
+(emmap (kbd "C-f") 'baddd-scroll-page-down)
+(emmap (kbd "C-o") 'baddd-jump-backward)
+(emmap (kbd "C-y") 'baddd-scroll-line-up)
+(emmap "\\" 'baddd-execute-in-emacs-state)
+(emmap "z^" 'baddd-scroll-top-line-to-bottom)
+(emmap "z+" 'baddd-scroll-bottom-line-to-top)
+(emmap "zt" 'baddd-scroll-line-to-top)
+;; TODO: z RET has an advanced form taking an count before the RET
+;; but this requires again a special state with a single command
+;; bound to RET
+(emmap (vconcat "z" [return]) "zt^")
+(emmap (kbd "z RET") (vconcat "z" [return]))
+(emmap "zz" 'baddd-scroll-line-to-center)
+(emmap "z." "zz^")
+(emmap "zb" 'baddd-scroll-line-to-bottom)
+(emmap "z-" "zb^")
+(emmap "v" (lambda () (interactive)
+             ;(estate-visual-state)
+             ;; TODO - I'm not sure how evil's visual state works, it is more complicated than others because it seems to have some hook on the mark state and transient-mark-mode as well...
+             (set-mark-command nil)))
+(emmap "V" 'baddd-visual-line)
+(emmap "\C-v" 'baddd-visual-block)
+(emmap "gv" (lambda () (interactive)
+              ;; TODO - this is not quite right for “restore last region” but is... close enough for now.
+              (exchange-point-and-mark) (exchange-point-and-mark)))
+(emmap [left] 'rmo/backward-char)
+(emmap [right] 'rmo/forward-char)
+(emmap [up] 'rmo/previous-line)
+(emmap [down] 'rmo/next-line)
+
+(evmap [escape] 'baddd-exit-visual-state)
+
+;;; Replace state
+
+;(define-key baddd-replace-state-map (kbd "DEL") 'baddd-replace-backspace)
+;(define-key baddd-replace-state-map [escape] 'baddd-normal-state)
+
+;;; Minibuffer
+
+;(define-key minibuffer-local-map "\C-p" 'baddd-complete-next)
+;(define-key minibuffer-local-map "\C-n" 'baddd-complete-previous)
+;(define-key minibuffer-local-map "\C-x\C-p" 'baddd-complete-next-line)
+;(define-key minibuffer-local-map "\C-x\C-n" 'baddd-complete-previous-line)
+
+;; Ex
+(emmap ":" 'baddd-ex)
+(emmap "!" 'baddd-shell-command)
+;
+;;; search command line
+;(define-key baddd-ex-search-keymap "\d" #'baddd-ex-delete-backward-char)
+;
+
+
+;;; CUSTOM BINDINGS SECTION
+
+;; window commands
+(defhydra my-window-map (:foreign-keys warn) "WM:"
+  ("v" split-window-horizontally nil)
+  ("s" split-window-vertically nil)
+  ("j" (lambda (&optional n) (interactive "p") (other-window n)) nil)
+  ("k" (lambda (&optional n) (interactive "p") (other-window (- n))) nil)
+  ("c" delete-window nil)
+  ("h" (lambda () (interactive)
+     (let ((current-prefix-arg '(5)))
+       (call-interactively 'shrink-window-horizontally))) "skinny")
+  ("l" (lambda () (interactive)
+     (let ((current-prefix-arg '(5)))
+       (call-interactively 'enlarge-window-horizontally))) "fat")
+  ("H" (lambda () (interactive)
+     (let ((current-prefix-arg '(5)))
+       (call-interactively 'enlarge-window))) "tall")
+  ("L" (lambda () (interactive)
+     (let ((current-prefix-arg '(5)))
+       (call-interactively 'shrink-window))) "short")
+  ("f" delete-other-windows "full")
+  ;; Space will be for layout concerns
+  ;(" f" delete-other-windows)
+  ;(" u" winner-undo)
+  ;(" r" winner-redo)
+  ;(" j" window-swap-next)
+  ;(" k" window-swap-prev)
+  ;("p" popwin-map)
+  ("=" balance-windows "balance")
+  ("g" elscreen-create)
+  ("G" elscreen-kill)
+  ("w" elscreen-next)
+  ("b" elscreen-previous)
+  ;; TODO - I want m to be "mode" -- IE I want a key to go into the map, but then
+  ;;        have a key inside the map to make it sticky (switch modes).
+  ("m" nil)
+  ("e" nil)
+)
+
+
+
+;; function aliases
+(defalias 'er 'eval-region)
+(defalias 'eb 'eval-buffer)
+(defalias 'ee 'eval-expression)
+(defalias 'shr 'shell-command-on-region)
+(defalias 'trunc 'toggle-truncate-lines)
+(defalias 'sc 'flyspell-mode)
+(defalias 'sc-prog 'flyspell-prog-mode)
+(defalias 'fc 'flycheck-mode)
+
+;; More text objects!
+;(define-key baddd-inner-text-objects-map "a" 'baddd-inner-arg)
+;(define-key baddd-outer-text-objects-map "a" 'baddd-outer-arg)
+;(define-key baddd-inner-text-objects-map "c" 'baddd-cp-inner-comment)
+;(define-key baddd-outer-text-objects-map "c" 'baddd-cp-a-comment)
+;(define-key baddd-inner-text-objects-map "d" 'baddd-cp-inner-defun)
+;(define-key baddd-outer-text-objects-map "d" 'baddd-cp-a-defun)
+;(define-key baddd-inner-text-objects-map "b" 'baddd-textobj-anyblock-inner-block)
+;(define-key baddd-outer-text-objects-map "b" 'baddd-textobj-anyblock-a-block)
+;(define-key baddd-inner-text-objects-map "i" 'indent-tree-inner)
+;(define-key baddd-outer-text-objects-map "i" 'indent-tree-outer)
+;;; These are also on t, which I'm already used to, but to fix the tree thing...
+;(define-key baddd-inner-text-objects-map "x" 'baddd-inner-tag)
+;(define-key baddd-outer-text-objects-map "x" 'baddd-a-tag)
+
+;; Normal state switch!
+(eimap (kbd "C-c") 'estate-command-state)
+
+; Keys unbound and reserved for future use - bind to nop so they don't input
+;(emmap (kbd "RET") 'ignore)
+(emmap "S" 'ignore)
+(emmap "T" 'ignore)
+
+;; make v a no-op in visual-char-mode, so I don't accidentally type vi)vi) and exit
+;; visual state
+(evmap "v" (lambda (&optional mark point type message)
+             (interactive)
+             (if (and (equal estate-state 'visual)
+                      ;(equal baddd-visual-selection 'char)
+                      )
+                 (ignore)
+               ;(baddd-visual-char baddd-visual-mark baddd-visual-point type message)
+               (ignore)
+               )))
+
+;; I'm not sure a better place to put this...
+(ecmap (kbd "TAB") 'sp-indent-defun)
+
+; g map
+(emmap "gr" 'baddd-ace-jump-word-mode)
+(emmap "gc" 'baddd-ace-jump-char-mode)
+(emmap "gf" 'baddd-ace-jump-line-mode)
+(emmap "gdd" 'xref-find-definitions)
+(emmap "gdD" 'xref-find-definitions-other-window)
+(emmap "gdr" 'xref-find-references)
+(emmap "gdi" 'lsp-describe-thing-at-point)
+(emmap "gdp" 'pop-tag-mark)
+(ecmap " yc" 'xcopy)
+(ecmap " Pc" 'xpaste)
+(ecmap " pc" 'xpaste)
+(emmap "gl" 'baddd-scroll-right)
+(emmap "gh" 'baddd-scroll-left)
+(emmap "gn" 'baddd-next-match)
+(emmap "gN" 'baddd-previous-match)
+
+(ecmap "g&" 'baddd-ex-repeat-global-substitute)
+(ecmap "gi" 'baddd-insert-resume) ; insert mode at ins. mode cursor point
+(ecmap "gu" 'baddd-downcase)
+(ecmap "gU" 'baddd-upcase)
+(ecmap "g~" 'baddd-invert-case)
+(ecmap "g;" 'goto-last-change)
+(ecmap "g," 'goto-last-change-reverse)
+
+; o and e maps - o is left/back, e is right/forward
+(emmap "ee" 'rmo/wgh/forward-word-end)
+(emmap "oe" 'rmo/wgh/backward-word-end)
+(emmap "eE" 'rmo/baddd-forward-WORD-end)
+(emmap "oE" 'rmo/baddd-backward-WORD-end)
+(defun vilish-open-line-below ()
+  ;; TODO - evil takes a numeric argument, and when you are done entering text it copies that line N times.  I never use that feature though, so... maybe I don't care.
+  (interactive)
+  (end-of-line)
+  (open-line 1)
+  (forward-line)
+  (estate-insert-state))
+(defun vilish-open-line-above ()
+  (interactive)
+  (beginning-of-line)
+  (open-line 1)
+  (estate-insert-state))
+(ecmap "eo" (lambda () (interactive) (if (region-active-p)
+                                         (exchange-point-and-mark)
+                                       (vilish-open-line-below))))
+(ecmap "oo" (lambda () (interactive) (if (region-active-p)
+                                         (exchange-point-and-mark)
+                                       (vilish-open-line-above))))
+;(evmap "o" nil)
+;(evmap "oo" 'exchange-point-and-mark)
+;(evmap "eo" 'exchange-point-and-mark)
+(emmap "ec" 'rmo/forward-char)
+(emmap "oc" 'rmo/backward-char)
+;(emmap "ed" 'rmo/baddd-next-close-paren)
+;(emmap "od" 'rmo/baddd-previous-open-paren)
+;(emmap "ed" 'rmo/baddd-next-close-brace)
+;(emmap "od" 'rmo/baddd-previous-open-brace)
+(emmap "ed" 'rmo/on-parens-down-sexp-end)
+(emmap "od" 'rmo/on-parens-down-sexp)
+(emmap "eg" 'rmo/on-parens-up-sexp-end)
+(emmap "og" 'rmo/on-parens-up-sexp)
+(emmap "eh" 'rmo/wgh/forward-symex-beginning)
+(emmap "oh" 'rmo/wgh/backward-symex-beginning)
+(emmap "em" 'rmo/wgh/forward-symex-end)
+(emmap "om" 'rmo/wgh/backward-symex-end)
+(emmap "eH" 'rmo/on-parens-forward-sexp-in-supersexp)
+(emmap "oH" 'rmo/on-parens-backward-sexp-in-supersexp)
+(emmap "ea" 'rmo/baddd-forward-arg)
+(emmap "oa" 'rmo/baddd-backward-arg)
+(emmap "ew" 'rmo/baddd-forward-little-word-begin)
+(emmap "ow" 'rmo/baddd-backward-little-word-begin)
+(emmap "eW" 'rmo/baddd-forward-little-word-end)
+(emmap "oW" 'rmo/baddd-backward-little-word-end)
+(emmap "es" 'rmo/wgh/forward-sentence-beginning)
+(emmap "os" 'rmo/wgh/backward-sentence-beginning)
+(emmap "ep" 'rmo/wgh/forward-paragraph-beginning)
+(emmap "op" 'rmo/wgh/backward-paragraph-beginning)
+;(emmap "eS" 'rmo/baddd-forward-section-begin)
+;(emmap "oS" 'rmo/baddd-backward-section-begin)
+;(emmap "eP" 'rmo/baddd-forward-section-end)
+;(emmap "oP" 'rmo/baddd-backward-section-end)
+(emmap "et" 'rmo/baddd-find-char-to)
+(emmap "ot" 'rmo/baddd-find-char-to-backward)
+(emmap "ef" 'rmo/baddd-find-char)
+(emmap "of" 'rmo/baddd-find-char-backward)
+(defun goto-column (&optional n)
+  (interactive "P")
+  (move-to-column (or n 0)))
+(defun goto-column/default-end (&optional n)
+  (interactive "P")
+  (if n (move-to-column n) (end-of-line)))
+(emmap "ol" 'goto-column)
+(emmap "o l" 'back-to-indentation)
+(emmap "el" 'goto-column/default-end)
+(emmap "oL" 'baddd-beginning-of-visual-line)
+(emmap "eL" 'baddd-end-of-visual-line)
+(emmap "eb" 'baddd-next-line-first-non-blank)
+(emmap "ob" 'baddd-previous-line-first-non-blank)
+(emmap "oB" 'baddd-first-non-blank)
+(emmap "eB" 'baddd-next-line-1-first-non-blank)
+;; TODO - I never use this binding, but symbol will be a useful thing when I make a more composable system...
+(emmap "eO" 'rmo/wgh/forward-symbol-beginning)
+(emmap "oO" 'rmo/wgh/backward-symbol-beginning)
+(emmap "ei" 'rmo/indent-tree-forward-sibling)
+(emmap "oi" 'rmo/indent-tree-backward-sibling)
+(emmap "eI" 'rmo/indent-tree-down-to-first-child)
+(emmap "oI" 'rmo/indent-tree-up-to-parent)
+(emmap "ej" 'rmo/baddd-jump-forward)
+(emmap "oj" 'rmo/baddd-jump-backward)
+;; eu/ou for destructive subcommands!
+(emmap "eus" 'on-parens-forward-slurp)
+(emmap "ous" 'on-parens-backward-slurp)
+(emmap "eub" 'on-parens-forward-barf)
+(emmap "oub" 'on-parens-backward-barf)
+(emmap "euj" 'on-parens-join-neighbor-sexp)
+(emmap "ouj" 'on-parens-split-supersexp)
+;; this one doesn't really belong...
+(emmap "eup" 'on-parens-splice)
+(emmap "oup" 'on-parens-splice)
+
+;; tree operations "en<op><tree-type>"
+;; TODO - I should have a wrapper function defined that has various arguments to compose, and the keybinding section should just use that one function composed.  eg. (tree-op 'OP 'TREE-TYPE 'DIRECTION 'ANY-OTHER-INFO) but probably with keyword args, then probably have an extensible table that it looks up.  For any entries that aren't there, instead of using the ignore function I can print a descriptive message about which entries are not yet filled out.
+;; TODO - rearrange this in whatever way is necessary to get hints as I go to remember what the options are
+;; TODO - slurp/barf are not the only tree mutation operations I should have, eg. above I have "eu_" as "mutate forward" with things like join, split, splice, ... I should consider other tree operations and how they should fit in.
+;; "ens_" forward slurp
+(emmap "ensp" 'on-parens-forward-slurp)
+(emmap "onsp" 'on-parens-backward-slurp)
+; TODO - indent tree slurp
+(emmap "ensi" 'ignore)
+(emmap "onsi" 'ignore)
+(emmap "enso" 'wgh/org-forward-slurp-heading)
+(emmap "onso" 'ignore)
+(emmap "ensx" 'ignore)
+(emmap "onsx" 'ignore)
+;; "enb_" forward barf
+(emmap "enbp" 'on-parens-forward-barf)
+(emmap "onbp" 'on-parens-backward-barf)
+; TODO - indent tree barf
+(emmap "enbi" 'ignore)
+(emmap "onbi" 'ignore)
+(emmap "enbo" 'wgh/org-forward-barf-heading)
+(emmap "onbo" 'ignore)
+(emmap "enbx" 'ignore)
+(emmap "onbx" 'ignore)
+;; "enh_" forward sibling
+(emmap "enhp" 'rmo/on-parens-forward-sexp)
+(emmap "onhp" 'rmo/on-parens-backward-sexp)
+(emmap "enhi" 'rmo/indent-tree-forward-sibling)
+(emmap "onhi" 'rmo/indent-tree-backward-sibling)
+(emmap "enho" 'rmo/org-forward-heading-same-level)
+(emmap "onho" 'rmo/org-backward-heading-same-level)
+;; TODO - make rmo versions
+(emmap "enhx" 'on-xml-forward)
+(emmap "onhx" 'on-xml-backward)
+;; "enm_" forward sibling end
+(emmap "enmp" 'rmo/on-parens-forward-sexp-end)
+(emmap "onmp" 'rmo/on-parens-backward-sexp-end)
+; TODO - indent tree moving by end of line
+(emmap "enmi" 'ignore)
+(emmap "onmi" 'ignore)
+(emmap "enmo" 'ignore)
+(emmap "onmo" 'ignore)
+(emmap "enmx" 'on-xml-forward-end)
+(emmap "onmx" 'on-xml-backward-end)
+;; "enp_" up to parent start/end
+(emmap "enpp" 'rmo/on-parens-up-sexp-end)
+(emmap "onpp" 'rmo/on-parens-up-sexp)
+(emmap "enpi" 'ignore)
+(emmap "onpi" 'rmo/indent-tree-up-to-parent)
+(emmap "enpo" 'ignore)
+(emmap "onpo" 'rmo/org-up-element)
+(emmap "enpx" 'on-xml-up-end)
+(emmap "onpx" 'on-xml-up)
+;; "enc_" down to first child / "onc_" down to last child
+(emmap "encp" 'rmo/on-parens-down-sexp)
+(emmap "oncp" 'rmo/on-parens-down-sexp-end)
+(emmap "enci" 'rmo/indent-tree-down-to-first-child)
+(emmap "onci" 'rmo/indent-tree-down-to-last-child)
+(emmap "enco" 'rmo/org-down-element)
+(emmap "onco" 'ignore)
+(emmap "encx" 'ignore)
+(emmap "oncx" 'ignore)
+;; TODO - down to end of last child (on-parens-down-sexp-end)
+;; TODO - to end/beginning of current tree element (IE swap between delimiters when available)
+;; TODO - forward/back in parent sibling? (on-parens-forward-sexp-in-supersexp)
+;; "ent_" inorder traversal
+;; TODO - write inorder traversal for symex and xml
+(emmap "entp" 'ignore)
+(emmap "ontp" 'ignore)
+(emmap "enti" 'rmo/indent-tree-inorder-traversal-forward)
+(emmap "onti" 'rmo/indent-tree-inorder-traversal-backward)
+(emmap "ento" 'rmo/wgh/org-inorder-traversal-forward)
+(emmap "onto" 'rmo/wgh/org-inorder-traversal-backward)
+(emmap "entx" 'ignore)
+(emmap "ontx" 'ignore)
+;; "end_" down to last descendant
+(emmap "endp" 'ignore)
+(emmap "ondp" 'ignore)
+(emmap "endi" 'rmo/indent-tree-down-to-last-descendant)
+(emmap "ondi" 'ignore)
+(emmap "endo" 'rmo/wgh/org-down-to-last-descendant)
+(emmap "ondo" 'ignore)
+;; "enw_" wrap/demote unwrap/promote
+(emmap "enwp" 'ignore) ;; TODO - wrap with paren, the default wrapper
+(emmap "onwp" 'ignore) ;; TODO - delete outer paren (of any type?  It's not symmetric, but maybe more useful?)
+(emmap "enwi" 'indent-tree-demote)
+(emmap "onwi" 'indent-tree-promote)
+(emmap "enwo" 'org-demote-subtree)
+(emmap "onwo" 'org-promote-subtree)
+;; TODO - insertions, like wgh/org-add-heading-above/below
+
+;; TODO - other useful tree operations:
+;; * make new next sibling (useful in particular for trees without an end delimiter like indent trees or org-mode, especially to easily make a next sibling for the last sibling, because you can't go to its end delimiter.)  I think this means it goes to the sibling's location, enters any necessary stuff (eg. indentation or org-mode header bullets), and maybe enters insert mode.
+
+;; TODO - tree text objects
+;(define-key baddd-inner-text-objects-map "np" 'inner-parens-textobj)
+;(define-key baddd-outer-text-objects-map "np" 'outer-parens-textobj)
+;(define-key baddd-inner-text-objects-map "ni" 'indent-tree-inner)
+;(define-key baddd-outer-text-objects-map "ni" 'indent-tree-outer)
+;(define-key baddd-inner-text-objects-map "no" 'wgh/org-tree-inner)
+;(define-key baddd-outer-text-objects-map "no" 'wgh/org-tree-outer)
+;;;;
+
+
+;; Mouse keys...
+;; mouse-1 is left-click.  There is also drag-mouse-1, double-mouse-1, triple-mouse-1
+;; drag-mouse-1 is left-click drag.
+;; mouse-3 is right-click
+;; mouse-4 is scroll-wheel up
+;; mouse-5 is scroll-wheel down
+;; You can also do combos with special regions where the mouse is, eg. [mode-line mouse-1] to bind to something different when clicking in the mode-line.
+(emmap [mouse-4] 'mwheel-scroll)
+(emmap [mouse-5] 'mwheel-scroll)
+;(global-set-key [mouse-4] (lambda () (interactive) (scroll-down 4)))
+;(global-set-key [mouse-5] (lambda () (interactive) (scroll-up 4)))
+
+
+(emmap "f" 'repeatable-motion-forward)
+(emmap "F" 'repeatable-motion-backward)
+
+; t map
+(emmap "tt" 'temp-key-map)
+
+(emmap "tia" 'switch-to-buffer)
+(emmap "tic" 'kill-buffer-or-quit-emacs)
+(emmap " tica" 'save-buffers-kill-terminal)
+(emmap "tis" 'save-buffer)
+(emmap " tisa" 'baddd-write-all)
+(emmap "tie" 'save-and-kill-buffer-and-maybe-quit-emacs)
+(emmap " tiea" 'baddd-save-and-quit)
+(emmap "tip" 'ffap/no-confirm)
+(emmap "tif" 'ido-ffap-no)
+(emmap " tifd" 'ido-find-file-from-pwd)
+(emmap " tiff" 'ffap/no-confirm)
+(emmap "tiw" 'next-buffer-no-star)
+(emmap "tib" 'prev-buffer-no-star)
+(emmap " tiwd" 'next-dirty-buffer-no-star)
+(emmap " tibd" 'prev-dirty-buffer-no-star)
+
+(emmap "th" 'my-window-map/body)
+(autoload 'projectile-command-map "projectile-conf" "" t 'keymap)
+(emmap "tp" 'projectile-command-map)
+(emmap "tr" 'baddd-use-register)
+;; "ts" will stand for "toggle setting"
+(emmap "ts"
+  (defhydra settings-toggle (:foreign-keys warn :exit t) "Toggle:"
+    ("p" smartparens-mode "smartparens")
+    ("w" whitespace "whitespace")
+    ("C" rainbow-mode "#aabbcc")
+    ("c" company-mode "company")
+    ("t" toggle-truncate-lines "trunc")
+    ("i" toggle-case-fold-search "/? case")
+    ("W" toggle-wrap-scan "search-wrap")
+    ("f" flycheck-mode "flycheck")
+    ("F" fci-mode-toggle "fill-col")
+    ("s" flyspell-mode "flyspell")
+    ("S" flyspell-prog-mode "flyspell-prog")
+    ("e" electric-indent-mode "el.indent")
+    ("d" rainbow-delimiters-mode "rainbow{}")
+    ("r" linum-relative-toggle "linum-rel")
+    ("h" baddd-search-highlight-persist-remove-all "search-highlight-now")
+    ("H" baddd-search-highlight-persist "search-highlight-ever")
+    ("M" menu-bar-mode "menu-bar")
+    ("l" lsp-lens-mode "lsp-lens") ;; lsp-lens is the thing that shows eg. haskell imports in an overlay
+    ("m" (lambda () (interactive)
+           (menu-bar-mode 1) (menu-bar-open))
+     "menu-open")
+    ("n" display-line-numbers-mode "line-numbers")
+    ("I" indent-guide-mode "indent-guide")
+    ("x" wgh/racket-xp-pre-redisplay-toggle "racket-xp-hl")
+    ))
+
+(emmap "tl"
+  (defhydra list-stuff-map (:foreign-keys warn :exit t) "List:"
+    ("b" list-buffers "buffers")
+    ("m" baddd-show-marks "marks")
+    ("M" bookmark-bmenu-list "bookmarks")
+                                        ;("tlk" 'list-keymaps) ; TODO - make this function
+    ("c" list-colors-display "colors")
+    ("f" list-faces-display "faces")
+    ("r" baddd-show-registers "registers")
+    ))
+; TODO - list jumps, maybe
+
+;; s map
+;(ecmap "ss" 'baddd-substitute)
+;(ecmap "sS" 'baddd-change-whole-line)
+;(baddd-define-key 'visual baddd-surround-mode-map "s" nil)
+;(baddd-define-key 'visual baddd-surround-mode-map "S" 'ignore)
+;(defun surround-region-with-parens (beg end)
+;  (interactive "r")
+;  (baddd-surround-region beg end nil ?\)))
+(evmap "(" 'quick-a-block)
+(evmap ")" 'quick-in-block)
+(evmap "ss" 'baddd-surround-region)
+(evmap "sS" 'baddd-Surround-region)
+(evmap "sh" 'shell-command-on-region)
+(ecmap "sh" 'shell-command)
+(emmap "sa" 'baddd-ex)
+(ecmap "s)" 'eval-last-sexp)
+(evmap "s)" 'eval-region)
+(evmap "s/" (kbd ":s/ ")) ; TODO - fix this...
+(ecmap "sm" 'baddd-set-marker)
+(ecmap "sM" 'bookmark-set)
+(ecmap "sg" 'baddd-goto-mark)
+(ecmap "sG" 'bookmark-jump)
+(eimap (kbd "M-c") 'helm-M-x)
+(emmap (kbd "M-c") 'helm-M-x)
+(global-set-key (kbd "M-c") 'helm-M-x)
+(emmap "sx" 'eval-expression)
+
+(evmap (kbd "C-s") 'yas-insert-with-region)
+
+;; command modes and macros
+(emmap "-" 'helm-M-x)
+;(emmap "|" 'execute-extended-command)
+(emmap "|" 'eval-expression)
+(emmap "_" 'eval-expression)
+(emmap "Q" 'call-last-kbd-macro)
+;; Movement
+(ecmap "m" nil) ;;;;;;;;;; m will be my prefix for mode-specific bindings
+;; everything in motion state is pulled into normal state
+(emmap "+" 'baddd-repeat-find-char)
+(emmap "~" 'baddd-repeat-find-char-reverse)
+(emmap "J" 'baddd-window-bottom)
+(emmap "K" 'baddd-window-top)
+(emmap "{" 'backward-sexp)
+(emmap "}" 'forward-sexp)
+(emmap "[" 'backward-list)
+(emmap "]" 'forward-list)
+(emmap (kbd "C-z") 'suspend-frame)
+(eimap (kbd "C-z") 'suspend-frame)
+
+(epmap " " 'rmo/pscroll-down-half)
+(epmap "j" 'rmo/pscroll-down-half)
+(epmap "k" 'rmo/pscroll-up-full)
+(epmap "J" 'rmo/pscroll-down-line)
+(epmap "K" 'rmo/pscroll-up-line)
+(epmap "sj" 'rmo/pscroll-down-full)
+(epmap "sk" 'rmo/pscroll-up-full)
+(epmap "e" 'baddd-normal-state)
+;; if I start in pager mode, this gets remapped to quit
+(epmap "q" 'estate-command-state)
+(emmap "to" 'estate-pager-state)
+
+
+; space map
+(emmap "sj" 'rmo/pscroll-down-half)
+(emmap "sk" 'rmo/pscroll-up-half)
+(emmap "sf" 'fold-toggle-wgh)
+(emmap "sF" 'fold-toggle-wgh-all)
+(emmap " /"
+  (myhydradef search-hydra
+              ("s" helm-swoop "swoop")
+              ("a" helm-multi-swoop-all "multi-swoop all")
+              ("m" helm-multi-swoop "multi-swoop")
+              ("r" wgh/fzf-repo "fzf-repo")
+  ))
+(emmap " -h" 'helm-M-x)
+(emmap " &g" 'baddd-ex-repeat-global-substitute)
+(emmap " va" 'mark-whole-buffer)
+
+;; Joining
+;; TODO -- make a better mapping for this.  I should make my prefixes be mnemonic or something...
+;;         for instance, g<key> is mostly navigation... t... mosty has window stuff in th... space is mostly one handed
+;;         navigation aside from this one
+(defun join-line/default-forward (arg)
+  (interactive "P")
+  (join-line (not arg)))
+(emmap " j"
+  (myhydradef j-hydra
+              ("l" join-line/default-forward "join lines")
+              ("w" baddd-join-whitespace "join whitespace")
+              ))
+
+
+;; input mode
+(eimap (kbd "DEL") 'delete-backward-char) ; remap away from the baddd-version backspace
+(eimap "\C-v" #'quoted-insert) ; more vim-like
+;(eimap "\M-r" 'baddd-paste-from-register)
+(eimap "\M-w" 'baddd-window-map)
+
+;; helm map to match what I've got going in zsh with zaw...
+(define-prefix-command 'meta-space-map)
+(global-set-key (kbd "M-SPC") 'meta-space-map)
+(define-key meta-space-map " " 'helm-helm-commands)
+(define-key meta-space-map (kbd "RET") 'helm-helm-commands)
+(define-key meta-space-map "c" 'helm-M-x)
+(define-key meta-space-map "p" 'helm-browse-project)
+(define-key meta-space-map "g" 'helm-do-grep)
+
+(myhydradef completer-map
+            ("h" hippie-expand "hippie")
+            ("n" baddd-complete-next "vim-n")
+            ("p" baddd-complete-previous "vim-p")
+            ("f" he-expand-file-name "file")
+            ("l" he-expand-lisp-symbol "lisp")
+            ("s" yas-expand "yas")
+)
+(eimap "\M-h" 'completer-map/body)
+(eimap (kbd "C-SPC TAB") 'completer-map/body)
+(eimap (kbd "C-@ TAB") 'completer-map/body)
+(eimap (kbd "TAB") 'company-complete-common-wgh)
+;; put indentation on something...
+;(define-key 'completer-map (kbd "TAB") 'indent-for-tab-command)
+(eimap (kbd "<backtab>") 'indent-for-tab-command)
+
+(global-set-key (kbd "C-\\") 'baddd-execute-in-normal-state)
+
+;; Default mode settings
+;(setq baddd-normal-state-modes (append baddd-emacs-state-modes baddd-normal-state-modes))
+;(setq baddd-emacs-state-modes nil)
+;(setq baddd-insert-state-modes (cons 'racket-repl-mode baddd-insert-state-modes))
+
+
+(define-key tty-menu-navigation-map "j" 'tty-menu-next-item)
+(define-key tty-menu-navigation-map "k" 'tty-menu-prev-item)
+(define-key tty-menu-navigation-map "h" 'tty-menu-prev-menu)
+(define-key tty-menu-navigation-map "l" 'tty-menu-next-menu)
+
+(define-key help-map "\C-h" 'describe-prefix-bindings)
+
+;(define-key baddd-ex-completion-map "\C-a" 'move-beginning-of-line)
+;(define-key baddd-ex-completion-map "\C-e" 'move-end-of-line)
+;(define-key baddd-ex-completion-map "\C-d" 'delete-char)
+;(define-key baddd-ex-completion-map "\C-k" 'kill-line)
+;(define-key baddd-ex-completion-map "\C-p" 'previous-complete-history-element)
+;(define-key baddd-ex-completion-map "\C-n" 'next-complete-history-element)
+;(define-key baddd-ex-completion-map "\C-f" 'forward-char)
+;(define-key baddd-ex-completion-map "\C-b" 'backward-char)
+;(define-key baddd-ex-completion-map "\M-r" 'baddd-paste-from-register)
+
+(define-key isearch-mode-map "\C-g" 'isearch-abort-abort-gosh-darn-it)
+
+
+(message "at end of keys-test.el")
