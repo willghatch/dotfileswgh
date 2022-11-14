@@ -234,9 +234,8 @@ quit emacs."
    (funcall current-theme-reapply-var)))
 (defun lightdark-update-theme ()
   (interactive)
-  (if (string-equal "light"
-                    (string-trim
-                     (shell-command-to-string "lightdark-status")))
+  (if (string-match "light"
+                    (shell-command-to-string "lightdark-status"))
       (light-theme)
     (dark-theme)))
 (defun lightdark-update-theme-watch ()

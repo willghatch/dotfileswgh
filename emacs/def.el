@@ -263,7 +263,7 @@
 
 
 (nobreak
- (if (equal (string-trim (shell-command-to-string "lightdark-status"))
+ (if (string-match (shell-command-to-string "lightdark-status")
             "light")
      (light-theme)
    (dark-theme)))
