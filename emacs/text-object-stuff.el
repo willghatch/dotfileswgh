@@ -8,13 +8,17 @@
     (and b (= (car b) (point)) b)))
 (defun wgh/at-thing-end-p (thing)
   "If at the end of a thing, return its bounds, else nil."
-  (let ((p-orig (point)))
-    (ignore-errors
-      (save-mark-and-excursion
-        (backward-char)
-        ;;(forward-thing thing -1)
-        (let ((b (bounds-of-thing-at-point thing)))
-          (and b (= (cdr b) p-orig) b))))))
+  (let ((p-orig (point))
+        (b-orig (bounds-of-thing-at-point thing)))
+    (or (and b-orig
+             (= p-orig (cdr b-orig))
+             b-orig)
+        (ignore-errors
+          (save-mark-and-excursion
+            (backward-char)
+            ;;(forward-thing thing -1)
+            (let ((b (bounds-of-thing-at-point thing)))
+              (and b (= (cdr b) p-orig) b)))))))
 
 (defun wgh/forward-thing (strict thing &optional count)
   "Like forward-thing, but add strict param. If strict, it only goes forward/back if at the end it is actually on a thing.  Return the number of things left to move."
@@ -118,46 +122,151 @@
 
 ;;;;;;
 
-;; TODO - delete this, but it was useful as a test, so I want it to end up in at least one commit for potential future use.
-;;(defun forward-pair-test (&optional count)
-;;  (setq count (or count 1))
-;;  (let* ((fwd (< 0 count))
-;;         (count (abs count))
-;;         (done nil))
-;;    (ignore-errors
-;;      (while (and (not done) (< 0 count))
-;;        (progn
-;;          (condition-case nil (if fwd (forward-char) (backward-char)) (setq done t))
-;;          (if fwd
-;;              (when (and (< 2 (point))
-;;                         (save-mark-and-excursion (backward-char 2) (looking-at "()")))
-;;                (setq count (- count 1)))
-;;            (when (looking-at "()")
-;;              (setq count (- count 1)))))))))
-;;
-;;(put 'pair-strict 'forward-op 'forward-pair-test)
-;;(put 'pair-lax 'forward-op 'forward-pair-test)
-;;(wgh/def-move-thing pair-strict :strict t)
-;;(wgh/def-move-thing pair-lax :strict nil)
+(defun wgh/transpose-thing-forward-once (thing)
+  (let ((bounds-1 (bounds-of-thing-at-point thing)))
+    (and bounds-1
+         (let ((bounds-2 (save-mark-and-excursion
+                           (goto-char (cdr bounds-1))
+                           (wgh/forward-thing-beginning t thing 1)
+                           (bounds-of-thing-at-point thing))))
+           (when (and bounds-2
+                      (<= (cdr bounds-1) (car bounds-2)))
+             (let ((s1 (buffer-substring-no-properties (car bounds-1)
+                                                       (cdr bounds-1)))
+                   (s2 (buffer-substring-no-properties (car bounds-2)
+                                                       (cdr bounds-2))))
+               ;; swap regions
+               (atomic-change-group
+                 (delete-region (car bounds-2) (cdr bounds-2))
+                 (goto-char (car bounds-2))
+                 (insert s1)
+                 (delete-region (car bounds-1) (cdr bounds-1))
+                 (goto-char (car bounds-1))
+                 (insert s2))
+               ;; put cursor at beginning of later region
+               (let ((len-diff (- (length s2) (length s1))))
+                 (goto-char (+ len-diff (car bounds-2)))
+                 (undo-boundary))))))))
+(defun wgh/transpose-thing-backward-once (thing)
+  (let ((bounds-1 (bounds-of-thing-at-point thing)))
+    (and bounds-1
+         (let ((bounds-2 (save-mark-and-excursion
+                           (wgh/backward-thing-beginning t thing 1)
+                           (bounds-of-thing-at-point thing))))
+           (when (and bounds-2
+                      (< (cdr bounds-2) (car bounds-1)))
+             (goto-char (car bounds-2))
+             (wgh/transpose-thing-forward-once thing)
+             (goto-char (car bounds-2)))))))
 
-(wgh/def-move-thing word :strict nil)
-(wgh/def-move-thing symbol)
-(wgh/def-move-thing sentence)
-(wgh/def-move-thing paragraph)
-(put 'symex 'forward-op 'sp-forward-sexp)
-(wgh/def-move-thing symex)
-
-;; I'm used to vi/evil word definition, it's strange to me that emacs' native word definition skips over punctuation and symbols, as well as blank lines.
-;; TODO - Well this didn't work...  I'll try again later.
-(setq vi-like-word-regexp (rx (or "\\w+"
-                                  (not (any word space))
-                                  "^\\s+$")))
-(defun forward-vi-like-word (&optional count)
+(defun wgh/transpose-thing-forward (thing &optional count)
   (setq count (or count 1))
   (let ((fwd (< 0 count))
         (count (abs count)))
     (while (< 0 count)
       (if fwd
-          (search-forward-regexp vi-like-word-regexp)
-        (search-backward-regexp vi-like-word-regexp)))))
+          (wgh/transpose-thing-forward-once thing)
+        (wgh/transpose-thing-backward-once thing))
+      (setq count (- count 1)))))
+(defun wgh/transpose-thing-backward (thing &optional count)
+  (setq count (or count 1))
+  (wgh/transpose-thing-forward thing (- count)))
+
+(cl-defmacro wgh/def-transpose-thing (thing)
+  (let ((fwd (intern (format "wgh/transpose-%s-forward" thing)))
+        (bwd (intern (format "wgh/transpose-%s-backward" thing))))
+    `(progn
+       (defun ,fwd (&optional count)
+         (interactive "p")
+         (wgh/transpose-thing-forward ',thing count))
+       (defun ,bwd (&optional count)
+         (interactive "p")
+         (wgh/transpose-thing-backward ',thing count)))))
+
+;;;;;
+
+
+(wgh/def-move-thing word :strict nil)
+(wgh/def-transpose-thing word)
+(wgh/def-move-thing symbol)
+(wgh/def-transpose-thing symbol)
+(wgh/def-move-thing sentence)
+(wgh/def-transpose-thing sentence)
+(wgh/def-move-thing paragraph)
+(wgh/def-transpose-thing paragraph)
+(put 'symex 'forward-op 'sp-forward-sexp)
+(wgh/def-move-thing symex)
+(wgh/def-transpose-thing symex)
+
+
+;;;;;
+
+
+;; I'm used to vi/evil word definition, it's strange to me that emacs' native word definition skips over punctuation and symbols, as well as blank lines.
+(defun forward-vi-like-word (&optional count)
+  (setq count (or count 1))
+  (rx-let ((blank-line-regexp "^\\s*$")
+           (vi-like-word-regexp-forward/non-blank-line
+            (or (+ word)
+                (+ (not (any word space))))))
+    (let ((vi-like-word-regexp-forward
+           (rx (or vi-like-word-regexp-forward/non-blank-line
+                   blank-line-regexp)))
+          (vi-like-word-regexp-backward
+           (rx (or (seq space
+                        vi-like-word-regexp-forward/non-blank-line)
+                   (seq word (+ (not (any word space))))
+                   (seq (not (any word space)) (+ word))
+                   blank-line-regexp)))
+          (blank-line-regexp (rx blank-line-regexp))
+          (point-orig (point))
+          (fwd (< 0 count))
+          (count (abs count)))
+      (while (< 0 count)
+        (if fwd
+            (re-search-forward vi-like-word-regexp-forward)
+          ;; Backward requires special handling, because searching a regexp backward isn't a mirror of regexp searching forward...
+          ;; This is going to be really inefficient, but I think the easiest way is...
+          (progn
+            (or
+             (let ((searched  (ignore-errors
+                                (re-search-backward vi-like-word-regexp-backward))))
+               (and searched
+                    (progn (unless (looking-at blank-line-regexp)
+                             (forward-char 1))
+                           t)))
+             (beginning-of-buffer))))
+        (setq count (- count 1))))))
 (wgh/def-move-thing vi-like-word)
+
+(defun -wgh/-vi-like-word-looking-at-category ()
+  (cond ((looking-at (rx word)) 'word)
+        ((looking-at (rx space)) 'space)
+        (t 'sym)))
+(defun forward-vi-like-word-2 (&optional count)
+  (setq count (or count 1))
+  (let ((fwd (< 0 count))
+        (count (abs count)))
+    (while (< 0 count)
+      (if fwd
+          (re-search-forward (rx (or (+ word)
+                                     (+ (not (any word space)))
+                                     (seq bol (* space) eol))))
+        (let* ((at-cat (lambda () (save-mark-and-excursion
+                                    (unless (bobp)
+                                      (backward-char 1)
+                                      (-wgh/-vi-like-word-looking-at-category)))))
+               (orig-cat (funcall at-cat))
+               (moved nil))
+          (while (not (or (bobp)
+                          (and moved (looking-at (rx (seq bol (* space) eol))))
+                          (let ((new-cat (funcall at-cat)))
+                            (or (and (not (equal new-cat orig-cat))
+                                     (not (equal orig-cat 'space)))))))
+            (backward-char 1)
+            (setq moved t)
+            (when (equal orig-cat 'space)
+              (setq orig-cat (funcall at-cat))))))
+      (setq count (- count 1)))))
+(wgh/def-move-thing vi-like-word-2)
+;; TODO - both of these attempts got me something kinda close... but wrong.  I should probably give up and do something else for now.  How much does it matter that my word movement behaves just like vim except in the specific way I want it not to?

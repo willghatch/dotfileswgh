@@ -14,6 +14,7 @@
 ;; * line/block-based visual modes with proper insert/append/edit support to do the operation to each line
 ;; * text objects, object/inner/around/etc with growing for nestable objects, and my easy bindings on () keys
 ;; * port my tree operations, in particular on-parens, but switching to normal smartparens now should be easy
+;; * change surrounding delimiters
 ;; * TODO - what else?
 
 ;; * TODO - improvements (that I could even put in my current config before switching to this)
@@ -180,7 +181,7 @@
 
 ;; undo
 (ecmap "u" 'undo)
-(ecmap "\C-r" 'baddd-redo)
+(ecmap "\C-r" 'undo-tree-redo)
 
 ;;; Motion state
 
@@ -197,8 +198,6 @@
 (emmap "8" 'digit-argument)
 (emmap "9" 'digit-argument)
 ;; TODO - word begin
-(emmap "b" 'rmo/wgh/backward-word-beginning)
-;(emmap "B" 'rmo/baddd-backward-WORD-begin)
 (emmap "E" 'rmo/baddd-forward-WORD-end)
 (emmap "f" 'rmo/baddd-find-char)
 (emmap "F" 'rmo/baddd-find-char-backward)
@@ -224,7 +223,11 @@
 (emmap "N" (lambda (&optional n) (interactive "p") (if wgh/isearch-repeat-forward-p (isearch-repeat-backward n) (isearch-repeat-forward n))))
 ;; TODO - word begin
 (emmap "w" 'rmo/wgh/forward-word-beginning)
+(emmap "b" 'rmo/wgh/backward-word-beginning)
+;(emmap "w" 'rmo/wgh/forward-vi-like-word-beginning)
+;(emmap "b" 'rmo/wgh/backward-vi-like-word-beginning)
 ;(emmap "W" 'rmo/baddd-forward-WORD-begin)
+;(emmap "B" 'rmo/baddd-backward-WORD-begin)
 ;(emmap "ge" 'rmo/baddd-backward-word-end)
 ;(emmap "gE" 'rmo/baddd-backward-WORD-end)
 (emmap "gg" 'vilish/goto-line/beginning)
@@ -440,6 +443,8 @@
 ; o and e maps - o is left/back, e is right/forward
 (emmap "ee" 'rmo/wgh/forward-word-end)
 (emmap "oe" 'rmo/wgh/backward-word-end)
+;(emmap "ee" 'rmo/wgh/forward-vi-like-word-end)
+;(emmap "oe" 'rmo/wgh/backward-vi-like-word-end)
 (emmap "eE" 'rmo/baddd-forward-WORD-end)
 (emmap "oE" 'rmo/baddd-backward-WORD-end)
 (defun vilish-open-line-below ()
@@ -463,16 +468,35 @@
 ;(evmap "o" nil)
 ;(evmap "oo" 'exchange-point-and-mark)
 ;(evmap "eo" 'exchange-point-and-mark)
-(emmap "ec" 'rmo/forward-char)
-(emmap "oc" 'rmo/backward-char)
+(defun wgh/forward-char/no-line-wrap (&optional count)
+  (interactive "p")
+  (let ((fwd (< 0 count))
+        (count (abs count))
+        (keep-going t))
+    (while (and keep-going (< 0 count))
+      (if fwd
+          (if (eolp) (setq keep-going nil) (forward-char 1))
+        (if (bolp) (setq keep-going nil) (backward-char 1)))
+      (setq count (- count 1)))))
+(defun wgh/backward-char/no-line-wrap (&optional count)
+  (interactive "p")
+  (wgh/forward-char/no-line-wrap (- count)))
+(repeatable-motion-define-pair 'wgh/forward-char/no-line-wrap
+                               'wgh/backward-char/no-line-wrap)
+(emmap "ec" 'rmo/wgh/forward-char/no-line-wrap)
+(emmap "oc" 'rmo/wgh/backward-char/no-line-wrap)
+;(emmap "ec" 'rmo/forward-char)
+;(emmap "oc" 'rmo/backward-char)
 ;(emmap "ed" 'rmo/baddd-next-close-paren)
 ;(emmap "od" 'rmo/baddd-previous-open-paren)
 ;(emmap "ed" 'rmo/baddd-next-close-brace)
 ;(emmap "od" 'rmo/baddd-previous-open-brace)
 (emmap "ed" 'rmo/on-parens-down-sexp-end)
 (emmap "od" 'rmo/on-parens-down-sexp)
-(emmap "eg" 'rmo/on-parens-up-sexp-end)
-(emmap "og" 'rmo/on-parens-up-sexp)
+(emmap "eg" 'rmo/sp-end-of-sexp)
+(emmap "og" 'rmo/sp-beginning-of-sexp)
+(emmap "eG" 'rmo/sp-up-sexp)
+(emmap "oG" 'rmo/sp-backward-up-sexp)
 (emmap "eh" 'rmo/wgh/forward-symex-beginning)
 (emmap "oh" 'rmo/wgh/backward-symex-beginning)
 (emmap "em" 'rmo/wgh/forward-symex-end)
