@@ -612,7 +612,7 @@
     ("F" fci-mode-toggle "fill-col")
     ("s" flyspell-mode "flyspell")
     ("S" flyspell-prog-mode "flyspell-prog")
-    ("e" electric-indent-mode "el.indent")
+    ;("e" electric-indent-mode "el.indent")
     ("d" rainbow-delimiters-mode "rainbow{}")
     ("r" linum-relative-toggle "linum-rel")
     ("h" evil-search-highlight-persist-remove-all "search-highlight-now")
