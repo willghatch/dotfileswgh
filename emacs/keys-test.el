@@ -1,22 +1,21 @@
 ;; TODO - working on replacing evil-mode with something that keeps cursor BETWEEN instead of ON characters in all modes.  Also hopefully a little lighter.
 ;; TODO - what major features do I really want from vim/evil?
 ;; * composable language for composing operations, motions, etc.  But I have something more ambitious than what vim does in mind, much more composable to learn a smaller number of keys yet have way more motions than vim.  But it may take me some time to fully flesh it out and build it, given how often I spend time working towards it...
-;; * marks (set mark, go to mark or line of mark)
-;; * yank/paste with registers
-;; * record keyboard to macro register and apply keyboard macro from register
-;; * overwrite mode?
-;; * replace single character?
 ;; * visual mode
-;; * line-based visual mode
-;; * block-based visual mode
-;; * line/block-based visual modes with proper insert/append/edit support to do the operation to each line
+;; * line-based visual mode - with proper insert/append support -- IE when inserting or appending, add to each line
+;; * block-based visual mode - with proper insert/append/edit support -- IE insert/append/replace on each line
 ;; * text objects, object/inner/around/etc with growing for nestable objects, and my easy bindings on () keys
 ;; * port my tree operations, in particular on-parens, but switching to normal smartparens now should be easy
 ;; * change surrounding delimiters
+;; * move to opposite delimiter (eg. % in evil-mode)
+;; * repeat command
+;; * marks (set mark, go to mark or line of mark) -- note that evil-mode marks are per-buffer, but I wonder if I would prefer marks that record buffer and position...
+;; * registers -- IE copy/paste to/from register, record/replay keyboard macro to/from register
+;; * overwrite mode?
+;; * replace single character?
 ;; * TODO - what else?
 
 ;; * TODO - improvements (that I could even put in my current config before switching to this)
-;; * move M-x off of minus key so I can easily do negative arguments
 
 
 (message "\n\nIn keys-test.el\n\n")
@@ -145,12 +144,12 @@
 (ecmap "&" 'baddd-ex-repeat-substitute)
 (ecmap "gq" 'baddd-fill-and-move)
 (ecmap "gw" 'baddd-fill)
-(ecmap "zo" 'baddd-open-fold)
-(ecmap "zc" 'baddd-close-fold)
-(ecmap "za" 'baddd-toggle-fold)
-(ecmap "zr" 'baddd-open-folds)
-(ecmap "zm" 'baddd-close-folds)
-(ecmap "z=" 'ispell-word)
+;;(ecmap "zo" 'baddd-open-fold)
+;;(ecmap "zc" 'baddd-close-fold)
+;;(ecmap "za" 'baddd-toggle-fold)
+;;(ecmap "zr" 'baddd-open-folds)
+;;(ecmap "zm" 'baddd-close-folds)
+;;(ecmap "z=" 'ispell-word)
 (ecmap "\C-n" 'baddd-paste-pop-next)
 (ecmap "\C-p" 'baddd-paste-pop)
 (ecmap "\C-t" 'pop-tag-mark)
@@ -185,7 +184,8 @@
 
 ;; "0" is a special command when called first
 ;(baddd-redirect-digit-argument baddd-motion-state-map "0" 'baddd-beginning-of-line)
-(emmap "0" 'baddd-beginning-of-line)
+;(emmap "0" 'baddd-beginning-of-line)
+(emmap "0" 'digit-argument)
 (emmap "1" 'digit-argument)
 (emmap "2" 'digit-argument)
 (emmap "3" 'digit-argument)
@@ -264,7 +264,7 @@
 (emmap "^" 'baddd-first-non-blank)
 (emmap "+" 'baddd-next-line-first-non-blank)
 (emmap "_" 'baddd-next-line-1-first-non-blank)
-(emmap "-" 'baddd-previous-line-first-non-blank)
+;;(emmap "-" 'baddd-previous-line-first-non-blank)
 (emmap "\C-w" 'baddd-window-map)
 (emmap "\C-]" 'baddd-jump-to-tag)
 (emmap (kbd "C-b") 'baddd-scroll-page-up)
@@ -274,18 +274,18 @@
 (emmap (kbd "C-o") 'baddd-jump-backward)
 (emmap (kbd "C-y") 'baddd-scroll-line-up)
 (emmap "\\" 'baddd-execute-in-emacs-state)
-(emmap "z^" 'baddd-scroll-top-line-to-bottom)
-(emmap "z+" 'baddd-scroll-bottom-line-to-top)
-(emmap "zt" 'baddd-scroll-line-to-top)
+;;(emmap "z^" 'baddd-scroll-top-line-to-bottom)
+;;(emmap "z+" 'baddd-scroll-bottom-line-to-top)
+;;(emmap "zt" 'baddd-scroll-line-to-top)
 ;; TODO: z RET has an advanced form taking an count before the RET
 ;; but this requires again a special state with a single command
 ;; bound to RET
-(emmap (vconcat "z" [return]) "zt^")
-(emmap (kbd "z RET") (vconcat "z" [return]))
-(emmap "zz" 'baddd-scroll-line-to-center)
-(emmap "z." "zz^")
-(emmap "zb" 'baddd-scroll-line-to-bottom)
-(emmap "z-" "zb^")
+;;(emmap (vconcat "z" [return]) "zt^")
+;;(emmap (kbd "z RET") (vconcat "z" [return]))
+;;(emmap "zz" 'baddd-scroll-line-to-center)
+;;(emmap "z." "zz^")
+;;(emmap "zb" 'baddd-scroll-line-to-bottom)
+;;(emmap "z-" "zb^")
 (emmap "v" (lambda () (interactive)
              ;(estate-visual-state)
              ;; TODO - I'm not sure how evil's visual state works, it is more complicated than others because it seems to have some hook on the mark state and transient-mark-mode as well...
@@ -846,7 +846,12 @@ is the opposite."
 (evmap (kbd "C-s") 'yas-insert-with-region)
 
 ;; command modes and macros
-(emmap "-" 'helm-M-x)
+(mkmap "-" (lambda (n)
+             (interactive "p")
+             (message "use z")
+             ;;(call-interactively 'helm-M-x)
+             ))
+(emmap "z" 'helm-M-x)
 ;(emmap "|" 'execute-extended-command)
 (emmap "|" 'eval-expression)
 (emmap "_" 'eval-expression)
