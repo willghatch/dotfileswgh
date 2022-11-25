@@ -1,7 +1,5 @@
 ;; TODO - working on replacing evil-mode with something that keeps cursor BETWEEN instead of ON characters in all modes.  Also hopefully a little lighter.
 ;; TODO - what major features do I really want from vim/evil?
-;; * I like vim's colon commands, but I really only use the s/foo/bar/ command.  Maybe I can take that part of evil without bringing in the rest...  Or I could just learn to use the emacs way of doing s/foo/bar/gc...  But I also like the idea of that kind of command line in an editor -- giving arguments inline is very different from the emacs way of specifying a command, then arguments one by one.
-;; * find char forward/backward and repeat with that character
 ;; * composable language for composing operations, motions, etc.  But I have something more ambitious than what vim does in mind, much more composable to learn a smaller number of keys yet have way more motions than vim.  But it may take me some time to fully flesh it out and build it, given how often I spend time working towards it...
 ;; * marks (set mark, go to mark or line of mark)
 ;; * yank/paste with registers
@@ -317,8 +315,10 @@
 ;(define-key minibuffer-local-map "\C-x\C-n" 'baddd-complete-previous-line)
 
 ;; Ex
-(emmap ":" 'baddd-ex)
-(emmap "!" 'baddd-shell-command)
+(emmap ":" (lambda () (interactive)
+             (require 'evil) (call-interactively 'evil-ex)))
+(emmap "!" (lambda () (interactive)
+             (require 'evil) (call-interactively 'evil-shell-command)))
 ;
 ;;; search command line
 ;(define-key baddd-ex-search-keymap "\d" #'baddd-ex-delete-backward-char)
@@ -517,10 +517,86 @@
 ;(emmap "oS" 'rmo/baddd-backward-section-begin)
 ;(emmap "eP" 'rmo/baddd-forward-section-end)
 ;(emmap "oP" 'rmo/baddd-backward-section-end)
-(emmap "et" 'rmo/baddd-find-char-to)
-(emmap "ot" 'rmo/baddd-find-char-to-backward)
-(emmap "ef" 'rmo/baddd-find-char)
-(emmap "of" 'rmo/baddd-find-char-backward)
+(setq -wgh/find-char-in-line/impl-last-char nil)
+(setq -wgh/find-char-in-line/impl-last-style 'reverse-emacs)
+(defun wgh/find-char-in-line/impl (char count style)
+  "STYLE is 'emacs, 'reverse-emacs, 'beginning, or 'end.
+Emacs style is to go to the end of the character when going forward, and
+to the beginning of the character when going backward.  Reverse-emacs style
+is the opposite."
+  (let ((r (regexp-quote (if (stringp char) char (string char))))
+        (fwd (< 0 count))
+        (count (abs count))
+        (keep-going t))
+    (when (and fwd
+               (or (equal style 'beginning)
+                   (equal style 'reverse-emacs))
+               (looking-at r))
+      (forward-char 1))
+    (when (and (not fwd)
+               (or (equal style 'end)
+                   (equal style 'reverse-emacs))
+               (save-mark-and-excursion
+                 (backward-char 1)
+                 (looking-at r)))
+      (backward-char 1))
+    (while (and keep-going (< 0 count))
+      (setq count (- count 1))
+      (let ((p (point))
+            (l (line-number-at-pos (point))))
+        (ignore-errors
+          (if fwd
+              (re-search-forward r)
+            (re-search-backward r)))
+        (when (not (equal l (line-number-at-pos (point))))
+          (setq keep-going nil)
+          (goto-char p))))
+    (when (and fwd
+               (or (equal style 'beginning)
+                   (equal style 'reverse-emacs)))
+      (backward-char 1))
+    (when (and (not fwd)
+               (or (equal style 'end)
+                   (equal style 'reverse-emacs))
+               (forward-char 1))
+      (backward-char 1))))
+(defun wgh/find-char-in-line-forward-repeat (&optional n)
+  (interactive "p")
+  (wgh/find-char-in-line/impl -wgh/find-char-in-line/impl-last-char
+                              n
+                              -wgh/find-char-in-line/impl-last-style))
+(defun wgh/find-char-in-line-backward-repeat (&optional n)
+  (interactive "p")
+  (wgh/find-char-in-line-forward-repeat (- n)))
+
+;; The evil-mode movements I'm used to are basically like emacs style and reverse-emacs style of what I've defined... so maybe I'll use them...
+(defun wgh/find-to-char-in-line-forward (&optional n)
+  (interactive "p")
+  (let ((c (read-char "char to find:")))
+    (setq -wgh/find-char-in-line/impl-last-char c)
+    (setq -wgh/find-char-in-line/impl-last-style 'reverse-emacs)
+    (wgh/find-char-in-line/impl c n 'reverse-emacs)))
+(defun wgh/find-to-char-in-line-backward (&optional n)
+  (interactive "p")
+  (wgh/find-to-char-in-line-forward (- n)))
+(repeatable-motion-define 'wgh/find-to-char-in-line-forward 'wgh/find-char-in-line-backward-repeat :repeat 'wgh/find-char-in-line-forward-repeat)
+(repeatable-motion-define 'wgh/find-to-char-in-line-backward 'wgh/find-char-in-line-forward-repeat :repeat 'wgh/find-char-in-line-backward-repeat)
+(defun wgh/find-after-char-in-line-forward (&optional n)
+  (interactive "p")
+  (let ((c (read-char "char to find:")))
+    (setq -wgh/find-char-in-line/impl-last-char c)
+    (setq -wgh/find-char-in-line/impl-last-style 'emacs)
+    (wgh/find-char-in-line/impl c n 'emacs)))
+(defun wgh/find-after-char-in-line-backward (&optional n)
+  (interactive "p")
+  (wgh/find-after-char-in-line-forward (- n)))
+(repeatable-motion-define 'wgh/find-after-char-in-line-forward 'wgh/find-char-in-line-backward-repeat :repeat 'wgh/find-char-in-line-forward-repeat)
+(repeatable-motion-define 'wgh/find-after-char-in-line-backward 'wgh/find-char-in-line-forward-repeat :repeat 'wgh/find-char-in-line-backward-repeat)
+
+(emmap "et" 'rmo/wgh/find-to-char-in-line-forward)
+(emmap "ot" 'rmo/wgh/find-to-char-in-line-backward)
+(emmap "ef" 'rmo/wgh/find-after-char-in-line-forward)
+(emmap "of" 'rmo/wgh/find-after-char-in-line-backward)
 (defun goto-column (&optional n)
   (interactive "P")
   (move-to-column (or n 0)))
