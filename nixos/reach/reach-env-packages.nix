@@ -105,6 +105,10 @@ in [
   pp.nodejs
   pp.nodePackages.npm
   pp.nodePackages.typescript-language-server
+  pp.yarn
+  pp.postgresql
+  pp.nodePackages.prisma
+  pp.openssl
 
   # for `make js-build` in the js/stdlib dir
   # TODO - this is probably too old, but I'll just go into the docker container to see things for now.
