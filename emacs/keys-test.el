@@ -780,7 +780,7 @@ is the opposite."
   (defhydra settings-toggle (:foreign-keys warn :exit t) "Toggle:"
     ("p" smartparens-mode "smartparens")
     ("w" whitespace "whitespace")
-    ("C" rainbow-mode "#aabbcc")
+    ("C" (lambda () (interactive) (require 'rainbow-mode) (rainbow-mode)) "#aabbcc")
     ("c" company-mode "company")
     ("t" toggle-truncate-lines "trunc")
     ("i" toggle-case-fold-search "/? case")
