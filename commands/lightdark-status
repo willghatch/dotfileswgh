@@ -1,9 +1,9 @@
 #!/usr/bin/env bash
 
 help() {
-    echo "Usage: $0 [dark|light]"
-    echo "Gives status if called with no argument."
-    echo "Sets status if called wath an argument."
+    echo "Usage: $0 [dark|light|toggle|status]"
+    echo "Gives status if called with no argument or the status argument."
+    echo "Sets status if called with light, dark, or toggle."
     exit 1
 }
 
@@ -44,6 +44,9 @@ elif [[ "$#" = 1 ]]; then
             update light
             exit 0
         fi
+    elif [[ "$1" == "status" ]]; then
+        echo "$lightdark"
+        exit 0
     fi
 fi
 
