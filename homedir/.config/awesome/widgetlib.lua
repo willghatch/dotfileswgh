@@ -5,6 +5,10 @@ local vicious = require("vicious")
 local math = require("math")
 mytextclock = awful.widget.textclock()
 
+local bar_bg_dark = "#494B4F"
+local bar_bg_light = "#ded8d5"
+local dark_orange = "#b03010"
+local light_orange = "#f05030"
 
 kbd_state_widget = wibox.widget.textbox()
 kbd_state_widget:set_text("")
@@ -42,7 +46,7 @@ get_unread_count = function()
        presort = incr(presort, line:match("^pre.sort.post.process (%d+)"))
     end
     local green = "<span color='green'>"
-    local cc = "<span color='#99ff66'>"
+    local cc = globalstate.theme_ld == "light" and "<span color='#225522'>" or "<span color='#99ff66'>"
     local ecc = "</span>"
     instr:close()
     return green ..
@@ -105,21 +109,24 @@ memTextWidget = wibox.widget.textbox()
 -- Register widget
 vicious.register(memTextWidget, vicious.widgets.mem, "RAM: $1% ")
 
--- Initialize widget
-memwidget = awful.widget.progressbar()
--- Progressbar properties
-memwidget:set_width(8)
-memwidget:set_height(10)
-memwidget:set_vertical(true)
-memwidget:set_background_color("#494B4F")
-memwidget:set_border_color(nil)
-memwidget:set_color("#003599")
---memwidget:set_color({ type = "linear", from = { 0, 0 }, to = { 10,0 }, stops = { {0, "#AECF96"}, {0.5, "#88A175"},
---                         {1, "#FF5656"}}})
--- Register widget
-vicious.register(memwidget, vicious.widgets.mem, "$1", 13)
+function mkMemWidget(ld_stat)
+   -- Initialize widget
+   memwidget = awful.widget.progressbar()
+   -- Progressbar properties
+   memwidget:set_width(8)
+   memwidget:set_height(10)
+   memwidget:set_vertical(true)
+   memwidget:set_background_color(ld_stat == "light" and bar_bg_light or bar_bg_dark)
+   memwidget:set_border_color(nil)
+   memwidget:set_color("#003599")
+   --memwidget:set_color({ type = "linear", from = { 0, 0 }, to = { 10,0 }, stops = { {0, "#AECF96"}, {0.5, "#88A175"},
+   --                         {1, "#FF5656"}}})
+   -- Register widget
+   vicious.register(memwidget, vicious.widgets.mem, "$1", 13)
 
-rotmemwidget = wibox.container.rotate(memwidget, "east")
+   rotmemwidget = wibox.container.rotate(memwidget, "east")
+   return rotmemwidget
+end
 
 -- Initialize widget
 cpuTextWidget = wibox.widget.textbox()
@@ -137,54 +144,52 @@ vicious.register(cpuTextWidget, vicious.widgets.cpu, " | CPU: $1% | ")
 ---- Register widget
 --vicious.register(cpuwidget, vicious.widgets.cpu, "$1")
 
---volume widget
---volumewidget = wibox.widget.textbox()
---volumewidget:set_align("right")
----- wrapper to make mute status more visible...
---volume_widget_wrapper = function(...)
---   ret = vicious.widgets.volume(...)
---   mutestr = ""
---   if ret[2] == "♩" then
---      mutestr = "MUTE"
---   end
---   return {ret[1], mutestr}
---end
---vicious.register(volumewidget, volume_widget_wrapper, "<span color='#00ffff'> Vol: $1%</span> <span color='#99FF99'>$2 </span>| ", 1, "Master")
 
-volumewidget = wibox.widget.textbox()
-set_volumewidget = function()
-    local io = { popen = io.popen }
-    local volout = io.popen("pamixer --get-volume")
-    local volstr = volout:read('*l') or "??"
-    volout:close()
-    local muteout = io.popen("pamixer --get-mute")
-    local mutestr = muteout:read('*l') or "??"
-    muteout:close()
-    local mute_use = (mutestr == "true") and "MUTE" or "♩"
-    volumewidget:set_markup('<span color="#00ffff">Vol: '.. volstr .."%</span><span color='#99ff99'> ".. mute_use .."</span>|")
+function mkVolumeWidget(ld_stat)
+   local volumewidget = wibox.widget.textbox()
+   local color = ld_stat == "light" and "#005555" or "#00ffff"
+   local color2 = ld_stat == "light" and "#226622" or "#99ff99"
+   set_volumewidget = function()
+      local io = { popen = io.popen }
+      local volout = io.popen("pamixer --get-volume")
+      local volstr = volout:read('*l') or "??"
+      volout:close()
+      local muteout = io.popen("pamixer --get-mute")
+      local mutestr = muteout:read('*l') or "??"
+      muteout:close()
+      local mute_use = (mutestr == "true") and "MUTE" or "♩"
+      volumewidget:set_markup('<span color="'.. color ..'">Vol: '.. volstr ..'%</span><span color="'..color2..'"> '.. mute_use ..'</span>|')
+   end
+   -- initialize volume widget, then let it run every so often
+   set_volumewidget()
+   volume_timer = timer({ timeout = 1 })
+   volume_timer:connect_signal("timeout", set_volumewidget)
+   volume_timer:start()
+   return volumewidget
 end
--- initialize volume widget, then let it run every so often
-set_volumewidget()
-volume_timer = timer({ timeout = 1 })
-volume_timer:connect_signal("timeout", set_volumewidget)
-volume_timer:start()
 
 
 -- battery widget
-batteryTextWidget = wibox.widget.textbox()
-vicious.register(batteryTextWidget, vicious.widgets.bat, "<span color='orange'> Bat: $2% $1</span>", 30, "BAT0")
+function mkBatteryTextWidget(ld_stat)
+   local batteryTextWidget = wibox.widget.textbox()
+   local color = ld_stat == "light" and dark_orange or light_orange
+   vicious.register(batteryTextWidget, vicious.widgets.bat, string.format("<span color='%s'> Bat: $2%s $1</span>", color, "%"), 30, "BAT0")
+   return batteryTextWidget
+end
 
-batteryWidget = awful.widget.progressbar()
-batteryWidget:set_width(8)
-batteryWidget:set_height(10)
-batteryWidget:set_vertical(true)
-batteryWidget:set_background_color("#494B4F")
-batteryWidget:set_border_color(nil)
-batteryWidget:set_color("#f05030")
---batteryWidget:set_color({ type = "linear", from = { 0, 0 }, to = { 10,0 }, stops = { {0, "#AECF96"}, {0.5, "#88A175"},
---                         {1, "#FF5656"}}})
-vicious.register(batteryWidget, vicious.widgets.bat, "$2", 30, "BAT0")
-rotbatteryWidget = wibox.container.rotate(batteryWidget, "east")
+
+function mkBatteryWidget(ld_stat)
+   batteryWidget = awful.widget.progressbar()
+   batteryWidget:set_width(8)
+   batteryWidget:set_height(10)
+   batteryWidget:set_vertical(true)
+   batteryWidget:set_background_color(ld_stat == "light" and bar_bg_light or bar_bg_dark)
+   batteryWidget:set_border_color(nil)
+   batteryWidget:set_color(ld_stat == "light" and dark_orange or light_orange)
+   vicious.register(batteryWidget, vicious.widgets.bat, "$2", 30, "BAT0")
+   rotbatteryWidget = wibox.container.rotate(batteryWidget, "east")
+   return rotbatteryWidget
+end
 
 
 return {
@@ -193,8 +198,8 @@ return {
    kbdstate = kbd_state_widget,
    cput = cpuTextWidget,
    memt = memTextWidget,
-   mem = rotmemwidget,
-   batt_t = batteryTextWidget,
-   batt = rotbatteryWidget,
-   vol = volumewidget
+   mem = mkMemWidget,
+   batt_t = mkBatteryTextWidget,
+   batt = mkBatteryWidget,
+   vol = mkVolumeWidget
 }

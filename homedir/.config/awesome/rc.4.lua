@@ -71,8 +71,7 @@ end
 
 -- {{{ Variable definitions
 -- Themes define colours, icons, font and wallpapers.
-theme_env_var="WGH_THEME_DARK_OR_LIGHT"
-init_theme_state = os.getenv(theme_env_var) or "dark"
+init_theme_state = "dark"
 dotfilesdir = os.getenv("DOTFILESWGH")
 
 globalstate = {
@@ -83,15 +82,26 @@ globalstate = {
 --beautiful.init(awful.util.get_themes_dir() .. "default/theme.lua")
 beautiful.init(dotfilesdir .. "/config/awesome/theme.lua")
 
+lightdark_update_awesome = function(ld_stat)
+   if ld_stat == "light\n" or ld_stat == "light" then
+      beautiful.init(dotfilesdir .. "/config/awesome/light-theme.lua")
+      globalstate.theme_ld = "light"
+   else
+      beautiful.init(dotfilesdir .. "/config/awesome/theme.lua")
+      globalstate.theme_ld = "dark"
+   end
+   awful.screen.connect_for_each_screen(topBarSetup)
+   -- this one widget would be harder to get to work nicer, so let's just force it to update when switching color...
+   set_email_widget()
+end
+-- set theme once for startup based on lightdark-status
+awful.spawn.easy_async({"lightdark-status"}, function(stdout, stderr, reason, exit_code)
+      lightdark_update_awesome(stdout)
+end)
+
 toggle_lightdark = function()
    awful.spawn.easy_async({"lightdark-status", "toggle"}, function(stdout, stderr, reason, exit_code)
-         if stdout == "light\n" then
-            -- TODO - this light theme sort-of works, but it's missing a lot.  Also, the theme doesn't update immediately, it needs some element to need an update.  So there is probably a function I need to call to kick the actual update into action.  I think this is not the correct way to update a theme, but I'm not sure what is.
-            --beautiful.init(dotfilesdir .. "/config/awesome/light-theme.lua")
-            beautiful.init(dotfilesdir .. "/config/awesome/theme.lua")
-         else
-            beautiful.init(dotfilesdir .. "/config/awesome/theme.lua")
-         end
+         lightdark_update_awesome(stdout)
   end)
 end
 
@@ -257,12 +267,19 @@ end
 -- Re-set wallpaper when a screen's geometry changes (e.g. different resolution)
 screen.connect_signal("property::geometry", set_wallpaper)
 
-awful.screen.connect_for_each_screen(function(s)
+topBarSetup = (function(s)
+    -- Remove old toolbar, if any.
+    if s.mywibox then s.mywibox:remove() end
+    if s.taglist then s.taglist:remove() end
+
     -- Wallpaper
     set_wallpaper(s)
 
     -- Each screen has its own tag table.
-    awful.tag({ "1", "2", "3", "4", "5", "6", "7", "8", "9" }, s, awful.layout.layouts[1])
+    -- not next(table) checks if it's empty...
+    if not next(s.tags) then
+       awful.tag({ "1", "2", "3", "4", "5", "6", "7", "8", "9" }, s, awful.layout.layouts[1])
+    end
 
     -- Create a promptbox for each screen
     s.mypromptbox = awful.widget.prompt()
@@ -300,10 +317,10 @@ awful.screen.connect_for_each_screen(function(s)
             mywidgets.kbdstate,
             mywidgets.cput,
             mywidgets.memt,
-            mywidgets.mem,
-            mywidgets.batt_t,
-            mywidgets.batt,
-            mywidgets.vol,
+            mywidgets.mem(globalstate.theme_ld),
+            mywidgets.batt_t(globalstate.theme_ld),
+            mywidgets.batt(globalstate.theme_ld),
+            mywidgets.vol(globalstate.theme_ld),
 
             mykeyboardlayout,
             wibox.widget.systray(),
@@ -312,6 +329,7 @@ awful.screen.connect_for_each_screen(function(s)
         },
     }
 end)
+awful.screen.connect_for_each_screen(topBarSetup)
 -- }}}
 
 function toggleBar(to)
