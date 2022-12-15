@@ -74,8 +74,8 @@
 ;(in 'counsel)
 
 
-;(in 'js2-mode)
-;(in 'js2-refactor)
+(in 'js2-mode)
+(in 'js2-refactor)
 (in 'typescript-mode)
 (in 'haskell-mode)
 (in 'lsp-haskell)
@@ -96,6 +96,10 @@
 (in 'systemd)
 (in 'lsp-java)
 (in 'solidity-mode)
+
+(in 'rust-mode)
+;; Rustic is recommended as being better, but also has more dependencies and I don't want to sort it out right now, I really just want syntax highlighting.
+;;(in 'rustic)
 
 (in 'keyfreq)
 

@@ -158,7 +158,7 @@
 (mkmap "f" 'rmo/evil-find-char)
 (mkmap "F" 'rmo/evil-find-char-backward)
 (mkmap "G" 'evil-goto-line)
-(mkmap "h" (lambda () (interactive) (message "use oc")))
+;(mkmap "h" (lambda () (interactive) (message "use oc")))
 (mkmap "H" 'evil-window-top)
 (mkmap "j" 'rmo-c/evil-next-line)
 (mkmap "k" 'rmo-c/evil-previous-line)
@@ -669,10 +669,12 @@
 ;; command modes and macros
 (mkmap "-" (lambda (n)
              (interactive "p")
-             (message "use z")
-             ;;(call-interactively 'helm-M-x)
+             ;(message "use h")
+             ;; I haven't liked using z, maybe I'll prefer h, but for now I just want to stop tripping over this.
+             (call-interactively 'helm-M-x)
              ))
 (mkmap "z" 'helm-M-x)
+(mkmap "h" 'helm-M-x)
 ;(mkmap "|" 'execute-extended-command)
 (mkmap "|" 'eval-expression)
 (mkmap "_" 'eval-expression)

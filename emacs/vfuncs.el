@@ -1,4 +1,4 @@
-
+;; -*- lexical-binding: t -*-
 
 (defun file-visiting-buffer-list ()
   (cl-remove-if-not 'buffer-file-name (buffer-list)))
