@@ -8,13 +8,15 @@ if [ -z "$XSESSION_COMMON_RUN_P" ]; then
   mkdir -p $busdir
   echo "${DBUS_SESSION_BUS_ADDRESS}" >"$busdir/tty_${LOGIN_TTY}"
 
-  ### light/dark theming
-  # Let's set our default theme to be dark this way.
-  darklight-status dark
   # Gnome programs can dynamically switch between light and dark if an xsettings daemon is running.
   # By default in gnome this is gsd-xsettings, but xsettingsd can be used with other window managers.
   # I'm not sure how to do this on wayland.
   xsettingsd-wrapper --start &
+
+  ### light/dark theming
+  # The default is dark if nothing is written to the status file, so this will default dark without writing anything.
+  # This also runs xrdb for xresources.
+  lightdark-status soft-update
 
 
   # hack to fix pulseaudio, which doesn't seem to work for some reason...
@@ -23,9 +25,6 @@ if [ -z "$XSESSION_COMMON_RUN_P" ]; then
     sleep 4
     pulseaudio
   } &
-
-  # merge xresources first, so other programs in this (xscreensaver) can get settings
-  xrdb $DOTFILESWGH/Xresources
 
   # get keyboard layout
   hkk

@@ -263,8 +263,8 @@
 
 
 (nobreak
- (if (string-match (shell-command-to-string "lightdark-status")
-            "light")
+ (if (string-match "light"
+                   (shell-command-to-string "lightdark-status"))
      (light-theme)
    (dark-theme)))
 (nobreak (lightdark-update-theme-watch))
