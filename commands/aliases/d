@@ -1,8 +1,8 @@
 #!/bin/sh
 UNAME=`uname`
-DIRCOLORS_FILE="$DOTFILESWGH/dircolors-dark"
+DIRCOLORS_FILE="$DOTFILESWGH/dircolors-gen-dark"
 if test "$(lightdark-status)" = "light"; then
-    DIRCOLORS_FILE="$DOTFILESWGH/dircolors-light"
+    DIRCOLORS_FILE="$DOTFILESWGH/dircolors-gen-light"
 fi
 
 eval `dircolors -b $DIRCOLORS_FILE`

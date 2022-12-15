@@ -1,0 +1,314 @@
+#!/usr/bin/env racket
+#lang racket/base
+(require
+ racket/match
+ racket/string
+ racket/file
+ racket/list
+ )
+
+#|
+TODO - I would like a listing command like `ls` but that can color in more configurable ways.  Probably I'll write it myself.  This kind of dircolors approach is probably good enough for normal use, though I would like to do different highlighting for things like git status (eg. ignored by gitignore, modified, staged, etc).  But I would also like to say `ls-like video` and highlight only video files, but highlight them differently based on things like file type (eg mp4 vs mkv vs mov, etc), size, name, ... in a variety of different contexts I might care about different things.
+
+TODO - even without making this better thing, I could at least make better categories than my old dircolors.  But my main motivation today is just making something reasonable for light mode, so I'm for the moment just basically copying over my old dircolors and making them more legible to improve going forward.
+|#
+
+#|
+From my old dircolors config:
+
+# Configuration file for dircolors, a utility to help you set the
+# LS_COLORS environment variable used by GNU ls with the --color option.
+
+# The keywords COLOR, OPTIONS, and EIGHTBIT (honored by the
+# slackware version of dircolors) are recognized but ignored.
+
+
+# Below are the color init strings for the basic file types. A color init
+# string consists of one or more of the following numeric codes:
+# Attribute codes:
+# 00=none 01=bold 04=underscore 05=blink 07=reverse 08=concealed
+# Text color codes:
+# 30=black 31=red 32=green 33=yellow 34=blue 35=magenta 36=cyan 37=white
+# Background color codes:
+# 40=black 41=red 42=green 43=yellow 44=blue 45=magenta 46=cyan 47=white
+# 256-color: 38;5;### - foreground 256-color
+#            48;5;### - background 256-color
+# 24-bit color: foreground: 38;2;R;G;B
+#               background: 48;2;R;G;B
+|#
+
+
+(define dgreen "#00d000")
+(define lgreen "#009000")
+
+(define dc
+  `(
+    ;; Special file types recognized by dircolors, as symbols:
+    [(NORMAL) (default 00)]
+    [(FILE) (default 00)]
+    [(EXEC) (dark (fg ,dgreen) bold) (light (fg ,lgreen) bold)]
+    [(LINK) (dark (fg "#00ffff") bold) (light (fg "#006f6f") bold)]
+    [(ORPHAN)
+     ;; IE link to nonexistent file
+     (dark (bg "#660000") (fg "#00ffff") bold)
+     (light (bg "#FF8888") (fg "#006f6f") bold)]
+    [(FIFO SOCK BLK CHR) (default (fg "#7700ff") bold)]
+    [(STICKY) (default (fg "#33cc88") bold)]
+    [(STICKY_OTHER_WRITABLE) (default (bg "#c77679") (fg "#137c28") bold)]
+    ;; TODO - setuid/setgid maybe should be styled differently?
+    [(DIR) (dark (fg "#5286fd") bold)
+             (light (fg "#2246ad") bold)]
+
+    ;; File extensions.
+    ;; You can't match a whole file name, only an extension.
+    ;; To best match a whole file name, use *filename.
+
+    ;; Partial download files, I want these to stick out.
+    [(".part") (default (fg "#fc00eb") (bg "#305407"))]
+    ;; Archives or compressed files
+    [(".tar"
+      ".tgz"
+      ".arj"
+      ".taz"
+      ".lzh"
+      ".zip"
+      ".rar"
+      ".7z"
+      ".z"
+      ".Z"
+      ".gz"
+      ".xz"
+      ".bz2"
+      ".deb"
+      ".rpm")
+     (dark (fg "#644d07"))
+     (light (fg "#442d07"))]
+    ;; Image formats
+    [(".png"
+      ".bmp"
+      ".ppm"
+      ".tga"
+      ".xbm"
+      ".xpm"
+      ".tif"
+      ".jpg"
+      ".jpeg"
+      )
+     (dark (fg "#a0e812"))
+     (light (fg "#304802"))]
+    ;; Video formats
+    [(
+      ".mp4"
+      ".mpg"
+      ".3gp"
+      ".mkv"
+      ".webm"
+      ".m4v"
+      ".avi"
+      ".ogv"
+      ".ts"
+      )
+     (dark (fg "#c4e812"))
+     (light (fg "#285006"))]
+    ;; Sound
+    [(
+      ".flac"
+      ".wav"
+      ".mp3"
+      ".ogg"
+      ".oga"
+      )
+     (dark (fg "#f84f52"))
+     (light (fg "#e82f12"))]
+    ;; Book/PDF
+    [(
+      ".epub"
+      ".mobi"
+      ".pdf"
+      )
+     (dark (fg "#edf40c"))
+     (light (fg "#583b03"))]
+    ;; Document formats
+    [(
+      ".odt"
+      ".odp"
+      ".ods"
+      ".doc"
+      ".docx"
+      ".ppt"
+      ".pptx"
+      ".xls"
+      ".xlsx"
+      )
+     (dark (fg "#10d3d3"))
+     (light (fg "#033d3d"))]
+    ;; Documentation
+    [(
+      "*readme"
+      ;; These I'm leaving upcased because they have specific casing...
+      "*README.md"
+      "*README.rst"
+      "*README.markdown"
+      "*install"
+      "*hacking"
+      "*copying"
+      "*credits"
+      "*license"
+      "*licence"
+      "*authors"
+      "*news"
+      "*todo"
+      )
+     (dark (fg "#237d3d"))
+     (light (fg "#035d3d"))]
+    ;; Build scripts
+    [(
+      "*configure"
+      "*autogen.sh"
+      "*makefile"
+      "*mk"
+      ".ant"
+      )
+     (dark (fg "#0b94dd"))
+     (light (fg "#03293d"))]
+    ;; Source code
+    [(
+      ".c"
+      ".cpp"
+      ".cxx"
+      ".py"
+      ".sh"
+      ".zsh"
+      ".bash"
+      ".csh"
+      ".pl"
+      ".el"
+      ".vim"
+      ".hs"
+      ".rb"
+      ".lisp"
+      ".lua"
+      ".rkt"
+      ".js"
+      ".mjs"
+      )
+     (dark (fg "#dd0b86"))
+     (light (fg "#8c0b6d"))]
+    [(
+      ".h"
+      ".hpp"
+      ".hxx"
+      )
+     (dark (fg "#0bdd86"))
+     (light (fg "#0b8c6d"))]
+    [(
+      ".html"
+      ".htm"
+      ".php"
+      )
+     (dark (fg "#dd150b"))
+     (light (fg "#5d150b"))]
+    ;; Text stuff
+    [(
+      ".txt"
+      ".org"
+      ".scrbl"
+      ".md"
+      ".textile"
+      ".rst"
+      ".rdoc"
+      ".asciidoc"
+      ".adoc"
+      ".creole"
+      ".pod"
+      )
+     (dark (fg "#ef4a21"))
+     (light (fg "#7f2a11"))]
+    ;; Config
+    [(
+      "*rc"
+      ".xml"
+      ".conf"
+      ".ini"
+      ".json"
+      ".csv"
+      ".tsv"
+      )
+     (dark (fg "#ea1c56"))
+     (light (fg "#4f0b1e"))]
+    ;; Some compiled formats
+    [(
+      ".o"
+      ".pyc"
+      ".elc"
+      ".hi"
+      ".zo"
+      )
+     (dark (fg "#1a381e"))
+     (light (fg "#67e077"))]
+
+    ))
+
+(define (style-part-process part)
+  (match part
+    [`(fg ,color) (string-append "38;2;" (hex-to-dec-semi color))]
+    [`(bg ,color) (string-append "48;2;" (hex-to-dec-semi color))]
+    ['bold "01"]
+    ['faint "02"]
+    ['italic "03"]
+    ['underline "04"]
+    ['blink "05"]
+    ['reverse "07"]
+    ['concealed "08"]
+    ['strikethrough "09"]
+    [(? number?) (number->string part)]
+    ))
+
+(define (upcases str)
+  (if (symbol? str)
+      ;; I'm reserving symbols for the special ones recognized by dircolors that I don't want to add extra cases for.
+      (list (symbol->string str))
+      (list str (string-upcase str) (string-titlecase str))))
+
+(define (process-one spec dl-mode)
+  (define patterns-orig (car spec))
+  (define patterns (flatten (map upcases patterns-orig)))
+  (define styles (cdr spec))
+  (define styles-matched (filter (λ (x) (or (equal? (car x) dl-mode)
+                                            (equal? (car x) 'default)))
+                                 styles))
+  (define use-style (car styles-matched))
+  (define style-str (string-join (map style-part-process (cdr use-style)) ";"))
+  (string-join
+   (for/list ([pat patterns])
+     (string-append pat " " style-str))
+   "\n"))
+
+(define (process specs dl-mode)
+  (string-join
+   (map (λ (s) (process-one s dl-mode)) specs)
+   "\n" #:after-last "\n"))
+
+
+
+(define (hex-to-dec-semi hexstr)
+  (define no-hash (if (equal? (string-length hexstr) 6)
+                      hexstr
+                      (substring hexstr 1)))
+  (define (->dec x)
+    (format "~a" (string->number x 16)))
+  (define (sub x start end)
+    (->dec (substring x start end)))
+  (string-append
+   (sub no-hash 0 2)
+   ";"
+   (sub no-hash 2 4)
+   ";"
+   (sub no-hash 4 6)))
+
+(define (go file dl-mode)
+  (display-to-file (process dc dl-mode) file #:exists 'replace))
+
+
+(go "dircolors-gen-light" 'light)
+(go "dircolors-gen-dark" 'dark)

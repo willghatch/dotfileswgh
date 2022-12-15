@@ -173,9 +173,33 @@ WORDCHARS="${WORDCHARS:s#/#}+"
 
 fpath=($fpath $HROOT/build/zsh-completions/src)
 
+rgbHexToDecSemiSep(){
+    local colorhexMaybeHash="$1"
+    local colorhex="${colorhexMaybeHash:1:6}"
+    if [[ "${#colorHexMaybeHash}" = "6" ]]; then
+        colorhex="${colorHexMaybeHash}"
+    fi
+    local r="$(printf "%d\n" 0x${colorhex:0:2})"
+    local g="$(printf "%d\n" 0x${colorhex:2:2})"
+    local b="$(printf "%d\n" 0x${colorhex:4:2})"
+    echo -e "${r};${g};${b}"
+}
+hexColorize(){
+    # colorhex should be in the form #123456
+    local colorhex="$1"
+    local fgbg="$2"
+    local fgbgnum=38
+    if [[ "$fgbg" = "bg" ]]; then
+        fgbgnum=48
+    fi
+    local rgbDecSemi="$(rgbHexToDecSemiSep $colorhex)"
+    echo -e "\033[${fgbgnum};2;${rgbDecSemi}m"
+}
+
 updateColorStyle(){
     # TODO - I should specify all styles for both light and dark so I get consistent colors either way.
-    local ld=$(lightdark-status)
+    local ld=$1
+    ld="${ld:-$(lightdark-status)}"
     ld="${ld:-dark}"
     if [[ "$ld" = "dark" ]]; then
         if [[ -n "$ZSH_HIGHLIGHT_STYLES" ]]; then
@@ -217,7 +241,8 @@ updateColorStyle(){
             ZSH_HIGHLIGHT_STYLES[bracket-error]="fg=red,bold"
             ZSH_HIGHLIGHT_STYLES[cursor-matchingbracket]="standout"
         fi
-        MEGAPROMPT_STYLES[hrule_char]="%b%F{blue}┅"
+        MEGAPROMPT_STYLES[hrule_style]="%b%F{blue}"
+        MEGAPROMPT_STYLES[hrule_char]="┅"
         MEGAPROMPT_STYLES[time]="%b%F{cyan}"
         MEGAPROMPT_STYLES[timestr]="%H:%M"
         MEGAPROMPT_STYLES[host]="%B%F{yellow}"
@@ -259,30 +284,32 @@ updateColorStyle(){
         MEGAPROMPT_KEYMAP_IND[keymap_unlisted]="%b%K{white}%F{black}?%k"
     fi
     if [[ "$ld" = "light" ]]; then
+        local lgreen="#005000"
+        local mag="#9f009f"
         if [[ -n "$ZSH_HIGHLIGHT_STYLES" ]]; then
             # Highlighter plugin config
             # Highlighters main
             ZSH_HIGHLIGHT_STYLES[default]="none"
             ZSH_HIGHLIGHT_STYLES[unknown-token]="fg=red,bold"
             ZSH_HIGHLIGHT_STYLES[path]="fg=blue,bold"
-            ZSH_HIGHLIGHT_STYLES[path_approx]="fg=cyan"
-            ZSH_HIGHLIGHT_STYLES[path_prefix]="fg=cyan"
+            ZSH_HIGHLIGHT_STYLES[path_approx]="fg=#006A6A"
+            ZSH_HIGHLIGHT_STYLES[path_prefix]="fg=#006A6A"
             ZSH_HIGHLIGHT_STYLES[globbing]="fg=blue,bold,strikethrough"
-            ZSH_HIGHLIGHT_STYLES[reserved-word]="fg=yellow"
+            ZSH_HIGHLIGHT_STYLES[reserved-word]="fg=#504010,bold"
             ZSH_HIGHLIGHT_STYLES[history-expansion]="fg=blue,bold"
             ZSH_HIGHLIGHT_STYLES[commandseparator]="fg=yellow"
-            ZSH_HIGHLIGHT_STYLES[precommand]="fg=green"
-            ZSH_HIGHLIGHT_STYLES[command]="fg=green"
-            ZSH_HIGHLIGHT_STYLES[hashed-command]="fg=green"
-            ZSH_HIGHLIGHT_STYLES[builtin]="fg=green"
-            ZSH_HIGHLIGHT_STYLES[function]="fg=green"
-            ZSH_HIGHLIGHT_STYLES[alias]="fg=green"
+            ZSH_HIGHLIGHT_STYLES[precommand]="fg=${lgreen}"
+            ZSH_HIGHLIGHT_STYLES[command]="fg=${lgreen}"
+            ZSH_HIGHLIGHT_STYLES[hashed-command]="fg=${lgreen}"
+            ZSH_HIGHLIGHT_STYLES[builtin]="fg=${lgreen}"
+            ZSH_HIGHLIGHT_STYLES[function]="fg=${lgreen}"
+            ZSH_HIGHLIGHT_STYLES[alias]="fg=${lgreen}"
             ZSH_HIGHLIGHT_STYLES[assign]="fg=black,bold"
-            ZSH_HIGHLIGHT_STYLES[back-quoted-argument]="fg=magenta"
+            ZSH_HIGHLIGHT_STYLES[back-quoted-argument]="fg=${mag}"
             ZSH_HIGHLIGHT_STYLES[back-double-quoted-argument]="fg=cyan"
             ZSH_HIGHLIGHT_STYLES[double-quoted-argument]="fg=red"
             ZSH_HIGHLIGHT_STYLES[single-quoted-argument]="fg=red,bold"
-            ZSH_HIGHLIGHT_STYLES[dollar-double-quoted-argument]="fg=magenta,bold"
+            ZSH_HIGHLIGHT_STYLES[dollar-double-quoted-argument]="fg=${mag},bold"
             ZSH_HIGHLIGHT_STYLES[single-hyphen-option]="fg=red"
             ZSH_HIGHLIGHT_STYLES[double-hyphen-option]="fg=red"
             # Highlighters root
@@ -290,27 +317,28 @@ updateColorStyle(){
             # Highlighters cursor
             ZSH_HIGHLIGHT_STYLES[cursor]="underline"
             # Highlighters brackets
-            ZSH_HIGHLIGHT_STYLES[bracket-level-1]="fg=blue,bold"
-            ZSH_HIGHLIGHT_STYLES[bracket-level-2]="fg=green"
-            ZSH_HIGHLIGHT_STYLES[bracket-level-3]="fg=magenta,bold"
-            ZSH_HIGHLIGHT_STYLES[bracket-level-4]="fg=yellow"
-            ZSH_HIGHLIGHT_STYLES[bracket-level-5]="fg=cyan,bold"
+            ZSH_HIGHLIGHT_STYLES[bracket-level-1]="fg=blue"
+            ZSH_HIGHLIGHT_STYLES[bracket-level-2]="fg=${lgreen}"
+            ZSH_HIGHLIGHT_STYLES[bracket-level-3]="fg=${mag}"
+            ZSH_HIGHLIGHT_STYLES[bracket-level-4]="fg=#822410"
+            ZSH_HIGHLIGHT_STYLES[bracket-level-5]="fg=#006f6f"
             ZSH_HIGHLIGHT_STYLES[bracket-error]="fg=red,bold"
             ZSH_HIGHLIGHT_STYLES[cursor-matchingbracket]="standout"
         fi
-        MEGAPROMPT_STYLES[hrule_char]="%b%F{blue}┅"
-        MEGAPROMPT_STYLES[time]="%b%F{cyan}"
+        MEGAPROMPT_STYLES[hrule_style]="%b%F{blue}"
+        MEGAPROMPT_STYLES[hrule_char]="┅"
+        MEGAPROMPT_STYLES[time]="%b%{$(hexColorize '#008888')%}"
         MEGAPROMPT_STYLES[timestr]="%H:%M"
-        MEGAPROMPT_STYLES[host]="%B%F{yellow}"
-        MEGAPROMPT_STYLES[userhost_brackets]="%b%F{white}"
+        MEGAPROMPT_STYLES[host]="%B%{$(hexColorize '#923416')%}"
+        MEGAPROMPT_STYLES[userhost_brackets]="%b%F{black}"
         MEGAPROMPT_STYLES[username]="%B%F{green}"
         MEGAPROMPT_STYLES[username_root]="%B%F{red}"
         MEGAPROMPT_STYLES[tty]="%b%F{blue}"
-        MEGAPROMPT_STYLES[at]="%b%F{white}"
+        MEGAPROMPT_STYLES[at]="%b%F{black}"
         MEGAPROMPT_STYLES[dir_owner]="%B%F{blue}"
         MEGAPROMPT_STYLES[dir_group]="%B%F{green}"
         MEGAPROMPT_STYLES[dir_nowrite]="%B%F{red}"
-        MEGAPROMPT_STYLES[dir_write]="%B%F{yellow}"
+        MEGAPROMPT_STYLES[dir_write]="%b%F{yellow}"
         MEGAPROMPT_STYLES[histnum]="%b%F{blue}"
         MEGAPROMPT_STYLES[prompt]="%b%F{default}"
         MEGAPROMPT_STYLES[prompt_char]="λ"
@@ -341,6 +369,8 @@ updateColorStyle(){
     fi
 }
 hooks-add-hook zle_line_init_hook updateColorStyle
+hooks-add-hook zle_line_finish_hook updateColorStyle
+updateColorStyle
 
 foreground(){
     fg
