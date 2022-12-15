@@ -1,0 +1,70 @@
+! Comments in this file use the ! character
+! one important comment -- I likely will have to add a line to read
+! this file to window manager startup files...
+! the command is:
+! xrdb $PATH_TO_THIS_FILE
+
+!XTerm*reverseVideo: on
+xterm*foreground: rgb:a8/a8/a8
+xterm*background: rgb:00/00/00
+xterm*color0: rgb:00/00/00
+xterm*color1: rgb:a8/00/00
+xterm*color2: rgb:00/a8/00
+xterm*color3: rgb:a8/54/00
+xterm*color4: rgb:00/00/a8
+xterm*color5: rgb:a8/00/a8
+xterm*color6: rgb:00/a8/a8
+xterm*color7: rgb:a8/a8/a8
+xterm*color8: rgb:54/54/54
+xterm*color9: rgb:fc/54/54
+xterm*color10: rgb:54/fc/54
+xterm*color11: rgb:fc/fc/54
+xterm*color12: rgb:54/54/fc
+xterm*color13: rgb:fc/54/fc
+xterm*color14: rgb:54/fc/fc
+xterm*color15: rgb:fc/fc/fc
+
+
+! bashrun runs an xterm, but matches on the name bashrun...
+bashrun*foreground: rgb:a8/a8/a8
+bashrun*background: rgb:00/00/00
+
+
+URxvt.foreground: rgb:a8/a8/a8
+URxvt.background: rgb:00/00/00
+URxvt.color0: rgb:00/00/00
+URxvt.color1: rgb:a8/00/00
+URxvt.color2: rgb:00/a8/00
+URxvt.color3: rgb:a8/54/00
+URxvt.color4: rgb:00/00/a8
+URxvt.color5: rgb:a8/00/a8
+URxvt.color6: rgb:00/a8/a8
+URxvt.color7: rgb:a8/a8/a8
+URxvt.color8: rgb:54/54/54
+URxvt.color9: rgb:fc/54/54
+URxvt.color10: rgb:54/fc/54
+URxvt.color11: rgb:fc/fc/54
+URxvt.color12: rgb:54/54/fc
+URxvt.color13: rgb:fc/54/fc
+URxvt.color14: rgb:54/fc/fc
+URxvt.color15: rgb:fc/fc/fc
+URxvt.colorBD: rgb:fc/fc/fc
+URxvt.scrollColor: #434343
+URxvt.troughColor: #232323
+
+
+!!!!! xscreensaver
+!general dialog box (affects main hostname, username, password text)
+xscreensaver.Dialog.foreground:         #a07fef
+xscreensaver.Dialog.background:         #111111
+xscreensaver.Dialog.topShadowColor:     #111111
+xscreensaver.Dialog.bottomShadowColor:  #111111
+xscreensaver.Dialog.Button.foreground:  #111111
+xscreensaver.Dialog.Button.background:  #2040e0
+!username/password input box and date text colour
+xscreensaver.Dialog.text.foreground:    #50c0f0
+xscreensaver.Dialog.text.background:    #333333
+!timeout bar (background is actually determined by Dialog.text.background)
+xscreensaver.passwd.thermometer.foreground:  #702020
+xscreensaver.passwd.thermometer.background:  #202020
+

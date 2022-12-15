@@ -5,7 +5,8 @@
 pulseaudio &
 
 # merge xresources first, so other programs in this (xscreensaver) can get settings
-xrdb $DOTFILESWGH/Xresources
+#xrdb $DOTFILESWGH/Xresources
+lightdark-status soft-update
 
 # The keyboard layout setting via environment variable leaves me with some
 # weirdness for some programs that this solves.

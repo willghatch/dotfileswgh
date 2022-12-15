@@ -1,9 +1,10 @@
 #!/usr/bin/env bash
 
 help() {
-    echo "Usage: $0 [dark|light|toggle|status]"
+    echo "Usage: $0 [dark|light|toggle|status|soft-update]"
     echo "Gives status if called with no argument or the status argument."
     echo "Sets status if called with light, dark, or toggle."
+    echo "On soft-update, does updates for current status (maybe useful for startup)."
     exit 1
 }
 
@@ -16,17 +17,22 @@ lightdark="$WGH_THEME_DARK_OR_LIGHT"
 lightdark="${lightdark:-$(cat $ldfile 2>/dev/null)}"
 lightdark=${lightdark:-dark}
 
-update(){
+soft-update(){
     # $1 is either "light" or "dark"
-    mkdir -p $lddir
-    echo "$1" > "$ldfile"
     lightdark-konsole-dbus-update
     # gsettings dynamically sets running gtk3 programs that are connected to the gsd-xsettings daemon (gnome-settings-daemon)
     # The well-supported dark/light themes are Yaru-dark and Yaru-light
     #gsettings set org.gnome.desktop.interface gtk-theme Yaru-$1
     # Alternatively, we can set that theme using xsettings instead.
     xsettingsd-wrapper
+    cat "$DOTFILESWGH/xresources-general" "$DOTFILESWGH/xresources-${1}" | xrdb
     echo "$1"
+}
+update(){
+    # $1 is either "light" or "dark"
+    mkdir -p $lddir
+    echo "$1" > "$ldfile"
+    soft-update "$1"
 }
 
 if [[ "$#" = 0 ]]; then
@@ -47,9 +53,12 @@ elif [[ "$#" = 1 ]]; then
     elif [[ "$1" == "status" ]]; then
         echo "$lightdark"
         exit 0
+    elif [[ "$1" == "soft-update" ]]; then
+        soft-update "$lightdark"
+        exit 0
     fi
 fi
 
-# Print help if argument wasn't one of "light", "dark", or "toggle".
+# Print help if argument wasn't recognized.
 
 help
