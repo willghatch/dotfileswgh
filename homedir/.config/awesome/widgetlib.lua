@@ -109,14 +109,14 @@ memTextWidget = wibox.widget.textbox()
 -- Register widget
 vicious.register(memTextWidget, vicious.widgets.mem, "RAM: $1% ")
 
-function mkMemWidget(ld_stat)
+function mkMemWidget()
    -- Initialize widget
    memwidget = awful.widget.progressbar()
    -- Progressbar properties
    memwidget:set_width(8)
    memwidget:set_height(10)
    memwidget:set_vertical(true)
-   memwidget:set_background_color(ld_stat == "light" and bar_bg_light or bar_bg_dark)
+   memwidget:set_background_color(globalstate.theme_ld == "light" and bar_bg_light or bar_bg_dark)
    memwidget:set_border_color(nil)
    memwidget:set_color("#003599")
    --memwidget:set_color({ type = "linear", from = { 0, 0 }, to = { 10,0 }, stops = { {0, "#AECF96"}, {0.5, "#88A175"},
@@ -145,10 +145,10 @@ vicious.register(cpuTextWidget, vicious.widgets.cpu, " | CPU: $1% | ")
 --vicious.register(cpuwidget, vicious.widgets.cpu, "$1")
 
 
-function mkVolumeWidget(ld_stat)
+function mkVolumeWidget()
    local volumewidget = wibox.widget.textbox()
-   local color = ld_stat == "light" and "#005555" or "#00ffff"
-   local color2 = ld_stat == "light" and "#226622" or "#99ff99"
+   local color = globalstate.theme_ld == "light" and "#005555" or "#00ffff"
+   local color2 = globalstate.theme_ld == "light" and "#226622" or "#99ff99"
    set_volumewidget = function()
       local io = { popen = io.popen }
       local volout = io.popen("pamixer --get-volume")
@@ -170,22 +170,22 @@ end
 
 
 -- battery widget
-function mkBatteryTextWidget(ld_stat)
+function mkBatteryTextWidget()
    local batteryTextWidget = wibox.widget.textbox()
-   local color = ld_stat == "light" and dark_orange or light_orange
+   local color = globalstate.theme_ld == "light" and dark_orange or light_orange
    vicious.register(batteryTextWidget, vicious.widgets.bat, string.format("<span color='%s'> Bat: $2%s $1</span>", color, "%"), 30, "BAT0")
    return batteryTextWidget
 end
 
 
-function mkBatteryWidget(ld_stat)
+function mkBatteryWidget()
    batteryWidget = awful.widget.progressbar()
    batteryWidget:set_width(8)
    batteryWidget:set_height(10)
    batteryWidget:set_vertical(true)
-   batteryWidget:set_background_color(ld_stat == "light" and bar_bg_light or bar_bg_dark)
+   batteryWidget:set_background_color(globalstate.theme_ld == "light" and bar_bg_light or bar_bg_dark)
    batteryWidget:set_border_color(nil)
-   batteryWidget:set_color(ld_stat == "light" and dark_orange or light_orange)
+   batteryWidget:set_color(globalstate.theme_ld == "light" and dark_orange or light_orange)
    vicious.register(batteryWidget, vicious.widgets.bat, "$2", 30, "BAT0")
    rotbatteryWidget = wibox.container.rotate(batteryWidget, "east")
    return rotbatteryWidget

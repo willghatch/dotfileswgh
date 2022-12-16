@@ -13,6 +13,11 @@ local menubar = require("menubar")
 local hotkeys_popup = require("awful.hotkeys_popup").widget
 local socket = require("socket")
 
+
+dotfilesdir = os.getenv("DOTFILESWGH")
+local darkTheme = require("theme")
+local lightTheme = require("light-theme")
+
 -- {{{ Error handling
 -- Check if awesome encountered an error during startup and fell back to
 -- another config (This code will only ever execute for the fallback config)
@@ -72,32 +77,33 @@ end
 -- {{{ Variable definitions
 -- Themes define colours, icons, font and wallpapers.
 init_theme_state = "dark"
-dotfilesdir = os.getenv("DOTFILESWGH")
-
 globalstate = {
    kbdstate = "normal",
    theme_ld = init_theme_state
 }
 
---beautiful.init(awful.util.get_themes_dir() .. "default/theme.lua")
-beautiful.init(dotfilesdir .. "/config/awesome/theme.lua")
+beautiful.init(darkTheme)
 
 lightdark_update_awesome = function(ld_stat)
+   -- TODO - toggling this a bunch of times with theme init and top bar update slowed things way down, so I'm just going to give up for now on theming awesome as well as everything else for now.  Another idea might be restarting awesome, which makes things fast again, but which resets some state (mostly which workspace is active).
    if ld_stat == "light\n" or ld_stat == "light" then
-      beautiful.init(dotfilesdir .. "/config/awesome/light-theme.lua")
+      --beautiful.init(lightTheme)
       globalstate.theme_ld = "light"
    else
-      beautiful.init(dotfilesdir .. "/config/awesome/theme.lua")
+      --beautiful.init(darkTheme)
       globalstate.theme_ld = "dark"
    end
-   awful.screen.connect_for_each_screen(topBarSetup)
+
+   -- reset widgets
+   --awful.screen.connect_for_each_screen(topBarSetup)
+
    -- this one widget would be harder to get to work nicer, so let's just force it to update when switching color...
-   set_email_widget()
+   --set_email_widget()
 end
 -- set theme once for startup based on lightdark-status
-awful.spawn.easy_async({"lightdark-status"}, function(stdout, stderr, reason, exit_code)
-      lightdark_update_awesome(stdout)
-end)
+--awful.spawn.easy_async({"lightdark-status"}, function(stdout, stderr, reason, exit_code)
+--      lightdark_update_awesome(stdout)
+--end)
 
 toggle_lightdark = function()
    awful.spawn.easy_async({"lightdark-status", "toggle"}, function(stdout, stderr, reason, exit_code)
@@ -267,10 +273,11 @@ end
 -- Re-set wallpaper when a screen's geometry changes (e.g. different resolution)
 screen.connect_signal("property::geometry", set_wallpaper)
 
+local registeredWidgets = {}
 topBarSetup = (function(s)
     -- Remove old toolbar, if any.
     if s.mywibox then s.mywibox:remove() end
-    if s.taglist then s.taglist:remove() end
+    --if s.taglist then s.taglist:remove() end
 
     -- Wallpaper
     set_wallpaper(s)
@@ -299,6 +306,17 @@ topBarSetup = (function(s)
 
     -- Create the wibox
     s.mywibox = awful.wibar({ position = "top", screen = s })
+    local vicious = require("vicious")
+
+    if registeredWidgets.mem then vicious.unregister(registeredWidgets.mem, false) end
+    if registeredWidgets.batt_t then vicious.unregister(registeredWidgets.batt_t, false) end
+    if registeredWidgets.batt then vicious.unregister(registeredWidgets.batt, false) end
+    if registeredWidgets.vol then vicious.unregister(registeredWidgets.vol, false) end
+    registeredWidgets.mem = mywidgets.mem()
+    registeredWidgets.batt_t = mywidgets.batt_t()
+    registeredWidgets.batt = mywidgets.batt()
+    registeredWidgets.vol = mywidgets.vol()
+
 
     -- Add widgets to the wibox
     s.mywibox:setup {
@@ -317,10 +335,10 @@ topBarSetup = (function(s)
             mywidgets.kbdstate,
             mywidgets.cput,
             mywidgets.memt,
-            mywidgets.mem(globalstate.theme_ld),
-            mywidgets.batt_t(globalstate.theme_ld),
-            mywidgets.batt(globalstate.theme_ld),
-            mywidgets.vol(globalstate.theme_ld),
+            mywidgets.mem(),
+            mywidgets.batt_t(),
+            mywidgets.batt(),
+            mywidgets.vol(),
 
             mykeyboardlayout,
             wibox.widget.systray(),
