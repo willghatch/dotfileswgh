@@ -48,7 +48,8 @@ let
   pname = "solc";
   #version = "0.8.13";
   #version = "0.8.12";
-  version = "0.8.16";
+  #version = "0.8.16";
+  version = "0.8.17";
   meta = with lib; {
     description = "Compiler for Ethereum smart contract language Solidity";
     homepage = "https://github.com/ethereum/solidity";
@@ -70,8 +71,12 @@ let
       #sha256 = "1li9qq8g68slk7ygx3sk4av2r2ppd8il5fn3la5nvawcrpsqy6qf";
 
       # for 0.8.16
+      #url = "https://github.com/ethereum/solidity/releases/download/v${version}/solidity_${version}.tar.gz";
+      #hash = "sha256-cq2rRcQu2l0fPR3Hf3l6AmhxaauSt5u8FAgl4Lj4Nig=";
+
+      # for 0.8.17
       url = "https://github.com/ethereum/solidity/releases/download/v${version}/solidity_${version}.tar.gz";
-      hash = "sha256-cq2rRcQu2l0fPR3Hf3l6AmhxaauSt5u8FAgl4Lj4Nig=";
+      hash = "sha256-0ZGDZvk+akO94aJZgktVErbWaU3+aKwRD283Mn9XrVE=";
     };
 
     postPatch = ''

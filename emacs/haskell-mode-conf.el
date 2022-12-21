@@ -10,6 +10,10 @@
             ;(setq lsp-haskell-server-path "haskell-language-server-wrapper")
             (setq lsp-haskell-server-path "haskell-language-server-9.0.2")
 
+            (require 'lsp)
+            (require 'lsp-ui)
+            (require 'lsp-haskell)
+
             ;; TODO - if I haven't yet imported the project, this will not ask which project to load and it will basically fail.  I'm not sure the best way around that.
             (lsp)
 

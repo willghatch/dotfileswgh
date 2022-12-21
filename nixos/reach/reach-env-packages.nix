@@ -56,7 +56,8 @@ in [
   # `solc` - solidity compiler.
   #(pp.callPackage ./solc-updated.nix {})
   #pp.solc
-  (pp.callPackage ./solc-updated.nix {z3 = (pp.callPackage ./z3-updated.nix {}).z3_4_8_17;})
+  #(pp.callPackage ./solc-updated.nix {z3 = (pp.callPackage ./z3-updated.nix {}).z3_4_8_17;})
+  (pp.callPackage ./solc-updated.nix {z3 = (pp.callPackage ./z3-updated.nix {}).z3_4_11_0;})
 
   pp.docker
   pp.docker-compose
@@ -74,23 +75,12 @@ in [
   # for visualizations with --intermediate-files compilation
   pp.graphviz
 
-  #pp.haskell-language-server
-  #(pp.callPackage ./haskell-language-server-for-reach.nix {})
-  #(pp.callPackage ./haskell-language-server-edit.nix {})
-  # This version of nixpkgs has packaged a version that might work.
-  # And it probably would if I didn't need to use an FHS env.  It complains about /usr/lib/libc being the wrong version.  So this won't work directly without upgrading the version of the FHS builder.
-  #(import (pkgs.fetchFromGitHub {
-  #    owner = "NixOS";
-  #    repo = "nixpkgs";
-  #    # nixos-unstable as of 2022-06-17
-  #    rev = "3d7435c638baffaa826b85459df0fff47f12317d";
-  #    sha256 = "19ahb9ww3r9p1ip9aj7f6rs53qyppbalz3997pzx2vv0aiaq3lz3";
-  #  }) {}).haskell-language-server
+  (pp.haskell-language-server.override {supportedGhcVersions = ["902"];})
   # Let's use the updated package from newer nixpkgs, but build it with pinned packages.
-  (pp.callPackage (pp.fetchurl {
-    url = "https://raw.githubusercontent.com/NixOS/nixpkgs/3d7435c638baffaa826b85459df0fff47f12317d/pkgs/development/tools/haskell/haskell-language-server/withWrapper.nix";
-    sha256 = "1b8ddvw0i10cnr6vf2sim5dixhkyldf7676qa4kavhdwlsznjkig";
-  }) { supportedGhcVersions = ["902"]; })
+  #(pp.callPackage (pp.fetchurl {
+  #  url = "https://raw.githubusercontent.com/NixOS/nixpkgs/3d7435c638baffaa826b85459df0fff47f12317d/pkgs/development/tools/haskell/haskell-language-server/withWrapper.nix";
+  #  sha256 = "1b8ddvw0i10cnr6vf2sim5dixhkyldf7676qa4kavhdwlsznjkig";
+  #}) { supportedGhcVersions = ["902"]; })
 
 
   (pkgs.fetchFromGitHub {
