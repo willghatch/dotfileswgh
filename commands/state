@@ -28,9 +28,10 @@ In fact the implementation of this state info is in those other scripts, but thi
     ;[mail-syncing TODO]
     ;[keyboard-layout TODO]
     ;[media-status TODO]
-    [backlight [get (laptop-backlight 0)]
-               [inc (laptop-backlight +5)]
-               [dec (laptop-backlight -5)]]
+    [backlight [get (laptop-backlight --get)]
+               [set (laptop-backlight --set [number])]
+               [inc (laptop-backlight --modify +5)]
+               [dec (laptop-backlight --modify -5)]]
     )
   )
 

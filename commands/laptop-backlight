@@ -6,25 +6,40 @@
  racket/cmdline
  )
 
-(define change-percent
-  (command-line
-   #:usage-help "Give zero to print the current value, negative or positive to change"
-   #:args (change+direction) (string->number change+direction)))
+(define-values (get modify set)
+  (let ([get #f]
+        [modify #f]
+        [set #f])
+    (command-line
+     #:usage-help "Give zero to print the current value, negative or positive to change"
+     #:once-any
+     [("--get") "get" (set! get #t)]
+     [("--modify") modval "modify by X% (positive or negative)" (set! modify (string->number modval))]
+     [("--set") setval "set to X%" (set! set (string->number setval))]
+     #:args ()
+     (values get modify set))))
 (define dir "/sys/class/backlight/intel_backlight")
 (define max-val #{cat $dir/max_brightness |> read})
 (define cur-val #{cat $dir/brightness |> read})
-(define change-amount
-  (* 0.01 change-percent max-val))
-(define new-amount (inexact->exact
-                    (round (max 0 (min (+ change-amount cur-val)
-                                       max-val)))))
-(define new-ratio (/ new-amount max-val))
 
-(if (zero? change-percent)
-    (displayln (round (/ (* 100 cur-val) max-val)))
-    {
-     echo new brightness: (inexact->exact (round (* 100 new-ratio)))
-     echo $new-amount &>! $dir/brightness
-     })
+(when get
+  (displayln (round (/ (* 100 cur-val) max-val)))
+  (exit 0))
+
+(define new-amount-1
+  (cond [modify (+ (* 0.01 modify max-val) cur-val)]
+        [set (* 0.01 set max-val)]
+        [else #f]))
+
+(define new-amount (and new-amount-1
+                        (inexact->exact
+                         (round (max 0 (min new-amount-1
+                                            max-val))))))
+(define new-ratio (and new-amount (/ new-amount max-val)))
+
+
+
+echo new brightness: (inexact->exact (round (* 100 new-ratio)))
+echo $new-amount &>! $dir/brightness
 
 
