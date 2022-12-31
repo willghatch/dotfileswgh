@@ -28,4 +28,4 @@ source=$(cat <<EOSOURCE
 EOSOURCE
 )
 #exec premacs-use-t --eval "(progn (wgh/add-buffer-to-kill-block-list (call-interactively 'magit-log-all)) (delete-other-windows) )"
-exec premacs-use-t --eval "$source"
+exec premacs-use-maybe --eval "$source"

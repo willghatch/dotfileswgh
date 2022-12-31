@@ -1,7 +1,1 @@
-#!/usr/bin/env bash
-
-if [[ -z "$CURRENT_DEV_MODE" && -e "$DOTFILESWGH/dotlocal/e-is-premacs" && ! "$(whoami)" = "root" ]]; then
-    exec premacs-use-or-create-t "$@"
-fi
-
-exec em "$@"
+premacs-use-maybe
