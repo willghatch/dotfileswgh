@@ -10,6 +10,7 @@ gitRefsUse="$(echo "$gitRefsAll" | grep -v gh-pages)"
 # Note that here-docs can include parameter substitution unless the end tag is quoted
 source=$(cat <<EOSOURCE
 (progn
+  (require 'magit)
   (wgh/add-buffer-to-kill-block-list
    (magit-log-other
      ;; refs
