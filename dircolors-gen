@@ -118,8 +118,8 @@ From my old dircolors config:
       ".ogg"
       ".oga"
       )
-     (dark (fg "#f84f52"))
-     (light (fg "#e82f12"))]
+     (dark (fg "#d86f62"))
+     (light (fg "#e84f12"))]
     ;; Book/PDF
     [(
       ".epub"
