@@ -95,7 +95,9 @@ if [ -z "$XSESSION_COMMON_RUN_P" ]; then
   # move the mouse out of the middle of the screen so it won't switch windows for no reason
   xdotool mousemove 100 100
 
-  premacs-init &
+  if [ -e "$DOTFILESWGH/dotlocal/e-is-premacs" ]; then
+    premacs-init &
+  fi
 
 
   if [ -f $DOTFILESWGH/pri/xinitrc ]; then
