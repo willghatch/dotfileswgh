@@ -16,7 +16,7 @@ local socket = require("socket")
 
 dotfilesdir = os.getenv("DOTFILESWGH")
 local darkTheme = require("theme")
-local lightTheme = require("light-theme")
+--local lightTheme = require("light-theme")
 
 -- {{{ Error handling
 -- Check if awesome encountered an error during startup and fell back to
