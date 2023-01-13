@@ -1,3 +1,3 @@
 #!/usr/bin/env bash
 # offline dictionary in command line
-STARDICT_DATA_DIR=$DOTFILESWGH/external/misc/dictionaries/dictionaries/ sdcv "$@"
+SDCV_HISTSIZE=0 STARDICT_DATA_DIR=$DOTFILESWGH/external/misc/dictionaries/dictionaries/ sdcv "$@"
