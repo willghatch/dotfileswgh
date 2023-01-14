@@ -23,6 +23,8 @@ set pager_stop=yes # stop at end of message - don't go on to the next by scrolli
 set pager_index_lines=7 # this many lines of the index show while reading email
 set tilde # show ~ after the end of the email, a la vim
 unset resolve # don't try to go to the next message after an operation
+# Don't show my laptop's domain in message IDs
+set hostname = localhost
 
 
 #set sort=threads  # how to sort conversation threads
