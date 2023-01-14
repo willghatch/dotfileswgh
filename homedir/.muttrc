@@ -25,6 +25,7 @@ set tilde # show ~ after the end of the email, a la vim
 unset resolve # don't try to go to the next message after an operation
 # Don't show my laptop's domain in message IDs
 set hostname = localhost
+set message_id_format = "<%Y%r%x%z@%f>"
 
 
 #set sort=threads  # how to sort conversation threads
