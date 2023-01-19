@@ -9,6 +9,7 @@
             ;; The default language server path should be generic, but I find it brittle.  So... Maybe I'll just update this each time I need to use a different GHC version...
             ;(setq lsp-haskell-server-path "haskell-language-server-wrapper")
             (setq lsp-haskell-server-path "haskell-language-server-9.0.2")
+            ;; If I get an error about GHC ABIs don't match, see this: https://github.com/haskell/vscode-haskell#ghc-abis-dont-match
 
             (require 'lsp)
             (require 'lsp-ui)

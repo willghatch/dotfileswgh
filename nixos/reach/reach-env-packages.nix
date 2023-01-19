@@ -45,6 +45,9 @@ in [
   hp.pkgconfig
   # }}}
 
+  # I am lately having trouble getting the haskell-language-server to work with stack, so let's just tell stack to use the system GHC and install it.
+  (pp.ghc.override {})
+
 
 
   # The NixOS 21.11 version is older than required for Reach, but current unstable has a new enough version (as of 2022-01-17).
