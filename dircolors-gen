@@ -91,6 +91,7 @@ From my old dircolors config:
       ".xbm"
       ".xpm"
       ".tif"
+      ".gif"
       ".jpg"
       ".jpeg"
       )
