@@ -1,2 +1,2 @@
 #!/bin/sh
-exec feh --scale-down "$@"
+exec a feh --scale-down "$@"

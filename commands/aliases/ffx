@@ -8,7 +8,7 @@ prof="$1"
 shift
 
 FFX=${FFX:-firefox}
-profile="$DOTFILESWGH/dotlocal/firefox-profile_$prof"
+profile="$DOTFILESWGH/dotlocal/firefox-profiles/firefox-profile_$prof"
 mkdir -p "$profile"
 
 exec nice -n 5 $FFX --profile $profile "$@"
