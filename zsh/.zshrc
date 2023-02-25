@@ -97,16 +97,16 @@ search-backward-current-command-repeat(){
 # zaw bookmark file
 BOOKMARKFILE=~/.cache/zsh/zaw-bookmarks
 # setup for zshmarks plugin
-BOOKMARKS_FILE=~/.cache/zsh/zsh-bookmarks
-jd(){
-    if [[ "ls" = "$1" ]]; then
-        showmarks
-    elif [[ "add" = "$1" ]]; then
-        bookmark "$2"
-    else
-        jump "$1"
-    fi
-}
+#BOOKMARKS_FILE=~/.cache/zsh/zsh-bookmarks
+#jd(){
+#    if [[ "ls" = "$1" ]]; then
+#        showmarks
+#    elif [[ "add" = "$1" ]]; then
+#        bookmark "$2"
+#    else
+#        jump "$1"
+#    fi
+#}
 
 compinit-widget(){
     ${=COMPINIT_COMMAND}
