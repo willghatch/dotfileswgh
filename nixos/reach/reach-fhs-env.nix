@@ -1,6 +1,8 @@
 { pkgs ? import <nixpkgs> {} }:
 let pp = import ./reach-env-pin.nix {};
 in
+let prisma-engines = (pp.callPackage ./prisma-engines-pin.nix {Security=false;});
+in
 (pp.buildFHSUserEnv {
   name = "reach-fhs-env";
   targetPkgs = pkgs: import ./reach-env-packages.nix {};
