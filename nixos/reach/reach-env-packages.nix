@@ -98,6 +98,7 @@ in [
   pp.nodejs
   pp.nodePackages.npm
   pp.nodePackages.typescript-language-server
+  pp.nodePackages.prettier
   pp.yarn
   pp.postgresql
   pp.openssl
