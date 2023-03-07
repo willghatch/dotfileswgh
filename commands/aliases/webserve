@@ -2,7 +2,7 @@
 
 # wrapper since I never remember the python module name
 
-python2 -m SimpleHTTPServer $1
+#python2 -m SimpleHTTPServer $1
 # or
-# python3 -m http.server $1
+python3 -m http.server $1
 
