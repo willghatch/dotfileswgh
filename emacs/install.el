@@ -77,6 +77,8 @@
 (in 'js2-mode)
 (in 'js2-refactor)
 (in 'typescript-mode)
+;; prettier code formatter integration
+(in 'prettier)
 (in 'haskell-mode)
 (in 'lsp-haskell)
 (in 'lsp-ui)
