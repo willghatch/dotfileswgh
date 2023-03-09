@@ -113,6 +113,54 @@ in [
   # EVM disassembler
   pp.evmdis
 
+  # for electron stuff
+  pp.electron
+  pp.glib
+  pp.glib.dev
+  pp.nss
+  pp.nss.dev
+  pp.nspr
+  pp.nspr.dev
+  pp.atk
+  pp.atk.dev
+  pp.cups
+  pp.cups.dev
+  pp.dbus
+  pp.dbus.dev
+  pp.libdrm
+  pp.libdrm.dev
+  pp.gtk3
+  pp.gtk3.dev
+  pp.pango
+  pp.pango.dev
+  pp.cairo
+  pp.cairo.dev
+  pp.xorg.libX11
+  pp.xorg.libX11.dev
+  pp.xorg.libXcomposite
+  pp.xorg.libXcomposite.dev
+  pp.xorg.libXdamage
+  pp.xorg.libXdamage.dev
+  pp.xorg.libXext
+  pp.xorg.libXext.dev
+  pp.xorg.libXfixes
+  pp.xorg.libXfixes.dev
+  pp.xorg.libXrandr
+  pp.xorg.libXrandr.dev
+  pp.xorg.libxcb
+  pp.xorg.libxcb.dev
+  pp.libxkbcommon
+  pp.libxkbcommon.dev
+  pp.mesa
+  pp.mesa.dev
+  pp.expat
+  pp.expat.dev
+  pp.alsa-lib
+  pp.alsa-lib.dev
+  pp.wine
+
+
+
 
   # This makes locales and unicode work.
   # No nix-shell environment should go without it.

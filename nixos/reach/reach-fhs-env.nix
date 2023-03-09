@@ -13,8 +13,11 @@ in
     export PRISMA_QUERY_ENGINE_LIBRARY="${prisma-engines}/lib/libquery_engine.node"
     export PRISMA_INTROSPECTION_ENGINE_BINARY="${prisma-engines}/bin/introspection-engine"
     export PRISMA_FMT_BINARY="${prisma-engines}/bin/prisma-fmt"
-    # Yarn seems to need this option to work for me...
+    # Yarn seems to need this option to work for some of our stuff
     export NODE_OPTIONS=--openssl-legacy-provider
+
+    # for electron
+    export WINEPREFIX=$HOME/s/mk/reach-wine-prefix
   '';
   runScript = ./reach-post-env.sh;
 }).env
