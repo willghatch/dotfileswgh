@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE keyboardmap>
+<!-- Note 9 is the lowest note that works with the default piano sound on vmpk. -->
+<!-- Note 21 is the low A0, the lowest key on a typical 88-key piano.  -->
+<!-- Note 26 is D1, the lowest note on a "drop D" tuned bass guitar.  -->
+<!-- Note 28 is E1, the lowest note on a standard tuning bass guitar.  -->
+<!-- Note 40 is E2, the lowest note on a standard tuning guitar.  -->
+<!-- My Cherry G86-63400 is like an 8-string fretboard with 17 frets (but no open strings), and so has 17 + (5 * 7) = 52 notes in perfect 4th configuration. -->
+<!-- My cheapo guitar in perfect 4th tuning has 22 frets plus open string and 6 strings, so 23 + (5 * 6) = 53 notes. -->
+<!-- So I could arrange it to be basically the same range as guitar. -->
+<!-- But if I give it bass range it will overlap significantly.  I'll try that first. -->
+<!-- Specifically, this starts with a low D below normal bass tuning.  -->
+
+<!-- Here is the series of keys on my current P4 configuration of the SPOS keyboard:  -->
+<!-- 1234567890-=qwertyuiop[]asdfghjkl;'zxcvbnm,./ then F1-F7 -->
+<!-- On the right column from bottom to top we have space, enter, backspace, page down, page up, escape. -->
+
+<keyboardmap version="1.0">
+    <mapping key="1" note="26"/>
+    <mapping key="2" note="27"/>
+    <mapping key="3" note="28"/>
+    <mapping key="4" note="29"/>
+    <mapping key="5" note="30"/>
+    <mapping key="6" note="31"/>
+    <mapping key="7" note="32"/>
+    <mapping key="8" note="33"/>
+    <mapping key="9" note="34"/>
+    <mapping key="0" note="35"/>
+    <mapping key="-" note="36"/>
+    <mapping key="=" note="37"/>
+    <mapping key="q" note="38"/>
+    <mapping key="w" note="39"/>
+    <mapping key="e" note="40"/>
+    <mapping key="r" note="41"/>
+    <mapping key="t" note="42"/>
+    <mapping key="y" note="43"/>
+    <mapping key="u" note="44"/>
+    <mapping key="i" note="45"/>
+    <mapping key="o" note="46"/>
+    <mapping key="p" note="47"/>
+    <mapping key="[" note="48"/>
+    <mapping key="]" note="49"/>
+    <mapping key="a" note="50"/>
+    <mapping key="s" note="51"/>
+    <mapping key="d" note="52"/>
+    <mapping key="f" note="53"/>
+    <mapping key="g" note="54"/>
+    <mapping key="h" note="55"/>
+    <mapping key="j" note="56"/>
+    <mapping key="k" note="57"/>
+    <mapping key="l" note="58"/>
+    <mapping key=";" note="59"/>
+    <mapping key="'" note="60"/>
+    <mapping key="z" note="61"/>
+    <mapping key="x" note="62"/>
+    <mapping key="c" note="63"/>
+    <mapping key="v" note="64"/>
+    <mapping key="b" note="65"/>
+    <mapping key="n" note="66"/>
+    <mapping key="m" note="67"/>
+    <mapping key="," note="68"/>
+    <mapping key="." note="69"/>
+    <mapping key="/" note="70"/>
+    <mapping key="F1" note="71"/>
+    <mapping key="F2" note="72"/>
+    <mapping key="F3" note="73"/>
+    <mapping key="F4" note="74"/>
+    <mapping key="F5" note="75"/>
+    <mapping key="F6" note="76"/>
+    <mapping key="F7" note="77"/>
+</keyboardmap>
