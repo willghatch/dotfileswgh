@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE rawkeyboardmap>
+<!-- Note 9 is the lowest note that works with the default piano sound on vmpk. -->
+<!-- Note 21 is the low A0, the lowest key on a typical 88-key piano.  -->
+<!-- Note 26 is D1, the lowest note on a "drop D" tuned bass guitar.  -->
+<!-- Note 28 is E1, the lowest note on a standard tuning bass guitar.  -->
+<!-- Note 40 is E2, the lowest note on a standard tuning guitar.  -->
+<rawkeymap version="1.0">
+    <!-- For now, let's start with note 40 as the lowest. -->
+    <!-- Farthest left column: Q / LeftShift -->
+    <!-- Farthest right column: Backspace / Enter -->
+    <!-- Second farthest right column on normal keyboard: RightBracket / RightShift -->
+    <!-- Second farthest right column on Mofii keyboard: RightBracket / UpArrow -->
+
+    <!-- Number Row, starting with 2, ending with backspace: keycodes 11-22, Odd note numbers -->
+    <mapping keycode="11" note="41"/>
+    <mapping keycode="12" note="43"/>
+    <mapping keycode="13" note="45"/>
+    <mapping keycode="14" note="47"/>
+    <mapping keycode="15" note="49"/>
+    <mapping keycode="16" note="51"/>
+    <mapping keycode="17" note="53"/>
+    <mapping keycode="18" note="55"/>
+    <mapping keycode="19" note="57"/>
+    <mapping keycode="20" note="59"/>
+    <mapping keycode="21" note="61"/>
+    <mapping keycode="22" note="63"/>
+    <!-- Upper Row, starting with Q, ending with right bracket: keycodes 24-35, even note numbers -->
+    <mapping keycode="24" note="40"/>
+    <mapping keycode="25" note="42"/>
+    <mapping keycode="26" note="44"/>
+    <mapping keycode="27" note="46"/>
+    <mapping keycode="28" note="48"/>
+    <mapping keycode="29" note="50"/>
+    <mapping keycode="30" note="52"/>
+    <mapping keycode="31" note="54"/>
+    <mapping keycode="32" note="56"/>
+    <mapping keycode="33" note="58"/>
+    <mapping keycode="34" note="60"/>
+    <mapping keycode="35" note="62"/>
+    <!-- Home Row, starting with A, ending with Enter: keycodes 38-48 but also enter is 36, odd note numbers -->
+    <mapping keycode="38" note="41"/>
+    <mapping keycode="39" note="43"/>
+    <mapping keycode="40" note="45"/>
+    <mapping keycode="41" note="47"/>
+    <mapping keycode="42" note="49"/>
+    <mapping keycode="43" note="51"/>
+    <mapping keycode="44" note="53"/>
+    <mapping keycode="45" note="55"/>
+    <mapping keycode="46" note="57"/>
+    <mapping keycode="47" note="59"/>
+    <mapping keycode="48" note="61"/>
+    <mapping keycode="36" note="63"/>
+    <!-- Lower Row, starting with leftShift, ending with rightShift/Up: keycodes... Left Shift is 50,  Z-QuestionMark is 52-61, right shift is 62, up is 111, even note numbers -->
+    <mapping keycode="50" note="40"/>
+    <mapping keycode="52" note="42"/>
+    <mapping keycode="53" note="44"/>
+    <mapping keycode="54" note="46"/>
+    <mapping keycode="55" note="48"/>
+    <mapping keycode="56" note="50"/>
+    <mapping keycode="57" note="52"/>
+    <mapping keycode="58" note="54"/>
+    <mapping keycode="59" note="56"/>
+    <mapping keycode="60" note="58"/>
+    <mapping keycode="61" note="60"/>
+    <mapping keycode="62" note="62"/>
+    <mapping keycode="111" note="62"/>
+</rawkeymap>
