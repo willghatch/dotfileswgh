@@ -16,6 +16,9 @@
 (autoload 'solidity-mode "solidity-mode")
 (add-to-list 'auto-mode-alist '("\\.sol" . solidity-mode))
 
+(autoload 'scad-mode "scad-mode")
+(add-to-list 'auto-mode-alist '("\\.scad" . scad-mode))
+
 
 (add-hook 'after-save-hook 'executable-make-buffer-file-executable-if-script-p)
 

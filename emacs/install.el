@@ -107,6 +107,8 @@
 
 (in 'fzf)
 
+(in 'scad-mode)
+
 ;; some other packages I don't currently use, but might want to later:
 
 ;; figlet -- make ascii banners
