@@ -82,7 +82,7 @@ if [ -z "$XSESSION_COMMON_RUN_P" ]; then
   #unicoder_socket="/tmp/the-unicoder_${USER}_${DISPLAY/:/}"
   unicoder_socket="5782"
   #rm -f "$unicoder_socket"
-  the-unicoder --server --port "$unicoder_socket" &
+  racket -l the-unicoder -- --server --port "$unicoder_socket" &
 
   #libnotifylogger.py $HOME/.cache/notifications.log &
 
