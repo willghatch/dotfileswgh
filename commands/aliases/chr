@@ -1,0 +1,13 @@
+#!/usr/bin/env bash
+
+if [[ -z "$1" ]]; then
+    echo "usage: $0 <profile>"
+    exit
+fi
+prof="$1"
+shift
+
+profile="$DOTFILESWGH/dotlocal/chromium-profiles/chromium-profile_$prof"
+mkdir -p "$profile"
+
+exec nice -n 5 chromium --user-data-dir=$profile "$@"
