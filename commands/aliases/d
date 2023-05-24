@@ -6,7 +6,11 @@ if test "$(lightdark-status)" = "light"; then
 fi
 
 eval `dircolors -b $DIRCOLORS_FILE`
+BSD="no"
 if test "$UNAME" = FreeBSD -o "$UNAME" = Darwin; then
+    BSD="yes"
+fi
+if test "$BSD" = yes -a ! -d /run/current-system/sw/bin ; then
     exec ls -G "$@"
 else
     exec ls --color=auto "$@"

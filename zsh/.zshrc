@@ -524,6 +524,9 @@ if [[ "$HOME" = /data/data/com.termux/files/home ]]; then
     MEGAPROMPT_DISPLAY_P[branch_style_regex]=false
     PAGER=less
 fi
+if [[ "$(uname)" = Darwin ]]; then
+    MEGAPROMPT_DISPLAY_P[branch_style_regex]=false
+fi
 
 unfunction compinit
 unfunction compdef
