@@ -15,10 +15,14 @@ GEOM=${1:-60x18}
 
 BASHRUNRC=$DOTFILESWGH/minimal-bashrunrc
 export HISTFILE=$HOME/.cache/minimal-bashrun-history
-export HISTCONTROL=ignoredups:erasedups
+#export HISTCONTROL=ignoredups:erasedups
 
 #XTERM=lxterminal
 XTERM=xterm
+
+if [[ "$(uname)" = Darwin ]]; then
+    XTERM=alacritty
+fi
 
 error() {
     if [ `which notify-send` ]; then
@@ -40,6 +44,13 @@ if [ "$XTERM" == "xterm" ]; then
     -title 'bashrun' \
     -geometry $GEOM \
     -e "bash --rcfile $BASHRUNRC -i -t"
+
+elif [[ "$XTERM" == "alacritty" ]]; then
+    cols=$(echo $GEOM | cut -d 'x' -f 1)
+    lines=$(echo $GEOM | cut -d 'x' -f 2)
+    $XTERM \
+    --title 'bashrun' \
+    -e bash --rcfile $BASHRUNRC -i -t
 
 elif [[ "$XTERM" == "my-alacritty" ]]; then
     cols=$(echo $GEOM | cut -d 'x' -f 1)
