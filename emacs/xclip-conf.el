@@ -3,6 +3,8 @@
   (unless init-xclip-conf-done
     (require 'xclip)
     (setq xclip-method 'xclip)
+    (when (equal system-type 'darwin)
+      (setq xclip-method 'pbpaste))
     (setq init-xclip-conf-done t)))
 
 (defun xcopy (beg end) (interactive "r")
