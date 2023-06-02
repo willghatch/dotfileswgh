@@ -18,7 +18,8 @@
      [("--set") setval "set to X%" (set! set (string->number setval))]
      #:args ()
      (values get modify set))))
-(define dir "/sys/class/backlight/intel_backlight")
+;(define dir "/sys/class/backlight/intel_backlight")
+(define dir "/sys/class/backlight/acpi_video0")
 (define max-val #{cat $dir/max_brightness |> read})
 (define cur-val #{cat $dir/brightness |> read})
 
