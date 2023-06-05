@@ -212,6 +212,11 @@ lesskey $DOTFILESWGH/lesskey 2>/dev/null
 
 source $DOTFILESWGH/bazsh/grml-funcs.sh
 
+# “training wheels” to stop using unix commands where I want custom behavior in the future
+alias cp="echo training wheels: use dup wrapper"
+alias mv="echo training wheels: use muv wrapper"
+alias rm="echo training wheels: use rb wrapper"
+
 ######## Add private stuff #######
 bazsh_common_pri=$DOTFILESWGH/pri/bazshrc
 if [ -f $bazsh_common_pri ]
