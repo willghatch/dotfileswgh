@@ -92,9 +92,9 @@
  ;(auto-compile-on-save-mode 1)
 
  (setq vc-follow-symlinks t) ; Don't prompt to follow symlinks of version-controlled files
- (setq-default tab-width 4)
+ (setq-default tab-width 2)
  (setq-default indent-tabs-mode nil) ; use spaces, not tabs
- (setq tab-stop-list (number-sequence 4 120 4)) ; setting tab expansion by setting stops
+ (setq tab-stop-list (number-sequence 2 120 2)) ; setting tab expansion by setting stops
  (defun set-indent-auto (indent-p)
    "Set whether to indent when you hit enter"
    (interactive)
@@ -106,7 +106,7 @@
  (setq echo-keystrokes 0.01) ; echo keystrokes faster than default 1s
 
  (setq c-default-style "k&r"
-       c-basic-offset 4)
+       c-basic-offset 2)
  (setq org-startup-folded nil)
  (global-auto-revert-mode t) ; auto-reload files when they change on disk
 

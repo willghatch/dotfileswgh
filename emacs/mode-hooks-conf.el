@@ -237,3 +237,19 @@
             (ikmap ">" 'wgh/xml-magic-tag-close)
             (require 'on-xml)
             ))
+
+(defun cpp-conf-setup ()
+  ;; This really ought to be set per-file or per-project
+  (setq c-basic-offset 2)
+
+  (message "about to require lsp")
+  (require 'lsp)
+  (require 'lsp-ui)
+  (lsp)
+
+  ;; TODO - actually learn how to use DAP
+  (require 'dap-cpptools)
+  (require 'helm-lsp)
+  ;; TODO - try helm-lsp
+  )
+(add-hook 'c++-mode-hook 'cpp-conf-setup)

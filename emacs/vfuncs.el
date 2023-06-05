@@ -326,13 +326,20 @@ abort."
                          (full-path (car parts))
                          (line-number (cadr parts))
                          (column-number (caddr parts)))
+                    (message "line: %s, full-path: %s, line-number: %s" line full-path line-number)
                     (find-file full-path)
                     (goto-line (string-to-number line-number))
                     (move-to-column (1- (string-to-number column-number)))))))
     (let ((fzf/args (format "--ansi --print-query --bind \"change:reload:%s {q} || true\" --query \"%s\"" fzf-rg-prefix initial-query))
           (process-environment
            (cons (concat "FZF_DEFAULT_COMMAND=" fzf-rg-prefix initial-query)
-                 process-environment)))
-      (fzf/start (fzf/resolve-directory) action))))
+                 process-environment))
+          ;; The validator strips extra info before this point.
+          (fzf--target-validator #'fzf--pass-through)
+          )
+      ;;(fzf/start (fzf/resolve-directory) action)
+      ;; The package seems not to be as stable as I had hoped -- the author changed a bunch of public things to private and made other changes to how the fzf.el package works.  This is frustrating and annoying.  If this happens again I will fork rather than figuring out what changed.
+      (fzf--start (fzf--resolve-directory) action)
+      )))
 
 (provide 'vfuncs)

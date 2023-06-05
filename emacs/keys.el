@@ -791,3 +791,6 @@
 
 (define-key isearch-mode-map "\C-g" 'isearch-abort-abort-gosh-darn-it)
 
+;; Without defining these, I get terminal bell events when I move the mouse around on the header line / mode line.
+(global-set-key (kbd "<header-line><mouse-movement>") 'ignore)
+(global-set-key (kbd "<mode-line><mouse-movement>") 'ignore)
