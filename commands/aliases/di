@@ -6,6 +6,11 @@ if test "$(lightdark-status)" = "light"; then
 fi
 
 eval `dircolors -b $DIRCOLORS_FILE`
+exapath="$(which exa)"
+whichExaResult=$?
+if test "$whichExaResult" = 0 -a -x "$exapath"; then
+    exec exa -la --group "$@"
+fi
 BSD="no"
 if test "$UNAME" = FreeBSD -o "$UNAME" = Darwin; then
     BSD="yes"
