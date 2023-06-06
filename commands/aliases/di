@@ -6,7 +6,7 @@ if test "$(lightdark-status)" = "light"; then
 fi
 
 eval `dircolors -b $DIRCOLORS_FILE`
-exapath="$(which exa)"
+exapath="$(which exa 2>/dev/null)"
 whichExaResult=$?
 if test "$whichExaResult" = 0 -a -x "$exapath"; then
     exec exa -la --group "$@"
