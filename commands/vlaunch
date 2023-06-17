@@ -24,6 +24,7 @@ function scmd(){
     fi
 }
 
+
 scmd terminal "konsole"
 scmd terminal2 "konsole"
 scmd lockscreen "xscreensaver-command -lock"
@@ -32,7 +33,15 @@ scmd unicode "the-unicoder"
 scmd calendar "xterm-pager cal $(date +%Y)"
 scmd sysmonitor "xterm -e htop"
 scmd mixer "xterm -e alsamixer"
-if which pamixer >/dev/null 2>&1; then
+if which pw-volume >/dev/null 2>&1; then
+    scmd volup "pw-volume change +5%"
+    scmd voldown "pw-volume change -5%"
+    scmd volmute "pw-volume mute toggle"
+    function volcurrent_pipewire(){
+        pw-volume status | jq .percentage
+    }
+    scmd volcurrent "volcurrent_pipewire"
+elif which pamixer >/dev/null 2>&1; then
     scmd volup "pamixer --increase 5"
     scmd voldown "pamixer --decrease 5"
     scmd volmute "pamixer --toggle-mute"
