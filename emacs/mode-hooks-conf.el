@@ -244,12 +244,20 @@
 
   (message "about to require lsp")
   (require 'lsp)
+  ;; Require all of these things, which are apparently not properly required transitively, so lsp finishes initialization and can properly work when opening multiple files.
   (require 'lsp-ui)
+  (require 'lsp-lens)
+  (require 'lsp-modeline)
   (lsp)
 
+  ;; TODO - maybe try eglot instead of lsp-mode some time.
+  ;(require 'eglot)
+
   ;; TODO - actually learn how to use DAP
-  (require 'dap-cpptools)
-  (require 'helm-lsp)
+  ;(require 'dap-mode)
+  ;(require 'dap-ui)
+  ;(require 'dap-cpptools)
+  ;(require 'helm-lsp)
   ;; TODO - try helm-lsp
   )
 (add-hook 'c++-mode-hook 'cpp-conf-setup)
