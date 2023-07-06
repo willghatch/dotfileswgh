@@ -6,9 +6,25 @@ for-each-merged-branch() {
     # IE it's licensed under CC BY-SA 4.0 by Stack Overflow user “Clay”.  Thanks Clay!
     # But I did adapt it a little.
     # Honestly I don't quite understand how this works because I don't know what all of these git commands do, and I'm not going to read the manual right now.
-    git checkout -q master && git for-each-ref refs/heads/ "--format=%(refname:short)" | while read branch;
+    MBRANCH=master
+    USE_MASTER=$(git branch | grep "..master$")
+    USE_MAIN=$(git branch | grep "..main$")
+    echo $USE_MASTER
+    echo $USE_MAIN
+    if [[ -n "$USE_MASTER" && -n "$USE_MAIN" ]]; then
+        echo "Found both master and main branches, aborting."
+        exit 2
+    elif [[ -n "$USE_MASTER" ]]; then
+        MBRANCH=master
+    elif [[ -n "$USE_MAIN" ]]; then
+        MBRANCH=main
+    else
+        echo "Found neithehr master nor main branch, aborting."
+        exit 1
+    fi
+    git checkout -q "$MBRANCH" && git for-each-ref refs/heads/ "--format=%(refname:short)" | while read branch;
         do
-            mergeBase=$(git merge-base master $branch) && [[ $(git cherry master $(git commit-tree $(git rev-parse "$branch^{tree}") -p $mergeBase -m _)) == "-"* ]] && "$f" "$branch"
+            mergeBase=$(git merge-base "$MBRANCH" $branch) && [[ $(git cherry "$MBRANCH" $(git commit-tree $(git rev-parse "$branch^{tree}") -p $mergeBase -m _)) == "-"* ]] && "$f" "$branch"
         done
 }
 
