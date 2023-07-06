@@ -794,3 +794,8 @@
 ;; Without defining these, I get terminal bell events when I move the mouse around on the header line / mode line.
 (global-set-key (kbd "<header-line><mouse-movement>") 'ignore)
 (global-set-key (kbd "<mode-line><mouse-movement>") 'ignore)
+
+(mkmap (kbd "C-c") 'ignore)
+(nkmap (kbd "C-c") 'ignore)
+(global-set-key (kbd "C-c") 'ignore)
+(vkmap (kbd "C-c") 'evil-normal-state)
