@@ -33,6 +33,10 @@
 
 (add-hook 'find-file-hook 'sensitive-if-prifs)
 
+(add-hook 'xref--xref-buffer-mode-hook
+          (lambda ()
+            (define-key evil-normal-state-local-map (kbd "RET") 'xref-goto-xref)))
+
 (add-hook 'hexl-mode-hook
           (lambda ()
             ;; These first two are in the default hook, but add-hook seems to be
@@ -245,6 +249,7 @@
   (message "about to require lsp")
   (require 'lsp)
   ;; Require all of these things, which are apparently not properly required transitively, so lsp finishes initialization and can properly work when opening multiple files.
+  ;; LSP setup -- the clangd server figures out build info to get include paths and hook everything up by looking for a `compile-commands.json` file in parent dirs and in `build` directories it finds on this path.  If building somewhere else, symlink the actual build dir to `build` at the root or something.
   (require 'lsp-ui)
   (require 'lsp-lens)
   (require 'lsp-modeline)
