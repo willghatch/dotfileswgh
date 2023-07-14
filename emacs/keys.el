@@ -587,6 +587,7 @@
 (mkmap " tiea" 'evil-save-and-quit)
 (mkmap "tip" 'ffap/no-confirm)
 (mkmap "tif" 'ido-ffap-no)
+(mkmap "tih" 'ff-find-other-file) ; IE switch between header and source file for C/C++
 (mkmap " tifd" 'ido-find-file-from-pwd)
 (mkmap " tiff" 'ffap/no-confirm)
 (mkmap "tiw" 'next-buffer-no-star)

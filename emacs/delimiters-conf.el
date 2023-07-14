@@ -13,6 +13,12 @@
                        (js-mode syntax ",")
                        (js-mode syntax ";")
                        (haskell-mode syntax ",")
+
+                       (c-mode syntax ",")
+                       (c-mode syntax ";")
+
+                       (c++-mode syntax ",")
+                       (c++-mode syntax ";")
                        ))
 
 ;; remove the pairs that won't be good for lisp
