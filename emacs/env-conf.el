@@ -6,7 +6,7 @@
       (let ((emacs.d-path (getenv "EMACS_DOT_D_PATH")))
         (if emacs.d-path
             emacs.d-path
-          (concat dotfileswgh "/dotlocal/emacs.d"))))
+          (concat dotfileswgh "/dotlocal/emacs.d/"))))
 ;; Set the name that emacs actually knows...
 (setq user-emacs-directory local-emacs.d-path)
 

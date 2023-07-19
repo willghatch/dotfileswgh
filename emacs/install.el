@@ -27,7 +27,7 @@ file from a large repository."
 
 (defun install-file-checked (path-in-install-dir url hash-name hash-value)
   "Specialization of downoad-checked to be more convenient to write in this file."
-  (let ((install-dir (concat wgh/local-emacs.d-path "single-files/")))
+  (let ((install-dir (concat local-emacs.d-path "single-files/")))
     (make-directory install-dir t)
     (download-checked url (concat install-dir path-in-install-dir)
                       hash-name hash-value)))
@@ -113,6 +113,7 @@ file from a large repository."
 (in 'haskell-mode)
 (in 'lsp-haskell)
 (in 'lsp-ui)
+(in 'eglot)
 (in 'racket-mode)
 (in 'scribble-mode)
 (in 'clojure-mode)

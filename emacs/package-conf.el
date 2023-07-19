@@ -11,8 +11,10 @@
 
   (let ((default-directory local-emacs.d-path))
     (normal-top-level-add-subdirs-to-load-path))
-  (let ((default-directory "~/.emacs.d/"))
+  (let ((default-directory (concat dotfileswgh "dotlocal/emacs/")))
     (normal-top-level-add-subdirs-to-load-path))
+  ;(let ((default-directory "~/.emacs.d/"))
+  ;  (normal-top-level-add-subdirs-to-load-path))
   )
 
 (setq package-archives '(

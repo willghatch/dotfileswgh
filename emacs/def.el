@@ -255,7 +255,7 @@
  ;(load-library "keyfreq-conf")
 )
 
-(let ((file (concat dotfileswgh "/dotlocal/emacs")))
+(let ((file (concat dotfileswgh "/dotlocal/emacs/def.el")))
   (if (file-exists-p file) (load-file file) nil))
 
 

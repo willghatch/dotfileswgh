@@ -2,4 +2,4 @@
 
 df=$DOTFILESWGH
 
-emacs -l $df/emacs/package-conf.el -batch -l $df/emacs/install.el
+emacs -batch -l $df/emacs/install.el

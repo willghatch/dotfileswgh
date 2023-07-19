@@ -269,3 +269,12 @@
   ;; TODO - try helm-lsp
   )
 (add-hook 'c++-mode-hook 'cpp-conf-setup)
+
+(add-hook 'tablegen-mode-hook
+          (lambda ()
+            (require 'lsp)
+            (require 'lsp-ui)
+            (require 'lsp-lens)
+            (require 'lsp-modeline)
+            (lsp)
+            ))
