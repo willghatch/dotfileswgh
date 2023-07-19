@@ -19,6 +19,9 @@
 (autoload 'scad-mode "scad-mode")
 (add-to-list 'auto-mode-alist '("\\.scad" . scad-mode))
 
+(autoload 'tablegen-mode "tablegen-mode")
+(add-to-list 'auto-mode-alist '("\\.td" . tablegen-mode))
+
 
 (add-hook 'after-save-hook 'executable-make-buffer-file-executable-if-script-p)
 

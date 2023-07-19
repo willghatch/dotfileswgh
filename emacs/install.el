@@ -1,5 +1,35 @@
+;; TODO - switch to a package management system that lets me pin versions.  Ideally I'd really like to write git repository paths for each of these and be able to pin versions inline as well as have a lock file.
 
 (load-file "~/dotfileswgh/emacs/package-conf.el")
+
+
+(defun file-to-string (file-path)
+  (with-temp-buffer (insert-file-contents file-path) (buffer-string)))
+(defun hash-file (file-path secure-hash-name)
+  (secure-hash secure-hash-name (file-to-string file-path)))
+
+(defun download-checked (url local-path secure-hash-name hash-value)
+  "Convenince function for installing a single file from a URL and
+checking that we get the right file.  Useful when you want a single
+file from a large repository."
+  (defun check-hash ()
+    (let ((actual-hash-value (hash-file local-path secure-hash-name)))
+      (when (not (equal actual-hash-value
+                        hash-value))
+        (error "Installing hash mismatch for %s, expected %s, got %s"
+               local-path hash-value actual-hash-value))))
+  (if (file-exists-p local-path)
+      (check-hash)
+    (progn
+      (url-copy-file url local-path)
+      (check-hash))))
+
+(defun install-file-checked (path-in-install-dir url hash-name hash-value)
+  "Specialization of downoad-checked to be more convenient to write in this file."
+  (let ((install-dir (concat wgh/local-emacs.d-path "single-files/")))
+    (make-directory install-dir t)
+    (download-checked url (concat install-dir path-in-install-dir)
+                      hash-name hash-value)))
 
 (package-initialize)
 (message "Updating package lists...")
@@ -125,6 +155,23 @@
 ;; (in 'link-hint)
 
 ;; 
+
+(install-file-checked "tablegen-mode.el"
+                      "https://raw.githubusercontent.com/llvm/llvm-project/llvmorg-16.0.6/llvm/utils/emacs/tablegen-mode.el"
+                      'sha256
+                      "2c8b17f091a23572deb09649323b21bd5d870d48cdc1fd14a03891958d5b2bce")
+(install-file-checked "llvm-mode.el"
+                      "https://raw.githubusercontent.com/llvm/llvm-project/llvmorg-16.0.6/llvm/utils/emacs/llvm-mode.el"
+                      'sha256
+                      "9d66cbae84e9868eaef841462d0f9faf877c5380b196d4414d048f69ae03cb38")
+(install-file-checked "mlir-mode.el"
+                      "https://raw.githubusercontent.com/llvm/llvm-project/llvmorg-16.0.6/mlir/utils/emacs/mlir-mode.el"
+                      'sha256
+                      "598a1b7fb3a9e23682ca120e30392a68ecb4486599d5cd8f239d3167bc29b5b6")
+(install-file-checked "mlir-lsp-client.el"
+                      "https://raw.githubusercontent.com/llvm/llvm-project/llvmorg-16.0.6/mlir/utils/emacs/mlir-lsp-client.el"
+                      'sha256
+                      "37761e19d08895298bbb04882a9d9810a718a2fb776e1ab4ef85877bf0886762")
 
 (message "Done installing packages!")
 
