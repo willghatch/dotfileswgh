@@ -10,14 +10,11 @@
      ,@(mapcar (lambda (form)
                  (list 'with-demoted-errors "Error %S" form))
                args)))
-(nobreak
- (setq dotfileswgh (getenv "DOTFILESWGH"))
- (setq local-emacs.d-path
-       (let ((emacs.d-path (getenv "EMACS_DOT_D_PATH")))
-         (if emacs.d-path
-             emacs.d-path
-           (concat dotfileswgh "/dotlocal/emacs.d"))))
 
+(let ((conf-dir (file-name-directory load-file-name)))
+  (load-file (expand-file-name "./env-conf.el" conf-dir)))
+
+(nobreak
  (setq package-user-dir (concat local-emacs.d-path "/elpa"))
  ;; Set up load path for requires
  (let ((default-directory local-emacs.d-path))
@@ -47,7 +44,7 @@
  (advice-add 'require :around #'load-library--around))
 
 (nobreak (require 'wgh-theme))
-(setq custom-file (concat dotfileswgh "/dotlocal/emacs.d/custom-file.el"))
+(setq custom-file (concat local-emacs.d-path "/custom-file.el"))
 (nobreak (load custom-file))
 
 ;; backup settings
@@ -81,7 +78,7 @@
                                          font-lock-function-name-face)
  sp-highlight-pair-overlay nil
  sp-show-pair-from-inside t
- bmkp-last-as-first-bookmark-file "~/.emacs.d/bookmarks"
+ bmkp-last-as-first-bookmark-file (concat local-emacs.d-path "/bookmarks")
  )
 
 (nobreak
