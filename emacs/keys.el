@@ -585,15 +585,18 @@
 (mkmap " tisa" 'evil-write-all)
 (mkmap "tie" 'save-and-kill-buffer-and-maybe-quit-emacs)
 (mkmap " tiea" 'evil-save-and-quit)
-(mkmap "tip" 'ffap/no-confirm)
-(mkmap "tif" 'ido-ffap-no)
-(mkmap "tih" 'ff-find-other-file) ; IE switch between header and source file for C/C++
-(mkmap " tifd" 'ido-find-file-from-pwd)
-(mkmap " tiff" 'ffap/no-confirm)
 (mkmap "tiw" 'next-buffer-no-star)
 (mkmap "tib" 'prev-buffer-no-star)
 (mkmap " tiwd" 'next-dirty-buffer-no-star)
 (mkmap " tibd" 'prev-dirty-buffer-no-star)
+;; TODO - I want to switch from "tif" and friends to "tf*" for the variety of ways I want to find files.
+(mkmap "tif" 'ido-ffap-no)
+(mkmap "tip" 'ffap/no-confirm)
+(mkmap "tff" 'ido-ffap-no)
+(mkmap "tfp" 'ffap/no-confirm)
+(mkmap "tfh" 'ff-find-other-file) ; IE switch between header and source file for C/C++
+(mkmap "tfd" 'ido-find-file-from-pwd)
+(mkmap "tfg" (lambda () (interactive) (require 'helm-projectile) (helm-projectile)))
 
 (mkmap "th" 'evil-window-map/body)
 (autoload 'projectile-command-map "projectile-conf" "" t 'keymap)
@@ -660,6 +663,7 @@
 (nkmap "sM" 'bookmark-set)
 (nkmap "sg" 'evil-goto-mark)
 (nkmap "sG" 'bookmark-jump)
+(nkmap "sc" 'comment-dwim)
 (ikmap (kbd "M-c") 'helm-M-x)
 (mkmap (kbd "M-c") 'helm-M-x)
 (global-set-key (kbd "M-c") 'helm-M-x)

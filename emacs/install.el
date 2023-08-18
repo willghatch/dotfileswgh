@@ -113,6 +113,8 @@ file from a large repository."
 (in 'haskell-mode)
 (in 'lsp-haskell)
 (in 'lsp-ui)
+(in 'dap-mode)
+(in 'all-the-icons) ;; used by dap-mode...
 (in 'eglot)
 (in 'racket-mode)
 (in 'scribble-mode)

@@ -19,6 +19,14 @@
 
                        (c++-mode syntax ",")
                        (c++-mode syntax ";")
+
+                       (python-mode syntax ",")
+                       (python-mode syntax ";")
+                       (python-mode syntax ":")
+
+                       (mojo-mode syntax ",")
+                       (mojo-mode syntax ";")
+                       (mojo-mode syntax ":")
                        ))
 
 ;; remove the pairs that won't be good for lisp
