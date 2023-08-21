@@ -177,6 +177,7 @@
    ;; • stash operations
    (setq wgh/magit-log-m-keymap (make-sparse-keymap))
    (define-key magit-log-mode-map "m" wgh/magit-log-m-keymap)
+   (define-key evil-normal-state-local-map "m" wgh/magit-log-m-keymap)
    (define-key magit-log-mode-map "C-l" 'magit-refresh)
    (define-key magit-log-mode-map (kbd "RET") 'magit-show-commit)
    (define-key wgh/magit-log-m-keymap "v" 'magit-show-commit)
@@ -265,14 +266,18 @@
   (require 'dap-mouse)
   (require 'dap-ui)
   (require 'dap-cpptools)
-  (require 'dap-lldb)
+  ;(require 'dap-lldb)
+  (require 'dap-hydra)
+  ;; Something is trying to access this and crashing, so let's just define it.
+  (defun treemacs--setup-mode-line () nil)
+  ;; dap-mode uses treemacs to build debugger UI stuff, and I guess I want to use the mouse with it sometimes.
+  (require 'treemacs-mouse-interface)
   ;; Remember to run dap-cpptools-setup to install, and put "type":"cppdbg" and "MIMode":"lldb" in dap config
   (require 'all-the-icons)
-  ;; Something is trying to access this and clashing, so let's just define it even though I have no interest in treemacs
-  (defun treemacs--setup-mode-line () nil)
 
   ;(require 'helm-lsp)
   ;; TODO - try helm-lsp
+  (nobreak-define-key evil-normal-state-local-map "m}" 'wgh/trivial-if-braces-remove)
   )
 (add-hook 'c++-mode-hook 'cpp-conf-setup)
 

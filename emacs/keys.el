@@ -685,7 +685,7 @@
 (mkmap "_" 'eval-expression)
 (mkmap "Q" 'call-last-kbd-macro)
 ;; Movement
-(nkmap "m" nil) ;;;;;;;;;; m will be my prefix for mode-specific bindings
+(nkmap "m" 'ignore) ;;;;;;;;;; m will be my prefix for mode-specific bindings
 ;; everything in motion state is pulled into normal state
 (mkmap "+" 'evil-repeat-find-char)
 (mkmap "~" 'evil-repeat-find-char-reverse)

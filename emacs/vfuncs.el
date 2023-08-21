@@ -344,4 +344,41 @@ abort."
       (fzf--start (fzf--resolve-directory) action)
       )))
 
+(defun shell-command-to-string-with-stdin (command-string stdin-string)
+  (with-temp-buffer
+    (insert stdin-string)
+    (shell-command-on-region (point-min) (point-max) command-string (current-buffer) t)
+    (buffer-string)))
+
+(defun wgh/trivial-if-braces-remove ()
+  "Remove braces for “trivial” if statements (single statement) for
+languages with C-like syntax.  I prefer to have them personally
+(having them leads to more consistent syntax, less editing churn,
+lower chance of mistakes), but for working where the style disagrees,
+I'm sick of doing this manually."
+  (interactive)
+  (save-mark-and-excursion
+    (when (looking-at-p (regexp-quote "}"))
+      ;; Go to the start brace.
+      (evil-jump-item))
+    (when (not (looking-at-p (regexp-quote "{")))
+      (error "Must be called on braces to be removed"))
+    (let* ((begin-point (point))
+           (end-point (save-mark-and-excursion (evil-jump-item) (point)))
+           (begin-on-end-of-line (save-mark-and-excursion
+                                   (forward-char)
+                                   (looking-at-p "[:blank:]*$")))
+           (end-on-end-of-line (save-mark-and-excursion
+                                 (evil-jump-item)
+                                 (forward-char)
+                                 (looking-at-p "[:blank:]*$"))))
+      (goto-char end-point)
+      (delete-char 1)
+      (when end-on-end-of-line
+        (call-interactively 'evil-join))
+      (goto-char begin-point)
+      (delete-char 1)
+      (indent-region begin-point end-point))))
+
+
 (provide 'vfuncs)
