@@ -1,0 +1,7 @@
+#compdef gco
+#autoload
+
+# Replace words and CURRENT zsh completion special variables so that `gco` is replaced by `git checkout`, then do normal completion.
+words=("git" "checkout" "${(@)words[2,$#words]}")
+CURRENT=$(( $CURRENT + 1 ))
+_normal
