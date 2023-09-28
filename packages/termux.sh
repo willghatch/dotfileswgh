@@ -14,8 +14,10 @@ tmux
 python
 which
 htop
+rsync
 
 binutils
+mount-utils
 
 # racket build deps
 libffi
