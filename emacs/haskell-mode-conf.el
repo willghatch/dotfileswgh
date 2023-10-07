@@ -11,10 +11,8 @@
             (setq lsp-haskell-server-path "haskell-language-server-9.0.2")
             ;; If I get an error about GHC ABIs don't match, see this: https://github.com/haskell/vscode-haskell#ghc-abis-dont-match
 
-            (require 'lsp)
-            (require 'lsp-ui)
+            (lsp-common-setup)
             (require 'lsp-haskell)
-
             ;; TODO - if I haven't yet imported the project, this will not ask which project to load and it will basically fail.  I'm not sure the best way around that.
             (lsp)
 

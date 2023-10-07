@@ -22,6 +22,9 @@
 (autoload 'tablegen-mode "tablegen-mode")
 (add-to-list 'auto-mode-alist '("\\.td" . tablegen-mode))
 
+(autoload 'mlir-mode "mlir-mode")
+(add-to-list 'auto-mode-alist '("\\.mlir" . mlir-mode))
+
 
 (add-hook 'after-save-hook 'executable-make-buffer-file-executable-if-script-p)
 
@@ -87,8 +90,7 @@
 
 (add-hook 'java-mode-hook
           (lambda ()
-            (setq lsp-headerline-breadcrumb-enable nil)
-            (require 'lsp-mode)
+            (lsp-common-setup)
             (require 'lsp-java)
             ;; This lsp download url should work with openjdk11.
             ;(setq lsp-java-jdt-download-url  "https://download.eclipse.org/jdtls/milestones/0.57.0/jdt-language-server-0.57.0-202006172108.tar.gz")
@@ -251,12 +253,9 @@
   (setq c-basic-offset 2)
 
   (message "about to require lsp")
-  (require 'lsp)
+  (lsp-common-setup)
   ;; Require all of these things, which are apparently not properly required transitively, so lsp finishes initialization and can properly work when opening multiple files.
   ;; LSP setup -- the clangd server figures out build info to get include paths and hook everything up by looking for a `compile-commands.json` file in parent dirs and in `build` directories it finds on this path.  If building somewhere else, symlink the actual build dir to `build` at the root or something.
-  (require 'lsp-ui)
-  (require 'lsp-lens)
-  (require 'lsp-modeline)
   (lsp)
 
   ;; TODO - maybe try eglot instead of lsp-mode some time.
@@ -281,11 +280,10 @@
   )
 (add-hook 'c++-mode-hook 'cpp-conf-setup)
 
-(add-hook 'tablegen-mode-hook
-          (lambda ()
-            (require 'lsp)
-            (require 'lsp-ui)
-            (require 'lsp-lens)
-            (require 'lsp-modeline)
-            (lsp)
-            ))
+(defun wgh/start-lsp-for-mlir ()
+  (lsp-common-setup)
+  (require 'mlir-lsp-client)
+  (lsp-mlir-setup)
+  (lsp))
+(add-hook 'tablegen-mode-hook 'wgh/start-lsp-for-mlir)
+(add-hook 'mlir-mode-hook 'wgh/start-lsp-for-mlir)

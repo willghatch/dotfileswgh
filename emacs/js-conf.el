@@ -16,8 +16,7 @@
   (setq typescript-indent-level 2)
 
   (message "about to require lsp")
-  (require 'lsp)
-  (require 'lsp-ui)
+  (lsp-common-setup)
   (lsp)
 
   (require 'sgml-mode)

@@ -198,6 +198,7 @@
  (load-library "org-mode-conf")
  (setq fill-column 80)
  (load-library "fci-mode-conf")
+ (load-library "lsp-conf")
  (load-library "mode-hooks-conf")
  (load-library "racket-mode-conf")
  (load-library "haskell-mode-conf")
