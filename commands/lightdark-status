@@ -26,6 +26,8 @@ soft-update(){
     # Alternatively, we can set that theme using xsettings instead.
     xsettingsd-wrapper
     cat "$DOTFILESWGH/xresources-general" "$DOTFILESWGH/xresources-${1}" | xrdb
+    # touch my wezterm config file, which will cause any terminal using it to reload the config file
+    touch $DOTFILESWGH/wezterm.lua
     echo "$1"
 }
 update(){

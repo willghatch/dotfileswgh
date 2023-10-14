@@ -5,8 +5,10 @@
 #    terminal2="gnome-terminal --profile=dark"
 #fi
 
-terminal="konsole-lightdark -e rash-repl"
+#terminal="konsole-lightdark -e rash-repl"
+terminal="wezterm --config-file $DOTFILESWGH/wezterm.lua start -- zsh"
 terminal2="konsole-lightdark -e zsh"
+
 
 #terminal2="my-alacritty -e zsh"
 #terminal="my-alacritty -e rr"
