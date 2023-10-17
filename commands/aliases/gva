@@ -6,6 +6,9 @@
 #gitRoot="$(git rev-parse --show-toplevel)"
 gitRefsAll="$(git show-ref | cut -d ' ' -f 2 | sed s+refs/heads/++ | sed s+refs/remotes/++ | sed s+refs/tags/++)"
 gitRefsUse="$(echo "$gitRefsAll" | grep -v gh-pages)"
+gitRefsUseFileTemplate="${XDG_RUNTIME_DIR:-/tmp}/gitRefsUseFile.tmp.XXXXXXXXXX"
+gitRefsUseFile="$(mktemp "$gitRefsUseFileTemplate")"
+echo "$gitRefsUse" > "$gitRefsUseFile"
 
 # Note that here-docs can include parameter substitution unless the end tag is quoted
 source=$(cat <<EOSOURCE
@@ -14,8 +17,11 @@ source=$(cat <<EOSOURCE
   (wgh/add-buffer-to-kill-block-list
    (magit-log-other
      ;; refs
-     (mapcar #'symbol-name
-             '($gitRefsUse))
+     (let ((refs-string
+            (with-temp-buffer
+              (insert-file-contents "$gitRefsUseFile")
+              (buffer-string))))
+       (split-string refs-string))
      ;; display options
      '("--graph"
        "--decorate"
@@ -28,5 +34,6 @@ source=$(cat <<EOSOURCE
   )
 EOSOURCE
 )
-#exec premacs-use-t --eval "(progn (wgh/add-buffer-to-kill-block-list (call-interactively 'magit-log-all)) (delete-other-windows) )"
-exec premacs-use-maybe --eval "$source"
+#exec premacs-use-t --eval "(progn (wgh/add-buffer-to-kill-block-list (call-interactively 'magit|log-all)) (delete-other-windows) )"
+premacs-use-maybe --eval "$source"
+rm "$gitRefsUseFile"
