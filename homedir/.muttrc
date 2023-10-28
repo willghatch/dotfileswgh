@@ -143,7 +143,7 @@ macro pager hh '|pelinks<enter>'
 macro attach hh '|pelinks<enter>'
 macro attach hf "<pipe-entry>cat >/tmp/html-mutt.html && ffxd --new-tab /tmp/html-mutt.html<enter>"
 macro pager hf "<pipe-entry>cat >/tmp/html-mutt.html && ffxd --new-tab /tmp/html-mutt.html<enter>"
-macro attach hv "<pipe-entry>feh -<enter>"
+macro attach hv "<pipe-entry>img -<enter>"
 bind pager q exit
 bind pager r noop
 bind pager rr reply
