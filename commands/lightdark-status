@@ -20,14 +20,18 @@ lightdark=${lightdark:-dark}
 macos-update(){
     # $1 is either "light" or "dark"
     local isDark=true
+    local iterm2Style=Default
     if [[ "$1" = "light" ]]; then
         isDark=false;
+        iterm2Style=light
     fi
-    echo isDark = $isDark
     local updateString="tell app \"System Events\" to tell appearance preferences to set dark mode to ${isDark}"
     osascript -e "$updateString"
     # I got this line from Stack Overflow: https://apple.stackexchange.com/questions/437581/toggle-system-dark-mode-from-terminal
     #osascript -e 'tell app "System Events" to tell appearance preferences to set dark mode to not dark mode'
+
+    # set iterm2 style
+    iterm2-set-profile.py "$iterm2Style"
 }
 linux-update(){
     # $1 is either "light" or "dark"
