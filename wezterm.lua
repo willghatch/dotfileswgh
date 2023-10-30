@@ -16,15 +16,27 @@ end
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 
+
+
+
 config.font = wezterm.font "Deja Vu Sans Mono"
-
-
-
 
 
 config.enable_scroll_bar=true
 config.hide_tab_bar_if_only_one_tab = true
 
+
+local unameProc = io.popen("uname")
+local unameStr = unameProc:read("*a")
+unameProc:close()
+if (unameStr == "Darwin\n") then
+  -- TODO - I can't seem to get any font to look non-terrible on Wezterm on MacOS.
+  config.font = wezterm.font("Monaco"
+                             --, {weight = "Thin"}
+  )
+  --config.font = wezterm.font "Menlo"
+  --config.font = wezterm.font "DejaVu Sans Mono"
+end
 
 -- Color scheme
 config.color_schemes = {
@@ -113,9 +125,12 @@ local ldStatus = ldStatusProc:read("*a")
 ldStatusProc:close()
 if (ldStatus == "light\n") then
    config.color_scheme = "Solarized Light (Gogh)"
-else
+elseif (ldStatus == "dark\n") then
    --config.color_scheme = "Dark Pastel"
    config.color_scheme = "wgh-dark"
+else
+   config.color_scheme = "wgh-dark"
+   --config.color_scheme = "Batman"
 end
 
 -- and finally, return the configuration to wezterm

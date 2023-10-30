@@ -1,0 +1,2 @@
+#!/bin/sh
+exec wezterm --config-file $DOTFILESWGH/wezterm.lua start -- zsh

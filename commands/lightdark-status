@@ -17,7 +17,19 @@ lightdark="$WGH_THEME_DARK_OR_LIGHT"
 lightdark="${lightdark:-$(cat $ldfile 2>/dev/null)}"
 lightdark=${lightdark:-dark}
 
-soft-update(){
+macos-update(){
+    # $1 is either "light" or "dark"
+    local isDark=true
+    if [[ "$1" = "light" ]]; then
+        isDark=false;
+    fi
+    echo isDark = $isDark
+    local updateString="tell app \"System Events\" to tell appearance preferences to set dark mode to ${isDark}"
+    osascript -e "$updateString"
+    # I got this line from Stack Overflow: https://apple.stackexchange.com/questions/437581/toggle-system-dark-mode-from-terminal
+    #osascript -e 'tell app "System Events" to tell appearance preferences to set dark mode to not dark mode'
+}
+linux-update(){
     # $1 is either "light" or "dark"
     lightdark-konsole-dbus-update
     # gsettings dynamically sets running gtk3 programs that are connected to the gsd-xsettings daemon (gnome-settings-daemon)
@@ -26,6 +38,20 @@ soft-update(){
     # Alternatively, we can set that theme using xsettings instead.
     xsettingsd-wrapper
     cat "$DOTFILESWGH/xresources-general" "$DOTFILESWGH/xresources-${1}" | xrdb
+}
+
+soft-update(){
+    # $1 is either "light" or "dark"
+
+    # Do system-specific updates
+    if [[ "$(uname)" = "Darwin" ]]; then
+        macos-update "$1"
+    else
+        linux-update "$1"
+    fi
+
+    # Generic updates
+
     # touch my wezterm config file, which will cause any terminal using it to reload the config file
     touch $DOTFILESWGH/wezterm.lua
     echo "$1"
