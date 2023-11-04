@@ -23,7 +23,8 @@ if [[ "$(lightdark-status)" = "light" ]]; then
 else
     emacsclient -e "(dark-theme)" -s "$daemon" >/dev/null
 fi
-emacsclient -s "$daemon" "$@"
+# The next line adds the given arguments.  If given `-t`, as in premacs-use-t, it will open a terminal, if given `-c` it will open a gui.  If not given one of those, it will send a command without doing anything else.  Importantly, the `-e` argument here is run after the terminal is initiated, so things that modify terminal state are effective here.
+emacsclient -e "(disable-csi-u-key-encoding)" -s "$daemon" "$@"
 emacsclient -e '(kill-emacs)' -s "$daemon"
 
 
