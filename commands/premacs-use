@@ -23,8 +23,11 @@ if [[ "$(lightdark-status)" = "light" ]]; then
 else
     emacsclient -e "(dark-theme)" -s "$daemon" >/dev/null
 fi
+emacsclient -e "(add-hook 'terminal-init-xterm-hook 'disable-csi-u-key-encoding)" -s "$daemon" >/dev/null
 # The next line adds the given arguments.  If given `-t`, as in premacs-use-t, it will open a terminal, if given `-c` it will open a gui.  If not given one of those, it will send a command without doing anything else.  Importantly, the `-e` argument here is run after the terminal is initiated, so things that modify terminal state are effective here.
-emacsclient -e "(disable-csi-u-key-encoding)" -s "$daemon" "$@"
+#emacsclient -e "(disable-csi-u-key-encoding)" -s "$daemon" -c "$@"
+# The above works when no file is given, but if I try to run premacs-use-t on a file, it immediately closes.  So I'll have to figure out a different way to get my terminal configuration to run.  So I think I can't have anything run there.  But now I've successfully added this behavior to the terminal-init-xterm-hook, which is probably the best thing.
+emacsclient -s "$daemon" "$@"
 emacsclient -e '(kill-emacs)' -s "$daemon"
 
 
