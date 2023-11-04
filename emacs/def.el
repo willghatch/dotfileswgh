@@ -267,6 +267,17 @@
    (dark-theme)))
 (nobreak (lightdark-update-theme-watch))
 
+(nobreak
+ ;; I recently started using Wezterm which supports the csi-u (also known as modify-other-keys) terminal protocol, which encodes keys to disambiguate things.  But it screws up handling of my Hatchak keyboard, so I get garbage when I type eg. shift+space (which I want to just send space) or any keys that take shift plus iso_level_3_shift (IE shift level 4).  So I want to simply disable it.
+ (let* ((term-params (terminal-parameter nil 'tty-mode-set-strings))
+        (csi-u-place (member "\e[>4;1m" term-params)))
+   (when csi-u-place
+     ;; First, disable future enabling of the csi-u protocol by removing the string from the set-strings.
+     (setcar csi-u-place "")
+     ;; Then send the terminal code to disable it immediately.
+     (send-string-to-terminal "\e[>4;0m")
+     )))
+
 (message "-")
 (message "--")
 (message "---")
