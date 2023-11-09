@@ -46,24 +46,30 @@ function iterm () {
         cmd="$args"
     fi
 
-   # osascript &>/dev/null <<EOF
-    osascript <<EOF
-tell application "iTerm"
-	activate
-	set new_window to (create window with default profile)
-	set cSession to current session of new_window
-	tell new_window
-		tell cSession
-			delay 2
-			repeat
-				delay 0.1
-				--          display dialog cSession is at shell prompt
-				set isdone to is at shell prompt
-				if isdone then exit repeat
-			end repeat
-		end tell
-	end tell
-end tell
-EOF
+    # The line creating the profile has different syntax for default vs non-default profiles...
+    profileLine="	set new_window to (create window with default profile)"
+    if [[ "$(lightdark-status)" = "light" ]]; then
+        profileLine="	set new_window to (create window with profile \"light\")"
+    fi
+
+    script="$(
+echo "tell application \"iTerm\""
+echo "	activate"
+echo "$profileLine"
+echo "	set cSession to current session of new_window"
+echo "	tell new_window"
+echo "		tell cSession"
+echo "			delay 2"
+echo "			repeat"
+echo "				delay 0.1"
+echo "				--          display dialog cSession is at shell prompt"
+echo "				set isdone to is at shell prompt"
+echo "				if isdone then exit repeat"
+echo "			end repeat"
+echo "		end tell"
+echo "	end tell"
+echo "end tell"
+)"
+    echo "$script" | osascript -
 }
 iterm $@
