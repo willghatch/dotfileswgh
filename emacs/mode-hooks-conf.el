@@ -25,6 +25,9 @@
 (autoload 'mlir-mode "mlir-mode")
 (add-to-list 'auto-mode-alist '("\\.mlir" . mlir-mode))
 
+(autoload 'markdown-mode "markdown-mode")
+(add-to-list 'auto-mode-alist '("\\.md" . markdown-mode))
+
 
 (add-hook 'after-save-hook 'executable-make-buffer-file-executable-if-script-p)
 
