@@ -31,6 +31,10 @@
 # OSX only
 [ `uname -s` != "Darwin" ] && echo 'OS X Only' &&return
 
+# set up dotfileswgh...
+DOTFILESWGH="${DOTFILESWGH:-$HOME/dotfileswgh}"
+PATH="$PATH":$DOTFILESWGH/commands
+
 function iterm () {
     local cmd=""
     local wd="$PWD"
