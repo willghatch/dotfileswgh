@@ -890,6 +890,7 @@ awful.rules.rules = {
 
         name = {
           "Event Tester",  -- xev.
+          "Surge XT",
           "bashrun"
         },
         role = {
