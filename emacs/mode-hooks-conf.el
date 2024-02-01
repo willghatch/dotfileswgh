@@ -74,6 +74,11 @@
             ;(projectile-mode 1)
             ;; The electric-indent-mode adds a hook to the post-self-insert-hook, and then does auto-indentation on things like comma.  This is extremely annoying when editing a file that doesn't conform to my auto-indent rules (eg. javascript with a different style of indent for method calls on a new line).  Yet it's not necessary for indent-after-newline, which is done with the newline-and-indent command which I already have bound to enter.  So I think I prefer just using newline-and-indent and indent-region without electric-indent-mode.  But something seems to be turning it on automatically.
             (electric-indent-mode -1)
+            (require 'magit)
+            (require 'git-gutter)
+            (global-git-gutter-mode 1)
+            (require 'blamer)
+            (global-blamer-mode 1)
             ))
 
 

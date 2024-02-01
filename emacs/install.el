@@ -84,6 +84,8 @@ file from a large repository."
 (in 'smooth-scrolling)
 (in 'guide-key)
 (in 'magit)
+(in 'git-gutter)
+(in 'blamer) ;; show git blame on line
 
 (in 'helm)
 (in 'helm-lsp)

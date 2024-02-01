@@ -606,6 +606,7 @@
 (mkmap "ts"
   (defhydra settings-toggle (:foreign-keys warn :exit t) "Toggle:"
     ("p" smartparens-mode "smartparens")
+    ("b" blamer-mode "git blame")
     ("w" whitespace "whitespace")
     ("C" (lambda () (interactive) (require 'rainbow-mode) (rainbow-mode)) "#aabbcc")
     ("c" company-mode "company")
@@ -613,7 +614,7 @@
     ("i" toggle-case-fold-search "/? case")
     ("W" toggle-wrap-scan "search-wrap")
     ("f" flycheck-mode "flycheck")
-    ("F" fci-mode-toggle "fill-col")
+    ("F" display-fill-column-indicator-mode "fill-col")
     ("s" flyspell-mode "flyspell")
     ("S" flyspell-prog-mode "flyspell-prog")
     ;("e" electric-indent-mode "el.indent")
