@@ -72,7 +72,6 @@ file from a large repository."
 (in 'ag)
 (in 'smex)
 (in 'flycheck)
-(in 'fill-column-indicator)
 (in 'highlight-chars)
 (in 'hlinum)
 (in 'elisp-slime-nav)

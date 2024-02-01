@@ -196,7 +196,7 @@
  ;(load-library "yasnippet-conf")
  (require 'indent-tree)
  (load-library "org-mode-conf")
- (setq fill-column 80)
+ (setq display-fill-column-indicator-column 80)
  (global-display-fill-column-indicator-mode 1)
  (load-library "lsp-conf")
  (load-library "mode-hooks-conf")
