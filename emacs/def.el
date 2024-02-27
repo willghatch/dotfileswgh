@@ -233,9 +233,7 @@
  (setq-default scroll-down-aggressively 0.0)
  (require 'smooth-scrolling)
 
- ;(require 'indent-guide)
- (setq indent-guide-recursive t)
- (setq indent-guide-delay 0.2)
+ (setq highlight-indent-guides-auto-enabled nil)
  (load-library "windows")
  (setq hl-todo-activate-in-modes '(prog-mode))
  ;(require 'hl-todo)
