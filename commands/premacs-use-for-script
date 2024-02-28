@@ -6,9 +6,10 @@ script="$1"
 daemon="$(premacs-use-next-daemon)"
 
 if [[ "none" = "$daemon" ]]; then
-    echo "premacs: no daemons available..." >&2
+    emacs --batch -l $DOTFILESWGH/emacs/def.el --eval "$script"
+    exit
 fi
 
-emacsclient -e "$script" -s "$daemon"
+emacsclient --eval "$script" -s "$daemon"
 
 emacsclient -e '(kill-emacs)' -s "$daemon"
