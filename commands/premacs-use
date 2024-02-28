@@ -1,20 +1,11 @@
 #!/usr/bin/env bash
 
-daemon="$(premacs-get-next-daemon)"
+daemon="$(premacs-use-next-daemon)"
 
 if [[ "none" = "$daemon" ]]; then
     # rather than die, fall back on ALTERNATE_EDITOR
     exec emacsclient -nw "$@"
 fi
-
-premaxd=${XDG_RUNTIME_DIR:-/tmp/$(whoami)}/
-old=$premaxd/premacs-list
-new=$premaxd/premacs-tmp
-mv "$old" "$new"
-grep -v "$daemon" "$new" > "$old"
-rm "$new"
-
-premacs-new >/dev/null 2>&1 &
 
 emacsclient -e "(setenv \"PWD\" \"$PWD\")" -s "$daemon" >/dev/null
 emacsclient -e "(with-current-buffer \"*scratch*\" (cd \"$PWD\"))" -s "$daemon" >/dev/null

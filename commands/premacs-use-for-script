@@ -1,0 +1,14 @@
+#!/usr/bin/env bash
+
+echo premacs-use-for-script got: $@
+script="$1"
+
+daemon="$(premacs-use-next-daemon)"
+
+if [[ "none" = "$daemon" ]]; then
+    echo "premacs: no daemons available..." >&2
+fi
+
+emacsclient -e "$script" -s "$daemon"
+
+emacsclient -e '(kill-emacs)' -s "$daemon"

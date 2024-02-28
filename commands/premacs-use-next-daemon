@@ -1,0 +1,19 @@
+#!/usr/bin/env bash
+
+daemon="$(premacs-get-next-daemon)"
+
+if [[ "none" = "$daemon" ]]; then
+    echo "none"
+    exit 1
+fi
+
+premaxd=${XDG_RUNTIME_DIR:-/tmp/$(whoami)}/
+old=$premaxd/premacs-list
+new=$premaxd/premacs-tmp
+grep -v "$daemon" "$old" > "$new"
+mv -f "$new" "$old"
+
+echo "$daemon"
+
+premacs-new >/dev/null 2>&1 &
+

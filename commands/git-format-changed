@@ -1,0 +1,17 @@
+#!/usr/bin/env racket
+#lang rash
+(require racket/cmdline
+         racket/string
+         )
+
+(define revision
+  (command-line #:help-labels "Format all files changed since given revision"
+                #:args (revision)
+                (values revision)))
+
+(define root #{git rev-parse --show-toplevel})
+cd "$root"
+(define files #{git diff --name-only $revision |>> string-split _ "\n"})
+(for ([file files])
+  {format $file})
+

@@ -1,0 +1,49 @@
+#!/usr/bin/env racket
+#lang rash
+(require racket/cmdline
+         racket/match
+         racket/file
+         )
+
+(define files
+  (command-line
+   #:help-labels "format given files with a code formatter"
+   #:args files (values files)))
+
+(define (null-formatter file)
+  (printf "Not formatting: ~a\n" file))
+(define (emacs-format file)
+  (define elisp
+    (format "~s"
+            `(with-current-buffer (find-file ,file)
+               (indent-region (point-min) (point-max))
+               (flush-standard-output)
+               (save-buffer))))
+  {premacs-use-for-script $elisp &>! /dev/null})
+(define (clang-format file)
+  {clang-format -i $file})
+
+
+(void
+ (for ([file files])
+   ;; Either just do it or return a function to do it.
+   (define pre-string (file->string file))
+   (define func-maybe
+     (match file
+       [(pregexp #px".*\\.rkt$") emacs-format]
+       [(pregexp #px".*\\.el$") emacs-format]
+       [(pregexp #px".*\\.c") clang-format]
+       [(pregexp #px".*\\.h") clang-format]
+       [(pregexp #px".*\\.cpp") clang-format]
+       [(pregexp #px".*\\.hpp") clang-format]
+       [(pregexp #px".*\\.mojo") {mblack $file}]
+       [(pregexp #px".*\\.🔥") {mblack $file}]
+       [else null-formatter]
+       ))
+   (when (procedure? func-maybe)
+     (func-maybe file))
+   (define post-string (file->string file))
+   (when (not (equal? pre-string post-string))
+     (printf "formatted ~a\n" file))
+   ))
+
