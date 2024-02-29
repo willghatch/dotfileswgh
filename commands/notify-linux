@@ -1,0 +1,18 @@
+#!/usr/bin/env racket
+#lang rash
+(require basedir file/glob racket/string)
+(define text (string-join (vector->list (current-command-line-arguments)) " "))
+(when (not (getenv "DISPLAY"))
+  ;; :0 is a reasonable assumption if nothing is set...
+  (void (putenv "DISPLAY" ":0")))
+(define dbus-var "DBUS_SESSION_BUS_ADDRESS")
+
+(if (getenv dbus-var)
+    {notify-send "Note" $text}
+    (let* ([dir (writable-runtime-dir #:program "dbus-session-bus-addresses")]
+           [addr-files (glob (build-path dir "*"))])
+      (when (null? addr-files)
+        (error 'notify "No dbus session address found!"))
+      (for ([f addr-files])
+        (putenv dbus-var #{cat $f})
+        {notify-send "Note" $text})))

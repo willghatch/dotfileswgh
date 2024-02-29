@@ -1,0 +1,12 @@
+#!/usr/bin/env bash
+
+text="$@"
+
+# I don't love this implementation -- the pop up window takes focus, would be easy to accidentally dismiss, etc.  But at least it basically works.  As long as the message doesn't have quotation marks...
+#osascript -e "tell application \"System Events\" to display dialog \"$text\" with icon caution"
+osascript -e "tell application \"System Events\" to display dialog \"$text\""
+
+# alt version using terminal-notifier, needs:
+# brew install terminal-notifier
+#echo $text | terminal-notifier -sound default
+# Except I can't seem to get normal system notifications working at all for some reason...
