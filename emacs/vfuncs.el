@@ -380,5 +380,9 @@ I'm sick of doing this manually."
       (delete-char 1)
       (indent-region begin-point end-point))))
 
+(defun refresh-buffer-from-file ()
+  "Alias for revert-buffer since I can never remember its name."
+  (interactive)
+  (revert-buffer))
 
 (provide 'vfuncs)
