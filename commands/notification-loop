@@ -228,9 +228,15 @@
                                                 (set! -socket socket))]
        [("--client") socket "run client" (begin (set! -mode 'client)
                                                 (set! -socket socket))]
-       [("--command") cmd "command for client to run" (set! -command cmd)]
        [("--time") time "clock time (24h) or minutes in future eg. 30m"
         (set! -time time)]
+       [("--command") cmd "command for client to run" (set! -command cmd)]
+       #:help-labels
+       "    Available commands:"
+       "    * notify <message ...>"
+       "    * notify-repeat <delay-m> <message ...>"
+       "    * get-event-list"
+       "    * terminate-server"
        #:args ()
        (values -mode -socket -command -time))))
   (with-handlers ([(λ(e) #t) (λ(e)
