@@ -1,0 +1,249 @@
+#!/usr/bin/env racket
+#lang rash
+(require
+ racket/cmdline
+ racket/match
+ racket/list
+ racket/unix-socket
+ gregor
+ gregor/time
+ gregor/period
+ )
+
+#|
+* want a timed wait loop, wake up every ~1m
+* have a priority queue of events, each event has a unix time to be due
+* on wake, check first event to see if it's due (due time <= current time)
+* events launch notifications as well as schedule future events (eg. re-schedule the next notification when running)
+* wrap some notification functionality in a way to NOT re-notify if previous notification is still up -- have a way when event runs to check if the previous notification has been dismissed.  Eg. maybe make a notify-blocking script.
+* run loop in one thread, have another thread listening to a unix socket for messages
+* write a client that parses times both in terms of HH:MM and in terms of Xm, with a message to send
+|#
+
+(define sleep-time 30) ;; in terms of seconds
+
+(define cleanup-handler #f)
+(define (cleanup!)
+  (when cleanup-handler
+    (cleanup-handler)
+    (set! cleanup-handler #f)))
+
+(define use-queue
+  (let ([lock (make-semaphore 1)]
+        [queue (box (list))])
+    (λ (fn-that-takes-box-of-list)
+      (dynamic-wind
+        (λ () (semaphore-wait lock))
+        (λ () (fn-that-takes-box-of-list queue))
+        (λ () (semaphore-post lock))))))
+
+
+(define (sanitize-for-write symex)
+  (match symex
+    [(list item ...) (map sanitize-for-write symex)]
+    [(? thread?) 'thread]
+    [else symex]))
+
+(define (process-queue)
+  (define action-items
+    (use-queue
+     (λ (boxed-list)
+       (define now (current-seconds))
+       (define-values (action-items new-queue)
+         (partition (λ (item) (<= (first item) now)) (unbox boxed-list)))
+       (set-box! boxed-list new-queue)
+       action-items)))
+  ;; Process the items after partitioning the lists to not nest uses of
+  ;; use-queue, which would deadlock.
+  (for ([item action-items])
+    (process-item item)))
+
+
+(define (enqueue item)
+  (use-queue
+   (λ (boxed-list)
+     (define new-list (sort (cons item (unbox boxed-list))
+                            <
+                            #:key (λ (item) (first item))))
+     (set-box! boxed-list new-list))))
+
+(define (get-current-queue)
+  (use-queue
+   (λ (boxed-list)
+     (unbox boxed-list))))
+
+(define (exec-loop)
+  (define (loop)
+    (process-queue)
+    (sleep sleep-time)
+    (loop))
+  (loop))
+
+(define (simple-notify message)
+  ;; TODO - at the moment my notify message blocks on macos and not on linux...
+  (thread (λ () {notify $message})))
+
+(define (listen-for-commands socket)
+  (with-handlers ([(λ(e) #t) (λ(e)
+                               (printf "error: ~v\n" e)
+                               (cleanup!)
+                               (exit 1))])
+    (define listener (unix-socket-listen socket))
+    (set! cleanup-handler (λ ()
+                            (unix-socket-close-listener listener)
+                            (set! listener #f)
+                            {rm $socket}))
+    (let loop ()
+      (define-values (in out) (unix-socket-accept listener))
+      (define item (read in))
+      (close-input-port in)
+
+      (define (output symex)
+        (fprintf out "~s\n" symex)
+        (flush-output out))
+
+      (define execute
+        (match item
+          ;; An item is (time command-form)
+          [(list (? number?)
+                 command-form)
+           (match command-form
+             [(list 'terminate-server)
+              (output '(terminate-server))
+              'terminate-server]
+             [(list 'notify (? string?))
+              (thread (λ () (enqueue item)))
+              (output `(success))
+              'success]
+             [(list 'notify-repeat (? number?) (? string?))
+              (thread (λ () (enqueue item)))
+              (output `(success))
+              'success]
+             [(list 'get-event-list)
+              (output `(current-queue ,(sanitize-for-write (get-current-queue))))
+              'success]
+             [else 'bad])]
+          [else 'bad]))
+
+      (match execute
+        ['bad (output `(bad-command ,item))]
+        ['success (void)]
+        ['terminate-server (void)]
+        [else (printf "Internal error: got execute item: ~s\n" execute)])
+      (flush-output out)
+      (close-output-port out)
+      (if (equal? execute 'terminate-server)
+          (printf "Got terminate-server command.\n")
+          (loop)))
+    (cleanup!))
+  (exit 0))
+
+(define (process-item item)
+  (match item
+    [(list time command)
+     (match command
+       [(list 'notify message)
+        (simple-notify message)]
+       [(list 'notify-repeat seconds message)
+        (process-item `(time (notify-repeat ,seconds ,message #f)))]
+       [(list 'notify-repeat seconds message previous)
+        (define thread-for-next-repeat-to-check
+          (if (and (thread? previous)
+                   (thread-running? previous))
+              previous
+              (thread (λ () {notify-blocking $message}))))
+        (enqueue `(,(+ (current-seconds) seconds)
+                   (notify-repeat ,seconds
+                                  ,message
+                                  ,thread-for-next-repeat-to-check)))]
+       [else (error "bad match in processing command: ~s" command)])]
+    [else (error "bad-match-in-processing-item ~s" item)]))
+
+(define (server-main socket)
+  (define loop-thread (thread exec-loop))
+  (define command-thread (thread (λ () (listen-for-commands socket))))
+  (thread-wait loop-thread)
+  (thread-wait command-thread)
+  ;; This exit should never be reached normally, because the threads should
+  ;; never end normally...
+  (exit 0))
+
+(define (client-main socket command time)
+  (define hh:mm (regexp-match (pregexp "^(.*):(.*)$")
+                              time))
+  (define hh:mm-distance (and hh:mm ))
+  (define Xm (regexp-match (pregexp "^(.*)m$")
+                           time))
+  (define seconds-to-wait
+    (with-handlers ([(λ(e)#t)
+                     (λ (e) (error "bad time format, expected HH:MM as clock time for event or Xm as minutes in the future, inner exn: ~s" e))])
+      (cond [hh:mm
+             (let* ([hour (string->number (second hh:mm))]
+                    [minute (string->number (third hh:mm))]
+                    [t (time hour minute)]
+                    [today (now)]
+                    [time-today (on-date t today)]
+                    [time-tomorrow (on-date t (+period today (days 1)))]
+                    [time-for-use (if (datetime<? time-today today)
+                                      time-tomorrow
+                                      time-today)])
+               (seconds-between today time-for-use))]
+            [Xm (* 60 (string->number (second Xm)))]
+            [else (error 'no-match)])))
+  (define epoch-time (+ (current-seconds) seconds-to-wait))
+
+  (define command-parse
+    (match command
+      [(pregexp "^terminate-server$") '(terminate-server)]
+      [(pregexp "^get-event-list$") '(get-event-list)]
+      [(pregexp "^notify-repeat (.*)m " (list full-match-string minutes))
+       `(notify-repeat ,(* 60 (string->number minutes))
+                       ,(substring command (string-length full-match-string)))]
+      [(pregexp "^notify " (list match-string))
+       `(notify ,(substring command (string-length match-string)))]
+      [else (error 'bad-command)]))
+
+  (define item (list epoch-time command-parse))
+
+  (define-values (in out)
+    (unix-socket-connect socket))
+
+  (fprintf out "~s" item)
+  (flush-output out)
+  (close-output-port out)
+  (define server-response (read in))
+  (close-input-port in)
+  (printf "~s\n" server-response)
+  (exit 0))
+
+(define (cli-main)
+  (define-values (mode socket command time)
+    (let ([-mode #f]
+          [-socket #f]
+          [-command #f]
+          [-time #f])
+      (command-line
+       #:once-each
+       [("--server") socket "run server" (begin (set! -mode 'server)
+                                                (set! -socket socket))]
+       [("--client") socket "run client" (begin (set! -mode 'client)
+                                                (set! -socket socket))]
+       [("--command") cmd "command for client to run" (set! -command cmd)]
+       [("--time") time "clock time (24h) or minutes in future eg. 30m"
+        (set! -time time)]
+       #:args ()
+       (values -mode -socket -command -time))))
+  (with-handlers ([(λ(e) #t) (λ(e)
+                               (when (procedure? cleanup-handler)
+                                 (cleanup-handler))
+                               (raise e))])
+    (match mode
+      ['server
+       (when (or command time)
+         (error "server mode must not have a command or time specified"))
+       (server-main socket)]
+      ['client (client-main socket command time)]
+      [else (error "must run with either --server or --client flags\n")])))
+
+(module+ main
+  (cli-main))

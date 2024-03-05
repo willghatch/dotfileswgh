@@ -1,0 +1,14 @@
+#!/usr/bin/env bash
+
+if [[ "$@" =~ "--help" ]]; then
+  echo usage: <number-of-minutes> message ...
+  exit 1
+fi
+
+socket=/tmp/notification-loop-socket
+
+minutes="$1"
+shift
+message="$(echo $@)"
+
+notification-loop --client $socket --time "${minutes}" --command "notify $message"

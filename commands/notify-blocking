@@ -1,0 +1,9 @@
+#!/usr/bin/env bash
+
+if [[ $(uname) = "Darwin" ]]; then
+  exec notify-blocking-macos "$@"
+fi
+
+echo "TODO - implement notify-blocking-linux"
+exit 1
+exec notify-blocking-linux "$@"

@@ -1,6 +1,8 @@
 #!/usr/bin/env bash
 
 if [[ $(uname) = "Darwin" ]]; then
-  exec notify-macos "$@"
+  notify-blocking-macos "$@" &
+  disown
+  exit 0
 fi
 exec notify-linux "$@"

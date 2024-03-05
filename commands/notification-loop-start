@@ -1,0 +1,8 @@
+#!/usr/bin/env bash
+
+socket=/tmp/notification-loop-socket
+
+notification-loop --server $socket &
+sleep 1
+notification-loop --client $socket --time 20m --command "notify-repeat 20m 20-20-20 eye strain time"
+
