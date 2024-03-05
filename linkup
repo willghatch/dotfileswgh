@@ -3,6 +3,9 @@
 # Script to put symlinks for dotfiles
 # assumes my dotfiles git repo is at $HOME/dotfileswgh
 
+DOTFILESWGH=$HOME/dotfileswgh
+cd $DOTFILESWGH
+
 dostuff() {
     stow --no-folding --restow homedir
     # Make sundry directories and files so things (especially vim) don't complain
