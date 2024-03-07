@@ -147,6 +147,7 @@
        [(list 'notify-repeat seconds message)
         (process-item `(time (notify-repeat ,seconds ,message #f)))]
        [(list 'notify-repeat seconds message previous)
+        ;; TODO - on MacOS this is working when the screen is awake, but if I lock the screen then it kills the notification processes without closing the windows, so this keeps waking up and spawning a new window (with popunder...), then the first notification after I unlock the screen makes all of them pop up.
         (define thread-for-next-repeat-to-check
           (if (and (thread? previous)
                    (thread-running? previous))
