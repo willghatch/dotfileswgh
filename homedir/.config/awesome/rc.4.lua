@@ -623,6 +623,9 @@ globalkeys = awful.util.table.join(
               {description = "input unicode", group = "launcher"}),
     awful.key({            }, "XF86DOS", mkspawn({"vlaunch", "unicode"}),
               {description = "input unicode", group = "launcher"}),
+    -- no mods easy key to turn on Hatchak
+    awful.key({            }, "Pause", mkspawn({"hkk"})),
+
     awful.key({ }, "XF86MonBrightnessDown", mkspawn({"state", "backlight", "dec"}),
               {description = "bright down", group = "launcher"}),
     awful.key({ }, "XF86MonBrightnessUp", mkspawn({"state", "backlight", "inc"}),
