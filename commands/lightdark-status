@@ -31,7 +31,7 @@ macos-update(){
     #osascript -e 'tell app "System Events" to tell appearance preferences to set dark mode to not dark mode'
 
     # set iterm2 style
-    iterm2-set-profile.py "$iterm2Style"
+    $DOTFILESWGH/dotlocal/iterm2-python3-venv/bin/python $DOTFILESWGH/commands/iterm2-set-profile.py "$iterm2Style"
 }
 linux-update(){
     # $1 is either "light" or "dark"
