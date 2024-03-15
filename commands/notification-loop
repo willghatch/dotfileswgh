@@ -74,7 +74,12 @@
 
 (define (exec-loop)
   (define (loop)
-    (process-queue)
+    (unless (and (equal? (system-type 'os) 'macosx)
+                 (equal? #{macos-screen-lock-state.sh} "locked"))
+      ;; If MacOS is locked, the tracking threads die and the notifications pop
+      ;; under other windows, both bad behaviors.  So just don't process anything
+      ;; until the screen is awake again.
+      (process-queue))
     (sleep sleep-time)
     (loop))
   (loop))
