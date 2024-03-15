@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 if [[ "$@" =~ "--help" ]]; then
-  echo usage: <number-of-minutes> message ...
+  echo "usage: <number-of-minutes> message ..."
   exit 1
 fi
 
