@@ -11,13 +11,10 @@
  )
 
 #|
-* want a timed wait loop, wake up every ~1m
-* have a priority queue of events, each event has a unix time to be due
-* on wake, check first event to see if it's due (due time <= current time)
-* events launch notifications as well as schedule future events (eg. re-schedule the next notification when running)
-* wrap some notification functionality in a way to NOT re-notify if previous notification is still up -- have a way when event runs to check if the previous notification has been dismissed.  Eg. maybe make a notify-blocking script.
-* run loop in one thread, have another thread listening to a unix socket for messages
-* write a client that parses times both in terms of HH:MM and in terms of Xm, with a message to send
+Server and client for setting single-shot or recurring desktop notifications.
+
+TODO - Maybe play sounds.  Eg. can use espeak and say commands to speak text, maybe check time to not play sound at night.
+TODO - maybe add extra optional logic to recurring events.  Eg. I would like to make an event that fires every X minutes if I don't have a notification enqueued to time a particular task, to remind myself to set a time box.
 |#
 
 (define sleep-time 30) ;; in terms of seconds
