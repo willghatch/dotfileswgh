@@ -16,11 +16,11 @@ end
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 
-
-
-
-config.font = wezterm.font "Deja Vu Sans Mono"
-
+function is_macos()
+  -- The common triples for MacOS are aarch64-apple-darwin
+  -- and x86_64-apple-darwin
+  return wezterm.target_triple:find "darwin"
+end
 
 config.enable_scroll_bar=true
 config.hide_tab_bar_if_only_one_tab = true
@@ -30,17 +30,12 @@ config.hide_tab_bar_if_only_one_tab = true
 config.enable_csi_u_key_encoding = false
 
 
-local unameProc = io.popen("uname")
-local unameStr = unameProc:read("*a")
-unameProc:close()
-if (unameStr == "Darwin\n") then
-  -- TODO - I can't seem to get any font to look non-terrible on Wezterm on MacOS.
-  config.font = wezterm.font("Monaco"
-                             --, {weight = "Thin"}
-  )
-  --config.font = wezterm.font "Menlo"
-  --config.font = wezterm.font "DejaVu Sans Mono"
+config.font = wezterm.font "Deja Vu Sans Mono"
+if is_macos() then
+  config.font = wezterm.font("Monaco")
+  --config.font = wezterm.font("Monaco", {weight = "Thin"})
 end
+
 
 -- Color scheme
 config.color_schemes = {
@@ -139,10 +134,12 @@ end
 
 -- This code is based on code from the wezterm docs.
 function get_appearance()
-  -- TODO - this doesn't seem to be working.
-  --if wezterm.gui then
-  --   return wezterm.gui.get_appearance()
-  --end
+  if wezterm.gui then
+    -- TODO - this doesn't seem to be working on Linux.
+    if is_macos() then
+      return wezterm.gui.get_appearance()
+    end
+  end
   return get_appearance_from_lightdark()
 end
 
