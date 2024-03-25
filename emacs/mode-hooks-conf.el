@@ -84,6 +84,9 @@
             ))
 
 
+(add-hook 'lua-mode-hook
+          (lambda ()
+            (setq lua-indent-level 2)))
 
 (add-hook 'python-mode-hook
           (lambda ()

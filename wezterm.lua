@@ -72,24 +72,24 @@ config.color_schemes = {
     --split = '#444444',
 
     ansi = {
-       'black',
-       'maroon',
-       'green',
-       'olive',
-       "#184eb2", --'navy',
-       'purple',
-       'teal',
-       'silver',
+      'black',
+      'maroon',
+      'green',
+      'olive',
+      "#184eb2", --'navy',
+      'purple',
+      'teal',
+      'silver',
     },
     brights = {
-       'grey',
-       'red',
-       'lime',
-       'yellow',
-       "#5286fd", --'blue',
-       'fuchsia',
-       'aqua',
-       'white',
+      'grey',
+      'red',
+      'lime',
+      'yellow',
+      "#5286fd", --'blue',
+      'fuchsia',
+      'aqua',
+      'white',
     },
 
     -- Arbitrary colors of the palette in the range from 16 to 255
@@ -123,19 +123,38 @@ config.color_schemes = {
   },
 }
 
-config.color_scheme = "Solarized Dark Higher Contrast"
-local ldStatusProc = io.popen("lightdark-status")
-local ldStatus = ldStatusProc:read("*a")
-ldStatusProc:close()
-if (ldStatus == "light\n") then
-   config.color_scheme = "Solarized Light (Gogh)"
-elseif (ldStatus == "dark\n") then
-   --config.color_scheme = "Dark Pastel"
-   config.color_scheme = "wgh-dark"
-else
-   config.color_scheme = "wgh-dark"
-   --config.color_scheme = "Batman"
+
+function get_appearance_from_lightdark()
+  local ldStatusProc = io.popen("lightdark-status")
+  local ldStatus = ldStatusProc:read("*a")
+  ldStatusProc:close()
+  if (ldStatus == "light\n") then
+    return "Light"
+  elseif (ldStatus == "dark\n") then
+    return "Dark"
+  else
+    return "Dark"
+  end
 end
+
+-- This code is based on code from the wezterm docs.
+function get_appearance()
+  -- TODO - this doesn't seem to be working.
+  --if wezterm.gui then
+  --   return wezterm.gui.get_appearance()
+  --end
+  return get_appearance_from_lightdark()
+end
+
+function scheme_for_appearance(appearance)
+  if appearance:find "Dark" then
+    return "wgh-dark"
+  else
+    return "Solarized Light (Gogh)"
+  end
+end
+
+config.color_scheme = scheme_for_appearance(get_appearance())
 
 -- and finally, return the configuration to wezterm
 return config
