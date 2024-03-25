@@ -1,0 +1,2 @@
+#!/bin/sh
+exec tm select-layout even-horizontal
