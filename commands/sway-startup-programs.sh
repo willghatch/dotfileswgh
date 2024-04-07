@@ -1,5 +1,6 @@
 #!/usr/bin/env bash
 
+
 # This is executed at the end of sway configuration.
 # Sway should be launched in some way such that it already has env-more sourced before launch.
 #source $DOTFILESWGH/env-more.sh

@@ -2,7 +2,8 @@
 
 if [ -z "$XSESSION_COMMON_RUN_P" ]; then
 
-  source $DOTFILESWGH/env-more.sh
+  # TODO - maybe put guards on env-more to not re-source it.
+  #source $DOTFILESWGH/env-more.sh
 
 
   ###################################################
