@@ -12,7 +12,7 @@ swayidle -w \
 		resume 'swaymsg "output * power on"' \
 	before-sleep 'swaylock-configured' &
 
-waybar --config $DOTFILESWGH/waybar-config.jsonc --style $DOTFILESWGH/waybar-style.css
+waybar-configured &
 
 
 # TODO - touchpad tap-to-click and horizontal scroll?  At least tap-to-click I have in my nixos config now.

@@ -1,0 +1,2 @@
+#!/bin/sh
+exec waybar --config $DOTFILESWGH/waybar-config.jsonc --style $DOTFILESWGH/waybar-style.css
