@@ -1,0 +1,12 @@
+#!/usr/bin/env bash
+
+mkdir -p /tmp/$USER
+file=/tmp/$USER/current-mpc
+current=$(cat $file 2>/dev/null)
+current="${current:-mpcl}"
+
+if [[ -z "$1" ]]; then
+  echo $current
+else
+  echo "$1" > $file
+fi
