@@ -12,7 +12,10 @@ set $sh1 Shift
 set $sh2 Mod5
 set $sh4 Mod3
 
+# can get input list from swaymsg -t get_inputs
 input * xkb_file "~/dotfileswgh/external/misc/hatchak/xkb/hatchak-single-file.xkb"
+# TODO - also check out seats, eg. config to hide the cursor is under seat config.
+# TODO - I think modern sway and libxkbcommon can read normal xkb config files when they are in XDG_CONFIG_HOME, and I should try setting it up that way.
 
 
 # Font for window titles. Will also be used by the bar unless a different font
@@ -33,26 +36,6 @@ font pango:monospace 8
 # Use Mouse+$mod to drag floating windows to their wanted position
 floating_modifier $mod
 
-# start a terminal
-bindsym $mod+Return exec vlaunch terminal
-bindsym $mod+$alt+Return exec vlaunch terminal2
-bindsym $mod+$ctl+Return exec vlaunch terminal3
-bindsym $mod+v exec vlaunch terminal
-bindsym $mod+$alt+v exec vlaunch terminal2
-bindsym $mod+s exec vlaunch terminal3
-bindsym $mod+$alt+s exec vlaunch terminal4
-bindsym $mod+r exec vlaunch launcher
-
-bindsym $mod+q exec swaylock -c 012323
-
-# xf86dos doesn't work...
-bindsym XF86DOS exec vlaunch unicode
-bindsym $mod+u exec vlaunch unicode
-
-bindsym $hyp+u exec vlaunch volup
-bindsym $hyp+d exec vlaunch voldown
-bindsym $hyp+m exec vlaunch volmute
-bindsym $hyp+g exec gajim-remote show_next_pending_event
 
 #bindsym $mod+c close
 bindsym $mod+c kill
@@ -78,13 +61,14 @@ bindsym $mod+$ctl+Space layout auto prev
 bindsym $mod+l resize shrink width 10 px or 10 ppt
 bindsym $mod+h resize grow width 10 px or 10 ppt
 
-# Increase/decrease number of master elements in auto layout
-bindsym $mod+$alt+h layout auto master inc 1
-bindsym $mod+$alt+l layout auto master inc -1
-
-# Increase/decrease number of slave element groups in auto layout
-bindsym $mod+$ctl+h layout auto ncol inc 1
-bindsym $mod+$ctl+l layout auto ncol inc -1
+# Alas!  Sway removed the master/stack layout a long time ago.  Sad.
+## Increase/decrease number of master elements in auto layout
+#bindsym $mod+$alt+h layout auto master inc 1
+#bindsym $mod+$alt+l layout auto master inc -1
+#
+## Increase/decrease number of slave element groups in auto layout
+#bindsym $mod+$ctl+h layout auto ncol inc 1
+#bindsym $mod+$ctl+l layout auto ncol inc -1
 
 # change focus
 bindsym $mod+j focus next
@@ -109,7 +93,6 @@ bindsym $mod+$alt+k move prev
 # split in vertical orientation
 #bindsym $mod+v split v
 
-bindsym $mod+g exec --no-startup-id i3-make-empty-workspace.sh
 
 # enter fullscreen mode for the focused container
 bindsym $mod+f fullscreen toggle
@@ -131,24 +114,86 @@ bindsym $mod+$alt+f focus mode_toggle
 # focus the child container
 #bindsym $mod+d focus child
 
+####### Workspaces
+# Workspaces auto-close when they are empty and you move out of them, and they “aren't accepting new window management features”, so they won't make it an option to keep empty workspaces.
+# Workspaces are added to the current output with `workspace <name>`, and this script just makes a new number each time.
+bindsym $mod+g exec --no-startup-id i3-make-numbered-workspace.sh
+bindsym $mod+$alt+g exec --no-startup-id i3-make-numbered-workspace.sh vlaunch terminal
+bindsym $mod+$ctl+g exec --no-startup-id i3-make-numbered-workspace.sh vlaunch launcher
 # switch to workspace
 bindsym $mod+w workspace next_on_output
 bindsym $mod+b workspace prev_on_output
-bindsym $mod+Mod1+w move window to workspace next_on_output; workspace next_on_output
-bindsym $mod+Mod1+b move window to workspace prev_on_output; workspace prev_on_output
+bindsym $mod+$alt+w move window to workspace next_on_output; workspace next_on_output
+bindsym $mod+$alt+b move window to workspace prev_on_output; workspace prev_on_output
 
 bindsym $mod+n focus output right
 bindsym $mod+p focus output left
-bindsym $mod+Mod1+n move window to output right; focus output right
-bindsym $mod+Mod1+p move window to output left; focus output left
+bindsym $mod+$alt+n move window to output right; focus output right
+bindsym $mod+$alt+p move window to output left; focus output left
+bindsym $mod+$ctl+n move workspace to output right;
+bindsym $mod+$ctl+p move workspace to output right;
+
 
 # reload the configuration file
-bindsym $mod+Mod1+r reload
+bindsym $mod+$alt+r reload
 # restart i3 inplace (preserves your layout/session, can be used to upgrade i3)
-bindsym $mod+Shift+r restart
+bindsym $mod+$sh1+r restart
 # exit i3 (logs you out of your X session)
 #bindsym $mod+Shift+period exec "i3-nagbar -t warning -m 'You pressed the exit shortcut. Do you really want to exit i3? This will end your X session.' -b 'Yes, exit i3' 'i3-msg exit'"
 bindsym $mod+$alt+q exit
+
+bindsym $mod+q exec swaylock-configured
+
+####### misc bindings
+
+# start a terminal
+bindsym $mod+Return exec vlaunch terminal
+bindsym $mod+$alt+Return exec vlaunch terminal2
+bindsym $mod+$ctl+Return exec vlaunch terminal3
+bindsym $mod+v exec vlaunch terminal
+bindsym $mod+$alt+v exec vlaunch terminal2
+bindsym $mod+s exec vlaunch terminal3
+bindsym $mod+$alt+s exec vlaunch terminal4
+bindsym $mod+r exec vlaunch launcher
+
+
+# xf86dos doesn't work...
+bindsym XF86DOS exec vlaunch unicode
+bindsym $mod+u exec vlaunch unicode
+
+#bindsym $hyp+u exec vlaunch volup
+#bindsym $hyp+d exec vlaunch voldown
+#bindsym $hyp+m exec vlaunch volmute
+#bindsym $hyp+g exec gajim-remote show_next_pending_event
+
+bindsym $hyp+l exec lightdark-status toggle
+bindsym $hyp+s exec vlaunch screenshot
+bindsym $hyp+t exec dunstctl close-all
+bindsym $hyp+y exec dunstctl context
+bindsym $hyp+h exec dunstctl history-pop
+
+bindsym $hyp+m exec state mute toggle
+bindsym XF86AudioMute exec state mute toggle
+bindsym $hyp+u exec state volume inc
+bindsym XF86AudioRaiseVolume exec state volume inc
+bindsym $hyp+d exec state volume dec
+bindsym XF86AudioLowerVolume exec state volume dec
+
+bindsym $mod+$hyp+t exec vlaunch musictoggle
+bindsym XF86AudioPlay exec vlaunch musictoggle
+bindsym $mod+$hyp+s exec vlaunch musicpause
+bindsym XF86AudioPause exec vlaunch musicpause
+bindsym $mod+$hyp+n exec vlaunch musicnext
+bindsym XF86AudioNext exec vlaunch musicnext
+bindsym $mod+$hyp+p exec vlaunch musicprev
+bindsym XF86AudioPrev exec vlaunch musicprev
+
+bindsym XF86MonBrightnessDown exec state backlight dec
+bindsym XF86MonBrightnessUp exec state backlight inc
+
+
+
+
 
 ## resize window (you can also use the mouse for that)
 #mode "resize" {
@@ -180,20 +225,27 @@ bindsym $mod+$alt+q exit
 # rules
 for_window [title="bashrun"] floating enable
 for_window [title="the-unicoder"] floating enable
+for_window [title="Surge XT"] floating enable
 
-# Start i3bar to display a workspace bar (plus the system information i3status
-# finds out, if available)
-bar {
-        #status_command i3status -c ~/dotfileswgh/config/sway/i3status.conf
-        tray_output primary
-        position top
-}
 
 #new_window pixel 1
 
-# start graphical programs -- there is no xinitrc with wayland
-#exec --no-startup-id sway-startup-programs.sh
-
-#workspace_layout auto left
+#workspace_layout can be default/stacking/tabbed, it's the initial layout for an empty workspace
 workspace_layout default
 
+# focus_follows_mouse can be yes/no/always
+focus_follows_mouse yes
+
+# xwayland can be enable/disable/force (where force eagerly initializes it)
+xwayland enable
+
+
+# TODO - figure out helper program for better layouts
+# TODO - maybe make alias wrappers that detect whether I'm in X11 or Wayland for various utilities, eg. abstracting arandr and wdisplays.
+
+
+
+exec --no-startup-id sway-startup-programs.sh
+
+# Might as well start with a terminal, since I'm going to launch one anyway.
+exec vlaunch terminal

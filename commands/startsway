@@ -1,8 +1,8 @@
 #!/usr/bin/env bash
 
 # get keyboard layout
-export XKB_DEFAULT_LAYOUT=hatchak,us
-export XKB_DEFAULT_OPTIONS=grp:alt_shift_toggle
+#export XKB_DEFAULT_LAYOUT=hatchak,us
+#export XKB_DEFAULT_OPTIONS=grp:alt_shift_toggle
 
 exec sway
 

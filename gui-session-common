@@ -1,0 +1,61 @@
+#!/bin/sh
+
+if [ -z "$GUI_SESSION_COMMON_RUN_P" ]; then
+  #  Needs to have env-more sourced before this, but it should be on all paths.
+
+  busdir=$XDG_RUNTIME_DIR/dbus-session-bus-addresses/
+  mkdir -p $busdir
+  echo "${DBUS_SESSION_BUS_ADDRESS}" >"$busdir/tty_${LOGIN_TTY}"
+
+
+  ### light/dark theming
+  # The default is dark if nothing is written to the status file, so this will default dark without writing anything.
+  # This also runs xrdb for xresources.
+  lightdark-status soft-update
+
+
+  # Be sure I have a decent terminfo available
+  tic $DOTFILESWGH/xterm-256color-italic.terminfo
+
+
+
+  ### Server or background programs
+
+  # Notifications
+  dunst &
+  dunst-lock-monitor &
+
+  mpd &
+
+
+  nm-applet &
+  #blueman-applet &
+  blueberry-tray &
+
+  #unicoder_socket="/tmp/the-unicoder_${USER}_${DISPLAY/:/}"
+  unicoder_socket="5782"
+  #rm -f "$unicoder_socket"
+  racket -l the-unicoder -- --server --port "$unicoder_socket" &
+
+  #libnotifylogger.py $HOME/.cache/notifications.log &
+
+  # start kdeconnect daemon, let my phone drive
+  #kdeconnect-cli
+
+  if [ -e "$DOTFILESWGH/dotlocal/e-is-premacs" ]; then
+    premacs-init &
+  fi
+
+
+  if [ -f $DOTFILESWGH/pri/gui-session-rc ]; then
+      source $DOTFILESWGH/pri/gui-session-rc
+  fi
+  if [ -f $HOME/rootgit-dotfiles/gui-session-rc ]; then
+      source $HOME/rootgit-dotfiles/gui-session-rc
+  fi
+  if [ -f $DOTFILESWGH/dotlocal/gui-session-rc ]; then
+      source $DOTFILESWGH/dotlocal/gui-session-rc
+  fi
+
+fi
+export GUI_SESSION_COMMON_RUN_P=true

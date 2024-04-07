@@ -4,13 +4,12 @@ if [ -z "$XSESSION_COMMON_RUN_P" ]; then
 
   source $DOTFILESWGH/env-more.sh
 
-  busdir=$XDG_RUNTIME_DIR/dbus-session-bus-addresses/
-  mkdir -p $busdir
-  echo "${DBUS_SESSION_BUS_ADDRESS}" >"$busdir/tty_${LOGIN_TTY}"
+
+  ###################################################
+
 
   # Gnome programs can dynamically switch between light and dark if an xsettings daemon is running.
-  # By default in gnome this is gsd-xsettings, but xsettingsd can be used with other window managers.
-  # I'm not sure how to do this on wayland.
+  # By default in gnome this is gsd-xsettings, but xsettingsd can be used with other X11 window managers.
   xsettingsd-wrapper --start &
 
   ### light/dark theming
@@ -20,11 +19,11 @@ if [ -z "$XSESSION_COMMON_RUN_P" ]; then
 
 
   # hack to fix pulseaudio, which doesn't seem to work for some reason...
-  {
-    killall pulseaudio
-    sleep 4
-    pulseaudio
-  } &
+  #{
+  #  killall pulseaudio
+  #  sleep 4
+  #  pulseaudio
+  #} &
 
   # get keyboard layout
   hkk
@@ -55,50 +54,26 @@ if [ -z "$XSESSION_COMMON_RUN_P" ]; then
 
   #### touchpad config
   # turn off tap-to-click
-  synclient maxtaptime=0
+  #synclient maxtaptime=0
   # allow horizontal two-finger scroll
-  synclient HorizTwoFingerScroll=1
-
-
-  # Be sure I have a decent terminfo available
-  tic $DOTFILESWGH/xterm-256color-italic.terminfo
-
-  # Notifications
-  dunst &
-  dunst-lock-monitor &
-
-  mpd &
+  #synclient HorizTwoFingerScroll=1
 
   # Compositing for eg. transparent terminals
   #xcompmgr &
-  picom &
+  #picom &
 
   # application tray
   # good trayer command
   #trayer --edge top --align right --width 10 --height 12 --transparent true --alpha 255 &
-  nm-applet &
-  #blueman-applet &
-  blueberry-tray &
-
-  #unicoder_socket="/tmp/the-unicoder_${USER}_${DISPLAY/:/}"
-  unicoder_socket="5782"
-  #rm -f "$unicoder_socket"
-  racket -l the-unicoder -- --server --port "$unicoder_socket" &
-
-  #libnotifylogger.py $HOME/.cache/notifications.log &
 
   # Watch keyboard state for awesome
   $DOTFILESWGH/config/awesome/kbd-state-mon.sh &
 
-  # start kdeconnect daemon, let my phone drive
-  #kdeconnect-cli
-
   # move the mouse out of the middle of the screen so it won't switch windows for no reason
   xdotool mousemove 100 100
 
-  if [ -e "$DOTFILESWGH/dotlocal/e-is-premacs" ]; then
-    premacs-init &
-  fi
+
+  source $DOTFILESWGH/gui-session-common
 
 
   if [ -f $DOTFILESWGH/pri/xinitrc ]; then

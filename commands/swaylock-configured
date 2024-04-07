@@ -1,0 +1,2 @@
+#!/bin/sh
+exec swaylock --ignore-empty-password --indicator-caps-lock --show-failed-attempts --show-keyboard-layout --color 012323

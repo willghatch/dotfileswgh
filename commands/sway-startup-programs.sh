@@ -1,55 +1,48 @@
 #!/usr/bin/env bash
 
-# xinitrc replacement for sway, essentially
+# This is executed at the end of sway configuration.
+# Sway should be launched in some way such that it already has env-more sourced before launch.
+#source $DOTFILESWGH/env-more.sh
 
-pulseaudio &
+# TODO - idle management - how to toggle this off/on?  Eg. if I'm watching a movie I don't want the screen to blank.  Probably I need to wrap this in a script and turn it on and off, or check a state file, or something.
+# swayidle *should* be toggleable on my waybar config
+swayidle -w \
+	timeout 300 'swaylock-configured' \
+	timeout 600 'swaymsg "output * power off"' \
+		resume 'swaymsg "output * power on"' \
+	before-sleep 'swaylock-configured' &
 
-# merge xresources first, so other programs in this (xscreensaver) can get settings
-#xrdb $DOTFILESWGH/Xresources
-lightdark-status soft-update
-
-# The keyboard layout setting via environment variable leaves me with some
-# weirdness for some programs that this solves.
-# I really don't understand what's going on.
-# It seems like some programs are still looking at some sort of X config
-# that wayland doesn't know about.  Ideally the commands used to set the keyboard
-# state would just work for both.
-hkk
-# I don't know if there is a way to do this and make it actually work on wayland.
-#xkbset sticky -twokey latchlock
+waybar --config $DOTFILESWGH/waybar-config.jsonc --style $DOTFILESWGH/waybar-style.css
 
 
-# TODO - something like this
-# Unclutter hides the mouse pointer after the given number of seconds
-#unclutter -idle 5 &
+# TODO - touchpad tap-to-click and horizontal scroll?  At least tap-to-click I have in my nixos config now.
+
+# TODO - keynav replacement?
+# TODO - unclutter replacement (hide mouse cursor)
+# TODO - something to detect and set monitor config, or apply the default for this machine, or something
+# TODO - wallpaper set random
+# TODO - set initial mouse cursor location?
 
 
-# TODO - how to set monitors?  By default it seems to do a good job, but if I want
-# something non-default or dynamic what do I do?
+## --- This comment was from probably 2017, and is probably out of date.  But I'll leave it here for easy reference if I notice anything fishy.
+## The keyboard layout setting via environment variable leaves me with some
+## weirdness for some programs that this solves.
+## I really don't understand what's going on.
+## It seems like some programs are still looking at some sort of X config
+## that wayland doesn't know about.  Ideally the commands used to set the keyboard
+## state would just work for both.
+#hkk
 
-# TODO - dynamic wallpaper setting in sway
+if [ -f $DOTFILESWGH/pri/sway-startup-rc ]; then
+    source $DOTFILESWGH/pri/sway-startup-rc
+fi
+if [ -f $HOME/rootgit-dotfiles/sway-startup-rc ]; then
+    source $HOME/rootgit-dotfiles/sway-startup-rc
+fi
+if [ -f $DOTFILESWGH/dotlocal/sway-startup-rc ]; then
+    source $DOTFILESWGH/dotlocal/sway-startup-rc
+fi
 
-# TODO - how to do this?
-#### touchpad config
-# turn off tap-to-click
-#synclient maxtaptime=0
-# allow horizontal two-finger scroll
-#synclient HorizTwoFingerScroll=1
 
-# Notifications
-dunst &
-$DOTFILESWGH/external/misc/libnotifylog/libnotifylogger.py $HOME/.cache/notifications.log &
-
-# music!
-mpd &
-
-# tray apps
-# TODO - tray support doesn't exist yet
-#nm-applet &
-#blueman-applet &
-
-# The unicoder doesn't work on wayland right now.  But eventually I'll fix that.
-unicoder_socket="/tmp/the-unicoder_${USER}_${DISPLAY/:/}"
-rm -f "$unicoder_socket"
-the-unicoder --server --path "$unicoder_socket" &
+source $DOTFILESWGH/gui-session-common
 

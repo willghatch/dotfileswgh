@@ -40,7 +40,11 @@ linux-update(){
     # The well-supported dark/light themes are Yaru-dark and Yaru-light
     #gsettings set org.gnome.desktop.interface gtk-theme Yaru-$1
     # Alternatively, we can set that theme using xsettings instead.
-    xsettingsd-wrapper
+    if [[ -n "$WAYLAND_DISPLAY" ]]; then
+        gsettings set org.gnome.desktop.interface gtk-theme "Yaru-${1}"
+    else
+        xsettingsd-wrapper
+    fi
     cat "$DOTFILESWGH/xresources-general" "$DOTFILESWGH/xresources-${1}" | xrdb
 }
 
