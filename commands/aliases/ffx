@@ -7,6 +7,12 @@ fi
 prof="$1"
 shift
 
+# MOZ_ENABLE_WAYLAND seems to be on by default, setting it to 0 forces it to run through xwayland.  In xwayland it doesn't pick up styling properly, but it doesn't crash every time I plug in/out a USB device.  I've read other opinions that Firefox isn't very stable on Wayland as well.
+#if [[ -n "$WAYLAND_DISPLAY" ]]; then
+#    export MOZ_ENABLE_WAYLAND=0
+#fi
+
+
 FFX=${FFX:-firefox}
 profile="$DOTFILESWGH/dotlocal/firefox-profiles/firefox-profile_$prof"
 mkdir -p "$profile"
