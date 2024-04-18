@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/usr/bin/env bash
 
 # Yeah, ripgrep is normally `rg`.  But I want my
 # aliases to be related to the function I want to perform.
@@ -13,4 +13,14 @@
 # those short names as aliases.  So with NixOS I can easily
 # give ripgrep a proper command name.  But I do want a short
 # alias... just one of my choosing.
-ripgrep "$@"
+if type -P ripgrep; then
+    exec ripgrep "$@"
+fi
+if type -P rg; then
+    exec rg "$@"
+fi
+if type -P ag; then
+    exec ag "$@"
+fi
+echo "ripgrep, rg, and ag not found, maybe just use grep"
+exit 1
