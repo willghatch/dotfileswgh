@@ -13,13 +13,13 @@
 # those short names as aliases.  So with NixOS I can easily
 # give ripgrep a proper command name.  But I do want a short
 # alias... just one of my choosing.
-if type -P ripgrep; then
+if type -P ripgrep >/dev/null 2>&1; then
     exec ripgrep "$@"
 fi
-if type -P rg; then
+if type -P rg >/dev/null 2>&1; then
     exec rg "$@"
 fi
-if type -P ag; then
+if type -P ag >/dev/null 2>&1; then
     exec ag "$@"
 fi
 echo "ripgrep, rg, and ag not found, maybe just use grep"
