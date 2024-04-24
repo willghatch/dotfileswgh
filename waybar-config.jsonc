@@ -37,7 +37,7 @@
     "memory",
     "cpu",
     "temperature",
-    //"backlight",
+    "backlight",
     //"keyboard-state",
     //"sway/language",
     "tray",
@@ -134,7 +134,8 @@
     "tooltip": false
   },
   "memory": {
-    "format": "{}% "
+    //"format": "{}% "
+    "format": "{}% 🐏"
   },
   "temperature": {
     // "thermal-zone": 2,
@@ -145,9 +146,12 @@
     "format-icons": ["", "", ""]
   },
   "backlight": {
-    // "device": "acpi_video1",
+    "device": "acpi_video0",
     "format": "{percent}% {icon}",
-    "format-icons": ["", "", "", "", "", "", "", "", ""]
+    "format-icons": ["💡"],
+    "on-scroll-up": "state backlight inc",
+    "on-scroll-down": "state backlight dec",
+    //"format-icons": ["", "", "", "", "", "", "", "", ""]
   },
   "battery": {
     "states": {
@@ -157,8 +161,8 @@
     },
     "format": "{capacity}% {icon}",
     "format-full": "{capacity}% {icon}",
-    "format-charging": "{capacity}% ",
-    "format-plugged": "{capacity}% ",
+    "format-charging": "{capacity}% +",
+    "format-plugged": "{capacity}% ≈",
     "format-alt": "{time} {icon}",
     // "format-good": "", // An empty format will hide the module
     // "format-full": "",
