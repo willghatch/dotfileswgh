@@ -1,0 +1,5 @@
+#!/bin/sh
+# The delta diff viewer is cool, but I need to wrap it to theme properly.
+flag="$(lightdark-status)"
+flag="--${flag:-dark}"
+exec delta --true-color always --light "$@"

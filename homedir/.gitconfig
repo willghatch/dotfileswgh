@@ -3,6 +3,15 @@
 	name = William G Hatch
 [core]
 	#excludesfile = ~/dotfileswgh/gitignore_global
+  # I don't like setting this globally that much.  I've added a wrapper script alias for calling git diff with delta instead.
+  #pager = delta-wrap
+[interactive]
+  #diffFilter = delta-wrap --color-only
+[delta]
+  navigate = true
+  side-by-side = true
+[diff]
+  colorMoved = dimmed-zebra
 [push]
 	default = current
 [alias]
