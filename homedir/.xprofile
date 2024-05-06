@@ -23,6 +23,10 @@ elif [ "$XDG_SESSION_TYPE" = "wayland" ]; then
         # maybe I broke something and now I need to manually start sway?  If I start sway here manually, it launches, then when I quit it... it launches again, because the display manager launches it too.  But if I do nothing here, it just hangs for a few seconds and then the display manager comes back.
         # Try just sleeping for a bit to see if it's just some race condition.  This is probably the problem, because this sleep call is fixing things...
         sleep 2
+    elif [ "$XDG_SESSION_DESKTOP" = "hyprland" ]; then
+        echo "about to start hyprland..."
+        sleep 2
+    fi
     fi
 else
     source $DOTFILESWGH/xsession-common

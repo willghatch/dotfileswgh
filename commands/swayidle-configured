@@ -1,0 +1,15 @@
+#!/usr/bin/env bash
+
+monitorOff='swaymsg "output * power off"'
+monitorOn='swaymsg "output * power on"'
+if [[ -n "$HYPRLAND_INSTANCE_SIGNATURE" ]]; then
+  monitorOff='hyprctl dispatch dpms off'
+  monitorOn='hyprctl dispatch dpms on'
+fi
+
+
+exec swayidle -w \
+	timeout 600 'swaylock-configured' \
+	timeout 900 "$monitorOff" \
+		resume "$monitorOn" \
+	before-sleep 'swaylock-configured' &

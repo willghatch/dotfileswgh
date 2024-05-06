@@ -243,6 +243,10 @@ xwayland enable
 # TODO - figure out helper program for better layouts
 # TODO - maybe make alias wrappers that detect whether I'm in X11 or Wayland for various utilities, eg. abstracting arandr and wdisplays.
 
+# TODO - key binding for: move current window to new workspace
+# TODO - key binding for: move workspace left/right in workspace ordering
+# TODO - key binding for: next/prev window limited to the current workspace, if possible, maybe through a helper program that manages layout
+
 
 
 exec --no-startup-id sway-startup-programs.sh

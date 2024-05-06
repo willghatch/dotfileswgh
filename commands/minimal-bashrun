@@ -19,6 +19,9 @@ export HISTFILE=$HOME/.cache/minimal-bashrun-history
 
 #XTERM=lxterminal
 XTERM=xterm
+if [[ "$XDG_SESSION_TYPE" = wayland ]]; then
+    XTERM=foot
+fi
 
 if [[ "$(uname)" = Darwin ]]; then
     XTERM=alacritty
@@ -82,6 +85,10 @@ elif [ "$XTERM" == "mrxvt" ]; then
     $XTERM -name 'bashrun' \
     -title 'bashrun' \
     -geometry $GEOM +sb -ht \
+    -e sh -c "bash --rcfile $BASHRUNRC -i -t"
+elif [ "$XTERM" == "foot" ]; then
+    $XTERM --title 'bashrun' --app-id "bashrun"\
+    --window-size-chars $GEOM \
     -e sh -c "bash --rcfile $BASHRUNRC -i -t"
 else
     error "$XTERM is not supported. Please check $BASHRUNRC"
