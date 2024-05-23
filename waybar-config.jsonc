@@ -26,14 +26,21 @@
     ,"sway/scratchpad"
     ,"hyprland/workspaces"
     //,"custom/media"
-  ],
-  "modules-center": [
-    "sway/window"
+    ,"sway/window"
     ,"hyprland/window"
   ],
+  //"modules-center": [
+  //  //"sway/window"
+  //  //,"hyprland/window"
+  //],
   "modules-right": [
     "mpd",
     "idle_inhibitor",
+    // TODO - this systemd unit is in the docs but not on my local install, maybe it's in a newer release.
+    //"systemd-failed-units",
+    // TODO - try waybar-privacy, which shows an icon when there is screen recording or a microphone on
+    // TODO - make a custom waybar widget that shows current keyboard state
+    // TODO - maybe make a custom waybar widget that shows something about email?  I mostly ignore this widget that I made on awesome, but sometimes it's useful to notice mail in a folder I don't check much.
     "network",
     //"power-profiles-daemon",
     "memory",
@@ -82,7 +89,10 @@
   },
   "hyprland/window": {
     "separate-outputs": true
+    ,"format": "{class} • {title}"
+    // Format also has initialTitle and initialClass available
     ,"max-length": 200
+    ,"icon": true
   },
   "sway/mode": {
     "format": "<span style=\"italic\">{}</span>"
@@ -97,10 +107,13 @@
   // TODO - MPD - I want this, but I want it to use the current-mpc infrastructure I have if possible.
   "mpd": {
     //"format": "{stateIcon} {consumeIcon}{randomIcon}{repeatIcon}{singleIcon}{artist} - {album} - {title} ({elapsedTime:%M:%S}/{totalTime:%M:%S}) ⸨{songPosition}|{queueLength}⸩ {volume}%",
-    "format": "{stateIcon}{consumeIcon}{randomIcon}{repeatIcon}{singleIcon} {artist} - {album} - {title} ({elapsedTime:%M:%S}/{totalTime:%M:%S})",
+    "format": "{stateIcon}{consumeIcon}{randomIcon}{repeatIcon}{singleIcon}({elapsedTime:%M:%S}/{totalTime:%M:%S}) {artist} - {album} - {title}",
     "format-disconnected": "MPD Disconnected",
     "format-stopped": "{consumeIcon}{randomIcon}{repeatIcon}{singleIcon}Stopped ",
     "unknown-tag": "N/A",
+    "artist-len": 15,
+    "album-len": 12,
+    "title-len": 20,
     "interval": 5,
     "consume-icons": {
       "on": " "
@@ -132,6 +145,13 @@
       "deactivated": "SCS"
     }
   },
+  "systemd-failed-units": {
+	  "hide-on-ok": false,
+	  "format": "✗ {nr_failed}",
+	  "format-ok": "✓",
+	  //"system": true,
+	  //"user": false,
+  },
   "tray": {
     // "icon-size": 21,
     "spacing": 10
@@ -143,24 +163,24 @@
     "format": "{:%a, %Y-%m-%d %H:%M}"
   },
   "cpu": {
-    "format": "{usage}% ",
+    "format": "{usage:3}%",
     "tooltip": false
   },
   "memory": {
     //"format": "{}% "
-    "format": "{}% 🐏"
+    "format": "{:3}%🐏"
   },
   "temperature": {
     // "thermal-zone": 2,
     // "hwmon-path": "/sys/class/hwmon/hwmon2/temp1_input",
     "critical-threshold": 80,
-    // "format-critical": "{temperatureC}°C {icon}",
-    "format": "{temperatureC}°C {icon}",
+    // "format-critical": "{temperatureC}°C{icon}",
+    "format": "{temperatureC}°C{icon}",
     "format-icons": ["", "", ""]
   },
   "backlight": {
     "device": "acpi_video0",
-    "format": "{percent}% {icon}",
+    "format": "{percent}%{icon}",
     "format-icons": ["💡"],
     "on-scroll-up": "state backlight inc",
     "on-scroll-down": "state backlight dec",
@@ -172,11 +192,11 @@
       "warning": 30,
       "critical": 15
     },
-    "format": "{capacity}% {icon}",
-    "format-full": "{capacity}% {icon}",
-    "format-charging": "{capacity}% +",
-    "format-plugged": "{capacity}% ≈",
-    "format-alt": "{time} {icon}",
+    "format": "{capacity}%{icon}",
+    "format-full": "{capacity}%{icon}",
+    "format-charging": "{capacity}%+",
+    "format-plugged": "{capacity}%≈",
+    "format-alt": "{time}{icon}",
     // "format-good": "", // An empty format will hide the module
     // "format-full": "",
     "format-icons": ["", "", "", "", ""]
@@ -197,8 +217,8 @@
   },
   "network": {
     // "interface": "wlp2*", // (Optional) To force the use of this interface
-    "format-wifi": "{essid} ({signalStrength}%) ",
-    "format-ethernet": "{ipaddr}/{cidr} ",
+    "format-wifi": "{essid}({signalStrength}%)",
+    "format-ethernet": "{ipaddr}/{cidr}",
     "tooltip-format": "{ifname} via {gwaddr} ",
     "format-linked": "{ifname} (No IP) ",
     "format-disconnected": "Disconnected ⚠",
@@ -207,10 +227,10 @@
   "pulseaudio": {
     // "scroll-step": 1, // %, can be a float
     "format": "{volume}% {icon} {format_source}",
-    "format-bluetooth": "{volume}% {icon} {format_source}",
-    "format-bluetooth-muted": " {icon} {format_source}",
-    "format-muted": " {format_source}",
-    "format-source": "{volume}% ",
+    "format-bluetooth": "{volume}%{icon}{format_source}",
+    "format-bluetooth-muted": "{icon}{format_source}",
+    "format-muted": "{format_source}",
+    "format-source": "{volume}%",
     "format-source-muted": "",
     "format-icons": {
       "headphone": "",
