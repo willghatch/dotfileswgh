@@ -5,10 +5,9 @@
 // Note that the modules-left/center/right is where the modules are chosen and placed, then the rest is configuration for those modules.
 // So commenting out should basically just be done at the module inclusion level.
 
-// TODO - volume
-// TODO - mute status
-// TODO - ram
-// TODO - CPU load?
+// Reload config and style by sending SIGUSR2
+
+// TODO - volume with multiple sinks / sources
 // TODO - email count?
 // TODO - keyboard layout or other status?
 
@@ -35,6 +34,7 @@
   //],
   "modules-right": [
     "mpd",
+    "mpris",
     "idle_inhibitor",
     // TODO - this systemd unit is in the docs but not on my local install, maybe it's in a newer release.
     //"systemd-failed-units",
@@ -136,6 +136,20 @@
     "tooltip-format": "MPD (connected)",
     "tooltip-format-disconnected": "MPD (disconnected)"
   },
+  "mpris": {
+    "format": "{player_icon} {dynamic}",
+    "format-paused": "{status_icon} <i>{dynamic}</i>",
+    "dynamic-len": 40,
+    "player-icons": {
+      "default": "▶",
+      //"mpv": "🎵"
+    },
+    "status-icons": {
+      // paused, playing, stopped
+      "paused": "⏸"
+    },
+    // "ignored-players": ["firefox"]
+  },
   "idle_inhibitor": {
     "format": "{icon}",
     "format-icons": {
@@ -228,10 +242,10 @@
     // "scroll-step": 1, // %, can be a float
     "format": "{volume}% {icon} {format_source}",
     "format-bluetooth": "{volume}%{icon}{format_source}",
-    "format-bluetooth-muted": "{icon}{format_source}",
-    "format-muted": "{format_source}",
+    "format-bluetooth-muted": "🔇{icon}{format_source}",
+    "format-muted": "🔇{format_source}",
     "format-source": "{volume}%",
-    "format-source-muted": "",
+    "format-source-muted": "🔇",
     "format-icons": {
       "headphone": "",
       "hands-free": "",
