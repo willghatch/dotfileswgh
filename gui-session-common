@@ -26,6 +26,7 @@ if [ -z "$GUI_SESSION_COMMON_RUN_P" ]; then
   dunst-lock-monitor &
 
   mpd &
+  mpDris2 &
 
 
   nm-applet &

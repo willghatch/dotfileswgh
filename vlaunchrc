@@ -28,11 +28,19 @@ launcher=minimal-bashrun
 brightup="laptop-backlight +5"
 brightdown="laptop-backlight -5"
 
-musictoggle="mpcc toggle"
-musicpause="mpcc pause"
-musicplay="mpcc play"
-musicnext="mpcc next"
-musicprev="mpcc prev"
+#musictoggle="mpcc toggle"
+#musicpause="mpcc pause"
+#musicplay="mpcc play"
+#musicnext="mpcc next"
+#musicprev="mpcc prev"
+
+musictoggle="playerctl play-pause"
+musicpause="playerctl pause"
+musicpauseall="playerctl -a pause"
+musicplay="playerctl play"
+musicnext="playerctl next"
+musicprev="playerctl prev"
+# TODO - position +/- offset, it doesn't seem to be working for me right now with playerctl...
 
 if [ -f $DOTFILESWGH/dotlocal/vlaunchrc ]; then
     source $DOTFILESWGH/dotlocal/vlaunchrc
