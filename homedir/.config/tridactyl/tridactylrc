@@ -1,0 +1,7 @@
+" For now I'm not using the native extension.  I gave up on tridactyl years ago because it couldn't work on all pages, and eg. having the keys to switch tabs not work when I hit a tab for an extenion page or even not work until after the page is loaded just killed it.  But I'm sick of using the mouse on the web.  So for now I've decided I'm going to learn and use Firefox's bad and unconfigurable keyboard shortcuts for core functionality that doesn't work in the add-on, eg. changing tabs, but use tridactyl (or one of its competitors) for in-page navigation.  Tridactyl has some other rich features that mostly require the native extension, but it is an extra installation hurdle for special cases that I don't want to deal with right now.  I'll probably use it eventually, but for now I'll just write the few most critical bits of configuration that I want to steal from the creator's RC file.  I can manually run these on the few browser instances where I'm trying this.  But my old RC file has some good stuff too, so I should probably take the good parts from it at some point when I decide I want to use the native messenger again.
+
+" New reddit is bad
+autocmd DocStart ^http(s?)://www.reddit.com js tri.excmds.urlmodify("-t", "www", "old")
+
+" Comment toggler for Reddit, Hacker News and Lobste.rs
+bind ;c hint -Jc [class*="expand"],[class*="togg"],[class="comment_folder"]
