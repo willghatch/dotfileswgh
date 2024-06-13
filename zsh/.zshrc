@@ -484,6 +484,10 @@ bindkey -M filterselect "^[b" backward-word
 bindkey -M filterselect "^[f" backward-word
 bindkey -M filterselect "^[d" kill-word
 
+
+# Don't use rationalise-dot, the function to replace "..." with "../..", anymore.
+bindkey -M viins '.' self-insert
+
 if [[ -z "$USER" ]]; then
     USER="$(whoami)"
 fi
