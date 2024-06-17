@@ -33,7 +33,7 @@
   //  //,"hyprland/window"
   //],
   "modules-right": [
-    "mpd",
+    //"mpd",
     "mpris",
     "idle_inhibitor",
     // TODO - this systemd unit is in the docs but not on my local install, maybe it's in a newer release.
