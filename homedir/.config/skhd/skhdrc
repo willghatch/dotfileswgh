@@ -105,22 +105,9 @@
 #    "qutebrowser"
 # ]
 
-# open terminal, blazingly fast compared to iTerm/Hyper
-#cmd - return : /Applications/kitty.app/Contents/MacOS/kitty --single-instance -d ~
-#cmd + shift - v : /run/current-system/sw/bin/alacritty
-#cmd + shift - v : /Applications/iTerm.app/Contents/MacOS/iTerm2
-cmd + shift - v : /Users/wgh/dotfileswgh/commands/launch-iterm
-#cmd + alt + shift - v : /Applications/iTerm.app/Contents/MacOS/iTerm2
-#cmd + alt + shift - v : /run/current-system/sw/bin/alacritty
-cmd + alt + shift - v : /Users/wgh/dotfileswgh/commands/launch-iterm
 
-cmd + shift - r : /Users/wgh/dotfileswgh/commands/minimal-bashrun
+cmd + shift - v : /Users/wgh/dotfileswgh/commands/with-dotfileswgh-env launch-iterm
+cmd + alt + shift - v : /Users/wgh/dotfileswgh/commands/with-dotfileswgh-env launch-iterm
+cmd + shift - r : /Users/wgh/dotfileswgh/commands/with-dotfileswgh-env minimal-bashrun
+cmd + shift - u : /Users/wgh/dotfileswgh/commands/with-dotfileswgh-env vlaunch unicode
 
-# NOTE - requires racket to be symlinked here, the default path is something like /Applications/Racket\ v8.9/bin/racket, but that includes a version... so I'm symlinking the binary.
-cmd + shift - u : /Users/wgh/dotfileswgh/dotlocal/racket -l the-unicoder -- --client --port 5782
-
-# open qutebrowser
-#cmd + shift - return : ~/Scripts/qtb.sh
-
-# open mpv
-#cmd - m : open -na /Applications/mpv.app $(pbpaste)

@@ -1,0 +1,6 @@
+#!/usr/bin/env bash
+
+source $HOME/dotfileswgh/env-basic.sh
+source $HOME/dotfileswgh/env-more.sh
+
+exec "$@"
