@@ -17,6 +17,7 @@ terminal2="konsole-lightdark -e zsh"
 
 unicode="racket -l the-unicoder -- --client --port 5782"
 unicode_reload="racket -l the-unicoder -- --client --port 5782 --command reload"
+unicode_start="racket -l the-unicoder -- --server --port 5782"
 #unicode_func(){
 #    echo 'prompt' | socat - UNIX-CONNECT:/tmp/the-unicoder_${USER}_${DISPLAY/:/}
 #}

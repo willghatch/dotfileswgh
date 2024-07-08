@@ -116,6 +116,9 @@ cmd + alt + shift - v : /Users/wgh/dotfileswgh/commands/launch-iterm
 
 cmd + shift - r : /Users/wgh/dotfileswgh/commands/minimal-bashrun
 
+# NOTE - requires racket to be symlinked here, the default path is something like /Applications/Racket\ v8.9/bin/racket, but that includes a version... so I'm symlinking the binary.
+cmd + shift - u : /Users/wgh/dotfileswgh/dotlocal/racket -l the-unicoder -- --client --port 5782
+
 # open qutebrowser
 #cmd + shift - return : ~/Scripts/qtb.sh
 
