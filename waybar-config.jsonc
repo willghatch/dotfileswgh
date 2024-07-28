@@ -36,6 +36,7 @@
     //"mpd",
     "mpris",
     "idle_inhibitor",
+    "custom/hmcounts",
     // TODO - this systemd unit is in the docs but not on my local install, maybe it's in a newer release.
     //"systemd-failed-units",
     // TODO - try waybar-privacy, which shows an icon when there is screen recording or a microphone on
@@ -256,6 +257,12 @@
       "default": ["", "", ""]
     },
     "on-click": "pavucontrol"
+  },
+  "custom/hmcounts": {
+    "format": "{}",
+    //"max-length": 25, // This supposedly is a max length in characters, but it is shortening well before that.
+    "exec": "waybar-hmcount.sh",
+    "restart-interval": 60
   },
   "custom/media": {
     "format": "{icon} {}",
