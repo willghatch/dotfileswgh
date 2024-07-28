@@ -1,7 +1,14 @@
-#!/bin/sh
+#!/usr/bin/env bash
 
 # Switch to hatchak layout
 hkdir=$DOTFILESWGH/external/misc/hatchak
+
+if [[ "$XDG_SESSION_TYPE" = "wayland" ]];  then
+    if [[ "$XDG_SESSION_DESKTOP" = "hyprland" ]];  then
+        hyprctl keyword input:kb_file $hkdir/xkb/hatchak-single-file.xkb
+    fi
+    exit 0
+fi
 
 xkbcomp -I$hkdir/xkb $hkdir/xkb/hatchak.xkb $DISPLAY
 

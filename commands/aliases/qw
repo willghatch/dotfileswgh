@@ -2,5 +2,13 @@
 
 # switch to qwerty layout
 
+if [[ "$XDG_SESSION_TYPE" = "wayland" ]];  then
+    if [[ "$XDG_SESSION_DESKTOP" = "hyprland" ]];  then
+        # I think this is just a file not found resetting it to qwerty.
+        hyprctl keyword input:kb_file ""
+    fi
+    exit 0
+fi
+
 setxkbmap -symbols 'pc+us+inet(evdev)'
 
