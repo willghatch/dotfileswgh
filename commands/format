@@ -38,6 +38,7 @@
        [(pregexp #px".*\\.hpp") clang-format]
        [(pregexp #px".*\\.mojo") {mblack $file}]
        [(pregexp #px".*\\.🔥") {mblack $file}]
+       [(pregexp #px".*\\.py") {black $file}]
        [else null-formatter]
        ))
    (when (procedure? func-maybe)
