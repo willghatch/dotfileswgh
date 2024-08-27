@@ -39,6 +39,12 @@
        [(pregexp #px".*\\.mojo") {mblack $file}]
        [(pregexp #px".*\\.🔥") {mblack $file}]
        [(pregexp #px".*\\.py") {black $file}]
+       [(pregexp #px".*\\.js") {prettier --write $file}]
+       [(pregexp #px".*\\.jsx") {prettier --write $file}]
+       [(pregexp #px".*\\.ts") {prettier --write $file}]
+       [(pregexp #px".*\\.css") {prettier --write $file}]
+       [(pregexp #px".*\\.html") {prettier --write $file}]
+       [(pregexp #px".*\\.json") {prettier --write $file}]
        [else null-formatter]
        ))
    (when (procedure? func-maybe)
