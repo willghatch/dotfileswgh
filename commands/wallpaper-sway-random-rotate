@@ -1,0 +1,24 @@
+#!/usr/bin/env bash
+
+delay=$(( 5 * 60 ))
+
+file=/dev/null
+chooseRandomWallpaper() {
+    file=$(ls $HOME/wallpapers | sort --random-sort | head -n 1)
+    if [ -z "$file" ]; then
+        exit 1
+    fi
+    file="$HOME/wallpapers/$file"
+    echo "$file"
+}
+
+trap "exit" INT TERM
+trap "kill 0" EXIT
+
+while true; do
+  swaybg --mode fit --image $(chooseRandomWallpaper) &
+  sleep "$delay"
+  kill %%
+done
+
+
