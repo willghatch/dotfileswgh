@@ -547,9 +547,9 @@ fi
 
 
 # “training wheels” to stop using unix commands where I want custom behavior in the future
-alias cp="echo training wheels: use dup wrapper"
-alias mv="echo training wheels: use muv wrapper"
-alias rm="echo training wheels: use rb wrapper"
+#alias cp="echo training wheels: use dup wrapper"
+#alias mv="echo training wheels: use muv wrapper"
+#alias rm="echo training wheels: use rb wrapper"
 
 tf=$WGHHOME/rootgit-dotfiles/env.sh
 if [ -f "$tf" ]
