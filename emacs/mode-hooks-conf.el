@@ -77,8 +77,6 @@
             (require 'magit)
             (require 'git-gutter)
             (global-git-gutter-mode 1)
-            (require 'blamer)
-            (global-blamer-mode 1)
             (require 'highlight-indent-guides)
             (highlight-indent-guides-mode 1)
             ))

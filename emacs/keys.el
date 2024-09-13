@@ -606,7 +606,7 @@
 (mkmap "ts"
   (defhydra settings-toggle (:foreign-keys warn :exit t) "Toggle:"
     ("p" smartparens-mode "smartparens")
-    ("b" blamer-mode "git blame")
+    ("b" (lambda () (interactive) (require 'blamer) (blamer-mode)) "git blame")
     ("w" whitespace "whitespace")
     ("C" (lambda () (interactive) (require 'rainbow-mode) (rainbow-mode)) "#aabbcc")
     ("c" company-mode "company")
