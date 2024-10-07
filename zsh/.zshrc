@@ -368,8 +368,9 @@ updateColorStyle(){
         MEGAPROMPT_KEYMAP_IND[keymap_unlisted]="%b%K{white}%F{black}?%k"
     fi
 }
-hooks-add-hook zle_line_init_hook updateColorStyle
-hooks-add-hook zle_line_finish_hook updateColorStyle
+#hooks-add-hook zle_line_init_hook updateColorStyle
+#hooks-add-hook zle_line_finish_hook updateColorStyle
+add-zsh-hook precmd updateColorStyle
 updateColorStyle
 
 foreground(){
