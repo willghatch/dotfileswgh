@@ -1,0 +1,2 @@
+#!/bin/sh
+zellij --config $DOTFILESWGH/zellij-config.kdl -s "$@"

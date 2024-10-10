@@ -1,0 +1,156 @@
+// zellij can dump the default config by running:
+// zellij --config /dev/null setup --dump-config
+// Note that the documentation can be out of date compared to commands listed in the default config...
+
+
+// Some initial thoughts on zellij:
+// As of 2024-10 I'm not sure it's ready to replace my usage of tmux.
+// What is lacking:
+// * It has an annoying hint bar, I don't see a way to disable it.
+// * The status bar above the hint bar never seems to have useful or interesting info.
+// * Actually, it looks like both the hint bar and the status bar are a single 2-line plugin, and I can maybe replace it with something useful.  That said, I probably only want 1 line total for tab and status info, like I have with tmux.
+// * Text selection mode, to search and highlight text to copy using the keyboard.  It looks like it has half of this, but not the whole way.  But it does have a way to dump history to an editor, which can then use copy/paste...
+// * It looks like it doesn't have its own copy/paste buffer.  It's nice to integrate with the host, but with remote servers this can get tricky, so it is nice to have something built-in as well.  Again, maybe dumping to editor solves this.
+// * I don't see a way to reload the config.
+// * I don't see a way to source another file in the config, or do things conditionally, or use environment variables, etc.
+
+
+// Enable or disable automatic copy (and clear) of selection when releasing mouse
+// Default: true
+copy_on_select false
+
+// Toggle between having pane frames around the panes -- default true
+// I prefer no frame, except the frame contains the only scroll info.
+pane_frames false
+
+// Whether sessions should be serialized to the cache folder (including their tabs/panes, cwds and running commands) so that they can later be resurrected
+// Options: //   - true (default)
+session_serialization false
+
+// scroll_buffer_size 10000
+
+// Path to the default editor to use to edit pane scrollbuffer
+// Default: $EDITOR or $VISUAL
+// scrollback_editor "/usr/bin/vim"
+
+//default_shell "bash"
+
+// Provide a command to execute when copying text. The text will be piped to
+// the stdin of the program to perform the copy. This can be used with
+// terminal emulators which do not support the OSC 52 ANSI control sequence
+// that will be used by default if this option is not set.
+// Examples:
+// copy_command "xclip -selection clipboard" // x11
+// copy_command "wl-copy"                    // wayland
+// copy_command "pbcopy"                     // osx
+// TODO - it looks like KDE Konsole doesn't support this control sequence, or it is turned off.  Because this isn't working without setting one.  This is a case where I would like conditional evaluation...
+
+
+// If you'd like to override the default keybindings completely, be sure to change "keybinds" to "keybinds clear-defaults=true"
+
+keybinds clear-defaults=true {
+    // normal mode is the default mode
+    normal {
+        // bind "Alt c" { Copy; }
+        bind "Ctrl t" { SwitchToMode "tmux"; }
+    }
+
+    // There are only specific canned modes available, you can't make up new modes.  But at least it seems that you can make each a clean slate...
+    tmux {
+        bind "Ctrl g" { SwitchToMode "Normal"; }
+        // C-t is ascii value 20
+        bind "Ctrl t" { Write 20; SwitchToMode "Normal"; }
+        bind "d" { Detach; SwitchToMode "Normal"; }
+        // L1 - pane control
+        bind "j" { FocusNextPane; SwitchToMode "Normal"; }
+        bind "k" { FocusPreviousPane; SwitchToMode "Normal"; }
+        bind "J" { MovePane; SwitchToMode "Normal"; }
+        bind "K" { MovePaneBackwards; SwitchToMode "Normal"; }
+        // TODO - resizing -- these work based on the current pane, and eg. decrease on the left only works if there is another pane on the left.  I think probably I want to just focus on layouts if I don't want to implement some complex logic to check where things are...
+        // The Increase/Decrease args for resize change both X and Y size at once if possible...
+        bind "h" { Resize "Increase"; SwitchToMode "Normal"; }
+        bind "l" { Resize "Decrease"; SwitchToMode "Normal"; }
+        //bind "h" { Resize "Decrease Left"; SwitchToMode "Normal"; }
+        //bind "l" { Resize "Decrease Right"; SwitchToMode "Normal"; }
+        //bind "H" { Resize "Decrease Up"; SwitchToMode "Normal"; }
+        //bind "L" { Resize "Decrease Down"; SwitchToMode "Normal"; }
+        bind "v" { NewPane "Right"; SwitchToMode "Normal"; }
+        bind "s" { NewPane "Down"; SwitchToMode "Normal"; }
+        bind "f" { ToggleFocusFullscreen; SwitchToMode "Normal"; }
+        bind "Space" { NextSwapLayout; SwitchToMode "Normal"; }
+        // TODO - maybe close pane command, though I never use that in tmux, except maybe by accident...
+
+        // TODO - layout selection -- I probably want to define some layouts that it can switch between.  Eg. I often use 3 tall panes, or 2-3 columns with 1-2 rows each.  I don't often go outside of that...
+
+        // L2 - tab control
+        bind "w" { GoToNextTab; SwitchToMode "Normal"; }
+        bind "b" { GoToPreviousTab; SwitchToMode "Normal"; }
+        bind "W" { BreakPaneRight; SwitchToMode "Normal"; }
+        bind "B" { BreakPaneLeft; SwitchToMode "Normal"; }
+        bind "g" { NewTab; SwitchToMode "Normal"; }
+        bind "G" { BreakPane; SwitchToMode "Normal"; }
+
+
+        // L2 - multi-session control
+        // TODO - want n/p to switch to next/prev client
+        // search client by name
+        bind "i" {
+            LaunchOrFocusPlugin "session-manager" {
+                floating true
+                move_to_focused_tab true
+            };
+            SwitchToMode "Normal"
+        }
+
+
+        // TODO - I don't love this, but it is something for now.
+        // TODO - this doesn't seem to be working on Wayland (or hyprland at least).
+        bind "Y" { Copy; SwitchToMode "Normal"; }
+        // open scrollback in editor, which is in many ways better than the tmux history search mode...
+        bind "y" { EditScrollback; SwitchToMode "Normal"; }
+
+        // TODO - maybe better key for this... but in tmux I typically hit enter to leave copy mode.
+        bind "Enter" { ScrollToBottom; SwitchToMode "Normal"; }
+
+
+        // TODO - unused bind for testing things...
+        //bind "z" { ToggleTab; SwitchToMode "Normal"; }
+
+
+        // TODO paste -- does zellij have its own internal copy/paste buffer like tmux does?  It doesn't look like it.
+
+        // TODO - finding windows/tabs/sessions by name or running process, etc
+        // TODO - locked mode -- duplicate this tmux mode, but without every key switching to normal mode
+        // TODO - copy mode IE text selection mode
+        // TODO - tools that use a dump of the window history, I should do this in tmux too
+        // TODO - bind for SwitchToMode "RenameTab", etc
+        // TODO - command prompt on : and - keys -- I don't think it has this, but I could open a new pane or tab pre-populated with `zellij action `.
+
+
+        // Command notes:
+        // ToggleTab is switching between recent tabs.
+    }
+
+    // Other modes available that I probably don't care about with respect to their intended purpose, but may repurpose for at least a locked mode:
+    // locked, resize, pane, move, tab, session
+    // Other modes I might use (use --dump-config to see defaults for them...):
+    // scroll, search, entersearch, renametab, renamepane,
+
+    // Note that you can also bind to multiple modes with shared_except
+}
+
+// TODO - I don't know if plugins are useful or helpful or anything... but they seem to include basic UI pieces.
+plugins {
+    tab-bar location="zellij:tab-bar"
+    status-bar location="zellij:status-bar"
+    strider location="zellij:strider"
+    compact-bar location="zellij:compact-bar"
+    session-manager location="zellij:session-manager"
+    welcome-screen location="zellij:session-manager" {
+        welcome_screen true
+    }
+    filepicker location="zellij:strider" {
+        cwd "/"
+    }
+}
+
