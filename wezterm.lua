@@ -29,13 +29,20 @@ config.hide_tab_bar_if_only_one_tab = true
 -- Unfortunately, the CSI-U protocol is enabled by a CSI escape sequence (`\e[>4;1m`), which some programs do automatically.  The CSI-U protocol is basically broken for my keyboard layout, so I don't know that I ever want it on.  It is very buggy in emacs, and less so but still buggy in vim.  In emacs I've hacked around to disable it, but for other programs it will be annoying.  There is currently no option to disable and ignore the CSI escape sequence to turn on the csi_u key encoding.
 config.enable_csi_u_key_encoding = false
 
-
 config.font = wezterm.font "Deja Vu Sans Mono"
 if is_macos() then
   config.font = wezterm.font("Monaco")
   --config.font = wezterm.font("Monaco", {weight = "Thin"})
 end
 
+config.keys = {
+  {
+    -- Workaround for MacOS eating shift2 plus space...  I'm not sure why it's ALT, but I'll take it.
+    key = " ",
+    mods = "ALT",
+    action = wezterm.action.SendKey {key = " "},
+  },
+}
 
 -- Color scheme
 config.color_schemes = {
