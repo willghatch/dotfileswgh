@@ -1,0 +1,8 @@
+#!/bin/sh
+
+tf=`mktemp /tmp/pffxd_XXXXXXXX.html`
+cat - > "$tf"
+ffxd "$tf"
+# hack to keep the file alive until it is read...
+#sleep 10
+#rm "$tf"
