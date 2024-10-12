@@ -25,11 +25,15 @@ end
 config.enable_scroll_bar=true
 config.hide_tab_bar_if_only_one_tab = true
 
+-- Wezterm isn't working on hyprland without disabling wayland, but running in Xwayland hasa its own issues...
+config.enable_wayland = false
+
 -- Keyboard handling
 -- Unfortunately, the CSI-U protocol is enabled by a CSI escape sequence (`\e[>4;1m`), which some programs do automatically.  The CSI-U protocol is basically broken for my keyboard layout, so I don't know that I ever want it on.  It is very buggy in emacs, and less so but still buggy in vim.  In emacs I've hacked around to disable it, but for other programs it will be annoying.  There is currently no option to disable and ignore the CSI escape sequence to turn on the csi_u key encoding.
 config.enable_csi_u_key_encoding = false
 
 config.font = wezterm.font "Deja Vu Sans Mono"
+--config.font = wezterm.font "Monaspace Radon"
 if is_macos() then
   config.font = wezterm.font("Monaco")
   --config.font = wezterm.font("Monaco", {weight = "Thin"})
@@ -159,6 +163,19 @@ function scheme_for_appearance(appearance)
 end
 
 config.color_scheme = scheme_for_appearance(get_appearance())
+
+
+---- Fuss with font size for different monitors.
+---- There is a DPI feature, but for now I'll just set it based on monitor resolution...
+--wezterm.on("window-resized", function(window, pane)
+--             print(window:get_dimensions())
+--             print(wezterm.gui.screens())
+--             if (wezterm.gui.screens().active.width > 1920) then
+--               window:set_config_overrides({font_size=14})
+--             else
+--               window:set_config_overrides({font_size=12})
+--             end
+--end)
 
 -- and finally, return the configuration to wezterm
 return config
