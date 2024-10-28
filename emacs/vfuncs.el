@@ -385,4 +385,13 @@ I'm sick of doing this manually."
   (interactive)
   (revert-buffer))
 
+(defun quiet-ignore-warnings ()
+  "Function that I can find when searching M-x to shut up annoying warnings or errors."
+  (interactive)
+  (setq warning-minimum-level :error))
+(defun quiet-ignore-errors ()
+  "Function that I can find when searching M-x to shut up annoying warnings or errors."
+  (interactive)
+  (setq warning-minimum-level :emergency))
+
 (provide 'vfuncs)
