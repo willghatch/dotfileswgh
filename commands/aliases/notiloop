@@ -1,0 +1,5 @@
+#!/usr/bin/env bash
+
+socket=/tmp/notification-loop-socket
+
+notification-loop --client $socket "$@"

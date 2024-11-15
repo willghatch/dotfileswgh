@@ -5,6 +5,7 @@
  racket/match
  racket/list
  racket/unix-socket
+ racket/format
  gregor
  gregor/time
  gregor/period
@@ -167,6 +168,19 @@ TODO - maybe add extra optional logic to recurring events.  Eg. I would like to 
        [else (error "bad match in processing command: ~s" command)])]
     [else (error "bad-match-in-processing-item ~s" item)]))
 
+(define (print-event-list-pretty events-response)
+  (match events-response
+    [(list 'current-queue (list items ...))
+     (for ([item items])
+       (match item
+         [(list (and (? number?) unix-time) command)
+          (define time-string (~t (posix->moment unix-time (current-timezone)) "hh:mm"))
+          (define minutes-left (/ (- unix-time (current-seconds)) 60.0))
+          (printf "• ~a (~am): ~s\n"
+                  time-string
+                  (~r minutes-left #:precision '(= 1))
+                  command)]))]))
+
 (define (server-main socket)
   (define loop-thread (thread exec-loop))
   (define command-thread (thread (λ () (listen-for-commands socket))))
@@ -177,11 +191,29 @@ TODO - maybe add extra optional logic to recurring events.  Eg. I would like to 
   (exit 0))
 
 (define (client-main socket command time)
-  (define hh:mm (regexp-match (pregexp "^(.*):(.*)$")
-                              time))
-  (define hh:mm-distance (and hh:mm ))
-  (define Xm (regexp-match (pregexp "^(.*)m$")
-                           time))
+  (define command-parse
+    (match command
+      [(pregexp "^terminate-server$") '(terminate-server)]
+      [(pregexp "^get-event-list$") '(get-event-list)]
+      [(pregexp "^pretty-events$") '(pretty-events)]
+      [(pregexp "^notify-repeat (.*)m " (list full-match-string minutes))
+       `(notify-repeat ,(* 60 (string->number minutes))
+                       ,(substring command (string-length full-match-string)))]
+      [(pregexp "^notify " (list match-string))
+       `(notify ,(substring command (string-length match-string)))]
+      ;; Have default command, display events.
+      [#f '(pretty-events)]
+      [else (error 'bad-command)]))
+
+  (define need-time? (not (or (equal? command-parse '(get-event-list))
+                              (equal? command-parse '(pretty-events)))))
+
+  (define hh:mm (and time
+                     (regexp-match (pregexp "^(.*):(.*)$")
+                                   time)))
+  (define Xm (and time
+                  (regexp-match (pregexp "^(.*)m$")
+                                time)))
   (define seconds-to-wait
     (with-handlers ([(λ(e)#t)
                      (λ (e) (error "bad time format, expected HH:MM as clock time for event or Xm as minutes in the future, inner exn: ~s" e))])
@@ -197,21 +229,15 @@ TODO - maybe add extra optional logic to recurring events.  Eg. I would like to 
                                       time-today)])
                (seconds-between today time-for-use))]
             [Xm (* 60 (string->number (second Xm)))]
-            [else (error 'no-match)])))
+            [else (if need-time?
+                      (error 'no-match)
+                      0)])))
   (define epoch-time (+ (current-seconds) seconds-to-wait))
 
-  (define command-parse
-    (match command
-      [(pregexp "^terminate-server$") '(terminate-server)]
-      [(pregexp "^get-event-list$") '(get-event-list)]
-      [(pregexp "^notify-repeat (.*)m " (list full-match-string minutes))
-       `(notify-repeat ,(* 60 (string->number minutes))
-                       ,(substring command (string-length full-match-string)))]
-      [(pregexp "^notify " (list match-string))
-       `(notify ,(substring command (string-length match-string)))]
-      [else (error 'bad-command)]))
-
-  (define item (list epoch-time command-parse))
+  (define server-command (if (equal? command-parse '(pretty-events))
+                             '(get-event-list)
+                             command-parse))
+  (define item (list epoch-time server-command))
 
   (define-values (in out)
     (unix-socket-connect socket))
@@ -221,7 +247,9 @@ TODO - maybe add extra optional logic to recurring events.  Eg. I would like to 
   (close-output-port out)
   (define server-response (read in))
   (close-input-port in)
-  (printf "~s\n" server-response)
+  (if (equal? command-parse '(pretty-events))
+      (print-event-list-pretty server-response)
+      (printf "~s\n" server-response))
   (exit 0))
 
 (define (cli-main)
@@ -244,6 +272,7 @@ TODO - maybe add extra optional logic to recurring events.  Eg. I would like to 
        "    * notify <message ...>"
        "    * notify-repeat <delay-m> <message ...>"
        "    * get-event-list"
+       "    * pretty-events"
        "    * terminate-server"
        #:args ()
        (values -mode -socket -command -time))))
