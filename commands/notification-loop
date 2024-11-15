@@ -154,7 +154,12 @@ TODO - maybe add extra optional logic to recurring events.  Eg. I would like to 
           (if (and (thread? previous)
                    (thread-running? previous))
               previous
-              (thread (λ () {notify-blocking $message}))))
+              (thread
+               (λ ()
+                 ;; On MacOS using `notify-blocking`, implemented with applescript forcing a display dialog, was the best thing that worked.  For Linux, I think I want just `notify`, especially since I haven't implemented a `notify-blocking` for linux...
+                 ;{notify-blocking $message}
+                 {notify $message}
+                 ))))
         (enqueue `(,(+ (current-seconds) seconds)
                    (notify-repeat ,seconds
                                   ,message
