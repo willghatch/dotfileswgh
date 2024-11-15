@@ -5,3 +5,6 @@ autocmd DocStart ^http(s?)://www.reddit.com js tri.excmds.urlmodify("-t", "www",
 
 " Comment toggler for Reddit, Hacker News and Lobste.rs
 bind ;c hint -Jc [class*="expand"],[class*="togg"],[class="comment_folder"]
+
+" Animate scrolling rather than having an instant jump, to track and not lose position.
+set smoothscroll true
