@@ -1,8 +1,11 @@
 #!/usr/bin/env bash
 
-if [[ -z "$1" ]]; then
+if [[ -z "$1" || "$@" =~ "--help" ]]; then
     echo "usage: $0 <profile>"
     exit
+fi
+if [[ "$1" = "--new" ]]; then
+    new=true
 fi
 prof="$1"
 shift
@@ -15,6 +18,15 @@ shift
 
 FFX=${FFX:-firefox}
 profile="$DOTFILESWGH/dotlocal/firefox-profiles/firefox-profile_$prof"
-mkdir -p "$profile"
 
-exec nice -n 5 $FFX --profile $profile "$@"
+if [[ "$new" = "true" ]]; then
+    mkdir -p "$profile"
+fi
+
+if [[ -d "$profile" ]]; then
+    exec nice -n 5 $FFX --profile $profile "$@"
+fi
+
+echo "profile does not exist"
+exit 1
+
