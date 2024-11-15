@@ -4,4 +4,15 @@ PS1="¢ "
 # ***DO NOT EDIT BEYOND THIS LINE***
 #
 # bind ENTER to add ' &' to command
-bind '"\x0d"':"\" &\n\""
+#bind '"\x0d"':"\" &\n\""
+minimal-bashrun-run-wrapper() {
+  "$@" &
+  sleep 0.125
+  if jobs %%; then
+      exit 0
+  else
+      notify-send "bashrun exited quickly"
+  fi
+}
+# bind ENTER to wrap the command, using C-a and C-e... brittle.
+bind '"\x0d"':"\"\x01minimal-bashrun-run-wrapper \x05\n\""
