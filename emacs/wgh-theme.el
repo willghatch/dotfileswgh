@@ -18,7 +18,8 @@
  ;; NOTE - matching on BOTH dark and light can be done with `((background dark light))` OR with `default`, note that `default` replaces the list of specifiers of which the background specifier is just one (though generally the only one).  The default specifier can be used to specify attributes common to both light and dark modes (eg. inheritance, weight, etc), then separate light and dark clauses can be used to specify eg. colors.
  '(default ((default (:inherit nil :stipple nil :inverse-video nil :box nil :strike-through nil :overline nil :underline nil :slant normal :weight normal :height 99 :width normal :foundry "unknown" :family "DejaVu Sans Mono"))
             (((background dark)) (:background "#050505" :foreground "#909090"))
-            (((background light)) (:background "#f0f0f0" :foreground "#2e3435"))))
+            ;; #fdf6e3 is the light background for solarized light
+            (((background light)) (:background "#fdf6e3" :foreground "#2e3435"))))
  '(bold-italic ((default (:slant italic :weight bold))))
  '(col-highlight ((((background dark)) (:background "#000035"))))
  '(custom-comment-tag ((((background dark)) (:foreground "#0087ff"))))
@@ -64,9 +65,9 @@
  '(helm-selection-line ((((background dark)) (:foreground "#000000" :background "#90b090"))))
  '(highlight ((((background dark)) (:background "#002f00" :foreground "#ffb030"))))
  '(highlight-indent-guides-even-face ((((background dark)) (:background "#050505"))
-                                      (((background light)) (:background "#f0f0f0"))))
+                                      (((background light)) (:background "#fdf6e3"))))
  '(highlight-indent-guides-odd-face ((((background dark)) (:background "#080808"))
-                                     (((background light)) (:background "#e9e9e9"))))
+                                     (((background light)) (:background "#faedda"))))
  '(hi-lock ((((background dark)) (:background "#301f00" :foreground "#6060ff"))))
  '(hl-line ((((background dark)) (:background "#000035"))))
  '(hl-todo ((((background dark)) (:foreground "#f59035" :background "#500000" :weight bold))))
