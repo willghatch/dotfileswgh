@@ -44,9 +44,12 @@
     // TODO - maybe make a custom waybar widget that shows something about email?  I mostly ignore this widget that I made on awesome, but sometimes it's useful to notice mail in a folder I don't check much.
     "network",
     //"power-profiles-daemon",
-    "memory",
-    "cpu",
     "temperature",
+    "cpu",
+    "memory",
+    "custom/wl-gammarelay-temperature",
+    "custom/wl-gammarelay-brightness",
+    "custom/wl-gammarelay-gamma",
     "backlight",
     //"keyboard-state",
     //"sway/language",
@@ -193,14 +196,6 @@
     "format": "{temperatureC}°C{icon}",
     "format-icons": ["", "", ""]
   },
-  "backlight": {
-    "device": "acpi_video0",
-    "format": "{percent}%{icon}",
-    "format-icons": ["💡"],
-    "on-scroll-up": "state backlight inc",
-    "on-scroll-down": "state backlight dec",
-    //"format-icons": ["", "", "", "", "", "", "", "", ""]
-  },
   "battery": {
     "states": {
       // "good": 95,
@@ -257,6 +252,32 @@
       "default": ["", "", ""]
     },
     "on-click": "pavucontrol"
+  },
+  "custom/wl-gammarelay-temperature": {
+      "format": "{} ",
+      "exec": "wl-gammarelay-rs watch {t}",
+      "on-scroll-up": "busctl --user -- call rs.wl-gammarelay / rs.wl.gammarelay UpdateTemperature n +100",
+      "on-scroll-down": "busctl --user -- call rs.wl-gammarelay / rs.wl.gammarelay UpdateTemperature n -100"
+  },
+  "custom/wl-gammarelay-brightness": {
+      "format": "{}% ",
+      "exec": "wl-gammarelay-rs watch {bp}",
+      "on-scroll-up": "busctl --user -- call rs.wl-gammarelay / rs.wl.gammarelay UpdateBrightness d +0.02",
+      "on-scroll-down": "busctl --user -- call rs.wl-gammarelay / rs.wl.gammarelay UpdateBrightness d -0.02"
+  },
+  "custom/wl-gammarelay-gamma": {
+      "format": "{}% γ",
+      "exec": "wl-gammarelay-rs watch {g}",
+      "on-scroll-up": "busctl --user -- call rs.wl-gammarelay / rs.wl.gammarelay UpdateGamma d +0.02",
+      "on-scroll-down": "busctl --user -- call rs.wl-gammarelay / rs.wl.gammarelay UpdateGamma d -0.02"
+  },
+  "backlight": {
+    "device": "acpi_video0",
+    "format": "{percent}%{icon}",
+    "format-icons": ["∠💡"],
+    "on-scroll-up": "state backlight inc",
+    "on-scroll-down": "state backlight dec",
+    //"format-icons": ["", "", "", "", "", "", "", "", ""]
   },
   "custom/hmcounts": {
     "format": "{}",
