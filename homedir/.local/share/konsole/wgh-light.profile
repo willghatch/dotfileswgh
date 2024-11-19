@@ -1,6 +1,6 @@
 [Appearance]
 AntiAliasFonts=true
-ColorScheme=BlackOnWhite
+ColorScheme=SolarizedLight
 Font=Monospace,12,-1,5,50,0,0,0,0,0
 
 [Encoding Options]
