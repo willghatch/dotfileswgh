@@ -27,7 +27,7 @@ in [
 
   pp.libffi
 
-  pp.pkgconfig
+  pp.pkg-config
   #pp.racket
 
   # for chez scheme
