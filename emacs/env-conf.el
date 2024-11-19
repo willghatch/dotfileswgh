@@ -7,6 +7,8 @@
         (if emacs.d-path
             emacs.d-path
           (concat dotfileswgh "/dotlocal/emacs.d/"))))
+(when (not (string-suffix-p "/" local-emacs.d-path))
+  (setq local-emacs.d-path (concat local-emacs.d-path "/")))
 ;; Set the name that emacs actually knows...
 (setq user-emacs-directory local-emacs.d-path)
 

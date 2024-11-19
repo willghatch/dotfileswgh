@@ -39,6 +39,8 @@ file from a large repository."
 (defun in (package)
   (with-demoted-errors "Error installing: %S" (package-install package)))
 
+(message "Current user-emacs-directory: %S" user-emacs-directory)
+(message "Current package-user-dir: %S" package-user-dir)
 (message "Installing packages...")
 
 (in 'evil)
