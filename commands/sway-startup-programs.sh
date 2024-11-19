@@ -7,7 +7,7 @@
 
 # TODO - idle management - how to toggle this off/on?  Eg. if I'm watching a movie I don't want the screen to blank.  Probably I need to wrap this in a script and turn it on and off, or check a state file, or something.
 # swayidle *should* be toggleable on my waybar config
-swayidle-configured &
+#swayidle-configured &
 
 waybar-configured &
 
