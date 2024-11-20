@@ -7,9 +7,13 @@ if [[ -n "$HYPRLAND_INSTANCE_SIGNATURE" ]]; then
   monitorOn='hyprctl dispatch dpms on'
 fi
 
+lockTimeout=600
+lockWarn=$(( $lockTimeout - 10 ))
+monitorTimeout=900
 
 exec swayidle -w \
-	timeout 600 'swaylock-configured' \
-	timeout 900 "$monitorOff" \
+	timeout $lockWarn 'lightdark-status-double-toggle.sh' \
+	timeout $lockTimeout 'swaylock-configured' \
+	timeout $monitorTimeout "$monitorOff" \
 		resume "$monitorOn" \
 	before-sleep 'swaylock-configured' &

@@ -5,14 +5,13 @@
 # Sway should be launched in some way such that it already has env-more sourced before launch.
 #source $DOTFILESWGH/env-more.sh
 
-# TODO - idle management - how to toggle this off/on?  Eg. if I'm watching a movie I don't want the screen to blank.  Probably I need to wrap this in a script and turn it on and off, or check a state file, or something.
-# swayidle *should* be toggleable on my waybar config
-#swayidle-configured &
+swayidle-configured &
 
 waybar-configured &
 
 wallpaper-sway-random-rotate &
 
+wl-gammarelay-rs &
 
 # TODO - touchpad tap-to-click and horizontal scroll?  At least tap-to-click I have in my nixos config now.
 
