@@ -6,6 +6,7 @@ if [[ -z "$1" || "$@" =~ "--help" ]]; then
 fi
 if [[ "$1" = "--new" ]]; then
     new=true
+    shift
 fi
 prof="$1"
 shift
