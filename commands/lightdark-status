@@ -42,6 +42,7 @@ linux-update(){
     # Alternatively, we can set that theme using xsettings instead.
     if [[ -n "$WAYLAND_DISPLAY" ]]; then
         gsettings set org.gnome.desktop.interface gtk-theme "Yaru-${1}"
+        xsettingsd-wrapper
     else
         xsettingsd-wrapper
     fi

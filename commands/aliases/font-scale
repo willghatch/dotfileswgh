@@ -1,0 +1,5 @@
+#!/usr/bin/env bash
+
+# TODO - gsettings sets the font scale for gnome programs and firefox, where else do I need to configure?
+
+gsettings set org.gnome.desktop.interface text-scaling-factor "$@"

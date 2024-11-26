@@ -13,6 +13,9 @@ wallpaper-sway-random-rotate &
 
 wl-gammarelay-rs &
 
+# We still need xsettingsd for xwayland programs and such.
+xsettingsd-wrapper --start &
+
 # TODO - touchpad tap-to-click and horizontal scroll?  At least tap-to-click I have in my nixos config now.
 
 # TODO - keynav replacement?
