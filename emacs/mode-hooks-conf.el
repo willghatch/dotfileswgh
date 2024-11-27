@@ -131,6 +131,14 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;; magit
 
+(add-hook 'git-rebase-mode-hook
+          (lambda ()
+            ;; git-rebase-mode does some things that are convenient, but also
+            ;; several really annoying things.
+            (read-only-mode -1)
+            (setcdr git-rebase-mode-map nil)
+            ))
+
 (defun wgh/magit-keys-setup ()
   ;; set up some keymaps that don't cleanly belong to a particular mode
   ;; TODO - do some checks to only run this once, some time after magit loads.
