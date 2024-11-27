@@ -53,8 +53,3 @@ export GREP_COLOR="1;32"
 export TODOMAN_CONFIG=$DOTFILESWGH/pri/todoman.conf
 export VDIRSYNCER_CONFIG=$DOTFILESWGH/pri/vdirsyncer.conf
 export KHARD_CONFIG=$DOTFILESWGH/pri/khard.conf
-
-# This is required for electron programs to launch properly and autodetect
-# wayland without specifying it explicitly.  I'm not sure why this isn't the
-# default behavior...
-export ELECTRON_OZONE_PLATFORM_HINT=auto

@@ -1,0 +1,15 @@
+#!/usr/bin/env bash
+
+# lightdark update for hyprland
+if [[ -n "$1" ]]; then
+    mode="$1"
+else
+    mode="$(lightdark-status)"
+fi
+
+if [[ "$mode" = "light" ]]; then
+    hyprctl keyword general:col.active_border "rgba(336cfdee)"
+else
+    hyprctl keyword general:col.active_border "rgba(33ccffee) rgba(00ff99ee) 45deg"
+fi
+

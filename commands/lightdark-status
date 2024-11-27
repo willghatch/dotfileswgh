@@ -46,6 +46,9 @@ linux-update(){
     else
         xsettingsd-wrapper
     fi
+    if [[ "$XDG_SESSION_DESKTOP" = "hyprland" ]]; then
+        bash $DOTFILESWGH/config/hypr/lightdark-update $1
+    fi
     cat "$DOTFILESWGH/xresources-general" "$DOTFILESWGH/xresources-${1}" | xrdb
 }
 
