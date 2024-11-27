@@ -1,0 +1,9 @@
+#!/usr/bin/env bash
+
+state=/tmp/hyprland-order-reverse
+
+if [[ $(cat $state) == true ]]; then
+    echo false > $state
+else
+    echo true > $state
+fi
