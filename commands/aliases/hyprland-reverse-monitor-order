@@ -2,7 +2,7 @@
 
 state=/tmp/hyprland-order-reverse
 
-if [[ $(cat $state) == true ]]; then
+if [[ $(cat $state 2>/dev/null) == true ]]; then
     echo false > $state
 else
     echo true > $state
