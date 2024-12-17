@@ -4,5 +4,6 @@ socket=/tmp/notification-loop-socket
 
 notification-loop --server $socket &
 sleep 1
-notification-loop --client $socket --time 20m --command "notify-repeat 20m 20-20-20 eye strain time\nmicro exercise\nmaybe raise desk"
+#notification-loop --client $socket --time 20m --command "notify-repeat 20m 20-20-20 eye strain time\nmicro exercise\nmaybe raise desk"
+notification-loop --client $socket --time 0m --command "notify-repeat 40m 20-20-20 eye strain time\n micro exercise\n maybe raise desk"
 

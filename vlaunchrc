@@ -6,14 +6,17 @@
 #fi
 
 #terminal="konsole-lightdark -e rash-repl"
-terminal="wezterm --config-file $DOTFILESWGH/wezterm.lua start -- zsh"
-terminal2="konsole-lightdark -e zsh"
+#terminal="wezterm --config-file $DOTFILESWGH/wezterm.lua start -- zsh"
+#terminal="wez"
+terminal="konsole-lightdark -e zsh"
+terminal2="wez"
+#terminal2="konsole-lightdark -e zsh"
+terminal3="konsole-lightdark -e rr"
 
 
 #terminal2="my-alacritty -e zsh"
 #terminal="my-alacritty -e rr"
 #terminal="my-alacritty -e rr"
-#terminal3="konsole-lightdark -e rr"
 
 unicode="racket -l the-unicoder -- --client --port 5782"
 unicode_reload="racket -l the-unicoder -- --client --port 5782 --command reload"
