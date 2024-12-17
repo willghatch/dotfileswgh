@@ -95,6 +95,40 @@
 (defun wgh/backward-thing-end (strict thing &optional count)
   (-wgh/fwd-beg_or_bwd-end_thing strict thing count nil))
 
+
+(defun wgh/expanded-region-to-bounds-of-thing-at-point (strict thing &optional region)
+  "Returns the new bounds or nil.
+If STRICT, only return the bounds if they are strictly greater than the original region.
+If REGION is not given, uses `region-bounds`, but either way the region must be a single contiguous region.
+If no region is active, it will use (point . point)."
+  (let* ((orig-regions (or (and region (list region))
+                           (if (region-active-p)
+                               (region-bounds)
+                             (list (cons (point) (point))))))
+         (orig-region (and (listp orig-regions)
+                           (null (cdr orig-regions))
+                           (car orig-regions)))
+         (bounds (and orig-region (save-excursion
+                                    (wgh/set-region orig-region)
+                                    (bounds-of-thing-at-point thing)))))
+    (if (and orig-region bounds)
+        (let* ((left-ok (<= (car bounds) (car orig-region)))
+               (left-grow (< (car bounds) (car orig-region)))
+               (right-ok (<= (cdr orig-region) (cdr bounds)))
+               (right-grow (< (cdr orig-region) (cdr bounds)))
+               (nonstrict-ok (and left-ok right-ok))
+               (strict-ok (and nonstrict-ok (or left-grow right-grow))))
+          (if (or (and strict strict-ok)
+                  (and (not strict) nonstrict-ok))
+              bounds
+            nil))
+      nil)))
+
+(defun wgh/set-region (bounds)
+  "Set the active region to BOUNDS.  BOUNDS must be a single pair."
+  (set-mark (car bounds))
+  (goto-char (cdr bounds)))
+
 ;;;;;;
 
 (cl-defmacro wgh/def-move-thing (thing &key (strict t))
@@ -202,6 +236,9 @@
 ;;;;;
 
 
+;;;;;
+
+
 ;; I'm used to vi/evil word definition, it's strange to me that emacs' native word definition skips over punctuation and symbols, as well as blank lines.
 (defun forward-vi-like-word (&optional count)
   (setq count (or count 1))
@@ -270,3 +307,16 @@
       (setq count (- count 1)))))
 (wgh/def-move-thing vi-like-word-2)
 ;; TODO - both of these attempts got me something kinda close... but wrong.  I should probably give up and do something else for now.  How much does it matter that my word movement behaves just like vim except in the specific way I want it not to?
+
+(defvar run-text-object-stuff-tests nil)
+(when run-text-object-stuff-tests
+  (require 'ert)
+  (setq some-words "The quick brown fox jumps over the lazy dog.")
+  (ert-deftest misc-tests ()
+    (with-temp-buffer
+      (insert some-words)
+      (goto-char 6)
+      (message "region active in test: %s" (region-active-p))
+      (should (equal (cons 5 10)
+                     (wgh/expanded-region-to-bounds-of-thing-at-point t 'word (cons 7 9))))))
+  )
