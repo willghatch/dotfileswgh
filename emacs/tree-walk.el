@@ -73,6 +73,23 @@
 ;; Movement and addressing:
 ;; * Movement operations should all move the cursor to some canonical anchor point.  This will probably typically be the beginning of the tree object, but could sometimes be elsewhere, eg. for infix trees the beginning of the infix operator is probably best.
 ;; * There should be a “thing at point” or similar function to get the bounds of the tree object at point.
+;;
+;;
+;; TODO list
+;; * Document things
+;; * Make macro keywords consistent, and use names like def-X for symbols that the macro will define.
+;; * Make it clear what APIs are necessary to define new tree-walk trees, and what APIs you get from it.
+;; * Implement helper to get bounds for indent tree and similar trees -- convert it from being focused on evil-mode to focused on getting bounds more generally.
+;; * Define a shared API for all trees to access bounds.  IE explicitly write some bounds helpers for smartparens, and decide if anything more is necessary.
+;; * Define easy generic ops: transpose-sibling, transpose-sibling-region (IE transpose a group of siblings together, all of the siblings in the region (either strictly with the sibling regions exactly fitting the region or sloppily using all siblings that are partially in the region)), raise/replace-parent, etc.  Do I want things like delete forward/back, delete to parent, etc?  I think just having movements is enough for that -- IE move to start of first sibling, move to end of last sibling, etc paired with regions and deletion do it.
+;; * Define additional motions -- IE in addition to the basic motions that go somewhere (hopefully to some canon anchor point) on the sibling/parent/child, define motions to go to specifically beginning/end of thing, also add idempotence option.
+;; * Decide: what is necessary to have other generic ops, or how far can they be generic?  Eg. slurp/barf, join/split, splice, demote/wrap, rewrap, etc
+;; * Define a full suite using smartparens as a base.
+;; * Define a full suite using indent-tree as a base.
+;; * Define a full suite using org-mode or outline-mode tree as a base.
+;; * Define a full suite for treesitter
+;; * Define a full suite for json
+;; * Define a full suite for XML
 
 (require 'cl-lib)
 
@@ -213,6 +230,23 @@
     (inner-name outer-name
      up down down-to-last-child
      left-finalize right-finalize)
+  "Define text objects.
+Define INNER-NAME and OUTER-NAME as evil-mode text objects (using with-eval-after-load).
+
+TODO - everything below this is a lie until I implement it...
+TODO - I need to define the below to have a bounds-of-thing-at-point implementation.
+
+Define INNER-NAME-bounds, OUTER-NAME-bounds as functions to get bounds of tree at point.
+
+The inner object is a little wonky, it is roughly the children of the tree node, but what exactly that means depends on the tree type.
+The outer object is the full tree node, and makes a lot more sense.
+
+Both bounds functions return a region as a cons cell (beg . end) or nil.
+
+The outer-bounds function takes an optional arguments: strictly-grow (bool), and region in (beg . end).
+If strictly-grow is true, it only returns a region if it both strictly contains the old region (given or current) AND is strictly greater than it (IE extending it to the left or the right).
+If no region is given, it uses the current region (or ((point) . (point))).
+"
   (let ((inner-left (gensym (format "-%s--inner-left" inner-name)))
         (outer-left (gensym (format "-%s--outer-left" outer-name)))
         (inner-right (gensym (format "-%s--inner-right" inner-name)))
@@ -247,6 +281,9 @@
          (evil-define-text-object ,outer-name (count &optional beg end type)
            ;; TODO - handle count, type
            (funcall ,outer-helper beg end))))))
+
+;; TODO - I need to define text object functions for delimited trees, probably using smartparens as the base case.
+;; TODO - should I use thing-at-point to define `bounds-of-thing-at-point X`?
 
 (cl-defmacro tree-walk-define-operations
     (&key
