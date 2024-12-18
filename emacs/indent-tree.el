@@ -317,6 +317,13 @@ It always moves to the FIRST sibling in the full sibling region, regardless of m
  :no-end-inner-object indent-tree-inner
  :no-end-outer-object indent-tree-outer
 
+ :def-bounds-no-end indent-tree-bounds
+ :def-children-bounds-no-end indent-tree-children-bounds
+ :def-expand-region indent-tree-expand-region
+ :def-expand-region-idempotent indent-tree-expand-region-idempotent
+ :def-select-children-once indent-tree-region-to-children
+ :def-expand-region-to-children/ancestor-generation indent-tree-expand-region/children-region
+
  :up-to-parent (lambda () (indent-tree-up-to-parent 1))
  :down-to-first-child (lambda () (indent-tree-down-to-first-child 1))
  :down-to-last-child (lambda () (indent-tree-down-to-last-child 1))
