@@ -239,12 +239,14 @@
              (tree-walk--text-object-no-end-helper ,inner-left ,inner-right ,up))
        (setq ,outer-helper
              (tree-walk--text-object-no-end-helper ,outer-left ,outer-right ,up))
-       (evil-define-text-object ,inner-name (count &optional beg end type)
-         ;; TODO - handle count, type
-         (funcall ,inner-helper beg end))
-       (evil-define-text-object ,outer-name (count &optional beg end type)
-         ;; TODO - handle count, type
-         (funcall ,outer-helper beg end)))))
+       (with-eval-after-load 'evil-macros
+         (evil-define-text-object ,inner-name (count &optional beg end type)
+           ;; TODO - handle count, type
+           (funcall ,inner-helper beg end)))
+       (with-eval-after-load 'evil-macros
+         (evil-define-text-object ,outer-name (count &optional beg end type)
+           ;; TODO - handle count, type
+           (funcall ,outer-helper beg end))))))
 
 (cl-defmacro tree-walk-define-operations
     (&key
