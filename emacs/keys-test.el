@@ -20,7 +20,8 @@
 
 (message "\n\nIn keys-test.el\n\n")
 
-(require 'estate)
+(require 'estate-core)
+(require 'estate-vim-like-states)
 (estate-mode 1)
 
 (load-library "text-object-stuff")
