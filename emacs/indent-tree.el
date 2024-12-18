@@ -7,6 +7,21 @@
 ;;   root
 ;;      indented more than root's next child!
 ;;     normal child indentation
+;;
+;; Or more accurately, there can be an arbitrary number of “half-sibling” child
+;; nodes for indentation (and org-mode) trees, where an early child is indented
+;; more than a later half-sibling.  There can be half-sibling sets.
+;; Eg:
+;;   root
+;;       4 deep
+;;       4 deep again, full sibling to above
+;;      3 deep, half sibling to above
+;;       4 deep, child of 3 deep
+;;      3 deep, full sibling to previous 3 deep
+;;     2 deep, half sibling of both top 4 deep and both above 3 deep
+;;
+;; TODO - So the system needs to account for half-siblings.  The inorder traversal needs to use them.
+
 
 (require 'tree-walk)
 (require 'repeatable-motion)

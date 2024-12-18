@@ -25,6 +25,9 @@
 ;; On trees with an explicit end delimiter, it can be really useful to go up to the end delimiter, but without an explicit end that operation doesn't really work -- eg. in an indentation tree where each line indents, the end of the (sub)tree is the end of each level of the subtree, so while it makes sense to go to the end point of any of those subtrees, it is ambigous if you want to go back.
 ;; This is also a problem for mixed trees, where if any of the trees mixed in lack explicit end delimiters, the mixed tree then doesn't universally have them.
 ;;
+;; Another weird tree issue is the idea of “half-siblings” for indent trees and org/outline-mode trees.  These can both have a first child that is indented more than later children, and in fact can have an arbitrary number of early children that are indented deeper than later children.  Eg: * h1 **** h4 *** h3 ** h2.  Each of these may have valid sub-trees, but they are not full siblings despite sharing a parent.  So there should be a next/prev full-sibling function and a next/prev full-or-half-sibling function, and maybe a next/prev half-sibling region function, and the full inorder traversal function needs to use the full-or-half-sibling functions.  Also XML could have a definition where the attributes count as a set of half siblings -- not the main XML definition, but it could be an alternate mode.
+;; But... does this tree-walk library need to care about full/half siblings?  The inorder traversal can just be given the next-full-or-half-sibling functions, and any specific trees with this quality can define their own helpers for dealing with full/half siblings.
+;;
 ;; What are the common USEFUL operations that may be built on top of the basics, that I can bind to keys in a generic way so that once I learn the keys for operations and for trees I can compose them?
 ;; * Move to sibling is really useful for navigation and reading, eg. to get an overview of definitions at a certain level
 ;; * I delete to the end of the current s-exp.  That might be more complicated with generic trees to know exactly where to delete to for trees without an explicit end delimiter.
@@ -66,6 +69,10 @@
 ;; ** a modification of this is delete-to-parent-or-newline, which I find a little awkward.
 ;; * Ryan Culpepper wrote a cool sexp-rewrite package for matching and transforming trees, it's a cool idea that could be generalized, but would be a lot of work.
 ;; * new sibling forward/backward -- Eg. for indent tree or org-mode it opens a new line below/above the current element and indents it/bullets it appropriately.  My binding would probably also leave me in insert mode instead of normal/command mode.  For symex it can... well, maybe it can be context sensitive and open a new line when its in a list where each item starts on a new line, or it can move and add spaces to the correct place in a context where all is on one line.  But what to do when there is only one item in the list?  I mostly want this operation for org-mode and indent trees, less for symex.
+;;
+;; Movement and addressing:
+;; * Movement operations should all move the cursor to some canonical anchor point.  This will probably typically be the beginning of the tree object, but could sometimes be elsewhere, eg. for infix trees the beginning of the infix operator is probably best.
+;; * There should be a “thing at point” or similar function to get the bounds of the tree object at point.
 
 (require 'cl-lib)
 
