@@ -334,6 +334,28 @@ Creates overlays for the areas that would be included in the line-based selectio
 
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; macro stuff, this really should go elsewhere
+(defvar-local wgh/-macro-recording nil)
+(defun wgh/macro-record (char)
+  (interactive "cmacro char:\n")
+  (setq-local wgh/-macro-recording char)
+  (kmacro-start-macro nil))
+(defun wgh/macro-finish-recording ()
+  (interactive)
+  (kmacro-end-macro nil)
+  (puthash wgh/-macro-recording last-kbd-macro estate--registers)
+  (setq-local wgh/-macro-recording nil))
+(defun wgh/macro-toggle ()
+  (interactive)
+  (if wgh/-macro-recording
+      (call-interactively 'wgh/macro-finish-recording)
+    (call-interactively 'wgh/macro-record)))
+(defun wgh/call-macro-by-name (count char)
+  (interactive "p\ncmacro char:\n")
+  (execute-kbd-macro (gethash char estate--registers "") count))
+
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 ;(set-keymap-parent -estate-mode-current-keymap estate-command-keymap)
 (estate-command-state)
