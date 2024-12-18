@@ -157,9 +157,88 @@ Return the (positive) number of iterations that could NOT be done (IE returns 0 
 (repeatable-motion-define-pair 'indent-tree-backward-full-or-half-sibling
                                'indent-tree-forward-full-or-half-sibling)
 
+(defun indent-tree--forward-full-sibling-region--only-to-boundary (num)
+  (let ((times (abs num))
+        (fwd (< 0 num))
+        (index 0)
+        (successful t)
+        (backtrack (point)))
+    (while (and (< index times)
+                successful)
+      (progn
+        (if fwd
+            (indent-tree-forward-to-last-full-sibling)
+          (indent-tree-backward-to-first-full-sibling))
+        (if (if fwd
+                (indent-tree--forward-half-sibling)
+              (indent-tree--backward-half-sibling))
+            (progn
+              (setq backtrack (point))
+              (setq index (+ 1 index)))
+          (progn
+            (setq successful nil)
+            (goto-char backtrack)))))
+    (- times index)))
 
-(defun indent-tree--indent-tree-forward-to-last-full-sibling ()
+(defun indent-tree-forward-full-sibling-region-first (num)
+  "Move forward to the next region of full siblings, NUM times.
+Move backward for negative NUM.
+Return the number of iterations that could NOT be done.
+
+By full-sibling region, I mean a region of full siblings that is delimited by half-sibling breaks.
+For example, consider:
+
+```
+root
+      r1a
+      r1b
+     r2a
+     r2b
+    r3a
+    r3b
+```
+
+If point is on r1a or r1b, moving forward to the next full-sibling region would move to r2a.
+If point is on r2a or r2b, moving backward to the next full-sibling region would move to r1a.
+
+It always moves to the FIRST sibling in the full sibling region, regardless of motion direction.
+"
+  (interactive "p")
+  (let ((remaining (indent-tree--forward-full-sibling-region--only-to-boundary num)))
+    (when (and (not (eql (abs num) remaining))
+               (< num 0))
+      (indent-tree-backward-to-first-full-sibling))
+    remaining))
+(defun indent-tree-backward-full-sibling-region-first (num)
+  "The reverse of `indent-tree-forward-full-sibling-region-first'."
+  (interactive "p")
+  (indent-tree-forward-full-sibling-region-first (- num)))
+
+(defun indent-tree-forward-full-sibling-region-last (num)
+  "Like `indent-tree-forward-full-sibling-region-first', but to the end."
+  (interactive "p")
+  (let ((remaining (indent-tree--forward-full-sibling-region--only-to-boundary num)))
+    (when (and (not (eql (abs num) remaining))
+               (> num 0))
+      (indent-tree-forward-to-last-full-sibling))
+    remaining))
+(defun indent-tree-backward-full-sibling-region-last (num)
+  "The reverse of `indent-tree-forward-full-sibling-region-last'."
+  (interactive "p")
+  (indent-tree-forward-full-sibling-region-last (- num)))
+
+(repeatable-motion-define-pair 'indent-tree-forward-full-sibling-region-first
+                               'indent-tree-backward-full-sibling-region-first)
+(repeatable-motion-define-pair 'indent-tree-forward-full-sibling-region-last
+                               'indent-tree-backward-full-sibling-region-last)
+
+(defun indent-tree-forward-to-last-full-sibling ()
+  (interactive)
   (while (tree-walk--motion-moved (lambda () (indent-tree-forward-full-sibling 1)))))
+(defun indent-tree-backward-to-first-full-sibling ()
+  (interactive)
+  (while (tree-walk--motion-moved (lambda () (indent-tree-forward-full-sibling -1)))))
+
 (defun indent-tree--indent-tree-forward-to-last-full-or-half-sibling ()
   (while (tree-walk--motion-moved (lambda () (indent-tree-forward-full-or-half-sibling 1)))))
 
