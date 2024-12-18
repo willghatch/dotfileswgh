@@ -87,8 +87,13 @@
       (let ((n-left (wgh/forward-thing strict thing (if fwd-beg-p count (- count)))))
         (when (or strict
                   (= 0 n-left))
+          (let ((bounds (if fwd-beg-p
+                            (wgh/at-thing-end-p thing)
+                          (wgh/at-thing-beginning-p thing))))
+            (if bounds (goto-char (if fwd-beg-p (car bounds) (cdr bounds)))))
           ;; I would use beginning/end-of-thing, but forward-thing is more robust due to nesting or adjacent things.
-          (if fwd-beg-p (forward-thing thing -1) (forward-thing thing 1)))
+          ;(if fwd-beg-p (forward-thing thing -1) (forward-thing thing 1))
+          )
         ))))
 (defun wgh/forward-thing-beginning (strict thing &optional count)
   (-wgh/fwd-beg_or_bwd-end_thing strict thing count t))
@@ -242,44 +247,83 @@ If no region is active, it will use (point . point)."
 ;; I'm used to vi/evil word definition, it's strange to me that emacs' native word definition skips over punctuation and symbols, as well as blank lines.
 (defun forward-vi-like-word (&optional count)
   (setq count (or count 1))
-  (rx-let ((blank-line-regexp "^\\s*$")
+  (rx-let ((blank-line-regexp (seq bol (* blank) eol))
            (vi-like-word-regexp-forward/non-blank-line
-            (or (+ word)
-                (+ (not (any word space))))))
+            (or
+             (seq (+ word) eol)
+             (+ word)
+             (seq (+ (not (any word space))) eol)
+             (+ (not (any word space)))
+             )))
     (let ((vi-like-word-regexp-forward
            (rx (or vi-like-word-regexp-forward/non-blank-line
-                   blank-line-regexp)))
-          (vi-like-word-regexp-backward
-           (rx (or (seq space
-                        vi-like-word-regexp-forward/non-blank-line)
-                   (seq word (+ (not (any word space))))
-                   (seq (not (any word space)) (+ word))
-                   blank-line-regexp)))
+                   blank-line-regexp
+                   )))
+          (vi-like-word-regexp-backward-no-bol
+           (rx (or
+                (seq blank (+ word))
+                (seq blank (+ (not (any word blank))))
+                (seq word (+ (not (any word blank "\n"))))
+                (seq (not (any word blank)) (+ word))
+                )))
+          (vi-like-word-regexp-backward-yes-bol
+           (rx (or
+                (seq blank (+ word))
+                (seq blank (+ (not (any word blank))))
+                (seq blank
+                     vi-like-word-regexp-forward/non-blank-line)
+                (seq word (+ (not (any word blank))))
+                (seq (not (any word blank)) (+ word))
+                (seq bol
+                     vi-like-word-regexp-forward/non-blank-line)
+                (seq bol (+ (not (any word blank))))
+                (seq bol (+ word))
+                (seq bol (* blank) eol)
+                )))
           (blank-line-regexp (rx blank-line-regexp))
           (point-orig (point))
           (fwd (< 0 count))
           (count (abs count)))
-      (while (< 0 count)
+      (while (and (< 0 count)
+                  (not (if fwd (eobp) (bobp))))
         (if fwd
-            (re-search-forward vi-like-word-regexp-forward)
+            (progn (re-search-forward vi-like-word-regexp-forward
+                                      (save-mark-and-excursion (forward-line) (point))))
           ;; Backward requires special handling, because searching a regexp backward isn't a mirror of regexp searching forward...
           ;; This is going to be really inefficient, but I think the easiest way is...
           (progn
             (or
-             (let ((searched  (ignore-errors
-                                (re-search-backward vi-like-word-regexp-backward))))
-               (and searched
-                    (progn (unless (looking-at blank-line-regexp)
-                             (forward-char 1))
-                           t)))
+             (let* ((point-orig (point))
+                    (searched-1 (ignore-errors
+                                  (re-search-backward vi-like-word-regexp-backward-no-bol)))
+                    (search-point-1 (point))
+                    (RESET (goto-char point-orig))
+                    (searched-2 (ignore-errors
+                                  (re-search-backward vi-like-word-regexp-backward-yes-bol)))
+                    (search-point-2 (point))
+                    (RESET (goto-char point-orig))
+                    )
+               (cond ((and (or (and searched-1 searched-2 (< search-point-1 search-point-2))
+                               (and (not searched-1) searched-2))
+                           (not (looking-at (rx (seq bol (* blank) eol)))))
+                      ;; The BOL case hit first, so go to it
+                      (goto-char search-point-2)
+                      t)
+                     (searched-1
+                      ;; The BOL case hit last, go to the other one, but fix it up
+                      (goto-char (+ 1 search-point-1))
+                      t)
+                     (t nil)))
              (beginning-of-buffer))))
-        (setq count (- count 1))))))
-(wgh/def-move-thing vi-like-word)
+        (setq count (- count 1)))
+      count)))
+(wgh/def-move-thing vi-like-word :strict nil)
 
 (defun -wgh/-vi-like-word-looking-at-category ()
   (cond ((looking-at (rx word)) 'word)
         ((looking-at (rx space)) 'space)
         (t 'sym)))
+
 (defun forward-vi-like-word-2 (&optional count)
   (setq count (or count 1))
   (let ((fwd (< 0 count))
@@ -305,8 +349,8 @@ If no region is active, it will use (point . point)."
             (when (equal orig-cat 'space)
               (setq orig-cat (funcall at-cat))))))
       (setq count (- count 1)))))
-(wgh/def-move-thing vi-like-word-2)
-;; TODO - both of these attempts got me something kinda close... but wrong.  I should probably give up and do something else for now.  How much does it matter that my word movement behaves just like vim except in the specific way I want it not to?
+(wgh/def-move-thing vi-like-word-2 :strict nil)
+
 
 (defvar run-text-object-stuff-tests nil)
 (when run-text-object-stuff-tests

@@ -221,11 +221,13 @@
 (emmap "M" 'baddd-window-middle)
 (emmap "n" (lambda (&optional n) (interactive "p") (if wgh/isearch-repeat-forward-p (isearch-repeat-forward n) (isearch-repeat-backward n))))
 (emmap "N" (lambda (&optional n) (interactive "p") (if wgh/isearch-repeat-forward-p (isearch-repeat-backward n) (isearch-repeat-forward n))))
+
 ;; TODO - word begin
-(emmap "w" 'rmo/wgh/forward-word-beginning)
-(emmap "b" 'rmo/wgh/backward-word-beginning)
-;(emmap "w" 'rmo/wgh/forward-vi-like-word-beginning)
-;(emmap "b" 'rmo/wgh/backward-vi-like-word-beginning)
+;(emmap "w" 'rmo/wgh/forward-word-beginning)
+;(emmap "b" 'rmo/wgh/backward-word-beginning)
+(emmap "w" 'rmo/wgh/forward-vi-like-word-beginning)
+(emmap "b" 'rmo/wgh/backward-vi-like-word-beginning)
+
 ;(emmap "W" 'rmo/baddd-forward-WORD-begin)
 ;(emmap "B" 'rmo/baddd-backward-WORD-begin)
 ;(emmap "ge" 'rmo/baddd-backward-word-end)
@@ -434,10 +436,10 @@
 (ecmap "g," 'goto-last-change-reverse)
 
 ; o and e maps - o is left/back, e is right/forward
-(emmap "ee" 'rmo/wgh/forward-word-end)
-(emmap "oe" 'rmo/wgh/backward-word-end)
-;(emmap "ee" 'rmo/wgh/forward-vi-like-word-end)
-;(emmap "oe" 'rmo/wgh/backward-vi-like-word-end)
+;(emmap "ee" 'rmo/wgh/forward-word-end)
+;(emmap "oe" 'rmo/wgh/backward-word-end)
+(emmap "ee" 'rmo/wgh/forward-vi-like-word-end)
+(emmap "oe" 'rmo/wgh/backward-vi-like-word-end)
 (emmap "eE" 'rmo/baddd-forward-WORD-end)
 (emmap "oE" 'rmo/baddd-backward-WORD-end)
 (defun vilish-open-line-below ()
