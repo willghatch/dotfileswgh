@@ -31,16 +31,20 @@
                   (buffer-substring (line-beginning-position)
                                     (line-end-position))))
 
-(defun indent-tree-forward-sibling (num)
+(defun indent-tree-forward-full-sibling (num)
+  "Go forward to full sibling of indent-tree node at point NUM times, going backward for negative NUM.
+Return the (positive) number of iterations that could NOT be done (IE returns 0 for full success).
+Notably this will stop if it hits a half-sibling boundary."
   (interactive "p")
   (let ((start-indent (current-indentation))
         (start-column (current-column))
         (backtrack-pos (point))
         (direction (if (< 0 num) 1 -1))
         (times (abs num))
-        (index 0))
+        (index 0)
+        (successful t))
     (while (and (< index times)
-                (setq index (+ 1 index)))
+                successful)
       (while (and (zerop (forward-line direction))
                   (or (> (current-indentation) start-indent)
                       ;; TODO - maybe this should be configurable as to whether it ignores empty lines and/or lines with indentation but nothing after
@@ -48,26 +52,116 @@
                       ;;(equal (line-beginning-position) (line-end-position))
                       ;; white space only line
                       (indent-tree--current-line-whitespace-only-p)
-
-                      )
-                  ))
+                      )))
       (if (or (not (= (current-indentation) start-indent))
               ;; TODO - without this, top-level movement can go to a blank line after the last top-level tree.  That could be useful, but violates my intention of making this a tree motion...
               (indent-tree--current-line-whitespace-only-p))
-          (goto-char backtrack-pos)
+          (progn
+            (setq successful nil)
+            (goto-char backtrack-pos))
         (progn
-          ;;(evil-goto-column start-column)
           (back-to-indentation)
-          (setq backtrack-pos (point)))))))
-(defun indent-tree-backward-sibling (direction)
+          (setq backtrack-pos (point))))
+      (when successful (setq index (+ 1 index))))
+    (- times index)))
+
+(defun indent-tree-backward-full-sibling (direction)
+  "The reverse of `indent-tree-forward-full-sibling'."
   (interactive "p")
-  (indent-tree-forward-sibling (* -1 (or direction 1))))
-(repeatable-motion-define-pair 'indent-tree-backward-sibling
-                               'indent-tree-forward-sibling)
+  (indent-tree-forward-full-sibling (* -1 (or direction 1))))
+
+(repeatable-motion-define-pair 'indent-tree-backward-full-sibling
+                               'indent-tree-forward-full-sibling)
+
+(defun indent-tree--forward-half-sibling ()
+  "Go forward to next half sibling iff the current node is the last one before a half-sibling region boundary.
+Return new position if moved, return nil on failure."
+  (let ((start-indent (current-indentation))
+        (start-column (current-column))
+        (backtrack-pos (point))
+        (parent-indentation (save-mark-and-excursion (indent-tree-up-to-parent 1)
+                                                     (current-indentation))))
+    (while (and (zerop (forward-line 1))
+                (or (> (current-indentation) start-indent)
+                    ;; TODO - maybe this should be configurable as to whether it ignores empty lines and/or lines with indentation but nothing after
+                    ;; white space only line
+                    (indent-tree--current-line-whitespace-only-p))))
+    (if (or (not (< parent-indentation (current-indentation) start-indent))
+            ;; TODO - without this, top-level movement can go to a blank line after the last top-level tree.  That could be useful, but violates my intention of making this a tree motion...
+            (indent-tree--current-line-whitespace-only-p))
+        (progn
+          (goto-char backtrack-pos)
+          nil)
+      (progn
+        (back-to-indentation)
+        (point)))))
+
+(defun indent-tree--backward-half-sibling ()
+  "Go backward to next half sibling iff the current node is the last one before a half-sibling region boundary.
+Return new position if moved, return nil on failure."
+  (let* ((start-indent (current-indentation))
+         (start-column (current-column))
+         (backtrack-pos (point))
+         (parent-info (save-mark-and-excursion (indent-tree-up-to-parent 1)
+                                               (cons (current-indentation)
+                                                     (point))))
+         (parent-indentation (car parent-info))
+         (parent-point (cdr parent-info)))
+    (while (and (zerop (forward-line -1))
+                (indent-tree--current-line-whitespace-only-p)))
+    (if (< parent-indentation start-indent (current-indentation))
+        ;; We have found a possible match, but need to go up the indent tree until one below the original parent.
+        (let ((success-backtrack-point (point)))
+          (while (< parent-indentation (current-indentation))
+            (setq success-backtrack-point (point))
+            (indent-tree-up-to-parent 1))
+          (if (eql (point) parent-point)
+              (progn
+                (goto-char success-backtrack-point)
+                (back-to-indentation)
+                (point))
+            (progn (goto-char backtrack-pos)
+                   nil)))
+      (progn (goto-char backtrack-pos)
+             nil))))
+
+(defun indent-tree-forward-full-or-half-sibling (num)
+  "Move forward NUM full or half sibling nodes from the indent-tree node at point.
+Move backward for negative num.
+Return the (positive) number of iterations that could NOT be done (IE returns 0 for full success)."
+  (interactive "p")
+  (let ((fwd (<= 0 num))
+        (num-left (abs num))
+        (successful t))
+    (while (and (< 0 num-left)
+                successful)
+      (setq num-left (indent-tree-forward-full-sibling
+                      (if fwd num-left (- num-left))))
+      (let ((half-sibling-success
+             (and (< 0 num-left)
+                  (funcall (if fwd
+                               #'indent-tree--forward-half-sibling
+                             #'indent-tree--backward-half-sibling)))))
+        (when half-sibling-success
+          (setq num-left (- num-left 1)))
+        ;; If full siblings were exhausted and half sibling fails, then we must be done.
+        ;; But if at least half-sibling-success, then we may still make progress in another loop iteration.
+        (setq successful half-sibling-success)))
+    num-left))
+
+(defun indent-tree-backward-full-or-half-sibling (direction)
+  "The reverse of `indent-tree-forward-full-or-half-sibling'."
+  (interactive "p")
+  (indent-tree-forward-full-or-half-sibling (* -1 (or direction 1))))
+
+(repeatable-motion-define-pair 'indent-tree-backward-full-or-half-sibling
+                               'indent-tree-forward-full-or-half-sibling)
 
 
-(defun indent-tree--indent-tree-forward-to-last-sibling ()
-  (while (tree-walk--motion-moved (lambda () (indent-tree-forward-sibling 1)))))
+(defun indent-tree--indent-tree-forward-to-last-full-sibling ()
+  (while (tree-walk--motion-moved (lambda () (indent-tree-forward-full-sibling 1)))))
+(defun indent-tree--indent-tree-forward-to-last-full-or-half-sibling ()
+  (while (tree-walk--motion-moved (lambda () (indent-tree-forward-full-or-half-sibling 1)))))
 
 (defun indent-tree-up-to-parent (num)
   ;; TODO - this should probably error if num is negative
@@ -132,7 +226,7 @@
     (while (and (< index times)
                 (setq index (+ 1 index)))
       (and (tree-walk--motion-moved (lambda () (indent-tree-down-to-first-child 1)))
-           (indent-tree--indent-tree-forward-to-last-sibling)))))
+           (indent-tree--indent-tree-forward-to-last-full-or-half-sibling)))))
 (repeatable-motion-define 'indent-tree-down-to-last-child
                           ;; down to last child has the same inverse as down to first child, but up to parent inverses as down to first child
                           'indent-tree-up-to-parent)
@@ -147,8 +241,8 @@
  :up-to-parent (lambda () (indent-tree-up-to-parent 1))
  :down-to-first-child (lambda () (indent-tree-down-to-first-child 1))
  :down-to-last-child (lambda () (indent-tree-down-to-last-child 1))
- :next-sibling (lambda () (indent-tree-forward-sibling 1))
- :previous-sibling (lambda () (indent-tree-forward-sibling -1))
+ :next-sibling (lambda () (indent-tree-forward-full-or-half-sibling 1))
+ :previous-sibling (lambda () (indent-tree-forward-full-or-half-sibling -1))
  :no-end-object-left-finalize #'line-beginning-position
  :no-end-object-right-finalize #'line-end-position
  )

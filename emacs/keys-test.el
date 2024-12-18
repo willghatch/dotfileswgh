@@ -618,8 +618,8 @@ is the opposite."
 ;; TODO - I never use this binding, but symbol will be a useful thing when I make a more composable system...
 (emmap "eO" 'rmo/wgh/forward-symbol-beginning)
 (emmap "oO" 'rmo/wgh/backward-symbol-beginning)
-(emmap "ei" 'rmo/indent-tree-forward-sibling)
-(emmap "oi" 'rmo/indent-tree-backward-sibling)
+(emmap "ei" 'rmo/indent-tree-forward-full-or-half-sibling)
+(emmap "oi" 'rmo/indent-tree-backward-full-or-half-sibling)
 (emmap "eI" 'rmo/indent-tree-down-to-first-child)
 (emmap "oI" 'rmo/indent-tree-up-to-parent)
 (emmap "ej" 'rmo/baddd-jump-forward)
