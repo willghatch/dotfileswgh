@@ -2,6 +2,8 @@
 
 ;; One issue with thing-at-point is that point can be in multiple things if they nest, or between two things if one point can be at once the end of one and the beginning of another.  In those cases, it prefers the thing whose bounds extend ahead of the cursor.  So, eg. between two close parens it is at the end of a symex and just inside another, and it will choose to work on the symex that it is inside rather than the symex it is at but after.
 
+;; TODO - add a buffer-local cache that is invalidated by buffer changes.  Add a flag to motions besides strict that is something like trusted or consistent, that the motion is trusted to provide consistent answers for thing-at-point bounds and thus be chacheable for its positioning without “poisoning” the cache with inconsistent values.  The cache can hold object bounds so that the wonky forward-beginning/backward-end functions don't recompute so much.
+
 (defun wgh/at-thing-beginning-p (thing)
   "If at the beginning of a thing, return its bounds, else nil."
   (let ((b (bounds-of-thing-at-point thing)))
@@ -101,9 +103,9 @@
   (-wgh/fwd-beg_or_bwd-end_thing strict thing count nil))
 
 
-(defun wgh/expanded-region-to-bounds-of-thing-at-point (strict thing &optional region)
+(defun wgh/expanded-region-to-bounds-of-thing-at-point (strictly-grow thing &optional region)
   "Returns the new bounds or nil.
-If STRICT, only return the bounds if they are strictly greater than the original region.
+If STRICTLY-GROW, only return the bounds if they are strictly greater than the original region.
 If REGION is not given, uses `region-bounds`, but either way the region must be a single contiguous region.
 If no region is active, it will use (point . point)."
   (let* ((orig-regions (or (and region (list region))
@@ -123,8 +125,8 @@ If no region is active, it will use (point . point)."
                (right-grow (< (cdr orig-region) (cdr bounds)))
                (nonstrict-ok (and left-ok right-ok))
                (strict-ok (and nonstrict-ok (or left-grow right-grow))))
-          (if (or (and strict strict-ok)
-                  (and (not strict) nonstrict-ok))
+          (if (or (and strictly-grow strict-ok)
+                  (and (not strictly-grow) nonstrict-ok))
               bounds
             nil))
       nil)))
@@ -318,38 +320,6 @@ If no region is active, it will use (point . point)."
         (setq count (- count 1)))
       count)))
 (wgh/def-move-thing vi-like-word :strict nil)
-
-(defun -wgh/-vi-like-word-looking-at-category ()
-  (cond ((looking-at (rx word)) 'word)
-        ((looking-at (rx space)) 'space)
-        (t 'sym)))
-
-(defun forward-vi-like-word-2 (&optional count)
-  (setq count (or count 1))
-  (let ((fwd (< 0 count))
-        (count (abs count)))
-    (while (< 0 count)
-      (if fwd
-          (re-search-forward (rx (or (+ word)
-                                     (+ (not (any word space)))
-                                     (seq bol (* space) eol))))
-        (let* ((at-cat (lambda () (save-mark-and-excursion
-                                    (unless (bobp)
-                                      (backward-char 1)
-                                      (-wgh/-vi-like-word-looking-at-category)))))
-               (orig-cat (funcall at-cat))
-               (moved nil))
-          (while (not (or (bobp)
-                          (and moved (looking-at (rx (seq bol (* space) eol))))
-                          (let ((new-cat (funcall at-cat)))
-                            (or (and (not (equal new-cat orig-cat))
-                                     (not (equal orig-cat 'space)))))))
-            (backward-char 1)
-            (setq moved t)
-            (when (equal orig-cat 'space)
-              (setq orig-cat (funcall at-cat))))))
-      (setq count (- count 1)))))
-(wgh/def-move-thing vi-like-word-2 :strict nil)
 
 
 (defvar run-text-object-stuff-tests nil)
