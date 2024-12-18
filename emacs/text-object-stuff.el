@@ -103,7 +103,7 @@
   (-wgh/fwd-beg_or_bwd-end_thing strict thing count nil))
 
 
-(defun wgh/expanded-region-to-bounds-of-thing-at-point (strictly-grow thing &optional region)
+(defun wgh/-expanded-region-to-bounds-of-thing-at-point (strictly-grow thing &optional region)
   "Returns the new bounds or nil.
 If STRICTLY-GROW, only return the bounds if they are strictly greater than the original region.
 If REGION is not given, uses `region-bounds`, but either way the region must be a single contiguous region.
@@ -116,7 +116,7 @@ If no region is active, it will use (point . point)."
                            (null (cdr orig-regions))
                            (car orig-regions)))
          (bounds (and orig-region (save-excursion
-                                    (wgh/set-region orig-region)
+                                    (wgh/-set-region orig-region)
                                     (bounds-of-thing-at-point thing)))))
     (if (and orig-region bounds)
         (let* ((left-ok (<= (car bounds) (car orig-region)))
@@ -131,10 +131,26 @@ If no region is active, it will use (point . point)."
             nil))
       nil)))
 
-(defun wgh/set-region (bounds)
+(defun wgh/-set-region (bounds)
   "Set the active region to BOUNDS.  BOUNDS must be a single pair."
   (set-mark (car bounds))
   (goto-char (cdr bounds)))
+
+(defun wgh/expand-region-to-thing (thing)
+  (interactive)
+  ;; TODO - handle trees and count?
+  (let ((new-bounds (wgh/-expanded-region-to-bounds-of-thing-at-point t thing)))
+    (when new-bounds
+      (wgh/-set-region new-bounds))))
+
+;; TODO - need an inner region for at least some objects.  Can use sp-beginning-of-sexp for smartparens, but point has to be inside the parens.  IE can combo sp-down-sexp with sp-beginning-of-sexp and sp-end-of-sexp.
+
+(cl-defmacro wgh/def-expand-region-to-thing (thing)
+  (let ((sym (intern (format "wgh/expand-region-to-%s" thing))))
+    `(progn
+       (defun ,sym ()
+         (interactive)
+         (wgh/expand-region-to-thing ',thing)))))
 
 ;;;;;;
 
@@ -226,18 +242,26 @@ If no region is active, it will use (point . point)."
 
 ;;;;;
 
+;;;;;
 
 (wgh/def-move-thing word :strict nil)
 (wgh/def-transpose-thing word)
+(wgh/def-expand-region-to-thing word)
 (wgh/def-move-thing symbol)
 (wgh/def-transpose-thing symbol)
+(wgh/def-expand-region-to-thing symbol)
 (wgh/def-move-thing sentence)
 (wgh/def-transpose-thing sentence)
+(wgh/def-expand-region-to-thing sentence)
 (wgh/def-move-thing paragraph)
 (wgh/def-transpose-thing paragraph)
+(wgh/def-expand-region-to-thing paragraph)
 (put 'symex 'forward-op 'sp-forward-sexp)
 (wgh/def-move-thing symex)
 (wgh/def-transpose-thing symex)
+;; TODO - this one is poor because it needs tree handling
+(wgh/def-expand-region-to-thing symex)
+;; TODO - need object specific to each delimiter for smartparens, as tree, in addition to smartparens general object.
 
 
 ;;;;;
@@ -319,7 +343,10 @@ If no region is active, it will use (point . point)."
              (beginning-of-buffer))))
         (setq count (- count 1)))
       count)))
+
 (wgh/def-move-thing vi-like-word :strict nil)
+(wgh/def-transpose-thing vi-like-word)
+(wgh/def-expand-region-to-thing vi-like-word)
 
 
 (defvar run-text-object-stuff-tests nil)
@@ -332,5 +359,5 @@ If no region is active, it will use (point . point)."
       (goto-char 6)
       (message "region active in test: %s" (region-active-p))
       (should (equal (cons 5 10)
-                     (wgh/expanded-region-to-bounds-of-thing-at-point t 'word (cons 7 9))))))
+                     (wgh/-expanded-region-to-bounds-of-thing-at-point t 'word (cons 7 9))))))
   )

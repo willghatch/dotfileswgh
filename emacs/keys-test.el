@@ -103,6 +103,12 @@
   (nobreak-define-key temp-key-map keys func))
 
 (ecmap "a" (lambda () (interactive) (message "don't append, use i for insert")))
+(evmap "aw" 'wgh/expand-region-to-vi-like-word)
+(evmap "aW" 'wgh/expand-region-to-word) ;; TODO - also define forward/back emacs-style word
+(evmap "as" 'wgh/expand-region-to-sentence)
+(evmap "aS" 'wgh/expand-region-to-symbol)
+(evmap "ap" 'wgh/expand-region-to-paragraph)
+(evmap "ab" 'wgh/expand-region-to-symex)
 (ecmap "A" (lambda () (interactive)
              (progn (move-end-of-line nil) (estate-insert-state))))
 (evmap "A" (lambda () (interactive) (progn (goto-char (region-end))
