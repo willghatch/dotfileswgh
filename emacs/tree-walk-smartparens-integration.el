@@ -173,6 +173,11 @@ But if point is both after an end delimiter and before an open delimiter, it wil
                    (cons (point) end-point)
                  nil)))))))
 
+(defun sptw-bounds-of-sexp (point)
+  (save-mark-and-excursion
+    (goto-char point)
+    (sptw-bounds-of-sexp-at-point)))
+
 (defun sptw-move-to-current-sexp-beginning ()
   "Move to the beginning of the current sexp at point."
   (interactive)
@@ -190,6 +195,11 @@ But if point is both after an end delimiter and before an open delimiter, it wil
           (cons (progn (sp-beginning-of-sexp) (point))
                 (progn (sp-end-of-sexp) (point))))
       nil)))
+
+(defun sptw-bounds-of-sexp-children (point)
+  (save-mark-and-excursion
+    (goto-char point)
+    (sptw-bounds-of-sexp-children-at-point)))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;; Motion commands
@@ -467,8 +477,8 @@ Specifically it moves inside the parens."
  :use-next-sibling 'sptw-forward-sibling-beginning
  :use-previous-sibling (lambda () (and (tree-walk--motion-moved 'sptw-backward-sibling-end)
                                        (sptw-backward-sibling-beginning)))
- :use-bounds 'sptw-bounds-of-sexp-at-point
- :use-children-bounds 'sptw-bounds-of-sexp-children-at-point
+ :use-bounds 'sptw-bounds-of-sexp
+ :use-children-bounds 'sptw-bounds-of-sexp-children
  )
 
 (provide 'tree-walk-smartparens-integration)
