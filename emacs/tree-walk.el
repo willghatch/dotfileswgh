@@ -176,6 +176,11 @@
        (fset ',name-backward
              (tree-walk--inorder-traversal-backward ,forward1 ,backward1)))))
 
+(defun tree-walk--down-to-last-child-default-impl (down-to-first-child next-sibling)
+  "Default implementation of down-to-last-child."
+  (and
+   (tree-walk--motion-moved down-to-first-child)
+   (while (tree-walk--motion-moved next-sibling))))
 
 (defun wgh/-region-less-or-equal (r1 r2)
   "Returns canon form of r2 if it includes all of r1, otherwise nil.
@@ -474,6 +479,7 @@ If no region is given, it uses the current region (or ((point) . (point))).
 
      def-bounds-no-end
      def-children-bounds-no-end
+     def-down-to-last-child
      ;; TODO - these should be able to use the new definitions OR provided existing definitions.
      def-expand-region
      def-expand-region-idempotent
@@ -496,14 +502,18 @@ If no region is given, it uses the current region (or ((point) . (point))).
      ,@(cl-remove-if-not
         (lambda (x) x)
         (list
+         (when def-down-to-last-child
+           `(defun ,def-down-to-last-child ()
+              (interactive)
+              (tree-walk--down-to-last-child-default-impl ,down-to-first-child ,next-sibling)))
          (when down-to-last-descendant
            `(defun ,down-to-last-descendant ()
               (interactive)
-              (tree-walk--down-to-last-descendant ,down-to-last-child)))
+              (tree-walk--down-to-last-descendant ,(or down-to-last-child def-down-to-last-child))))
          (when (or no-end-inner-object no-end-outer-object)
            `(tree-walk-define-text-objects-no-end-tree
              ,no-end-inner-object ,no-end-outer-object
-             ,up-to-parent ,down-to-first-child ,down-to-last-child
+             ,up-to-parent ,down-to-first-child ,(or down-to-last-child def-down-to-last-child)
              ,no-end-object-left-finalize ,no-end-object-right-finalize))
          (when (or def-bounds-no-end def-children-bounds-no-end)
            `(tree-walk--define-bounds-functions-for-tree-with-no-end-delimiter
@@ -533,7 +543,7 @@ If no region is given, it uses the current region (or ((point) . (point))).
              ,inorder-forward
              ,inorder-backward
              ,next-sibling ,previous-sibling
-             ,up-to-parent ,down-to-first-child ,down-to-last-child
+             ,up-to-parent ,down-to-first-child ,(or down-to-last-child def-down-to-last-child)
              ))
          ))))
 

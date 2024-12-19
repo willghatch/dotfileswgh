@@ -11,6 +11,8 @@
 ;; It would be more efficient to use smartparens internals, rather than doing motions and looking at the results.
 ;; I should maybe see if smartparens has a stable public API for programming against without using the motions.
 ;; But that would take more time than just slightly editing the thing I already wrote over a decade ago.
+;;
+;; TODO - improve handling of prefix quotes, unquotes, etc.
 
 (require 'dash)
 (require 'smartparens)
@@ -152,6 +154,41 @@ IE point is immediately after the end.
 Note that point can be both at the end and start of two different sexps, and commands prefer using the sexp that point is at the start of."
   (or (sptw-at-close-end?)
       (sptw--at-end-of-symbol-sexp?)))
+
+(defun sptw-bounds-of-sexp-at-point ()
+  "Return the bounds of the smartparens sexp at point as (beg . end), or nil if there is no sexp at point.
+Note that if point is just before an opening delimiter or just after a closing delimiter, the sexp will be the one for those delimiters.
+But if point is both after an end delimiter and before an open delimiter, it will prefer the open delimiter."
+  (cond ((sptw-at-sexp-beginning?)
+         (cons (point) (save-mark-and-excursion (sp-forward-sexp) (point))))
+        ((sptw-at-sexp-end?)
+         (cons (save-mark-and-excursion (sp-backward-sexp) (point)) (point)))
+        (t
+         (let ((orig-point (point)))
+           (save-mark-and-excursion
+             (sp-forward-sexp)
+             (let ((end-point (point)))
+               (sp-backward-sexp)
+               (if (<= (point) orig-point end-point)
+                   (cons (point) end-point)
+                 nil)))))))
+
+(defun sptw-move-to-current-sexp-beginning ()
+  (interactive)
+  (let ((bounds (sptw-bounds-of-sexp-at-point)))
+    (when bounds
+      (goto-char (car bounds)))))
+
+(defun sptw-bounds-of-sexp-children-at-point ()
+  "Like `sptw-bounds-of-sexp-at-point' but trimmed to only the area inside the delimiters."
+  (save-mark-and-excursion
+    (sptw-move-to-current-sexp-beginning)
+    (if (sptw-at-open-beginning?)
+        (progn
+          (sptw-down-sexp-beginning)
+          (cons (progn (sp-beginning-of-sexp) (point))
+                (progn (sp-end-of-sexp) (point))))
+      nil)))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;; Motion commands
@@ -401,30 +438,26 @@ Specifically it moves inside the parens."
 
 ;(put 'smartparens-sexp 'forward-op 'sp-forward-sexp)
 
+;; TODO - sptw-down-sexp-end is broken
 
 ;(tree-walk-define-operations
-; :inorder-forward TODO
-; :inorder-backward TODO
-; :down-to-last-descendant TODO
-; :no-end-inner-object TODO
-; :no-end-outer-object TODO
+; :inorder-forward sptw-inorder-traversal-forward
+; :inorder-backward sptw-inorder-traversal-backward
+; :down-to-last-descendant sptw-down-to-last-descendant
 ;
-; :def-expand-region TODO
-; :def-expand-region-idempotent TODO
-; :def-select-children-once TODO
-; :def-expand-region-to-children/ancestor-generation TODO
+; :def-expand-region sptw-expand-region
+; :def-expand-region-idempotent sptw-expand-region-idempotent
+; :def-select-children-once sptw-select-children-region-idempotent
+; :def-expand-region-to-children/ancestor-generation sptw-expand-region/children-region
+; :def-down-to-last-child sptw-down-to-last-child-beginning
 ;
 ; ;; TODO - I probably need to wrap these to constrain their behavior
-; :up-to-parent sp-up-sexp
-; :down-to-first-child sp-down-sexp
+; :up-to-parent sptw-up-sexp-beginning
+; :down-to-first-child sptw-down-sexp-beginning
 ; :down-to-last-child TODO
-; :next-sibling sp-forward-sexp
-; :previous-sibling sp-backward-sexp
-; :bounds-func-use (lambda () (bounds-of-thing-at-point 'smartparens-sexp))
-; :children-bounds-func-use (lambda ()
-;                             ;; TODO - this is wrong because I need to detect errors and force failure, but it should look something like this.
-;                             (save-mark-and-excursion
-;                               (sp-down-sexp)
-;                               (cons (save-mark-and-excursion (sp-beginning-of-sexp) (point))
-;                                     (save-mark-and-excursion (sp-end-of-sexp) (point)))))
+; :next-sibling sptw-forward-sexp-sibling-beginning
+; ;; TODO - this is not quite right.  Actually tree-walk should have a move-to-canon-anchor-point-for-current-tree-node function to fix this.
+; :previous-sibling (lambda () (sptw-move-to-current-sexp-beginning) (sptw-backward-sexp-sibling-beginning))
+; :bounds-func-use sptw-bounds-of-sexp-at-point
+; :children-bounds-func-use sptw-bounds-of-sexp-children-at-point
 ; )
