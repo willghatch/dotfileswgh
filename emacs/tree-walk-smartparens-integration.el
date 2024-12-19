@@ -270,8 +270,13 @@ Note that point can be both at the end and start of two different sexps, and com
                     "Move up to the end of the containing smartparens sexp.")
 
 (defun sptw--down-sexp ()
-  ;; Surprise!!!
-  (sp-down-sexp))
+  (if (and (sptw-at-sexp-end?)
+           (not (sptw-at-sexp-beginning?)))
+      (progn
+        (backward-char)
+        (sp-down-sexp))
+    (sp-down-sexp)))
+
 ;;;###autoload (autoload 'sptw-down-sexp "tree-walk-smartparens-integration.el" "" t)
 (sptw--command-wrap sptw-down-sexp-beginning
                     sptw--down-sexp
@@ -317,47 +322,58 @@ Note that point can be both at the end and start of two different sexps, and com
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;; editing commands!
 
-(defmacro sptw--maybe-forwarded (name forward-p action)
-  `(defun ,name (&optional arg)
-     (interactive "p")
-     (let ((fwd (,forward-p)))
-       (when fwd
-         (forward-char))
-       (,action arg)
-       (when fwd
-         (backward-char)))))
+(defun sptw--action-move-wrap (action mod-list action-arg)
+  "mod-list is a list of lists like (predicate pre-move post-move).
+If no predicate matches, just do the action.
+If a predicate matches, the first match is used, and pre-move is done before action and post-move is done after it.
+"
+  (let ((matched (cl-find-if (lambda (x) (funcall (car x))) mod-list)))
+    (if matched
+        (progn
+          (funcall (cadr matched))
+          (message "action: %s" action)
+          (funcall action action-arg)
+          (funcall (caddr matched)))
+      (funcall action action-arg))))
 
-;; TODO - consider placement required for these ops, and where point lands at end.
+(defmacro sptw--def-action-with-adjusted-bounds (name action)
+  "Define NAME that wraps ACTION, but it handles being at the begin/end of a thing differently.
+Specifically it moves inside the parens."
+  `(defun ,name (&optional interactive-arg)
+     (interactive "p")
+     (sptw--action-move-wrap
+      ,action
+      (list (list 'sptw-at-open-beginning?
+                   (lambda () (sptw-down-sexp-beginning 1))
+                   (lambda () (sptw-up-sexp-beginning 1)))
+            (list 'sptw-at-close-end?
+                   (lambda () (sptw-down-sexp-beginning 1))
+                   (lambda () (sptw-up-sexp-end 1))))
+      interactive-arg)))
+
 
 ;;;###autoload (autoload 'sptw-forward-slurp "tree-walk-smartparens-integration.el" "" t)
-(sptw--maybe-forwarded sptw-forward-slurp
-                       sptw-at-open-beginning?
-                       sp-forward-slurp-sexp)
+(sptw--def-action-with-adjusted-bounds
+ sptw-forward-slurp
+ 'sp-forward-slurp-sexp)
 ;;;###autoload (autoload 'sptw-backward-slurp "tree-walk-smartparens-integration.el" "" t)
-(sptw--maybe-forwarded sptw-backward-slurp
-                       sptw-at-open-beginning?
-                       sp-backward-slurp-sexp)
+(sptw--def-action-with-adjusted-bounds
+ sptw-backward-slurp
+ 'sp-backward-slurp-sexp)
 ;;;###autoload (autoload 'sptw-forward-barf "tree-walk-smartparens-integration.el" "" t)
-(sptw--maybe-forwarded sptw-forward-barf
-                       sptw-at-open-beginning?
-                       sp-forward-barf-sexp)
+(sptw--def-action-with-adjusted-bounds
+ sptw-forward-barf
+ 'sp-forward-barf-sexp)
 ;;;###autoload (autoload 'sptw-backward-barf "tree-walk-smartparens-integration.el" "" t)
-(sptw--maybe-forwarded sptw-backward-barf
-                       sptw-at-open-beginning?
-                       sp-backward-barf-sexp)
+(sptw--def-action-with-adjusted-bounds
+ sptw-backward-barf
+ 'sp-backward-barf-sexp)
 ;;;###autoload (autoload 'sptw-splice "tree-walk-smartparens-integration.el" "" t)
-(sptw--maybe-forwarded sptw-splice
-                       sptw-at-open-beginning?
-                       sp-splice-sexp)
-;;;###autoload (autoload 'sptw-split-supersexp "tree-walk-smartparens-integration.el" "" t)
-(sptw--maybe-forwarded sptw-split-supersexp
-                       sptw-at-close-end?
-                       sp-split-sexp)
-;;;###autoload (autoload 'sptw-join-neighbor-sexp "tree-walk-smartparens-integration.el" "" t)
-(sptw--maybe-forwarded sptw-join-neighbor-sexp
-                       sptw-at-close-end?
-                       sp-join-sexp)
-;;;###autoload
+(sptw--def-action-with-adjusted-bounds
+ sptw-splice
+ 'sp-splice-sexp)
+
+;;;###autoload (autoload 'sptw-kill-sexp "tree-walk-smartparens-integration.el" "" t)
 (defun sptw-kill-sexp (&optional arg)
   "Like sp-kill-sexp, except if at the end of a smartparens sexp, kill the sexp that you're at the end of rather than its parent."
   (interactive "p")
@@ -369,6 +385,8 @@ Note that point can be both at the end and start of two different sexps, and com
     (sp-kill-sexp arg)))
 
 
+;; TODO - sp-split-sexp is defined in a useful way that works, it doesn't need a wrapper.
+;; TODO - sp-join-sexp is useful, but needs some tweaking, but I want to move on for now.
 
 
 
