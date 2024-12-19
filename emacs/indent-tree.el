@@ -311,26 +311,27 @@ It always moves to the FIRST sibling in the full sibling region, regardless of m
                           'indent-tree-up-to-parent)
 
 (tree-walk-define-operations
- :inorder-forward indent-tree-inorder-traversal-forward
- :inorder-backward indent-tree-inorder-traversal-backward
- :down-to-last-descendant indent-tree-down-to-last-descendant
- :no-end-inner-object indent-tree-inner
- :no-end-outer-object indent-tree-outer
+ :def-inorder-forward indent-tree-inorder-traversal-forward
+ :def-inorder-backward indent-tree-inorder-traversal-backward
+ :def-down-to-last-descendant indent-tree-down-to-last-descendant
 
- :def-bounds-no-end indent-tree-bounds
- :def-children-bounds-no-end indent-tree-children-bounds
+ ;:def-evil-inner-object-for-tree-with-no-end-delimiter indent-tree-inner
+ ;:def-evil-outer-object-for-tree-with-no-end-delimiter indent-tree-outer
+
+ :def-bounds-for-tree-with-no-end-delimiter indent-tree-bounds
+ :def-children-bounds-for-tree-with-no-end-delimiter indent-tree-children-bounds
  :def-expand-region indent-tree-expand-region
  :def-expand-region-idempotent indent-tree-expand-region-idempotent
  :def-select-children-once indent-tree-region-to-children
  :def-expand-region-to-children/ancestor-generation indent-tree-expand-region/children-region
 
- :up-to-parent (lambda () (indent-tree-up-to-parent 1))
- :down-to-first-child (lambda () (indent-tree-down-to-first-child 1))
- :down-to-last-child (lambda () (indent-tree-down-to-last-child 1))
- :next-sibling (lambda () (indent-tree-forward-full-or-half-sibling 1))
- :previous-sibling (lambda () (indent-tree-forward-full-or-half-sibling -1))
- :no-end-object-left-finalize #'line-beginning-position
- :no-end-object-right-finalize #'line-end-position
+ :use-up-to-parent (lambda () (indent-tree-up-to-parent 1))
+ :use-down-to-first-child (lambda () (indent-tree-down-to-first-child 1))
+ :use-down-to-last-child (lambda () (indent-tree-down-to-last-child 1))
+ :use-next-sibling (lambda () (indent-tree-forward-full-or-half-sibling 1))
+ :use-previous-sibling (lambda () (indent-tree-forward-full-or-half-sibling -1))
+ :use-left-finalizer-for-tree-with-no-end-delimiter #'line-beginning-position
+ :use-right-finalizer-for-tree-with-no-end-delimiter #'line-end-position
  )
 (repeatable-motion-define-pair 'indent-tree-inorder-traversal-forward
                                'indent-tree-inorder-traversal-backward)

@@ -472,15 +472,15 @@ If no region is given, it uses the current region (or ((point) . (point))).
 
 (cl-defmacro tree-walk-define-operations
     (&key
-     inorder-forward
-     inorder-backward
-     down-to-last-descendant
+     def-inorder-forward
+     def-inorder-backward
+     def-down-to-last-descendant
 
-     no-end-inner-object
-     no-end-outer-object
+     def-evil-inner-object-for-tree-with-no-end-delimiter
+     def-evil-outer-object-for-tree-with-no-end-delimiter
 
-     def-bounds-no-end
-     def-children-bounds-no-end
+     def-bounds-for-tree-with-no-end-delimiter
+     def-children-bounds-for-tree-with-no-end-delimiter
      def-down-to-last-child
      ;; TODO - these should be able to use the new definitions OR provided existing definitions.
      def-expand-region
@@ -488,16 +488,16 @@ If no region is given, it uses the current region (or ((point) . (point))).
      def-select-children-once
      def-expand-region-to-children/ancestor-generation
 
-     up-to-parent
-     down-to-first-child
-     down-to-last-child
-     next-sibling
-     previous-sibling
-     no-end-object-left-finalize
-     no-end-object-right-finalize
+     use-up-to-parent
+     use-down-to-first-child
+     use-down-to-last-child
+     use-next-sibling
+     use-previous-sibling
+     use-left-finalizer-for-tree-with-no-end-delimiter
+     use-right-finalizer-for-tree-with-no-end-delimiter
 
-     bounds-func-use
-     children-bounds-func-use
+     use-bounds
+     use-children-bounds
      )
   ;; TODO - add error checking to be sure requirements are met for each non-null thing to be defined
   `(progn
@@ -507,26 +507,26 @@ If no region is given, it uses the current region (or ((point) . (point))).
          (when def-down-to-last-child
            `(defun ,def-down-to-last-child ()
               (interactive)
-              (tree-walk--down-to-last-child-default-impl ,down-to-first-child ,next-sibling)))
-         (when down-to-last-descendant
-           `(defun ,down-to-last-descendant ()
+              (tree-walk--down-to-last-child-default-impl ,use-down-to-first-child ,use-next-sibling)))
+         (when def-down-to-last-descendant
+           `(defun ,def-down-to-last-descendant ()
               (interactive)
-              (tree-walk--down-to-last-descendant ,(or down-to-last-child `',def-down-to-last-child))))
-         (when (or no-end-inner-object no-end-outer-object)
+              (tree-walk--down-to-last-descendant ,(or use-down-to-last-child `',def-down-to-last-child))))
+         (when (or def-evil-inner-object-for-tree-with-no-end-delimiter def-evil-outer-object-for-tree-with-no-end-delimiter)
            `(tree-walk-define-text-objects-no-end-tree
-             ,no-end-inner-object ,no-end-outer-object
-             ,up-to-parent ,down-to-first-child ,(or down-to-last-child `',def-down-to-last-child)
-             ,no-end-object-left-finalize ,no-end-object-right-finalize))
-         (when (or def-bounds-no-end def-children-bounds-no-end)
+             ,def-evil-inner-object-for-tree-with-no-end-delimiter ,def-evil-outer-object-for-tree-with-no-end-delimiter
+             ,use-up-to-parent ,use-down-to-first-child ,(or use-down-to-last-child `',def-down-to-last-child)
+             ,use-left-finalizer-for-tree-with-no-end-delimiter ,use-right-finalizer-for-tree-with-no-end-delimiter))
+         (when (or def-bounds-for-tree-with-no-end-delimiter def-children-bounds-for-tree-with-no-end-delimiter)
            `(tree-walk--define-bounds-functions-for-tree-with-no-end-delimiter
-             :def-bounds-name ,def-bounds-no-end
-             :def-children-bounds-name ,def-children-bounds-no-end
-             :up-func ,up-to-parent
-             :down-func ,down-to-first-child
+             :def-bounds-name ,def-bounds-for-tree-with-no-end-delimiter
+             :def-children-bounds-name ,def-children-bounds-for-tree-with-no-end-delimiter
+             :up-func ,use-up-to-parent
+             :down-func ,use-down-to-first-child
              ;; TODO - make this not broken
-             :down-to-last-descendant-func #',down-to-last-descendant
-             :left-finalize-func ,no-end-object-left-finalize
-             :right-finalize-func ,no-end-object-right-finalize
+             :down-to-last-descendant-func #',def-down-to-last-descendant
+             :left-finalize-func ,use-left-finalizer-for-tree-with-no-end-delimiter
+             :right-finalize-func ,use-right-finalizer-for-tree-with-no-end-delimiter
              ))
          (when (or def-expand-region def-expand-region-idempotent
                    def-select-children-once
@@ -537,15 +537,15 @@ If no region is given, it uses the current region (or ((point) . (point))).
              :def-select-children-once ,def-select-children-once
              :def-expand-region-to-children/ancestor-generation ,def-expand-region-to-children/ancestor-generation
              ;; TODO - generalize this
-             :bounds-func #',(or bounds-func-use def-bounds-no-end)
-             :children-bounds-func #',(or children-bounds-func-use def-children-bounds-no-end)
-             :up-func #',up-to-parent))
-         (when (or inorder-forward inorder-backward)
+             :bounds-func #',(or use-bounds def-bounds-for-tree-with-no-end-delimiter)
+             :children-bounds-func #',(or use-children-bounds def-children-bounds-for-tree-with-no-end-delimiter)
+             :up-func #',use-up-to-parent))
+         (when (or def-inorder-forward def-inorder-backward)
            `(tree-walk-define-inorder-traversal
-             ,inorder-forward
-             ,inorder-backward
-             ,next-sibling ,previous-sibling
-             ,up-to-parent ,down-to-first-child ,(or down-to-last-child `',def-down-to-last-child)
+             ,def-inorder-forward
+             ,def-inorder-backward
+             ,use-next-sibling ,use-previous-sibling
+             ,use-up-to-parent ,use-down-to-first-child ,(or use-down-to-last-child `',def-down-to-last-child)
              ))
          ))))
 

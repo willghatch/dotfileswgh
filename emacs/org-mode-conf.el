@@ -66,19 +66,28 @@
 
 
 (tree-walk-define-operations
- :inorder-forward wgh/org-inorder-traversal-forward
- :inorder-backward wgh/org-inorder-traversal-backward
- :down-to-last-descendant wgh/org-down-to-last-descendant
- :no-end-inner-object wgh/org-tree-inner
- :no-end-outer-object wgh/org-tree-outer
+ :def-inorder-forward wgh/org-inorder-traversal-forward
+ :def-inorder-backward wgh/org-inorder-traversal-backward
+ :def-down-to-last-descendant wgh/org-down-to-last-descendant
 
- :up-to-parent #'wgh/org-up-element
- :down-to-first-child #'wgh/org-down-element
- :down-to-last-child #'wgh/org-down-to-last-child
- :next-sibling (lambda () (org-forward-heading-same-level 1))
- :previous-sibling (lambda () (org-backward-heading-same-level 1))
- :no-end-object-left-finalize #'line-beginning-position
- :no-end-object-right-finalize #'line-end-position
+ ;:def-evil-inner-object-for-tree-with-no-end-delimiter wgh/org-tree-inner
+ ;:def-evil-outer-object-for-tree-with-no-end-delimiter wgh/org-tree-outer
+
+ :def-bounds-for-tree-with-no-end-delimiter wgh/org-tree-bounds
+ :def-children-bounds-for-tree-with-no-end-delimiter wgh/org-tree-children-bounds
+ :def-expand-region wgh/org-expand-region
+ :def-expand-region-idempotent wgh/org-expand-region-idempotent
+ :def-select-children-once wgh/org-region-to-children
+ :def-expand-region-to-children/ancestor-generation wgh/org-expand-region/children-region
+
+ :use-up-to-parent #'wgh/org-up-element
+ :use-down-to-first-child #'wgh/org-down-element
+ :use-down-to-last-child #'wgh/org-down-to-last-child
+ :use-next-sibling (lambda () (org-forward-heading-same-level 1))
+ :use-previous-sibling (lambda () (org-backward-heading-same-level 1))
+ :use-left-finalizer-for-tree-with-no-end-delimiter #'line-beginning-position
+ ;; TODO - this is wrong, it needs to get the contents of the heading potentially below the line.
+ :use-right-finalizer-for-tree-with-no-end-delimiter #'line-end-position
  )
 
 (require 'repeatable-motion)

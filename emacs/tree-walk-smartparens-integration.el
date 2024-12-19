@@ -450,25 +450,25 @@ Specifically it moves inside the parens."
 (tree-walk-define-operations
  ;; For all of these tree-walk operations, we move to the beginning of the tree node.
  ;; TODO - the traversal is inconsistent in handling string contents for forward vs backward.
- :inorder-forward sptw-inorder-traversal-forward
- :inorder-backward sptw-inorder-traversal-backward
- :down-to-last-descendant sptw-down-to-last-descendant
+ :def-inorder-forward sptw-inorder-traversal-forward
+ :def-inorder-backward sptw-inorder-traversal-backward
+ :def-down-to-last-descendant sptw-down-to-last-descendant
 
  :def-expand-region sptw-expand-region
  :def-expand-region-idempotent sptw-expand-region-idempotent
  :def-select-children-once sptw-select-children-region-idempotent
  :def-expand-region-to-children/ancestor-generation sptw-expand-region/children-region
- ;:def-down-to-last-child sptw-down-to-last-child-beginning
- :down-to-last-child (lambda () (and (tree-walk--motion-moved 'sptw-down-last-child-end)
-                                     (sptw-move-to-current-sexp-beginning)))
+                                        ;:def-down-to-last-child sptw-down-to-last-child-beginning
+ :use-down-to-last-child (lambda () (and (tree-walk--motion-moved 'sptw-down-last-child-end)
+                                         (sptw-move-to-current-sexp-beginning)))
 
- :up-to-parent 'sptw-up-parent-beginning
- :down-to-first-child 'sptw-down-first-child-beginning
- :next-sibling 'sptw-forward-sibling-beginning
- :previous-sibling (lambda () (and (tree-walk--motion-moved 'sptw-backward-sibling-end)
-                                   (sptw-backward-sibling-beginning)))
- :bounds-func-use 'sptw-bounds-of-sexp-at-point
- :children-bounds-func-use 'sptw-bounds-of-sexp-children-at-point
+ :use-up-to-parent 'sptw-up-parent-beginning
+ :use-down-to-first-child 'sptw-down-first-child-beginning
+ :use-next-sibling 'sptw-forward-sibling-beginning
+ :use-previous-sibling (lambda () (and (tree-walk--motion-moved 'sptw-backward-sibling-end)
+                                       (sptw-backward-sibling-beginning)))
+ :use-bounds 'sptw-bounds-of-sexp-at-point
+ :use-children-bounds 'sptw-bounds-of-sexp-children-at-point
  )
 
 (provide 'tree-walk-smartparens-integration)
