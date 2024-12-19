@@ -185,7 +185,7 @@ But if point is both after an end delimiter and before an open delimiter, it wil
     (sptw-move-to-current-sexp-beginning)
     (if (sptw-at-open-beginning?)
         (progn
-          (sptw-down-sexp-beginning)
+          (sptw-down-first-sexp-beginning 1)
           (cons (progn (sp-beginning-of-sexp) (point))
                 (progn (sp-end-of-sexp) (point))))
       nil)))
@@ -199,10 +199,10 @@ But if point is both after an end delimiter and before an open delimiter, it wil
   `(defun ,name (&optional arg)
      ,docs
      (interactive "p")
-     (if (< arg 0)
-         (,opposite (abs arg))
-       (dotimes (_i arg)
-         (,command)))))
+     (cond ((not (integerp arg)) (,command))
+           ((< arg 0) (,opposite (abs arg)))
+           (t (dotimes (_i arg)
+                (,command))))))
 
 (defun sptw--sptw-use-move-if-advances (move fwd)
   (let ((new-point (sptw--advances? move fwd)))
@@ -292,7 +292,7 @@ But if point is both after an end delimiter and before an open delimiter, it wil
 (sptw--command-wrap sptw-up-sexp-beginning
                     ;; TODO - rename to up-sexp-beginning
                     sptw--up-sexp
-                    sptw-down-sexp-beginning
+                    sptw-down-first-sexp-beginning
                     "Move up to the start of the containing smartparens sexp.")
 (defun sptw--up-sexp-end ()
   (let ((start-point (point)))
@@ -303,29 +303,49 @@ But if point is both after an end delimiter and before an open delimiter, it wil
 ;;;###autoload (autoload 'sptw-up-sexp-end "tree-walk-smartparens-integration.el" "" t)
 (sptw--command-wrap sptw-up-sexp-end
                     sptw--up-sexp-end
-                    sptw-down-sexp-beginning
+                    sptw-down-first-sexp-beginning
                     "Move up to the end of the containing smartparens sexp.")
 
+(defun sptw--move-if-within-bounds-of-current-delimited-sexp (movement)
+  (let ((start-point (point))
+        (bounds (sptw-bounds-of-sexp-at-point)))
+    (when (not (and bounds
+                    (and (save-mark-and-excursion (goto-char (car bounds))
+                                                  (sptw-at-open-beginning?)))
+                    (funcall movement)
+                    (<= (car bounds) (point) (cdr bounds))))
+      (goto-char start-point))))
+
 (defun sptw--down-sexp ()
-  (if (and (sptw-at-sexp-end?)
-           (not (sptw-at-sexp-beginning?)))
-      (progn
-        (backward-char)
-        (sp-down-sexp))
-    (sp-down-sexp)))
+  (sptw--move-if-within-bounds-of-current-delimited-sexp
+   (lambda ()
+     (if (and (sptw-at-sexp-end?)
+              (not (sptw-at-sexp-beginning?)))
+         (progn
+           (backward-char)
+           (sp-down-sexp))
+       (sp-down-sexp)))))
 
 ;;;###autoload (autoload 'sptw-down-sexp "tree-walk-smartparens-integration.el" "" t)
-(sptw--command-wrap sptw-down-sexp-beginning
+(sptw--command-wrap sptw-down-first-sexp-beginning
                     sptw--down-sexp
                     sptw-up-sexp-beginning
                     "Move down to the beginning of the contained smartparens sexp.")
-(defun sptw--down-sexp-end ()
-  (sp-down-sexp)
-  (sp-end-of-sexp)
-  (backward-char))
-;;;###autoload (autoload 'sptw-down-sexp-end "tree-walk-smartparens-integration.el" "" t)
-(sptw--command-wrap sptw-down-sexp-end
-                    sptw--down-sexp-end
+(defun sptw--down-last-sexp-end ()
+  (and (tree-walk--motion-moved 'sptw--down-sexp)
+       (sp-end-of-sexp)))
+(defun sptw--down-last-sexp-beginning ()
+  (and (tree-walk--motion-moved 'sptw--down-sexp)
+       (sp-end-of-sexp)
+       (sptw-backward-sexp-sibling-beginning)))
+;;;###autoload (autoload 'sptw-down-last-sexp-end "tree-walk-smartparens-integration.el" "" t)
+(sptw--command-wrap sptw-down-last-sexp-end
+                    sptw--down-last-sexp-end
+                    sptw-up-sexp-beginning
+                    "Move down to the end of the contained smartparens sexp.")
+;;;###autoload (autoload 'sptw-down-last-sexp-beginning "tree-walk-smartparens-integration.el" "" t)
+(sptw--command-wrap sptw-down-last-sexp-beginning
+                    sptw--down-last-sexp-beginning
                     sptw-up-sexp-beginning
                     "Move down to the end of the contained smartparens sexp.")
 
@@ -381,10 +401,10 @@ Specifically it moves inside the parens."
      (sptw--action-move-wrap
       ,action
       (list (list 'sptw-at-open-beginning?
-                   (lambda () (sptw-down-sexp-beginning 1))
+                   (lambda () (sptw-down-first-sexp-beginning 1))
                    (lambda () (sptw-up-sexp-beginning 1)))
             (list 'sptw-at-close-end?
-                   (lambda () (sptw-down-sexp-beginning 1))
+                   (lambda () (sptw-down-first-sexp-beginning 1))
                    (lambda () (sptw-up-sexp-end 1))))
       interactive-arg)))
 
@@ -427,37 +447,28 @@ Specifically it moves inside the parens."
 
 
 
+(tree-walk-define-operations
+ ;; For all of these tree-walk operations, we move to the beginning of the tree node.
+ ;; TODO - the traversal is inconsistent in handling string contents for forward vs backward.
+ :inorder-forward sptw-inorder-traversal-forward
+ :inorder-backward sptw-inorder-traversal-backward
+ :down-to-last-descendant sptw-down-to-last-descendant
+
+ :def-expand-region sptw-expand-region
+ :def-expand-region-idempotent sptw-expand-region-idempotent
+ :def-select-children-once sptw-select-children-region-idempotent
+ :def-expand-region-to-children/ancestor-generation sptw-expand-region/children-region
+ ;:def-down-to-last-child sptw-down-to-last-child-beginning
+ :down-to-last-child (lambda () (and (tree-walk--motion-moved 'sptw-down-last-sexp-end)
+                                     (sptw-move-to-current-sexp-beginning)))
+
+ :up-to-parent 'sptw-up-sexp-beginning
+ :down-to-first-child 'sptw-down-first-sexp-beginning
+ :next-sibling 'sptw-forward-sexp-sibling-beginning
+ :previous-sibling (lambda () (and (tree-walk--motion-moved 'sptw-backward-sexp-sibling-end)
+                                   (sptw-backward-sexp-sibling-beginning)))
+ :bounds-func-use 'sptw-bounds-of-sexp-at-point
+ :children-bounds-func-use 'sptw-bounds-of-sexp-children-at-point
+ )
+
 (provide 'tree-walk-smartparens-integration)
-
-
-
-
-
-;; use prefix sptw for now
-
-
-;(put 'smartparens-sexp 'forward-op 'sp-forward-sexp)
-
-;; TODO - sptw-down-sexp-end is broken
-
-;(tree-walk-define-operations
-; :inorder-forward sptw-inorder-traversal-forward
-; :inorder-backward sptw-inorder-traversal-backward
-; :down-to-last-descendant sptw-down-to-last-descendant
-;
-; :def-expand-region sptw-expand-region
-; :def-expand-region-idempotent sptw-expand-region-idempotent
-; :def-select-children-once sptw-select-children-region-idempotent
-; :def-expand-region-to-children/ancestor-generation sptw-expand-region/children-region
-; :def-down-to-last-child sptw-down-to-last-child-beginning
-;
-; ;; TODO - I probably need to wrap these to constrain their behavior
-; :up-to-parent sptw-up-sexp-beginning
-; :down-to-first-child sptw-down-sexp-beginning
-; :down-to-last-child TODO
-; :next-sibling sptw-forward-sexp-sibling-beginning
-; ;; TODO - this is not quite right.  Actually tree-walk should have a move-to-canon-anchor-point-for-current-tree-node function to fix this.
-; :previous-sibling (lambda () (sptw-move-to-current-sexp-beginning) (sptw-backward-sexp-sibling-beginning))
-; :bounds-func-use sptw-bounds-of-sexp-at-point
-; :children-bounds-func-use sptw-bounds-of-sexp-children-at-point
-; )

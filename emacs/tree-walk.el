@@ -140,7 +140,8 @@
 (defun tree-walk--inorder-traversal-forward (forward1 backward1)
   (lambda (num)
     (interactive "p")
-    (cond ((= num 0) t)
+    (cond ((not (integerp num)) (funcall forward1))
+          ((= num 0) t)
           ((< num 0) (funcall backward1 (- num)))
           (t
            ;; TODO - a custom while loop could exit early if the number given is too high
@@ -148,7 +149,8 @@
 (defun tree-walk--inorder-traversal-backward (forward1 backward1)
   (lambda (num)
     (interactive "p")
-    (cond ((= num 0) t)
+    (cond ((not (integerp num)) (funcall forward1))
+          ((= num 0) t)
           ((< num 0) (funcall forward1 (- num)))
           (t
            ;; TODO - a custom while loop could exit early if the number given is too high
@@ -509,11 +511,11 @@ If no region is given, it uses the current region (or ((point) . (point))).
          (when down-to-last-descendant
            `(defun ,down-to-last-descendant ()
               (interactive)
-              (tree-walk--down-to-last-descendant ,(or down-to-last-child def-down-to-last-child))))
+              (tree-walk--down-to-last-descendant ,(or down-to-last-child `',def-down-to-last-child))))
          (when (or no-end-inner-object no-end-outer-object)
            `(tree-walk-define-text-objects-no-end-tree
              ,no-end-inner-object ,no-end-outer-object
-             ,up-to-parent ,down-to-first-child ,(or down-to-last-child def-down-to-last-child)
+             ,up-to-parent ,down-to-first-child ,(or down-to-last-child `',def-down-to-last-child)
              ,no-end-object-left-finalize ,no-end-object-right-finalize))
          (when (or def-bounds-no-end def-children-bounds-no-end)
            `(tree-walk--define-bounds-functions-for-tree-with-no-end-delimiter
@@ -543,7 +545,7 @@ If no region is given, it uses the current region (or ((point) . (point))).
              ,inorder-forward
              ,inorder-backward
              ,next-sibling ,previous-sibling
-             ,up-to-parent ,down-to-first-child ,(or down-to-last-child def-down-to-last-child)
+             ,up-to-parent ,down-to-first-child ,(or down-to-last-child `',def-down-to-last-child)
              ))
          ))))
 
