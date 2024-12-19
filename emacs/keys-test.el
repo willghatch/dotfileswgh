@@ -25,6 +25,7 @@
 (estate-mode 1)
 
 (load-library "text-object-stuff")
+(load-library "tree-walk-smartparens-integration.el")
 
 (setq wgh/isearch-repeat-forward-p t)
 
@@ -87,6 +88,19 @@
 (key-chord-define estate-insert-keymap (kbd "kj") 'estate-command-state)
 
 
+(progn
+     (repeatable-motion-define-pair 'sptw-forward-sexp-sibling-beginning 'sptw-backward-sexp-sibling-beginning)
+     ;; TODO - even though it's not inclusive, the backwards one is killing the character
+     ;; it lands on.  Same with backwards end of anything.  That should not be.
+     (repeatable-motion-define-pair 'sptw-forward-sexp-sibling-end 'sptw-backward-sexp-sibling-end
+                                    :inclusive1 t)
+     ;; TODO - d<up-sexp> kills the opening delimiter, whereas d<up-sexp-end> doesn't.
+     ;; I want the former to act like the latter.
+     (repeatable-motion-define-pair 'sptw-up-sexp-beginning 'sptw-down-sexp-beginning)
+     (repeatable-motion-define 'sptw-up-sexp-end 'sptw-down-sexp-beginning)
+     (repeatable-motion-define 'sptw-down-sexp-end 'sptw-up-sexp-beginning :inclusive t)
+     (repeatable-motion-define-pair 'sptw-forward-sexp-in-supersexp 'sptw-backward-sexp-in-supersexp)
+     )
 
 
 
@@ -109,6 +123,8 @@
 (evmap "aS" 'wgh/expand-region-to-symbol)
 (evmap "ap" 'wgh/expand-region-to-paragraph)
 (evmap "ab" 'wgh/expand-region-to-symex)
+(evmap "ai" 'indent-tree-expand-region)
+(evmap "ii" 'indent-tree-expand-region/children-region)
 (ecmap "A" (lambda () (interactive)
              (progn (move-end-of-line nil) (estate-insert-state))))
 (evmap "A" (lambda () (interactive) (progn (goto-char (region-end))
@@ -491,18 +507,21 @@
 ;(emmap "od" 'rmo/baddd-previous-open-paren)
 ;(emmap "ed" 'rmo/baddd-next-close-brace)
 ;(emmap "od" 'rmo/baddd-previous-open-brace)
-(emmap "ed" 'rmo/on-parens-down-sexp-end)
-(emmap "od" 'rmo/on-parens-down-sexp)
+(emmap "ed" 'rmo/sptw-down-sexp-end)
+(emmap "od" 'rmo/sptw-down-sexp-beginning)
+;; Note that these two are just sp, not wrapped
 (emmap "eg" 'rmo/sp-end-of-sexp)
 (emmap "og" 'rmo/sp-beginning-of-sexp)
-(emmap "eG" 'rmo/sp-up-sexp)
-(emmap "oG" 'rmo/sp-backward-up-sexp)
-(emmap "eh" 'rmo/wgh/forward-symex-beginning)
-(emmap "oh" 'rmo/wgh/backward-symex-beginning)
-(emmap "em" 'rmo/wgh/forward-symex-end)
-(emmap "om" 'rmo/wgh/backward-symex-end)
-(emmap "eH" 'rmo/on-parens-forward-sexp-in-supersexp)
-(emmap "oH" 'rmo/on-parens-backward-sexp-in-supersexp)
+(emmap "eG" 'rmo/sptw-up-sexp-end)
+(emmap "oG" 'rmo/sptw-up-sexp-beginning)
+;(emmap "eh" 'rmo/wgh/forward-symex-beginning)
+;(emmap "oh" 'rmo/wgh/backward-symex-beginning)
+(emmap "eh" 'rmo/sptw-forward-sexp-sibling-beginning)
+(emmap "oh" 'rmo/sptw-backward-sexp-sibling-beginning)
+(emmap "em" 'rmo/sptw-forward-sexp-sibling-end)
+(emmap "om" 'rmo/sptw-backward-sexp-sibling-end)
+(emmap "eH" 'rmo/sptw-forward-sexp-in-supersexp)
+(emmap "oH" 'rmo/sptw-backward-sexp-in-supersexp)
 (emmap "ea" 'rmo/baddd-forward-arg)
 (emmap "oa" 'rmo/baddd-backward-arg)
 (emmap "ew" 'rmo/baddd-forward-little-word-begin)
@@ -625,23 +644,23 @@ is the opposite."
 (emmap "ej" 'rmo/baddd-jump-forward)
 (emmap "oj" 'rmo/baddd-jump-backward)
 ;; eu/ou for destructive subcommands!
-(emmap "eus" 'on-parens-forward-slurp)
-(emmap "ous" 'on-parens-backward-slurp)
-(emmap "eub" 'on-parens-forward-barf)
-(emmap "oub" 'on-parens-backward-barf)
-(emmap "euj" 'on-parens-join-neighbor-sexp)
-(emmap "ouj" 'on-parens-split-supersexp)
+(emmap "eus" 'sptw-forward-slurp)
+(emmap "ous" 'sptw-backward-slurp)
+(emmap "eub" 'sptw-forward-barf)
+(emmap "oub" 'sptw-backward-barf)
+(emmap "euj" 'sptw-join-neighbor-sexp)
+(emmap "ouj" 'sptw-split-supersexp)
 ;; this one doesn't really belong...
-(emmap "eup" 'on-parens-splice)
-(emmap "oup" 'on-parens-splice)
+(emmap "eup" 'sptw-splice)
+(emmap "oup" 'sptw-splice)
 
 ;; tree operations "en<op><tree-type>"
 ;; TODO - I should have a wrapper function defined that has various arguments to compose, and the keybinding section should just use that one function composed.  eg. (tree-op 'OP 'TREE-TYPE 'DIRECTION 'ANY-OTHER-INFO) but probably with keyword args, then probably have an extensible table that it looks up.  For any entries that aren't there, instead of using the ignore function I can print a descriptive message about which entries are not yet filled out.
 ;; TODO - rearrange this in whatever way is necessary to get hints as I go to remember what the options are
 ;; TODO - slurp/barf are not the only tree mutation operations I should have, eg. above I have "eu_" as "mutate forward" with things like join, split, splice, ... I should consider other tree operations and how they should fit in.
 ;; "ens_" forward slurp
-(emmap "ensp" 'on-parens-forward-slurp)
-(emmap "onsp" 'on-parens-backward-slurp)
+(emmap "ensp" 'sptw-forward-slurp)
+(emmap "onsp" 'sptw-backward-slurp)
 ; TODO - indent tree slurp
 (emmap "ensi" 'ignore)
 (emmap "onsi" 'ignore)
@@ -650,8 +669,8 @@ is the opposite."
 (emmap "ensx" 'ignore)
 (emmap "onsx" 'ignore)
 ;; "enb_" forward barf
-(emmap "enbp" 'on-parens-forward-barf)
-(emmap "onbp" 'on-parens-backward-barf)
+(emmap "enbp" 'sptw-forward-barf)
+(emmap "onbp" 'sptw-backward-barf)
 ; TODO - indent tree barf
 (emmap "enbi" 'ignore)
 (emmap "onbi" 'ignore)
@@ -660,8 +679,8 @@ is the opposite."
 (emmap "enbx" 'ignore)
 (emmap "onbx" 'ignore)
 ;; "enh_" forward sibling
-(emmap "enhp" 'rmo/on-parens-forward-sexp)
-(emmap "onhp" 'rmo/on-parens-backward-sexp)
+(emmap "enhp" 'rmo/sptw-forward-sexp)
+(emmap "onhp" 'rmo/sptw-backward-sexp)
 (emmap "enhi" 'rmo/indent-tree-forward-sibling)
 (emmap "onhi" 'rmo/indent-tree-backward-sibling)
 (emmap "enho" 'rmo/org-forward-heading-same-level)
@@ -670,8 +689,8 @@ is the opposite."
 (emmap "enhx" 'on-xml-forward)
 (emmap "onhx" 'on-xml-backward)
 ;; "enm_" forward sibling end
-(emmap "enmp" 'rmo/on-parens-forward-sexp-end)
-(emmap "onmp" 'rmo/on-parens-backward-sexp-end)
+(emmap "enmp" 'rmo/sptw-forward-sexp-end)
+(emmap "onmp" 'rmo/sptw-backward-sexp-end)
 ; TODO - indent tree moving by end of line
 (emmap "enmi" 'ignore)
 (emmap "onmi" 'ignore)
@@ -680,8 +699,8 @@ is the opposite."
 (emmap "enmx" 'on-xml-forward-end)
 (emmap "onmx" 'on-xml-backward-end)
 ;; "enp_" up to parent start/end
-(emmap "enpp" 'rmo/on-parens-up-sexp-end)
-(emmap "onpp" 'rmo/on-parens-up-sexp)
+(emmap "enpp" 'rmo/sptw-up-sexp-end)
+(emmap "onpp" 'rmo/sptw-up-sexp)
 (emmap "enpi" 'ignore)
 (emmap "onpi" 'rmo/indent-tree-up-to-parent)
 (emmap "enpo" 'ignore)
@@ -689,8 +708,8 @@ is the opposite."
 (emmap "enpx" 'on-xml-up-end)
 (emmap "onpx" 'on-xml-up)
 ;; "enc_" down to first child / "onc_" down to last child
-(emmap "encp" 'rmo/on-parens-down-sexp)
-(emmap "oncp" 'rmo/on-parens-down-sexp-end)
+(emmap "encp" 'rmo/sptw-down-sexp)
+(emmap "oncp" 'rmo/sptw-down-sexp-end)
 (emmap "enci" 'rmo/indent-tree-down-to-first-child)
 (emmap "onci" 'rmo/indent-tree-down-to-last-child)
 (emmap "enco" 'rmo/org-down-element)

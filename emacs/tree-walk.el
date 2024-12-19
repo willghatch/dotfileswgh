@@ -487,6 +487,9 @@ If no region is given, it uses the current region (or ((point) . (point))).
      previous-sibling
      no-end-object-left-finalize
      no-end-object-right-finalize
+
+     bounds-func-use
+     children-bounds-func-use
      )
   ;; TODO - add error checking to be sure requirements are met for each non-null thing to be defined
   `(progn
@@ -522,8 +525,8 @@ If no region is given, it uses the current region (or ((point) . (point))).
              :def-select-children-once ,def-select-children-once
              :def-expand-region-to-children/ancestor-generation ,def-expand-region-to-children/ancestor-generation
              ;; TODO - generalize this
-             :bounds-func #',def-bounds-no-end
-             :children-bounds-func #',def-children-bounds-no-end
+             :bounds-func #',(or bounds-func-use def-bounds-no-end)
+             :children-bounds-func #',(or children-bounds-func-use def-children-bounds-no-end)
              :up-func #',up-to-parent))
          (when (or inorder-forward inorder-backward)
            `(tree-walk-define-inorder-traversal
