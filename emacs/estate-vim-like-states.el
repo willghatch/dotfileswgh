@@ -297,10 +297,7 @@ Creates overlays for the areas that would be included in the line-based selectio
 
 ;; TODO - also shouldn't be in estate, but markers -- eg. evil-mode stores markers with buffer, line, and column, so you can hop between them.
 ;; TODO - not stuff to actually go in this file, but a checklist of things I want to replace evil-mode.  Note that many of these I can just fall back to requiring evil-mode and just using it...
-;; * “word” object more like evil-mode
-;; * i/a select text object
 ;; * quick-in-block/quick-a-block re-implementation
-;; * on-parens - write a few replacement wrappers for smartparens to not do things that I don't like about smartparens
 ;; * et/ot/ef/of - make them be “find to char begin/end” instead
 ;; * markers
 ;; * surround region - add delimiter
@@ -308,6 +305,8 @@ Creates overlays for the areas that would be included in the line-based selectio
 ;; * . repeat, maybe, could just use macros more
 ;; * select register, maybe
 ;; * d/c/y operators, maybe, could just get used to visual first -- I only use the operators for trivial cases
+;; * select object modifiers to get surrounding whitespace
+;; * isearch land on start of search string -- actually I would like both, but with a way to control it.  Maybe this already exists?
 ;;
 ;; Differences from vim/evil to note:
 ;; * cursor always between parens

@@ -66,6 +66,8 @@
 
 
 (tree-walk-define-operations
+ ;; TODO - handle half siblings like I did for indent-tree
+ ;; TODO - can I adjust this to work outside of org-mode?
  :def-inorder-forward wgh/org-inorder-traversal-forward
  :def-inorder-backward wgh/org-inorder-traversal-backward
  :def-down-to-last-descendant wgh/org-down-to-last-descendant
