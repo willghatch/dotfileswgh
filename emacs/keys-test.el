@@ -89,17 +89,12 @@
 
 
 (progn
-     (repeatable-motion-define-pair 'sptw-forward-sexp-sibling-beginning 'sptw-backward-sexp-sibling-beginning)
-     ;; TODO - even though it's not inclusive, the backwards one is killing the character
-     ;; it lands on.  Same with backwards end of anything.  That should not be.
-     (repeatable-motion-define-pair 'sptw-forward-sexp-sibling-end 'sptw-backward-sexp-sibling-end
-                                    :inclusive1 t)
-     ;; TODO - d<up-sexp> kills the opening delimiter, whereas d<up-sexp-end> doesn't.
-     ;; I want the former to act like the latter.
-     (repeatable-motion-define-pair 'sptw-up-sexp-beginning 'sptw-down-sexp-beginning)
-     (repeatable-motion-define 'sptw-up-sexp-end 'sptw-down-sexp-beginning)
-     (repeatable-motion-define 'sptw-down-sexp-end 'sptw-up-sexp-beginning :inclusive t)
-     (repeatable-motion-define-pair 'sptw-forward-sexp-in-supersexp 'sptw-backward-sexp-in-supersexp)
+     (repeatable-motion-define-pair 'sptw-forward-sibling-beginning 'sptw-backward-sibling-beginning)
+     (repeatable-motion-define-pair 'sptw-forward-sibling-end 'sptw-backward-sibling-end)
+     (repeatable-motion-define-pair 'sptw-up-parent-beginning 'sptw-down-first-child-beginning)
+     (repeatable-motion-define 'sptw-up-parent-end 'sptw-down-first-child-beginning)
+     (repeatable-motion-define 'sptw-down-last-child-end 'sptw-up-parent-beginning)
+     ;(repeatable-motion-define-pair 'sptw-forward-sexp-in-supersexp 'sptw-backward-sexp-in-supersexp)
      )
 
 
@@ -507,21 +502,21 @@
 ;(emmap "od" 'rmo/baddd-previous-open-paren)
 ;(emmap "ed" 'rmo/baddd-next-close-brace)
 ;(emmap "od" 'rmo/baddd-previous-open-brace)
-(emmap "ed" 'rmo/sptw-down-sexp-end)
-(emmap "od" 'rmo/sptw-down-sexp-beginning)
+(emmap "ed" 'rmo/sptw-down-last-child-end)
+(emmap "od" 'rmo/sptw-down-first-child-beginning)
+(emmap "eg" 'rmo/sptw-up-parent-end)
+(emmap "og" 'rmo/sptw-up-parent-beginning)
 ;; Note that these two are just sp, not wrapped
-(emmap "eg" 'rmo/sp-end-of-sexp)
-(emmap "og" 'rmo/sp-beginning-of-sexp)
-(emmap "eG" 'rmo/sptw-up-sexp-end)
-(emmap "oG" 'rmo/sptw-up-sexp-beginning)
+(emmap "eG" 'rmo/sp-end-of-sexp)
+(emmap "oG" 'rmo/sp-beginning-of-sexp)
 ;(emmap "eh" 'rmo/wgh/forward-symex-beginning)
 ;(emmap "oh" 'rmo/wgh/backward-symex-beginning)
-(emmap "eh" 'rmo/sptw-forward-sexp-sibling-beginning)
-(emmap "oh" 'rmo/sptw-backward-sexp-sibling-beginning)
-(emmap "em" 'rmo/sptw-forward-sexp-sibling-end)
-(emmap "om" 'rmo/sptw-backward-sexp-sibling-end)
-(emmap "eH" 'rmo/sptw-forward-sexp-in-supersexp)
-(emmap "oH" 'rmo/sptw-backward-sexp-in-supersexp)
+(emmap "eh" 'rmo/sptw-forward-sibling-beginning)
+(emmap "oh" 'rmo/sptw-backward-sibling-beginning)
+(emmap "em" 'rmo/sptw-forward-sibling-end)
+(emmap "om" 'rmo/sptw-backward-sibling-end)
+;(emmap "eH" 'rmo/sptw-forward-sexp-in-supersexp)
+;(emmap "oH" 'rmo/sptw-backward-sexp-in-supersexp)
 (emmap "ea" 'rmo/baddd-forward-arg)
 (emmap "oa" 'rmo/baddd-backward-arg)
 (emmap "ew" 'rmo/baddd-forward-little-word-begin)
@@ -648,8 +643,8 @@ is the opposite."
 (emmap "ous" 'sptw-backward-slurp)
 (emmap "eub" 'sptw-forward-barf)
 (emmap "oub" 'sptw-backward-barf)
-(emmap "euj" 'sptw-join-neighbor-sexp)
-(emmap "ouj" 'sptw-split-supersexp)
+;(emmap "euj" 'sptw-join-neighbor-sexp)
+(emmap "ouj" 'sp-split-sexp)
 ;; this one doesn't really belong...
 (emmap "eup" 'sptw-splice)
 (emmap "oup" 'sptw-splice)
