@@ -161,6 +161,7 @@ Note that if point is just before an opening delimiter or just after a closing d
 But if point is both after an end delimiter and before an open delimiter, it will prefer the open delimiter."
   (cond ((sptw-at-sexp-beginning-p)
          (cons (point) (save-mark-and-excursion (sp-forward-sexp) (point))))
+        ;; TODO - sptw-at-sexp-end-p is causing a problem here for cases where the end delimiter matches the opening delimiter.
         ((sptw-at-sexp-end-p)
          (cons (save-mark-and-excursion (sp-backward-sexp) (point)) (point)))
         (t
@@ -174,6 +175,7 @@ But if point is both after an end delimiter and before an open delimiter, it wil
                  nil)))))))
 
 (defun sptw-bounds-of-sexp (point)
+  ;; TODO - I should give the other one an optional argument instead...
   (save-mark-and-excursion
     (goto-char point)
     (sptw-bounds-of-sexp-at-point)))

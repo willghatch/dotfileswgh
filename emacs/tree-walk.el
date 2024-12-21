@@ -209,7 +209,7 @@ If r2 is not in order, a successful return has in ordered."
   (let ((cover (wgh/-region-less-or-equal r1 r2)))
     (and cover
          (or (< (car r2) (min (car r1) (cdr r1)))
-             (< (cdr r2) (max (cdr r1) (car r1))))
+             (<  (max (cdr r1) (car r1)) (cdr r2)))
          cover)))
 
 
