@@ -80,8 +80,8 @@ if [ -z "$XSESSION_COMMON_RUN_P" ]; then
   if [ -f $DOTFILESWGH_PRI/xinitrc ]; then
       source $DOTFILESWGH_PRI/xinitrc
   fi
-  if [ -f $DOTFILESWGH/dotlocal/xinitrc ]; then
-      source $DOTFILESWGH/dotlocal/xinitrc
+  if [ -f ~/dotfileswgh-dotlocal/xinitrc ]; then
+      source ~/dotfileswgh-dotlocal/xinitrc
   fi
 
 fi

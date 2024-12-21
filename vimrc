@@ -432,7 +432,7 @@ endif
 highlight StatusLine ctermfg=17 ctermbg=164
 
 
-if filereadable($DOTFILESWGH . "/dotlocal/vimrc")
-    source $DOTFILESWGH/dotlocal/vimrc
+if filereadable("~/dotfileswgh-dotlocal/vimrc")
+    source ~/dotfileswgh-dotlocal/vimrc
 endif
 

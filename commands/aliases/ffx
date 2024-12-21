@@ -18,7 +18,7 @@ shift
 
 
 FFX=${FFX:-firefox}
-profile="$DOTFILESWGH/dotlocal/firefox-profiles/firefox-profile_$prof"
+profile="~/dotfileswgh-dotlocal/firefox-profiles/firefox-profile_$prof"
 
 if [[ "$new" = "true" ]]; then
     mkdir -p "$profile"

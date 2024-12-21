@@ -7,7 +7,7 @@ fi
 prof="$1"
 shift
 
-profile="$DOTFILESWGH/dotlocal/chromium-profiles/chromium-profile_$prof"
+profile="~/dotfileswgh-dotlocal/chromium-profiles/chromium-profile_$prof"
 mkdir -p "$profile"
 
 exec nice -n 5 chromium --user-data-dir=$profile "$@"

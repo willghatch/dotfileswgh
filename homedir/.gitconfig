@@ -49,8 +49,8 @@
 	pushInsteadOf = https://github.com/
 
 [include]
-	path = ~/dotfileswgh/pri/gitconfig
-	path = ~/dotfileswgh/dotlocal/gitconfig
+	path = ~/dotfileswgh-pri/gitconfig
+	path = ~/dotfileswgh-dotlocal/gitconfig
 
 ## apparently you have to explicitly tell git to check integrity this way...
 ## according to https://groups.google.com/forum/#!topic/binary-transparency/f-BI4o8HZW0

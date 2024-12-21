@@ -1,7 +1,7 @@
 ;; Load this AFTER env-conf.
 
 ; load local settings first, in case of proxy or something
-(let ((local-f (concat dotfileswgh "dotlocal/emacs/package-conf.el")))
+(let ((local-f "~/dotfileswgh-dotlocal/emacs/package-conf.el"))
   (when (file-exists-p local-f)
     (with-demoted-errors "Warning: %S" (load-file local-f))))
 
@@ -11,7 +11,7 @@
 
   (let ((default-directory local-emacs.d-path))
     (normal-top-level-add-subdirs-to-load-path))
-  (let ((default-directory (concat dotfileswgh "dotlocal/emacs/")))
+  (let ((default-directory "~/dotfileswgh-dotlocal/emacs/"))
     (when (file-directory-p default-directory)
       (normal-top-level-add-subdirs-to-load-path)))
   ;(let ((default-directory "~/.emacs.d/"))

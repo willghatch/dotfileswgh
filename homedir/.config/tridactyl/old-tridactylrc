@@ -15,7 +15,7 @@ set allowautofocus false
 "guiset_quiet hoverlink top-left
 
 set searchengine duckduckgo
-set profiledir /home/wgh/dotfileswgh/dotlocal/firefox-default-profile/
+set profiledir /home/wgh/dotfileswgh-dotlocal/firefox-default-profile/
 " about:blank can be modified by dark-mode addons
 set newtab about:blank
 

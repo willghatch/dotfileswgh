@@ -120,7 +120,7 @@ lazy_source () {
 }
 
 ZGEN_AUTOLOAD_COMPINIT=false
-ZGEN_DIR=$DOTFILESWGH/dotlocal/zsh/zgen
+ZGEN_DIR=~/dotfileswgh-dotlocal/zsh/zgen
 lazy_source zgen $DOTFILESWGH/external/zsh/zgen/zgen.zsh
 #if ! zgen saved; then
 if ! source "$ZGEN_DIR/init.zsh"; then

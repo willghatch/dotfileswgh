@@ -43,7 +43,7 @@ if [ -z "$GUI_SESSION_COMMON_RUN_P" ]; then
   # start kdeconnect daemon, let my phone drive
   #kdeconnect-cli
 
-  if [ -e "$DOTFILESWGH/dotlocal/e-is-premacs" ]; then
+  if [ -e "~/dotfileswgh-dotlocal/e-is-premacs" ]; then
     premacs-init &
   fi
 
@@ -54,8 +54,8 @@ if [ -z "$GUI_SESSION_COMMON_RUN_P" ]; then
   if [ -f $HOME/rootgit-dotfiles/gui-session-rc ]; then
       source $HOME/rootgit-dotfiles/gui-session-rc
   fi
-  if [ -f $DOTFILESWGH/dotlocal/gui-session-rc ]; then
-      source $DOTFILESWGH/dotlocal/gui-session-rc
+  if [ -f ~/dotfileswgh-dotlocal/gui-session-rc ]; then
+      source ~/dotfileswgh-dotlocal/gui-session-rc
   fi
 
 fi

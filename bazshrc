@@ -227,7 +227,7 @@ then
     source $bazsh_common_rootgit
 fi
 
-bazsh_common_local=$DOTFILESWGH/dotlocal/bazshrc
+bazsh_common_local=~/dotfileswgh-dotlocal/bazshrc
 if [ -f $bazsh_common_local ]
 then
     source $bazsh_common_local

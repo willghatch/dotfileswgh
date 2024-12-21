@@ -22,10 +22,10 @@ dostuff() {
     mkdir -p $HOME/.cache/mpd/playlists
     mkdir -p $HOME/.cache/mutt
     mkdir -p $HOME/musc-local
-    mkdir -p dotlocal/firefox-default-profile
-    mkdir -p dotlocal/firefox-default-profile/chrome
-    ln -sf ../../../usercss dotlocal/firefox-default-profile/chrome/
-    echo '@import url("./usercss/master.css")' > dotlocal/firefox-default-profile/chrome/userContent.css
+    mkdir -p ~/dotfileswgh-dotlocal/firefox-default-profile
+    mkdir -p ~/dotfileswgh-dotlocal/firefox-default-profile/chrome
+    #ln -sf ../../../usercss dotlocal/firefox-default-profile/chrome/
+    #echo '@import url("./usercss/master.css")' > dotlocal/firefox-default-profile/chrome/userContent.css
 
     # get terminfo set up
     tic -x xterm-256color-italic.terminfo
