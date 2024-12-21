@@ -2,8 +2,7 @@
 if [ -z "$WGHHOME" ]; then
     export WGHHOME=$HOME
 fi
-export DOTFILESWGH=$WGHHOME/dotfileswgh
-export DOTFILESWGH_PRI=$WGHHOME/dotfileswgh-pri
+export DOTFILESWGH="${DOTFILESWGH:-$WGHHOME/dotfileswgh}"
 source $DOTFILESWGH/env-more.sh
 
 # When $WGHHOME is not equal to $HOME I've switched to another user, and while I'll

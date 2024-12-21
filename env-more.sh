@@ -1,12 +1,15 @@
 # Requires $WGHHOME and $DOTFILESWGH be set
 
+export DOTFILESWGH_DOTLOCAL="${DOTFILESWGH_DOTLOCAL:-$WGHHOME/dotfileswgh-dotlocal}"
+export DOTFILESWGH_PRI="${DOTFILESWGH_PRI:-$WGHHOME/dotfileswgh-pri}"
+
 export HROOT=$WGHHOME/hroot
 
-export RACKET_NO_DEV_PATH=~/dotfileswgh-dotlocal/racket-pkgs-bin:~/dotfileswgh-dotlocal/racket-bin
+export RACKET_NO_DEV_PATH=$DOTFILESWGH_DOTLOCAL/racket-pkgs-bin:$DOTFILESWGH_DOTLOCAL/racket-bin
 export RACKET_PKG_DEV_PATH=$WGHHOME/s/mk/racket-pkgdev/racket/bin:$WGHHOME/s/mk/racket-pkgdev/bin:$WGHHOME/.local/share/racket/pkgdev/bin
 export RACKET_CORE_DEV_PATH=$WGHHOME/s/mk/racket-coredev/racket/bin
 
-DOTFILESWGH_COMMAND_PATH=~/prifs/boot/dotlocal/commands:~/dotfileswgh-dotlocal/commands:$WGHHOME/rootgit-dotfiles/commands:/rootgit/bin.rootgit:/rootgit/base.rootgit/commands:/rootgit/tools.rootgit:$DOTFILESWGH_PRI/commands:$DOTFILESWGH_PRI/commands/aliases:$DOTFILESWGH/commands:$DOTFILESWGH/commands/aliases
+DOTFILESWGH_COMMAND_PATH=~/prifs/boot/dotlocal/commands:$DOTFILESWGH_DOTLOCAL/commands:$WGHHOME/rootgit-dotfiles/commands:/rootgit/bin.rootgit:/rootgit/base.rootgit/commands:/rootgit/tools.rootgit:$DOTFILESWGH_PRI/commands:$DOTFILESWGH_PRI/commands/aliases:$DOTFILESWGH/commands:$DOTFILESWGH/commands/aliases
 
 HROOT_PATH=$HROOT/bin:$HROOT/usr/bin:$HROOT/usr/local/bin
 COMMON_PATHS=/usr/bin:/bin:/usr/local/bin:/sbin:/usr/sbin:/usr/local/sbin

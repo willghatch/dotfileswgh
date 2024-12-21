@@ -8,6 +8,6 @@ if [ -z "$WGHHOME" ]; then
         export WGHHOME=$HOME
     fi
 fi
-export DOTFILESWGH=$WGHHOME/dotfileswgh
+export DOTFILESWGH="${DOTFILESWGH:-$WGHHOME/dotfileswgh}"
 #PATH=$DOTFILESWGH/commands:$DOTFILESWGH/commands/aliases:$PATH
 
