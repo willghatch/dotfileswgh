@@ -25,10 +25,10 @@
    (normal-top-level-add-subdirs-to-load-path))
  (let ((default-directory (concat dotfileswgh "/external/emacs")))
    (normal-top-level-add-subdirs-to-load-path))
- (let ((default-directory (concat dotfileswgh "/pri/emacs")))
+ (let ((default-directory "~/dotfileswgh-pri/emacs"))
    (normal-top-level-add-subdirs-to-load-path))
  (setq load-path (cons (concat dotfileswgh "/emacs") load-path))
- (setq load-path (cons (concat dotfileswgh "/pri/emacs") load-path))
+ (setq load-path (cons "~/dotfileswgh-pri/emacs" load-path))
 )
 
 (defun load-library--around (orig-fun &rest args)
@@ -254,7 +254,7 @@
  ;(load-library "keyfreq-conf")
 )
 
-(let ((file (concat dotfileswgh "/dotlocal/emacs/def.el")))
+(let ((file "~/dotfileswgh-dotlocal/emacs/def.el"))
   (if (file-exists-p file) (load-file file) nil))
 
 
