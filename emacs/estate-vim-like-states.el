@@ -125,6 +125,7 @@
 
 (defun estate-visual-state ()
   (interactive)
+  (setq-local estate--visual-line nil)
   (estate--visual-state-helper nil))
 
 (defun estate-visual-line-state ()
@@ -271,7 +272,8 @@ Creates overlays for the areas that would be included in the line-based selectio
   (add-hook 'post-command-hook #'estate--visual-line-overlay-helper nil t)
   (estate--visual-line-overlay-helper))
 (defun estate--visual-line-off ()
-  (remove-hook 'post-command-hook #'estate--visual-line-overlay-helper t))
+  (remove-hook 'post-command-hook #'estate--visual-line-overlay-helper t)
+  (setq estate--visual-line nil))
 
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
