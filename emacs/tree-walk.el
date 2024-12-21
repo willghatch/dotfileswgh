@@ -98,6 +98,15 @@
     (funcall motion)
     (not (= (point) start-pos))))
 
+(defun tree-walk--motion-moved-region (motion)
+  (let ((start-pos (point))
+        (start-mark (mark))
+        (start-region-active (region-active-p)))
+    (funcall motion)
+    (or (not (= (point) start-pos))
+        (not (= (mark) start-mark))
+        (not (equal start-region-active (region-active-p))))))
+
 (defun tree-walk--last-leaf-forward-in-order (up next)
   (lambda ()
     ;; IE if you're at a leaf with no next sibling,

@@ -483,4 +483,61 @@ Specifically it moves inside the parens."
  :use-children-bounds 'sptw-bounds-of-sexp-children
  )
 
+
+(defun sptw--expand-region-until-predicate (expansion-func predicate)
+  "Call EXPANSION-FUNC until PREDICATE is true.
+If the expansion func stops expanding the region before the predicate is ever true, return to the original region and return nil.
+If the predicate succeeds, leave the expanded region and return the new bounds."
+  (let ((orig-bounds (cons (region-beginning) (region-end)))
+        result)
+    (save-mark-and-excursion
+      (while (and (not result)
+                  (tree-walk--motion-moved-region expansion-func))
+        (if (funcall predicate)
+            (setq result (cons (point) (mark)))
+          ;; Keep expanding until predicate is true or expansion stops
+          nil)))
+    (if result
+        (progn
+          ;; Go to the new point/mark, but return the region canonicalized to (beg . end).
+          (goto-char (car result))
+          (set-mark (cdr result))
+          (if (<= (car result) (cdr result))
+              result
+            (cons (cdr result) (car result))))
+      nil)))
+
+(defun sptw-expand-region-to-any-delimiter ()
+  "Like `sptw-expand-region' but specifically expanding to a delimited region, not just something like a symbol."
+  (interactive)
+  (sptw--expand-region-until-predicate
+   'sptw-expand-region
+   (lambda () (save-mark-and-excursion
+                (and (region-active-p)
+                     (goto-char (region-beginning))
+                     (sptw-at-open-delimiter-p))))))
+
+(defun sptw-expand-region-to-delimiter (delimiter)
+  "DELIMITER must be an opening delimiter used by smartparens.
+Expand region until hitting that specific delimiter."
+  (sptw--expand-region-until-predicate
+   'sptw-expand-region
+   (lambda () (save-mark-and-excursion
+                (and (region-active-p)
+                     (goto-char (region-beginning))
+                     (looking-at (regexp-quote delimiter)))))))
+
+(defun sptw-expand-region-to-delimiter/children-region (delimiter)
+  "DELIMITER must be an opening delimiter used by smartparens.
+Expand region until hitting that specific delimiter.
+Except only expand to the inner area inside the parens."
+  (sptw--expand-region-until-predicate
+   'sptw-expand-region/children-region
+   (lambda () (save-mark-and-excursion
+                (and (region-active-p)
+                     (goto-char (region-beginning))
+                     (< (length delimiter) (point))
+                     (progn (backward-char (length delimiter))
+                            (looking-at (regexp-quote delimiter))))))))
+
 (provide 'tree-walk-smartparens-integration)
