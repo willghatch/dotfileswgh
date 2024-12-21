@@ -6,7 +6,7 @@
 # When loading an X11 session, X11 is already running when this is executed.  But when loading sway, this is executed before sway is fully loaded (and thus GUI programs or programs that need to talk to the current display server fail to load if executed here).
 
 export WGHHOME="$HOME"
-export DOTFILESWGH="$HOME/dotfileswgh"
+export DOTFILESWGH=${DOTFILESWGH:-$WGHHOME/dotfileswgh}
 source $DOTFILESWGH/env-more.sh
 # I used to conditionally source this, but I really don't remember why.
 # If I find a reason to do this again, I think I'll reverse the test.
