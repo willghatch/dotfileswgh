@@ -43,6 +43,10 @@
 
 ;; A pager state is nice to have -- it's basically motion state but maybe with some extra keys.  The idea is that it's like command mode but you won't accidentally hit editing keys or such.
 (estate-define-state pager estate-motion-keymap)
+(defun estate-pager-state ()
+  (interactive)
+  (deactivate-mark)
+  (estate-state-activate 'pager))
 
 ;; Insert state inherits the global keymap.  It's basically emacs mode.
 (estate-define-state insert -estate-original-global-map)

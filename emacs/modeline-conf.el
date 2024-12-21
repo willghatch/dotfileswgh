@@ -67,6 +67,8 @@
                         (propertize "<LINE>" 'face 'wevil-visual-face))
                        ((eq estate-state 'insert)
                         (propertize "<INST>" 'face 'wevil-insert-face))
+                       ((eq estate-state 'pager)
+                        (propertize "<PAGE>" 'face 'wevil-pager-face))
                        (t (propertize "WHAT ESTATE??" 'face 'wevil-emacs-face))))
                      ((boundp 'evil-state)
                       (cond
