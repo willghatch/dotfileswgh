@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-if [[ "$(cat ~/dotfileswgh-dotlocal/background-sync 2>/dev/null)" = "true" ]]; then
+if [[ "$(cat $DOTFILESWGH_DOTLOCAL/background-sync 2>/dev/null)" = "true" ]]; then
   exec "$@"
 else
   echo background-sync disabled >&2

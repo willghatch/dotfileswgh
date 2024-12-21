@@ -1,6 +1,6 @@
 #!/bin/sh
 export CURRENT_DEV_PATH=$RACKET_PKG_DEV_PATH
 export CURRENT_DEV_MODE=racket-packages
-export EMACS_DOT_D_PATH=~/dotfileswgh-dotlocal/emacs.d_racket-packages-dev
+export EMACS_DOT_D_PATH=$DOTFILESWGH_DOTLOCAL/emacs.d_racket-packages-dev
 # It's convenient to use fhs for racket installer scripts.
 exec racket-dev-environment.sh fhs "$@"

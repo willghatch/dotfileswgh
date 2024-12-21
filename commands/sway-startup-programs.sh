@@ -40,8 +40,8 @@ fi
 if [ -f $HOME/rootgit-dotfiles/sway-startup-rc ]; then
     source $HOME/rootgit-dotfiles/sway-startup-rc
 fi
-if [ -f ~/dotfileswgh-dotlocal/sway-startup-rc ]; then
-    source ~/dotfileswgh-dotlocal/sway-startup-rc
+if [ -f $DOTFILESWGH_DOTLOCAL/sway-startup-rc ]; then
+    source $DOTFILESWGH_DOTLOCAL/sway-startup-rc
 fi
 
 

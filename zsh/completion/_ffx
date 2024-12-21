@@ -1,4 +1,4 @@
 #compdef ffx
 #autoload
 
-_arguments "1: :(`grep "firefox-profile_" <(ls ~/dotfileswgh-dotlocal/firefox-profiles/) | sed s/firefox-profile_//`)"
+_arguments "1: :(`grep "firefox-profile_" <(ls $DOTFILESWGH_DOTLOCAL/firefox-profiles/) | sed s/firefox-profile_//`)"

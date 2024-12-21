@@ -46,7 +46,7 @@ musicnext="playerctl next"
 musicprev="playerctl prev"
 # TODO - position +/- offset, it doesn't seem to be working for me right now with playerctl...
 
-if [ -f ~/dotfileswgh-dotlocal/vlaunchrc ]; then
-    source ~/dotfileswgh-dotlocal/vlaunchrc
+if [ -f $DOTFILESWGH_DOTLOCAL/vlaunchrc ]; then
+    source $DOTFILESWGH_DOTLOCAL/vlaunchrc
 fi
 
