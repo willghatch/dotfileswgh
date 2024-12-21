@@ -6,7 +6,7 @@ export RACKET_NO_DEV_PATH=$DOTFILESWGH/dotlocal/racket-pkgs-bin:$DOTFILESWGH/dot
 export RACKET_PKG_DEV_PATH=$WGHHOME/s/mk/racket-pkgdev/racket/bin:$WGHHOME/s/mk/racket-pkgdev/bin:$WGHHOME/.local/share/racket/pkgdev/bin
 export RACKET_CORE_DEV_PATH=$WGHHOME/s/mk/racket-coredev/racket/bin
 
-DOTFILESWGH_COMMAND_PATH=$DOTFILESWGH/pri/dotlocal/commands:$DOTFILESWGH/dotlocal/commands:$WGHHOME/rootgit-dotfiles/commands:/rootgit/bin.rootgit:/rootgit/base.rootgit/commands:/rootgit/tools.rootgit:$DOTFILESWGH/pri/commands:$DOTFILESWGH/pri/commands/aliases:$DOTFILESWGH/commands:$DOTFILESWGH/commands/aliases
+DOTFILESWGH_COMMAND_PATH=~/prifs/boot/dotlocal/commands:$DOTFILESWGH/dotlocal/commands:$WGHHOME/rootgit-dotfiles/commands:/rootgit/bin.rootgit:/rootgit/base.rootgit/commands:/rootgit/tools.rootgit:$DOTFILESWGH_PRI/commands:$DOTFILESWGH_PRI/commands/aliases:$DOTFILESWGH/commands:$DOTFILESWGH/commands/aliases
 
 HROOT_PATH=$HROOT/bin:$HROOT/usr/bin:$HROOT/usr/local/bin
 COMMON_PATHS=/usr/bin:/bin:/usr/local/bin:/sbin:/usr/sbin:/usr/local/sbin
@@ -29,7 +29,7 @@ export XDG_DATA_DIRS=$DOTFILESWGH/local/share:$XDG_DATA_DIRS:/usr/local/share:/u
 # writable config location
 #XDG_CONFIG_HOME=$HOME/.config
 # read-only but searched config locations
-export XDG_CONFIG_DIRS=$DOTFILESWGH/pri/xdg-config-ro:$DOTFILESWGH/xdg-config-ro:$WGHHOME/rootgit-dotfiles/xdg-config-ro:$XDG_CONFIG_DIRS
+export XDG_CONFIG_DIRS=$DOTFILESWGH_PRI/xdg-config-ro:$DOTFILESWGH/xdg-config-ro:$WGHHOME/rootgit-dotfiles/xdg-config-ro:$XDG_CONFIG_DIRS
 #XDG_CONFIG_DIRS=/etc/xdg
 # writable cache dir
 export XDG_CACHE_HOME=$HOME/.cache
@@ -50,6 +50,6 @@ export VLAUNCHRC="$DOTFILESWGH/vlaunchrc"
 
 export GREP_COLOR="1;32"
 
-export TODOMAN_CONFIG=$DOTFILESWGH/pri/todoman.conf
-export VDIRSYNCER_CONFIG=$DOTFILESWGH/pri/vdirsyncer.conf
-export KHARD_CONFIG=$DOTFILESWGH/pri/khard.conf
+export TODOMAN_CONFIG=$DOTFILESWGH_PRI/todoman.conf
+export VDIRSYNCER_CONFIG=$DOTFILESWGH_PRI/vdirsyncer.conf
+export KHARD_CONFIG=$DOTFILESWGH_PRI/khard.conf

@@ -3,6 +3,7 @@ if [ -z "$WGHHOME" ]; then
     export WGHHOME=$HOME
 fi
 export DOTFILESWGH=$WGHHOME/dotfileswgh
+export DOTFILESWGH_PRI=$WGHHOME/dotfileswgh-pri
 source $DOTFILESWGH/env-more.sh
 
 # When $WGHHOME is not equal to $HOME I've switched to another user, and while I'll
@@ -214,7 +215,7 @@ source $DOTFILESWGH/bazsh/grml-funcs.sh
 
 
 ######## Add private stuff #######
-bazsh_common_pri=$DOTFILESWGH/pri/bazshrc
+bazsh_common_pri=$DOTFILESWGH_PRI/bazshrc
 if [ -f $bazsh_common_pri ]
 then
     source $bazsh_common_pri
@@ -232,7 +233,7 @@ then
     source $bazsh_common_local
 fi
 
-bazsh_common_pri_local=$DOTFILESWGH/pri/dotlocal/bazshrc
+bazsh_common_pri_local=$DOTFILESWGH_PRI/dotlocal/bazshrc
 if [ -f $bazsh_common_pri_local ]
 then
     source $bazsh_common_pri_local

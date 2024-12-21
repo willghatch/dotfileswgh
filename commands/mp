@@ -29,7 +29,7 @@ idle="--idle=40"
 if [[ "$name" = "boot" ]]; then
     idle=""
 fi
-idle_opt=$(cat $DOTFILESWGH/pri/prifs-idle-options 2>/dev/null | grep "^$name" | awk '{print $2}')
+idle_opt=$(cat $DOTFILESWGH_PRI/prifs-idle-options 2>/dev/null | grep "^$name" | awk '{print $2}')
 if [[ -n "$idle_opt" ]]; then
     idle="--idle=$idle_opt"
 fi

@@ -77,8 +77,8 @@ if [ -z "$XSESSION_COMMON_RUN_P" ]; then
   source $DOTFILESWGH/gui-session-common
 
 
-  if [ -f $DOTFILESWGH/pri/xinitrc ]; then
-      source $DOTFILESWGH/pri/xinitrc
+  if [ -f $DOTFILESWGH_PRI/xinitrc ]; then
+      source $DOTFILESWGH_PRI/xinitrc
   fi
   if [ -f $DOTFILESWGH/dotlocal/xinitrc ]; then
       source $DOTFILESWGH/dotlocal/xinitrc

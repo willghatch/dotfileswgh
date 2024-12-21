@@ -34,8 +34,8 @@ xsettingsd-wrapper --start &
 ## state would just work for both.
 #hkk
 
-if [ -f $DOTFILESWGH/pri/sway-startup-rc ]; then
-    source $DOTFILESWGH/pri/sway-startup-rc
+if [ -f $DOTFILESWGH_PRI/sway-startup-rc ]; then
+    source $DOTFILESWGH_PRI/sway-startup-rc
 fi
 if [ -f $HOME/rootgit-dotfiles/sway-startup-rc ]; then
     source $HOME/rootgit-dotfiles/sway-startup-rc
