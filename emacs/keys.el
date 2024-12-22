@@ -233,7 +233,7 @@
                                           (estate-insert-state)))))
 (ecmap "d" (lambda () (interactive) (message "d not really implemented yet")))
 (evmap "d" (lambda () (interactive)
-             (estate-visual-execution-helper (lambda () (kill-region nil nil t)))
+             (estate-visual-execution-helper (lambda () (delete-region (region-beginning) (region-end))))
              ;; Even without putting this switch to command state, kill-region disables the region and exits... I'm not sure whether that's a bug or a feature.
              ;;(estate-command-state)
              ))
