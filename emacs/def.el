@@ -120,8 +120,10 @@
 (nobreak
  ;;; these are the most critical loads
  (load-library "init-helpers")
- (require 'evil)
- (evil-mode 1)
+
+ ;(require 'evil)
+ ;(evil-mode 1)
+
  ;; Don't litter with undo-tree history files everywhere.
  ;; But maybe I should also look for how to put them in my emacs cache dir?
  ;; Persistent undo would be useful, but also annoying for when I really want to just get a file to its original state when I opened it.
@@ -140,7 +142,8 @@
  (setq repeatable-motion-training-wheels-p nil)
  (require 'repeatable-motion)
  (load-library "vfuncs")
- (load-library "keys")
+ ;(load-library "keys")
+ (load-library "keys-test")
  )
 
 (nobreak
@@ -169,15 +172,15 @@
 
 
 (nobreak
- ;(load-library "ace-jump-mode-conf")
- (require 'evil-little-word)
- ;(require 'evil-args) ; autoloaded
- (require 'evil-surround)
- (global-evil-surround-mode 1)
- ;(require 'evil-cleverparens-text-objects)
- (require 'evil-textobj-between)
- (require 'evil-textobj-anyblock)
- (require 'on-parens)
+ ;;(load-library "ace-jump-mode-conf")
+ ;(require 'evil-little-word)
+ ;;(require 'evil-args) ; autoloaded
+ ;(require 'evil-surround)
+ ;(global-evil-surround-mode 1)
+ ;;(require 'evil-cleverparens-text-objects)
+ ;(require 'evil-textobj-between)
+ ;(require 'evil-textobj-anyblock)
+ ;(require 'on-parens)
 
  (load-library "ido-conf")
  (ido-mode 1)
