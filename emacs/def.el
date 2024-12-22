@@ -25,10 +25,13 @@
    (normal-top-level-add-subdirs-to-load-path))
  (let ((default-directory (concat dotfileswgh "/external/emacs")))
    (normal-top-level-add-subdirs-to-load-path))
- (let ((default-directory "~/dotfileswgh-pri/emacs"))
+ (let ((default-directory (concat dotfileswgh-pri "/emacs")))
+   (normal-top-level-add-subdirs-to-load-path))
+ (let ((default-directory (concat dotfileswgh-dotlocal "/emacs")))
    (normal-top-level-add-subdirs-to-load-path))
  (setq load-path (cons (concat dotfileswgh "/emacs") load-path))
- (setq load-path (cons "~/dotfileswgh-pri/emacs" load-path))
+ (setq load-path (cons (concat dotfileswgh-pri "/emacs") load-path))
+ (setq load-path (cons (concat dotfileswgh-dotlocal "/emacs") load-path))
 )
 
 (defun load-library--around (orig-fun &rest args)
@@ -191,7 +194,7 @@
  (setq lsp-headerline-breadcrumb-enable nil)
 
  ;(require 'smex) ; autoloaded
- (require 'rainbow-delimiters) ; autoloaded
+ ;(require 'rainbow-delimiters) ; autoloaded
  (load-library "package-conf")
  ;(load-library "yasnippet-conf")
  (require 'indent-tree)
@@ -254,6 +257,8 @@
  ;(load-library "keyfreq-conf")
 )
 
+(let ((file (concat dotfileswgh-pri "/emacs/def.el")))
+  (if (file-exists-p file) (load-file file) nil))
 (let ((file (concat dotfileswgh-dotlocal "/emacs/def.el")))
   (if (file-exists-p file) (load-file file) nil))
 
