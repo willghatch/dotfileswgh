@@ -77,7 +77,7 @@
 ;; Visual states.
 ;; I've made visual states use a hook so that commands that activate the region will activate visual modes.
 ;; All of these visual modes presuppose that you are using and want to use transient-mark-mode.
-(estate-define-state visual estate-motion-keymap)
+(estate-define-state visual estate-command-keymap)
 (estate-define-state visual-rectangle estate-visual-keymap)
 (estate-define-state visual-line estate-visual-keymap)
 

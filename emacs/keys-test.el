@@ -29,6 +29,7 @@
 
 (setq wgh/isearch-repeat-forward-p t)
 
+
 (defun emmap (keys func)
   (nobreak-define-key estate-motion-keymap keys func))
 (defun ecmap (keys func)
@@ -49,6 +50,12 @@
 ;; * visual mode
 ;; * text objects
 ;; ... a lot more
+
+(defmacro with-evil (func)
+  `(lambda ()
+     (interactive)
+     (require 'evil)
+     (call-interactively ,func)))
 
 (cl-defun wgh/forward-line-keep-column/qd (&optional count)
   ;; Well, not as good as evil mode... maybe I'll do this properly later?
@@ -195,8 +202,8 @@
 (evmap "y" 'estate-copy)
 (ecmap "Y" (lambda () (interactive) (message "Y not yet implemented")))
 ;(ecmap "&" 'baddd-ex-repeat-substitute)
-(ecmap "gq" 'baddd-fill-and-move)
-(ecmap "gw" 'baddd-fill)
+(ecmap "gq" (with-evil 'evil-fill-and-move))
+(ecmap "gw" (with-evil 'evil-fill))
 ;;(ecmap "zo" 'baddd-open-fold)
 ;;(ecmap "zc" 'baddd-close-fold)
 ;;(ecmap "za" 'baddd-toggle-fold)
@@ -208,12 +215,12 @@
 (ecmap "\C-t" 'pop-tag-mark)
 ;(ecmap (kbd "C-.") 'baddd-repeat-pop)
 ;(ecmap (kbd "M-.") 'baddd-repeat-pop-next)
-(ecmap "." 'baddd-repeat)
+(ecmap "." 'baddd-repeat) ;; TODO - repeat is an important evil-mode thing to replace!
 (ecmap "\"" 'baddd-use-register)
-(ecmap "~" 'baddd-invert-char)
+(ecmap "~" (with-evil 'evil-invert-char))
 ;(ecmap "=" 'baddd-indent)
-(ecmap "<" 'baddd-shift-left)
-(ecmap ">" 'baddd-shift-right)
+(ecmap "<" (with-evil 'evil-shift-left))
+(ecmap ">" (with-evil 'evil-shift-right))
 ;(ecmap "ZZ" 'baddd-save-modified-and-close)
 ;(ecmap "ZQ" 'baddd-quit)
 (ecmap (kbd "DEL") 'rmo/backward-char)
@@ -282,15 +289,14 @@
 (emmap "#" 'rmo/baddd-search-word-backward)
 (emmap "g#" 'rmo/baddd-search-unbounded-word-backward)
 ;(emmap "$" 'end-of-line)
-;(emmap "%" 'baddd-jump-item)
 (emmap "%" (lambda () (interactive)
              (cond ((wgh/at-thing-beginning-p 'symex)
                     (wgh/forward-thing-end t 'symex))
                    ((wgh/at-thing-end-p 'symex)
                     (wgh/backward-thing-beginning t 'symex))
                    (message "Not in a position to use %"))))
-(emmap "`" 'baddd-goto-mark)
-(emmap "'" 'baddd-goto-mark-line)
+(emmap "`" (with-evil 'evil-goto-mark))
+(emmap "'" (with-evil 'evil-goto-mark-line))
 ;(emmap "]]" 'rmo/baddd-forward-section-begin)
 ;(emmap "][" 'rmo/baddd-forward-section-end)
 ;(emmap "[[" 'rmo/baddd-backward-section-begin)
@@ -307,7 +313,7 @@
 (emmap "/" (lambda () (interactive) (setq wgh/isearch-repeat-forward-p t) (call-interactively 'isearch-forward)))
 (emmap "?" (lambda () (interactive) (setq wgh/isearch-repeat-forward-p nil) (call-interactively 'isearch-backward)))
 (emmap ";" 'er/expand-region)
-(emmap "^" 'baddd-first-non-blank)
+(emmap "^" 'baddd-first-non-blank) ;; TODO - re-impl using back-to-indentation...
 ;(emmap "+" 'baddd-next-line-first-non-blank)
 ;(emmap "_" 'baddd-next-line-1-first-non-blank)
 ;;(emmap "-" 'baddd-previous-line-first-non-blank)
@@ -841,12 +847,12 @@ is the opposite."
 (emmap "tl"
   (defhydra list-stuff-map (:foreign-keys warn :exit t) "List:"
     ("b" list-buffers "buffers")
-    ("m" baddd-show-marks "marks")
+    ("m" (with-evil 'evil-show-marks) "marks")
     ("M" bookmark-bmenu-list "bookmarks")
                                         ;("tlk" 'list-keymaps) ; TODO - make this function
     ("c" list-colors-display "colors")
     ("f" list-faces-display "faces")
-    ("r" baddd-show-registers "registers")
+    ("r" (with-evil 'evil-show-registers) "registers")
     ))
 ; TODO - list jumps, maybe
 
@@ -866,9 +872,9 @@ is the opposite."
 (ecmap "s)" 'eval-last-sexp)
 (evmap "s)" 'eval-region)
 (evmap "s/" (kbd ":s/ ")) ; TODO - fix this...
-(ecmap "sm" 'baddd-set-marker)
+(ecmap "sm" (with-evil 'evil-set-marker))
 (ecmap "sM" 'bookmark-set)
-(ecmap "sg" 'baddd-goto-mark)
+(ecmap "sg" (with-evil 'evil-goto-mark))
 (ecmap "sG" 'bookmark-jump)
 (eimap (kbd "M-c") 'helm-M-x)
 (emmap (kbd "M-c") 'helm-M-x)
