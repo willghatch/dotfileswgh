@@ -161,6 +161,7 @@
                          (if (eolp)
                              end
                            (progn (move-end-of-line 1)
+                                  (unless (eobp) (forward-char 1))
                                   (point))))))
          (if (and point-first (< (mark) (point)))
              (cons end-use beg-use)
@@ -224,7 +225,9 @@
       (save-mark-and-excursion
         (atomic-change-group
           (end-of-line)
-          (insert "\n")
+          (if (eobp)
+              (insert "\n")
+            (forward-char 1))
           (insert to-paste-text))))
      ((eq estate-state 'visual-line)
       (error "Paste of non-line text in visual-line state not yet supported"))
