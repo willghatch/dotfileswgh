@@ -43,12 +43,16 @@ file from a large repository."
 (message "Current package-user-dir: %S" package-user-dir)
 (message "Installing packages...")
 
-(in 'evil)
 (in 'repeatable-motion)
+(in 'dash)
+(in 'smartparens)
+(in 'hydra)
+(in 'undo-tree)
+;; The above are the most critical to getting my config running at all.
+
+(in 'evil)
 (in 'on-parens)
 (in 'key-chord)
-(in 'undo-tree)
-(in 'hydra)
 (in 'auto-compile)
 (in 'evil-surround)
 (in 'evil-search-highlight-persist)
@@ -65,7 +69,6 @@ file from a large repository."
 (in 'rainbow-delimiters)
 (in 'rainbow-identifiers)
 (in 'rainbow-mode) ; for #123456 colors
-(in 'smartparens)
 (in 'ace-jump-mode)
 (in 'markchars)
 
