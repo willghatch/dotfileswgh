@@ -71,15 +71,13 @@ The keymap gets the specified parent."
   (unless (eq estate-state state)
     (let ((keymap-sym (estate--keymap-name state))
           (enter-hook (estate--enter-hook-name state))
-          (leave-hook (and estate--previous-state
-                           (estate--leave-hook-name estate--previous-state))))
+          (leave-hook (and estate-state
+                           (estate--leave-hook-name estate-state))))
       (if (boundp keymap-sym)
           (progn
             (setq-local estate--previous-state estate-state)
             (setq-local estate-state state)
-
             (setq-local -estate-mode-map-alist `((estate-local-mode . ,(symbol-value keymap-sym))))
-            ;(set-keymap-parent -estate-mode-current-keymap (symbol-value keymap-sym))
             (unless skip-undo-grouping
               (estate-mode-with-change-group-handler))
             (when (symbol-value leave-hook)

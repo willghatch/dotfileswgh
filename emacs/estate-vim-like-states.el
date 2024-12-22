@@ -279,6 +279,7 @@ Creates overlays for the areas that would be included in the line-based selectio
   (add-hook 'post-command-hook #'estate--visual-line-overlay-helper nil t)
   (estate--visual-line-overlay-helper))
 (defun estate--visual-line-off ()
+  (estate--visual-line-overlay-helper)
   (remove-hook 'post-command-hook #'estate--visual-line-overlay-helper t)
   (setq estate--visual-line nil))
 
