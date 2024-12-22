@@ -130,8 +130,6 @@
  (setq undo-tree-auto-save-history nil)
  (require 'undo-tree)
  (global-undo-tree-mode 1)
- (require 'key-chord)
- (key-chord-mode 1)
  (require 'hydra)
  (require 'mouse)
  (require 'mwheel)

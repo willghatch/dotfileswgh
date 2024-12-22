@@ -152,7 +152,12 @@
 (eimap "a" 'self-insert-command)
 ;(eimap "z" 'kill-emacs)
 ;; TODO - wean myself off key chords because they are finnicky when there is input lag, they don't work with macros, and they just have issues.
-(key-chord-define estate-insert-keymap (kbd "kj") 'estate-command-state)
+
+
+;; Wow.  I've stopped using this organically over time due to inherent issues in timing based key chords.  But it turns out that removing this single require cut my load time by nearly half.
+;(require 'key-chord)
+;(key-chord-mode 1)
+;(key-chord-define estate-insert-keymap (kbd "kj") 'estate-command-state)
 
 
 (progn
