@@ -17,6 +17,48 @@
 
 ;; * TODO - improvements (that I could even put in my current config before switching to this)
 
+;; * TODO - I now have a bunch of definitions in here that I should move out
+
+
+;; Keys I don't really use:
+
+;; Insert mode:
+;; C-o -- I read that this is bound to something useful in readline, I should look into it
+;; C-q
+;; maybes
+;; C-r
+;; C-w is close window on certain un-customizable browsers and I accidentally
+;;     hit it all the time, so I should not use it.
+;; non-character symbols?
+;; M- combos? (I like and use them less)
+;; M-a,e,g,i
+;; M-j is something that maybe I should use, but I don't
+;; M-k,l,m,n,o,p,q
+;; M-s,u,v
+;; maybe M-y
+;; M-z
+
+;; M-t -- I think I want to save this for windowing in terminal multiplexer with C-t
+
+;; G- H- (sup- hyp-) combos?  (I need conventions for terminal encodings of these...)
+
+;; Normal mode:
+;; B,W I don't really use, but maybe I should?
+;; E
+;; h,l I have on ec/oc which I'm mostly happy with
+;; H,L,M -- move to top,bottom,middle of window.  I don't really use these.  Should I?
+;; J,K -- aliases for H,L, also not really used
+;; m -- I think I wanted this to be mode-specific -- eg. a fallback to normal emacs keys for things like dired
+;; O -- I have it as oo
+;; S,T,U,Y -- all no-ops or duplicates, or things I don't use.
+;; Z -- currently sub-map, but I don't use it for anything.
+;; non-character symbols?
+;; #, $, comma, +
+;; & I don't really use, maybe I should
+;; also maybe I should use *
+;; []{}
+;; any weird unicode that I have in convenient places
+
 
 (message "\n\nIn keys-test.el\n\n")
 
@@ -462,7 +504,7 @@
 (emmap (kbd "C-c") 'ignore)
 
 ; Keys unbound and reserved for future use - bind to nop so they don't input
-;(emmap (kbd "RET") 'ignore)
+(emmap (kbd "RET") 'ignore)
 (emmap "S" 'ignore)
 (emmap "T" 'ignore)
 
@@ -694,6 +736,7 @@ is the opposite."
 ;; TODO - I should have a wrapper function defined that has various arguments to compose, and the keybinding section should just use that one function composed.  eg. (tree-op 'OP 'TREE-TYPE 'DIRECTION 'ANY-OTHER-INFO) but probably with keyword args, then probably have an extensible table that it looks up.  For any entries that aren't there, instead of using the ignore function I can print a descriptive message about which entries are not yet filled out.
 ;; TODO - rearrange this in whatever way is necessary to get hints as I go to remember what the options are
 ;; TODO - slurp/barf are not the only tree mutation operations I should have, eg. above I have "eu_" as "mutate forward" with things like join, split, splice, ... I should consider other tree operations and how they should fit in.
+;; TODO - add insertion functions, eg. org-mode insert sibling header below/above.
 ;; "ens_" forward slurp
 (emmap "ensp" 'sptw-forward-slurp)
 (emmap "onsp" 'sptw-backward-slurp)
@@ -821,6 +864,7 @@ is the opposite."
 (emmap "tie" 'save-and-kill-buffer-and-maybe-quit-emacs)
 (emmap " tiea" 'baddd-save-and-quit)
 (emmap "tip" 'ffap/no-confirm)
+;; TODO - I want to switch from "tif" and friends to "tf*" for the variety of ways I want to find files.
 (emmap "tif" 'ido-ffap-no)
 (emmap " tifd" 'ido-find-file-from-pwd)
 (emmap " tiff" 'ffap/no-confirm)
@@ -828,6 +872,11 @@ is the opposite."
 (emmap "tib" 'prev-buffer-no-star)
 (emmap " tiwd" 'next-dirty-buffer-no-star)
 (emmap " tibd" 'prev-dirty-buffer-no-star)
+(emmap "tff" 'ido-ffap-no)
+(emmap "tfp" 'ffap/no-confirm)
+(emmap "tfh" 'ff-find-other-file) ; IE switch between header and source file for C/C++
+(emmap "tfd" 'ido-find-file-from-pwd)
+(emmap "tfg" (lambda () (interactive) (require 'helm-projectile) (helm-projectile)))
 
 (emmap "th" 'my-window-map/body)
 (autoload 'projectile-command-map "projectile-conf" "" t 'keymap)
@@ -837,6 +886,7 @@ is the opposite."
 (emmap "ts"
   (defhydra settings-toggle (:foreign-keys warn :exit t) "Toggle:"
     ("p" smartparens-mode "smartparens")
+    ("b" (lambda () (interactive) (require 'blamer (blamer-mode))) "git blame")
     ("w" whitespace "whitespace")
     ("C" (lambda () (interactive) (require 'rainbow-mode) (rainbow-mode)) "#aabbcc")
     ("c" company-mode "company")
@@ -844,7 +894,7 @@ is the opposite."
     ("i" toggle-case-fold-search "/? case")
     ("W" toggle-wrap-scan "search-wrap")
     ("f" flycheck-mode "flycheck")
-    ("F" fci-mode-toggle "fill-col")
+    ("F" display-fill-column-indicator-mode "fill-col")
     ("s" flyspell-mode "flyspell")
     ("S" flyspell-prog-mode "flyspell-prog")
     ;("e" electric-indent-mode "el.indent")
@@ -854,9 +904,7 @@ is the opposite."
     ("H" baddd-search-highlight-persist "search-highlight-ever")
     ("M" menu-bar-mode "menu-bar")
     ("l" lsp-lens-mode "lsp-lens") ;; lsp-lens is the thing that shows eg. haskell imports in an overlay
-    ("m" (lambda () (interactive)
-           (menu-bar-mode 1) (menu-bar-open))
-     "menu-open")
+    ("m" (lambda () (interactive) (menu-bar-mode 1) (menu-bar-open)) "menu-open")
     ("n" display-line-numbers-mode "line-numbers")
     ("I" indent-guide-mode "indent-guide")
     ("x" wgh/racket-xp-pre-redisplay-toggle "racket-xp-hl")
@@ -1026,6 +1074,11 @@ is the opposite."
 ;(define-key baddd-ex-completion-map "\M-r" 'baddd-paste-from-register)
 
 (define-key isearch-mode-map "\C-g" 'isearch-abort-abort-gosh-darn-it)
+
+
+;; Without defining these, I get terminal bell events when I move the mouse around on the header line / mode line.
+(global-set-key (kbd "<header-line><mouse-movement>") 'ignore)
+(global-set-key (kbd "<mode-line><mouse-movement>") 'ignore)
 
 
 (message "at end of keys-test.el")
