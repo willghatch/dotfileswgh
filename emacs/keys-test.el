@@ -44,6 +44,24 @@
   (nobreak-define-key estate-insert-keymap keys func))
 ;; TODO - pager mode/state
 
+
+;; TODO - These are defined in init-helpers, but I'm redefining them for now for compatibility until I finish the a full transition to the new config...
+;; TODO - I should move the above definitions into init-helpers instead and replace uses of these everywhere.  At least a bit in mode-hooks.
+(defun mkmap (keys func)
+  (nobreak-define-key estate-motion-keymap keys func))
+(defun nkmap (keys func)
+  (nobreak-define-key estate-command-keymap keys func))
+(defun vkmap (keys func)
+  (nobreak-define-key estate-visual-keymap keys func))
+(defun ikmap (keys func)
+  (nobreak-define-key estate-insert-keymap keys func))
+(defun pkmap (keys func)
+  (nobreak-define-key estate-pager-keymap keys func))
+;; TODO - do I want to add something like evil-normal-state-local-map?  The only place I have used this is in org-mode to overwrite bindings to be org-specific.  Only I haven't liked that, because then I can't use the bindings that they shadow, which I also sometimes want.  This is part of the motivation to design a more composable and prefix-heavy keymap -- so that I can have more things bound in a way that I can remember them, and use all of the commands together.
+(defun lnkmap (keys func)
+  (nobreak-define-key evil-normal-state-local-map keys func))
+
+
 ;; TODOs
 ;; * forward/back line keeping column position (including when going through a short line)
 ;; * repeat commands
