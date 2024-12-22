@@ -142,8 +142,7 @@
  (setq repeatable-motion-training-wheels-p nil)
  (require 'repeatable-motion)
  (load-library "vfuncs")
- ;(load-library "keys")
- (load-library "keys-test")
+ (load-library "keys")
  )
 
 (nobreak
