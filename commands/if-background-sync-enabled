@@ -2,6 +2,6 @@
 if [[ "$(cat $DOTFILESWGH_DOTLOCAL/background-sync 2>/dev/null)" = "true" ]]; then
   exec "$@"
 else
-  echo background-sync disabled >&2
+  echo "background-sync disabled, relevant env: DOTFILESWGH_DOTLOCAL = '$DOTFILESWGH_DOTLOCAL'" >&2
   exit
 fi
