@@ -1,5 +1,7 @@
 # Requires $WGHHOME and $DOTFILESWGH be set
 
+export WGHHOME="${WGHHOME:-$HOME}"
+export DOTFILESWGH="${DOTFILESWGH:-$WGHHOME/dotfileswgh}"
 export DOTFILESWGH_DOTLOCAL="${DOTFILESWGH_DOTLOCAL:-$WGHHOME/dotfileswgh-dotlocal}"
 export DOTFILESWGH_PRI="${DOTFILESWGH_PRI:-$WGHHOME/dotfileswgh-pri}"
 
