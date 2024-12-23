@@ -149,9 +149,8 @@
 (eimap "\C-c" 'estate-command-state)
 (eimap "\C-l" 'estate-command-state)
 (eimap "\M-c" 'execute-extended-command)
-(eimap "a" 'self-insert-command)
-;(eimap "z" 'kill-emacs)
-;; TODO - wean myself off key chords because they are finnicky when there is input lag, they don't work with macros, and they just have issues.
+(eimap "\C-w" 'ignore) ;; by default bound to kill-region.  I might map it to delete-backward-word, but I also don't want to get used to using it such that I accidentally use it in a web browser, since browsers are both extremely necessary, in fact using multiple browsers is more-or-less necessary, and none of them have reasonable allowance for user customization of keyboard shortcuts.
+(eimap "\C-t" 'ignore)
 
 
 ;; Wow.  I've stopped using this organically over time due to inherent issues in timing based key chords.  But it turns out that removing this single require cut my load time by nearly half.
