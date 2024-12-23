@@ -189,6 +189,8 @@
 (evmap "as" 'wgh/expand-region-to-sentence)
 (evmap "aS" 'wgh/expand-region-to-symbol)
 (evmap "ap" 'wgh/expand-region-to-paragraph)
+(evmap "al" 'wgh/expand-region-to-line)
+(evmap "il" 'wgh/expand-region-to-line-no-newline_TODO-implement-this)
 (evmap "ab" 'sptw-expand-region)
 (evmap "ib" 'sptw-expand-region/children-region)
 (evmap "a\"" (lambda () (interactive) (sptw-expand-region-to-delimiter "\"")))

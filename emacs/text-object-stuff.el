@@ -256,12 +256,11 @@ If no region is active, it will use (point . point)."
 (wgh/def-move-thing paragraph)
 (wgh/def-transpose-thing paragraph)
 (wgh/def-expand-region-to-thing paragraph)
-(put 'symex 'forward-op 'sp-forward-sexp)
-(wgh/def-move-thing symex)
-(wgh/def-transpose-thing symex)
-;; TODO - this one is poor because it needs tree handling
-(wgh/def-expand-region-to-thing symex)
-;; TODO - need object specific to each delimiter for smartparens, as tree, in addition to smartparens general object.
+(wgh/def-move-thing line)
+(wgh/def-transpose-thing line)
+(wgh/def-expand-region-to-thing line)
+
+
 
 
 ;;;;;
