@@ -80,6 +80,7 @@
 (estate-define-state visual estate-command-keymap)
 (estate-define-state visual-rectangle estate-visual-keymap)
 (estate-define-state visual-line estate-visual-keymap)
+;; TODO - the more I think about it, the more I think visual-line mode is more complexity than it is worth.  I'm going to expand the line selection text object behavior to expand the region to fill both begin and end lines for the region, then disable visual line mode for a while to see if I'm sure about it.
 
 (defvar-local estate--visual-line nil)
 
@@ -285,7 +286,192 @@ Creates overlays for the areas that would be included in the line-based selectio
 
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;; macro stuff, this really should go elsewhere
+;; macro stuff
+;; TODO - after I decide what I want, rename and finalize things.
+;; TODO - don't use name kmacro -- kmacro is a specific library for handling keyboard macros.  The base emacs term is “kbd-macro”, so use that instead, or come up with some better term.
+;; TODO - I want to have some kind of nested kmacro recording.  Eg. I want to be able to start recording a specific named macro, then start recording another specific named macro inside, finish the inner one and probably call it, then end the outer macro.  In part I want to use this because I want to have various commands that implicitly record named macros, mostly as an implementation detail, then allow calling them outside.
+;;      - it looks like start-kbd-macro with an arg lets you start editing.  So If I keep state of a list of macro tags, and change behavior based on tag state, I can juggle multiple macro definitions.
+
+(defvar-local estate--nested-macro-states-alist nil
+  "Alist of tags to nested macro recording state.
+For each (potentially) nested macro recording, the list stores the prefix length of the kbd macro when the nested macro recording started.
+When a macro recording ends, it ends recording, reads the state of last-kbd-macro, and removes the prefix as appropriate.
+Then, if there are other macros being recorded, it starts a macro edit so that the other macro can continue.
+")
+
+(defun estate-nestable-keyboard-macro-start (tag)
+  "Start recording a nestable keyboard macro.
+This is presumably incompatible with any other packages that wrap kbd macro recording.
+TAG must be a unique key as tested by `equal', and it is an error to start recording again with the same tag.
+
+TODO - maybe I should add a counter like kmacro has, that is tag-specific?
+"
+  (cond ((assoc tag estate--nested-macro-states-alist)
+         (error "estate-nestable-keyboard-macro-start error: tag already in use: %s"
+                tag))
+        ((and (null estate--nested-macro-states-alist)
+              defining-kbd-macro)
+         (error "estate-nestable-keyboard-macro-start error: already defining kbd macro outside of this framework"))
+        ((null estate--nested-macro-states-alist)
+         ;; Non-nested call.
+         (setq estate--nested-macro-states-alist (list (list tag 0)))
+         (start-kbd-macro nil))
+        (t
+         ;; Nested call.
+         (end-kbd-macro)
+         (setq estate--nested-macro-states-alist
+               (cons (list tag (length last-kbd-macro))
+                     estate--nested-macro-states-alist))
+         (start-kbd-macro t t))))
+
+(defun estate-nestable-keyboard-macro-end (tag)
+"Stop recording a nestable keyboard macro for TAG.
+Return the keyboard macro as a string or vector.
+TODO - maybe I should also save the recording to some data structure?
+"
+(let* ((found (assoc tag estate--nested-macro-states-alist))
+       (prefix-length (and found (cadr found))))
+  (cond ((not defining-kbd-macro)
+         (error "estate-nestable-keyboard-macro-end: not currently defining kbd macro"))
+        ((not found)
+         (error "estate-nestable-keyboard-macro-end: tag not found: %s" tag))
+        (t
+         (end-kbd-macro)
+         (let ((last-val last-kbd-macro))
+           (setq estate--nested-macro-states-alist
+                 (assoc-delete-all tag estate--nested-macro-states-alist))
+           (when (not (null estate--nested-macro-states-alist))
+             (start-kbd-macro t t))
+           (seq-drop last-val prefix-length))))))
+
+
+(setq-local estate--kmacro-to-buffer-change-state nil)
+
+(defun estate-record-quick-keyboard-macro-to-buffer-change ()
+  "Start recording a nestable keyboard macro that will stop recording automatically once the buffer has been changed and estate is back in command state.
+Uses `estate-nestable-keyboard-macro-start', and thus is incompatible with other keyboard macro tools that don't.
+"
+  (interactive)
+  (when estate--kmacro-to-buffer-change-state
+    (error "estate--kmacro-to-buffer-change-state error, alread: recording in %s state"
+           estate--kmacro-too-buffer-change-state))
+  ;;(kmacro-start-macro nil)
+  (estate-nestable-keyboard-macro-start 'estate--to-change-keyboard-macro)
+  (setq-local estate--kmacror-to-buffer-change-state 'recording)
+  (letrec ((kmacro-record-until-buffer-change-func
+            (lambda (changed-beg changed-end old-length)
+              (remove-hook 'after-change-functions
+                           kmacro-record-until-buffer-change-func
+                           t)
+              (if (equal estate-state 'command)
+                  (progn
+                    (setq-local estate--kmacro-to-buffer-change-state nil)
+                    ;;(end-kbd-macro)
+                    (puthash "kmacro-to-buffer-change"
+                             (estate-nestable-keyboard-macro-end
+                              'estate--to-change-keyboard-macro)
+                             estate--registers))
+                (progn
+                  (setq-local estate--kmacro-to-buffer-change-state 'changed)
+                  (letrec ((command-state-kmacro-hook
+                            (lambda ()
+                              (remove-hook 'estate-command-state-enter-hook
+                                           command-state-kmacro-hook
+                                           t)
+                              (setq-local estate--kmacro-to-buffer-change-state nil)
+                              ;;(end-kbd-macro)
+                              (puthash "kmacro-to-buffer-change"
+                                       ;; When using the
+                                       ;; estate-command-state-enter-hook, the
+                                       ;; kmacro has not yet recorded the
+                                       ;; current keys.  I don't love this, but
+                                       ;; I'm not sure a better way right now.
+                                       ;; TODO - this doesn't work when nested under recording a macro to a particular register.
+                                       (vconcat (estate-nestable-keyboard-macro-end
+                                                 'estate--to-change-keyboard-macro)
+                                                (this-command-keys-vector))
+                                       estate--registers))))
+                    (add-hook 'estate-command-state-enter-hook
+                              command-state-kmacro-hook
+                              0 t)))))))
+    (add-hook 'after-change-functions
+              kmacro-record-until-buffer-change-func
+              0 t)))
+
+
+(defun estate-execute-quick-keyboard-macro-to-buffer-change (count)
+  "
+Execute the last keyboard macro recorded by `estate-record-quick-keyboard-macro-to-buffer-change'
+"
+  (interactive "p")
+  (dotimes (i count)
+    (execute-kbd-macro (gethash "kmacro-to-buffer-change"
+                                estate--registers
+                                ""))))
+
+(defun estate-get-last-quick-keyboard-macro-to-buffer-change ()
+  "Return the last keyboard macro recorded by `estate-record-quick-keyboard-macro-to-buffer-change', as a string or vector."
+  (gethash "kmacro-to-buffer-change" estate--registers ""))
+
+
+(setq estate--most-recent-register-macro-recorded nil)
+
+(defun estate-keyboard-macro-to-register-start (char)
+  "Start recording a keyboard macro to register CHAR."
+  (interactive "cmacro register char:\n")
+  (estate-nestable-keyboard-macro-start
+   (cons 'estate--keyboard-macro-to-register char)))
+
+(defun estate-keyboard-macro-to-register-end (char)
+  "Finish recording a keyboard macro to register CHAR."
+  (let ((value (estate-nestable-keyboard-macro-end
+                (cons 'estate--keyboard-macro-to-register char))))
+    (puthash char value estate--registers)
+    ;; TODO - I've been writing this macro stuff with setq-local and maybe defvar-local, but actually it should probably be global, not local.
+    (setq estate--most-recent-register-macro-recorded char)
+    value))
+
+(defun estate--keyboard-macro-to-register-assoc-helper (alist-car key)
+  (and (consp alist-car)
+       (equal (car alist-car) key)))
+
+(defun estate-keyboard-macro-to-register-end-most-recent ()
+  "Finish recording a keyboard macro to a register, the most recent one started."
+  (interactive)
+  (let* ((found (assoc 'estate--keyboard-macro-to-register
+                        estate--nested-macro-states-alist
+                        'estate--keyboard-macro-to-register-assoc-helper)))
+    (when (not found)
+      (error "estate-keyboard-macro-to-register-end-most-recent: not currently recording any"))
+    (estate-keyboard-macro-to-register-end (cdar found))))
+
+(defun estate-keyboard-macro-execute-from-register (count char)
+  (interactive "p\ncregister char:\n")
+  (execute-kbd-macro (gethash char estate--registers "") count))
+
+(defun estate-keyboard-macro-execute-from-most-recently-macro-recorded-register
+    (count)
+  "TODO"
+  (interactive "p")
+  (estate-keyboard-macro-execute-from-register
+   count
+   estate--most-recent-register-macro-recorded))
+
+(defun estate-keyboard-macro-to-register-end-most-recent-or-start-default ()
+  "If currently recording from an estate-keyboard-macro-to-register-* function, end the most recently started one.
+Otherwise, start recording to the register \"default\".
+"
+  (interactive)
+  (let* ((found (assoc 'estate--keyboard-macro-to-register
+                        estate--nested-macro-states-alist
+                        'estate--keyboard-macro-to-register-assoc-helper)))
+    (if found
+        (puthash (cdar found)
+                 (estate-keyboard-macro-to-register-end (cdar found))
+                 estate--registers)
+      (estate-keyboard-macro-to-register-start "default"))))
+;; TODO - probably use the character for default register a la vim, so it can still be selected by char.
+
 (defvar-local wgh/-macro-recording nil)
 (defun wgh/macro-record (char)
   (interactive "cmacro char:\n")
@@ -304,6 +490,7 @@ Creates overlays for the areas that would be included in the line-based selectio
 (defun wgh/call-macro-by-name (count char)
   (interactive "p\ncmacro char:\n")
   (execute-kbd-macro (gethash char estate--registers "") count))
+
 
 ;; TODO - also shouldn't be in estate, but markers -- eg. evil-mode stores markers with buffer, line, and column, so you can hop between them.
 ;; TODO - not stuff to actually go in this file, but a checklist of things I want to replace evil-mode.  Note that many of these I can just fall back to requiring evil-mode and just using it...
