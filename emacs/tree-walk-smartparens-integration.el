@@ -14,7 +14,6 @@
 ;;
 ;; TODO - improve handling of prefix quotes, unquotes, etc.
 
-(require 'dash)
 (require 'smartparens)
 (require 'tree-walk)
 
@@ -27,7 +26,7 @@
     (if (or
          (equal t mode)
          (equal mode major-mode)
-         (-contains? minor-mode-list mode))
+         (memq mode minor-mode-list))
         (cdr sp-def)
       nil)))
 (defun sptw--get-delim-from-spec (sp-spec open?)
@@ -39,10 +38,12 @@
 
 (defun sptw--delim-list (open?)
   (let ((get-delim (lambda (x) (sptw--get-delim-from-spec x open?))))
-    (-flatten (-map (lambda (def)
-                      (-map get-delim
-                            (sptw--get-specs def)))
-                    sp-pairs))))
+    (apply #'append
+           ;; The below returns a list of lists of specs.
+           (mapcar (lambda (def)
+                     (mapcar get-delim
+                             (sptw--get-specs def)))
+                   sp-pairs))))
 
 (defun sptw--at-delim-p (open? at-end?)
   "If at smartparens delimiter, return the delimiter string.
@@ -50,14 +51,14 @@ If OPEN?, use the opening delimiter, else the closing delimiter.
 If AT-END?, check if point is immediately after the last character of the delimiter, else check if point is immediately before the first character of the delimiter.
 Return nil if not at any current smartparens delimiter.
 "
-  (-reduce-from (lambda (prev cur)
-                  (if prev prev
-                    (and (save-mark-and-excursion
-                           (when at-end? (backward-char (length cur)))
-                           (looking-at-p (regexp-quote cur)))
-                         cur)))
-                nil
-                (sptw--delim-list open?)))
+  (seq-reduce (lambda (prev cur)
+                (if prev prev
+                  (and (save-mark-and-excursion
+                         (when at-end? (backward-char (length cur)))
+                         (looking-at-p (regexp-quote cur)))
+                       cur)))
+              (sptw--delim-list open?)
+              nil))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;; Predicates!
