@@ -60,7 +60,7 @@
 ;; any weird unicode that I have in convenient places
 
 
-(message "\n\nIn keys-test.el\n\n")
+(message "\n\nIn keys.el\n\n")
 
 (require 'estate-core)
 (require 'estate-vim-like-states)
@@ -69,7 +69,14 @@
 (load-library "text-object-stuff")
 (load-library "tree-walk-smartparens-integration.el")
 
+;; State for repeating isearch -- my key to start isearch sets this so that the repeat keys go the right direction.
 (setq wgh/isearch-repeat-forward-p t)
+;; State for isearch repetition -- values 'beginning or 'end.
+;; TODO - I would like a system for writing an escape in the search for where the cursor should go.
+(setq wgh/isearch-go-part 'beginning)
+
+;; isearch-wrap-pause can be t (default) to signal an error, then actually wrap the next time, 'no to wrap immediately but flash, 'no-ding to wrap immediately but not flash, or nil to disallow wrapping entirely.
+(setq isearch-wrap-pause 'no)
 
 
 (defun emmap (keys func)
@@ -350,8 +357,21 @@
 ;(emmap "K" 'baddd-lookup)
 ;(emmap "L" 'baddd-window-bottom)
 ;(emmap "M" 'baddd-window-middle)
-(emmap "n" (lambda (&optional n) (interactive "p") (if wgh/isearch-repeat-forward-p (isearch-repeat-forward n) (isearch-repeat-backward n))))
-(emmap "N" (lambda (&optional n) (interactive "p") (if wgh/isearch-repeat-forward-p (isearch-repeat-backward n) (isearch-repeat-forward n))))
+(defun wgh/isearch-repeat (&optional count)
+  (let* ((count-fwd (<= 0 (or count 1)))
+         (count-num (abs (or count 1)))
+         (fwd (not (xor count-fwd wgh/isearch-repeat-forward-p)))
+         (repeat-func (if fwd #'isearch-repeat-forward #'isearch-repeat-backward))
+         (moved (tree-walk--motion-moved (lambda () (funcall repeat-func count-num)))))
+    (cond ((not moved) nil)
+          ((and (equal wgh/isearch-go-part 'beginning)
+                (< isearch-other-end (point)))
+           (goto-char isearch-other-end))
+          ((and (equal wgh/isearch-go-part 'end)
+                (>= isearch-other-end (point)))
+           (goto-char isearch-other-end)))))
+(emmap "n" (lambda (&optional n) (interactive "p") (wgh/isearch-repeat (or n 1))))
+(emmap "N" (lambda (&optional n) (interactive "p") (wgh/isearch-repeat (- (or n 1)))))
 
 ;(emmap "w" 'rmo/wgh/forward-word-beginning)
 ;(emmap "b" 'rmo/wgh/backward-word-beginning)
@@ -916,8 +936,9 @@ is the opposite."
     ;("e" electric-indent-mode "el.indent")
     ("d" rainbow-delimiters-mode "rainbow{}")
     ("r" linum-relative-toggle "linum-rel")
-    ("h" baddd-search-highlight-persist-remove-all "search-highlight-now")
-    ("H" baddd-search-highlight-persist "search-highlight-ever")
+    ("h" isearch-exit "clear-search-highlight")
+    ;;("h" baddd-search-highlight-persist-remove-all "search-highlight-now")
+    ;;("H" baddd-search-highlight-persist "search-highlight-ever")
     ("M" menu-bar-mode "menu-bar")
     ("l" lsp-lens-mode "lsp-lens") ;; lsp-lens is the thing that shows eg. haskell imports in an overlay
     ("m" (lambda () (interactive) (menu-bar-mode 1) (menu-bar-open)) "menu-open")
@@ -1089,7 +1110,26 @@ is the opposite."
 ;(define-key baddd-ex-completion-map "\C-b" 'backward-char)
 ;(define-key baddd-ex-completion-map "\M-r" 'baddd-paste-from-register)
 
+
+(defun my-isearch-bor-exit ()
+  "Ensure point is at beginning of isearch result and exit."
+  ;; Copied from https://emacs.stackexchange.com/questions/74339/how-to-leave-cursor-at-beginning-of-searched-text-in-isearch
+  (interactive)
+  (when (< isearch-other-end (point))
+    (goto-char isearch-other-end))
+  (call-interactively 'isearch-exit))
+
+(defun my-isearch-eor-exit ()
+  "Ensure point is at end of isearch result and exit."
+  ;; Copied from https://emacs.stackexchange.com/questions/74339/how-to-leave-cursor-at-beginning-of-searched-text-in-isearch
+  (interactive)
+  (when (>= isearch-other-end (point))
+    (goto-char isearch-other-end))
+  (call-interactively 'isearch-exit))
+
 (define-key isearch-mode-map "\C-g" 'isearch-abort-abort-gosh-darn-it)
+(define-key isearch-mode-map (kbd "RET") (lambda () (interactive) (setq wgh/isearch-go-part 'beginning) (call-interactively 'my-isearch-bor-exit)))
+(define-key isearch-mode-map "\C-j" (lambda () (interactive) (setq wgh/isearch-go-part 'end) (call-interactively 'my-isearch-eor-exit)))
 
 
 ;; Without defining these, I get terminal bell events when I move the mouse around on the header line / mode line.
@@ -1097,4 +1137,4 @@ is the opposite."
 (global-set-key (kbd "<mode-line><mouse-movement>") 'ignore)
 
 
-(message "at end of keys-test.el")
+(message "at end of keys.el")

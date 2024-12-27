@@ -1,5 +1,8 @@
 ;;; Key config
 
+(require 'evil)
+(evil-mode 1)
+
 ;; Keys I don't really use:
 
 ;; Insert mode:
@@ -337,8 +340,8 @@
 (define-key evil-outer-text-objects-map "x" 'evil-a-tag)
 
 ;; Normal state switch!
-(key-chord-define evil-insert-state-map (kbd "kj") 'evil-normal-state)
-(key-chord-define evil-replace-state-map (kbd "kj") 'evil-normal-state)
+;;(key-chord-define evil-insert-state-map (kbd "kj") 'evil-normal-state)
+;;(key-chord-define evil-replace-state-map (kbd "kj") 'evil-normal-state)
 (ikmap (kbd "C-c") 'evil-normal-state)
 
 ; Keys unbound and reserved for future use - bind to nop so they don't input
