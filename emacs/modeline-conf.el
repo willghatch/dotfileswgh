@@ -115,6 +115,12 @@
                                   (lendiff (- len (length ps))))
                              (concat (make-string lendiff (aref " " 0)) ps))
                            'face 'font-lock-constant-face))
+       " M1:"
+       '(:eval (propertize (let* ((ps (format "%s" (mark)))
+                                  (len (length (format "%s" (point-max))))
+                                  (lendiff (- len (length ps))))
+                             (concat (make-string lendiff (aref " " 0)) ps))
+                           'face 'font-lock-constant-face))
 
        ;; add the time, with the date and the emacs uptime in the tooltip
        ;; Well, I have plenty of clocks, I never look at this one.
