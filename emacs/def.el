@@ -167,6 +167,8 @@
  (require 'repeatable-motion)
  (load-library "vfuncs")
  (load-library "keys")
+ (setq evil-motion-state-local-map (make-sparse-keymap)) ;; To prevent breakage where this is still used.  TODO - delete this.
+
  ;; I wanted to try one more time to see if maybe I should just use evil-mode with some configuration changes.  But it's too set in its on-character addressing ways.  The evil-move-cursor-back setting only affects what happens when exiting insert mode.  It doesn't change the fact that evil-forward-word-end puts the cursor ON the last character (IE before it) instead of after the last character, and that it has a bunch of logic for adjusting the ranges used for operations (eg. delete forward word end deletes one character farther than the movement goes).  And I think working my full plans in with evil-mode will be difficult, at best.  And the main parts of evil-mode that I really care about that don't conflict with how evil-mode is set up have been relatively easy to re-implement in a much smaller way.  The remaining parts that I care about I can mostly just keep using from evil-mode as a lazy require.
  ;(setq evil-move-cursor-back nil)
  ;(setq evil-move-beyond-eol t)
