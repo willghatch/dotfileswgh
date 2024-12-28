@@ -352,6 +352,7 @@
 (emmap "7" 'digit-argument)
 (emmap "8" 'digit-argument)
 (emmap "9" 'digit-argument)
+(emmap "-" 'negative-argument)
 (defun vilish/goto-line/beginning (n)
   (interactive "p")
   (if (= n 0) (goto-line 1) (goto-line n)))
@@ -998,11 +999,12 @@ is the opposite."
 ;(evmap (kbd "C-s") 'yas-insert-with-region)
 
 ;; command modes and macros
-(emmap "-" (lambda (n)
-             (interactive "p")
-             (message "use z")
-             ;;(call-interactively 'helm-M-x)
-             ))
+
+;; (emmap "-" (lambda (n)
+;;              (interactive "p")
+;;              (message "use z")
+;;              ;;(call-interactively 'helm-M-x)
+;;              ))
 (emmap "z" 'helm-M-x)
 ;(emmap "|" 'execute-extended-command)
 (emmap "|" 'eval-expression)

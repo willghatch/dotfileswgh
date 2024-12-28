@@ -108,9 +108,9 @@ Return nil if not at any current smartparens delimiter.
   (sptw--advances? 'sp-previous-sexp t))
 (defun sptw--from-close-on-first-sexp? ()
   (sptw--advances? (lambda ()
-                          (sp-previous-sexp)
-                          (sp-previous-sexp))
-                        t))
+                     (sp-previous-sexp)
+                     (sp-previous-sexp))
+                   t))
 (defun sptw--on-first-sexp? ()
   (cond ((sptw-at-open-delimiter-p) (sptw--from-open-on-first-sexp?))
         ((sptw-at-close-delimiter-p) (sptw--from-close-on-first-sexp?))
@@ -122,9 +122,9 @@ Return nil if not at any current smartparens delimiter.
   ;; If backward-sexp then forward-sexp nets a backward movement, it means
   ;; we were at the start of the symbol.
   (sptw--advances? (lambda ()
-                          (sp-backward-sexp)
-                          (sp-forward-sexp))
-                        nil))
+                     (sp-backward-sexp)
+                     (sp-forward-sexp))
+                   nil))
 (defun sptw--at-end-of-symbol-sexp? ()
   (sptw--movements-equal?
    'ignore (lambda () (sp-backward-sexp) (sp-forward-sexp))))
@@ -362,24 +362,24 @@ But if point is both after an end delimiter and before an open delimiter, it wil
                     sptw-up-parent-beginning
                     "Move down to the end of the contained smartparens sexp.")
 
-;(defun sptw--forward-sexp-in-supersexp ()
-;  (sptw--up-sexp)
-;  (sptw--forward-sexp)
-;  (sptw--down-sexp))
-;(defun sptw--backward-sexp-in-supersexp ()
-;  (sptw--up-sexp)
-;  (sptw--backward-sexp-end)
-;  (sptw--down-sexp))
+                                        ;(defun sptw--forward-sexp-in-supersexp ()
+                                        ;  (sptw--up-sexp)
+                                        ;  (sptw--forward-sexp)
+                                        ;  (sptw--down-sexp))
+                                        ;(defun sptw--backward-sexp-in-supersexp ()
+                                        ;  (sptw--up-sexp)
+                                        ;  (sptw--backward-sexp-end)
+                                        ;  (sptw--down-sexp))
 ;;;;###autoload (autoload 'sptw-forward-sexp-in-supersexp "tree-walk-smartparens-integration.el" "" t)
-;(sptw--command-wrap sptw-forward-sexp-in-supersexp
-;                    sptw--forward-sexp-in-supersexp
-;                    sptw-backward-sexp-in-supersexp
-;                    "up, forward, down")
+                                        ;(sptw--command-wrap sptw-forward-sexp-in-supersexp
+                                        ;                    sptw--forward-sexp-in-supersexp
+                                        ;                    sptw-backward-sexp-in-supersexp
+                                        ;                    "up, forward, down")
 ;;;;###autoload (autoload 'sptw-backward-sexp-in-supersexp "tree-walk-smartparens-integration.el" "" t)
-;(sptw--command-wrap sptw-backward-sexp-in-supersexp
-;                    sptw--backward-sexp-in-supersexp
-;                    sptw-forward-sexp-in-supersexp
-;                    "up, backward, down")
+                                        ;(sptw--command-wrap sptw-backward-sexp-in-supersexp
+                                        ;                    sptw--backward-sexp-in-supersexp
+                                        ;                    sptw-forward-sexp-in-supersexp
+                                        ;                    "up, backward, down")
 
 (defun sptw-move-to-other-end-of-sexp ()
   "If at the beginning of a smartparens sexp, move to the end of the same sexp, and vice versa."
@@ -414,11 +414,11 @@ Specifically it moves inside the parens."
      (sptw--action-move-wrap
       ,action
       (list (list 'sptw-at-open-delimiter-p
-                   (lambda () (sptw-down-first-child-beginning 1))
-                   (lambda () (sptw-up-parent-beginning 1)))
+                  (lambda () (sptw-down-first-child-beginning 1))
+                  (lambda () (sptw-up-parent-beginning 1)))
             (list 'sptw-at-close-delimiter-p
-                   (lambda () (sptw-down-first-child-beginning 1))
-                   (lambda () (sptw-up-parent-end 1))))
+                  (lambda () (sptw-down-first-child-beginning 1))
+                  (lambda () (sptw-up-parent-end 1))))
       interactive-arg)))
 
 
@@ -471,7 +471,10 @@ Specifically it moves inside the parens."
  :def-expand-region-idempotent sptw-expand-region-idempotent
  :def-select-children-once sptw-select-children-region-idempotent
  :def-expand-region-to-children/ancestor-generation sptw-expand-region/children-region
-                                        ;:def-down-to-last-child sptw-down-to-last-child-beginning
+ ;;:def-down-to-last-child sptw-down-to-last-child-beginning
+ :def-transpose-sibling-forward sptw-transpose-sibling-forward
+ :def-transpose-sibling-backward sptw-transpose-sibling-backward
+
  :use-down-to-last-child (lambda () (and (tree-walk--motion-moved 'sptw-down-last-child-end)
                                          (sptw-move-to-current-sexp-beginning)))
 

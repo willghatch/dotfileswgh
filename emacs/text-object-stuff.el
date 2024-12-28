@@ -208,6 +208,7 @@ If no region is active, it will use (point . point)."
   (let ((bounds-1 (bounds-of-thing-at-point thing)))
     (and bounds-1
          (let ((bounds-2 (save-mark-and-excursion
+                           (goto-char (car bounds-1))
                            (wgh/backward-thing-beginning t thing 1)
                            (bounds-of-thing-at-point thing))))
            (when (and bounds-2

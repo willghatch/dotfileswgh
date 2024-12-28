@@ -193,7 +193,7 @@
    (tree-walk--motion-moved down-to-first-child)
    (while (tree-walk--motion-moved next-sibling))))
 
-(defun wgh/-region-less-or-equal (r1 r2)
+(defun tree-walk--region-less-or-equal (r1 r2)
   "Returns canon form of r2 if it includes all of r1, otherwise nil.
 r1 and r2 should both be cons pairs of points eg. (beg . end), but also return nil if one of them is not.
 r1 and r2 do not have to be in proper order.
@@ -213,13 +213,74 @@ If r2 is not in order, a successful return has in ordered."
        (cons (min (car r2) (cdr r2))
              (max (car r2) (cdr r2)))))
 
-(defun wgh/-region-strictly-less (r1 r2)
+(defun tree-walk--region-strictly-less (r1 r2)
   "Returns canon form of r2 if it is strictly greater than r1, IE it covers but also goes beyond on at least one side."
-  (let ((cover (wgh/-region-less-or-equal r1 r2)))
+  (let ((cover (tree-walk--region-less-or-equal r1 r2)))
     (and cover
          (or (< (car r2) (min (car r1) (cdr r1)))
              (<  (max (cdr r1) (car r1)) (cdr r2)))
          cover)))
+
+(defun tree-walk--regions-not-overlapping (r1 r2)
+  "Return t if regions do not overlap, nil otherwise."
+  (if (< (car r1) (car r2))
+      (<= (cdr r1) (car r2))
+    (<= (cdr r2) (car r1))))
+
+(defun tree-walk--transpose-sibling-once (bounds-func move-func goto-anchor-func)
+  "Transpose a tree node forward by swapping it with its next neighbor forward, based on the given functions to operate on it.
+If GOTO-ANCHOR-FUNC is nil, then the beginning of the bounds is assumed to be the anchor point.
+Leave the cursor on the original thing, so you can keep dragging it forward or back."
+(message "in tree-walk--transpase-sibling-once with move-func: %s" move-func)
+  (let ((bounds-1 (funcall bounds-func (point))))
+(message "bounds-1: %s" bounds-1)
+    (and bounds-1
+         (let* ((bounds-2 (save-mark-and-excursion
+                            (if goto-anchor-func
+                                (funcall goto-anchor-func)
+                              (goto-char (car bounds-1)))
+                            (message "about to move...")
+                            (and (tree-walk--motion-moved move-func)
+                                 (message "post-move at point: %s" (point))
+                                 (funcall bounds-func (point))))))
+           (message "bounds-2: %s" bounds-2)
+           (when (and bounds-2
+                      (tree-walk--regions-not-overlapping bounds-1 bounds-2))
+             (let* ((s1 (buffer-substring-no-properties (car bounds-1)
+                                                        (cdr bounds-1)))
+                    (s2 (buffer-substring-no-properties (car bounds-2)
+                                                        (cdr bounds-2)))
+                    (b1-earlier-p (< (car bounds-1) (car bounds-2)))
+                    (bounds-earlier (if b1-earlier-p bounds-1 bounds-2))
+                    (bounds-later (if b1-earlier-p bounds-2 bounds-1))
+                    (s-earlier (if b1-earlier-p s1 s2))
+                    (s-later (if b1-earlier-p s2 s1)))
+               (message "s1: %s, s2: %s, s-earlier: %s, s-later: %s" s1 s2 s-earlier s-later)
+               ;; swap regions
+               (atomic-change-group
+                 (delete-region (car bounds-later) (cdr bounds-later))
+                 (goto-char (car bounds-later))
+                 (insert s-earlier)
+                 (delete-region (car bounds-earlier) (cdr bounds-earlier))
+                 (goto-char (car bounds-earlier))
+                 (insert s-later))
+               ;; put cursor at beginning of later region
+               (let ((len-diff (- (length s2) (length s1))))
+                 (goto-char (if b1-earlier-p
+                                (+ len-diff (car bounds-2))
+                              (car bounds-2)))
+                 (undo-boundary))))))))
+(defun tree-walk--transpose-siblings (count bounds-func move-func goto-anchor-func move-backward-func)
+  "TODO"
+  (setq count (or count 1))
+  (let ((fwd (< 0 count))
+        (count (abs count)))
+(message "in tree-walk--transpose-siblings with count: %s" count)
+    (while (< 0 count)
+      (if fwd
+          (tree-walk--transpose-sibling-once bounds-func move-func goto-anchor-func)
+        (tree-walk--transpose-sibling-once bounds-func (or move-backward-func (lambda () (funcall move-func -1))) goto-anchor-func))
+      (setq count (- count 1)))))
 
 
 ;; TODO - all of this code about getting bounds is just a disaster.  I wanted to make the code I already had work, but I should have just started from scratch.  At any rate, it's mostly working.  I should come back and clean it up.  Eg. remove the stuff that's specific to evil-mode, and make things simpler and less super higher order due to whatever whims of the day I threw together the evil-mode version and then my desire to use that rather than starting over.
@@ -324,8 +385,8 @@ It does not actually move the active region, it just takes and returns region da
 If REGION is null, then any region succeeds.
 "
               (let ((compare-func (if strictly-grow
-                                      #'wgh/-region-strictly-less
-                                    #'wgh/-region-less-or-equal)))
+                                      #'tree-walk--region-strictly-less
+                                    #'tree-walk--region-less-or-equal)))
                 (save-mark-and-excursion
                  (let* ((bounds (funcall get-bounds-func anchor-point))
                         (success (and bounds (or (and (not region) bounds)
@@ -497,6 +558,9 @@ If no region is given, it uses the current region (or ((point) . (point))).
      def-select-children-once
      def-expand-region-to-children/ancestor-generation
 
+     def-transpose-sibling-forward
+     def-transpose-sibling-backward
+
      use-up-to-parent
      use-down-to-first-child
      use-down-to-last-child
@@ -549,6 +613,22 @@ If no region is given, it uses the current region (or ((point) . (point))).
              :bounds-func ,(or use-bounds `',def-bounds-for-tree-with-no-end-delimiter)
              :children-bounds-func ,(or use-children-bounds `'def-children-bounds-for-tree-with-no-end-delimiter)
              :up-func ,use-up-to-parent))
+         (when (or def-transpose-sibling-forward def-transpose-sibling-backward)
+           `(progn
+              (fset ',def-transpose-sibling-forward (lambda (&optional count)
+                                                      (interactive "p")
+                                                      (tree-walk--transpose-siblings (or count 1)
+                                                                                     ,(or use-bounds `',def-bounds-for-tree-with-no-end-delimiter)
+                                                                                     ,use-next-sibling
+                                                                                     nil
+                                                                                     ,use-previous-sibling)))
+              (fset ',def-transpose-sibling-backward (lambda (&optional count)
+                                                      (interactive "p")
+                                                      (tree-walk--transpose-siblings (or count 1)
+                                                                                     ,(or use-bounds `',def-bounds-for-tree-with-no-end-delimiter)
+                                                                                     ,use-previous-sibling
+                                                                                     nil
+                                                                                     ,use-next-sibling)))))
          (when (or def-inorder-forward def-inorder-backward)
            `(tree-walk-define-inorder-traversal
              ,def-inorder-forward

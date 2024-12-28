@@ -325,6 +325,9 @@ It always moves to the FIRST sibling in the full sibling region, regardless of m
  :def-select-children-once indent-tree-region-to-children
  :def-expand-region-to-children/ancestor-generation indent-tree-expand-region/children-region
 
+ :def-transpose-sibling-forward indent-tree-transpose-sibling-forward
+ :def-transpose-sibling-backward indent-tree-transpose-sibling-backward
+
  :use-up-to-parent (lambda () (indent-tree-up-to-parent 1))
  :use-down-to-first-child (lambda () (indent-tree-down-to-first-child 1))
  :use-down-to-last-child (lambda () (indent-tree-down-to-last-child 1))
