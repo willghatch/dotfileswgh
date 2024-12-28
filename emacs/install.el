@@ -44,7 +44,6 @@ file from a large repository."
 (message "Installing packages...")
 
 (in 'repeatable-motion)
-(in 'dash)
 (in 'smartparens)
 (in 'hydra)
 (in 'undo-tree)
