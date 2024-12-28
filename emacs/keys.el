@@ -200,7 +200,7 @@
     (set-mark (point)))
   (let ((point-first (< (point) (mark)))
         (goto-end (if include-final-newline
-                      (lambda () (goto-char (line-end-position)) (forward-char 1))
+                      (lambda () (goto-char (line-end-position)) (when (not (eobp)) (forward-char 1)))
                     (lambda () (goto-char (line-end-position))))))
     (if point-first (goto-char (line-beginning-position)) (funcall goto-end))
     (exchange-point-and-mark)
