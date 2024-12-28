@@ -43,7 +43,15 @@
 
 ;; Somehow I think emacs regexps don't work exactly as I expect...
 ;; #? doesn't seem to work normally before ,@...
-(setq sp-sexp-prefix '((racket-mode regexp "#,@\\|,@\\|#?[`',]")))
+(setq sp-sexp-prefix `((racket-mode regexp ,(rx (or (seq (? "#") "'")
+                                                    (seq (? "#") "`")
+                                                    (seq (? "#") ",")
+                                                    (seq (? "#") ",@"))))
+                       (emacs-lisp-mode regexp ,(rx (or (seq (? "#") "'")
+                                                        (seq (? "#") "`")
+                                                        (seq (? "#") ",")
+                                                        (seq (? "#") ",@"))))
+                       ))
 
 (defun make-inner-textobj-name (name)
   (intern (concat "inner-" name "-textobj")))
