@@ -471,7 +471,21 @@
 
 ;; Ex
 (emmap ":" (lambda () (interactive)
-             (require 'evil) (call-interactively 'evil-ex)))
+             (require 'evil)
+             (if (region-active-p)
+                 (evil-ex (format "%s,%s "
+                                  (line-number-at-pos (region-beginning))
+                                  (line-number-at-pos (region-end))))
+               (evil-ex))
+             ;; The below isn't working, but it would be nicer to have symbolic '<,'> for region bounds so that I can just repeat a replacement command.
+             ;; (assq-delete-all 60 evil-markers-alist) ;; by default has evil-visual-beginning
+             ;; (assq-delete-all 62 evil-markers-alist) ;; by default has evil-visual-goto-end
+             ;; (setq evil-markers-alist (cons
+             ;;                           (cons 62 #'region-end)
+             ;;                           (cons (cons 60 #'region-beginning) evil-markers-alist)))
+
+             ;; (evil-ex (if (region-active-p) "'<,'> " nil))
+             ))
 (emmap "!" (lambda () (interactive)
              (require 'evil) (call-interactively 'evil-shell-command)))
 ;
@@ -931,6 +945,8 @@ is the opposite."
 (emmap "tp" 'projectile-command-map)
 (emmap "tr" 'baddd-use-register)
 ;; "ts" will stand for "toggle setting"
+(ecmap "tac" 'comment-region)
+(ecmap "taC" 'uncomment-region)
 (emmap "ts"
   (defhydra settings-toggle (:foreign-keys warn :exit t) "Toggle:"
     ("p" smartparens-mode "smartparens")
