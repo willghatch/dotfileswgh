@@ -15,24 +15,25 @@
   (load-file (expand-file-name "./env-conf.el" conf-dir)))
 
 (nobreak
- (setq package-user-dir (concat local-emacs.d-path "/elpa"))
+ (setq package-user-dir (concat local-emacs.d-path "elpa/"))
  ;; Set up load path for requires
- (let ((default-directory local-emacs.d-path))
+ ;;(let ((default-directory local-emacs.d-path))
+ ;;  (normal-top-level-add-subdirs-to-load-path))
+ (let ((default-directory "/usr/share/emacs/site-lisp/"))
    (normal-top-level-add-subdirs-to-load-path))
- (let ((default-directory "/usr/share/emacs/site-lisp"))
+ (let ((default-directory (concat dotfileswgh "emacs/")))
    (normal-top-level-add-subdirs-to-load-path))
- (let ((default-directory (concat dotfileswgh "/emacs")))
+ (let ((default-directory (concat dotfileswgh "external/emacs/")))
    (normal-top-level-add-subdirs-to-load-path))
- (let ((default-directory (concat dotfileswgh "/external/emacs")))
+ (let ((default-directory (concat dotfileswgh-pri "emacs/")))
    (normal-top-level-add-subdirs-to-load-path))
- (let ((default-directory (concat dotfileswgh-pri "/emacs")))
+ (let ((default-directory (concat dotfileswgh-dotlocal "emacs/")))
    (normal-top-level-add-subdirs-to-load-path))
- (let ((default-directory (concat dotfileswgh-dotlocal "/emacs")))
-   (normal-top-level-add-subdirs-to-load-path))
- (setq load-path (cons (concat dotfileswgh "/emacs") load-path))
- (setq load-path (cons (concat dotfileswgh-pri "/emacs") load-path))
- (setq load-path (cons (concat dotfileswgh-dotlocal "/emacs") load-path))
-)
+ (setq load-path (cons (concat local-emacs.d-path "single-files/") load-path))
+ (setq load-path (cons (concat dotfileswgh "emacs/") load-path))
+ (setq load-path (cons (concat dotfileswgh-pri "emacs/") load-path))
+ (setq load-path (cons (concat dotfileswgh-dotlocal "emacs/") load-path))
+ )
 
 (defun load-library--around (orig-fun &rest args)
   (let ((curtime (current-time))
@@ -47,8 +48,33 @@
  (advice-add 'require :around #'load-library--around))
 
 (nobreak (require 'wgh-theme))
-(setq custom-file (concat local-emacs.d-path "/custom-file.el"))
+(setq custom-file (concat local-emacs.d-path "custom-file.el"))
 (nobreak (load custom-file))
+
+;; straight.el package install
+(progn
+  (defvar bootstrap-version)
+  (setq straight-base-dir (concat local-emacs.d-path "straight/"))
+  (setq wgh/straight-first-install-p (not (file-exists-p straight-base-dir)))
+  ;; The default for this has find-at-startup, which runs find(1) and is slow.
+  (setq straight-check-for-modifications '(check-on-save find-when-checking))
+  (setq straight-profiles `((nil . ,(concat dotfileswgh "emacs/straight-lockfile-for-dotfileswgh.el"))))
+
+  (let ((bootstrap-file
+         (concat dotfileswgh "external/emacs/straight.el/bootstrap.el"))
+        (bootstrap-version 7))
+    (load bootstrap-file nil 'nomessage))
+
+  (when wgh/straight-first-install-p
+    (straight-thaw-versions))
+
+  ;; Load core packages most critical to my config running at all.
+  (straight-use-package 'repeatable-motion)
+  (straight-use-package 'smartparens)
+  (straight-use-package 'hydra)
+  (straight-use-package 'undo-tree)
+  ;; The above are the most critical to getting my config running at all.
+  )
 
 ;; backup settings
 (nobreak (load-library "sensitive-mode"))
@@ -81,7 +107,7 @@
                                          font-lock-function-name-face)
  sp-highlight-pair-overlay nil
  sp-show-pair-from-inside t
- bmkp-last-as-first-bookmark-file (concat local-emacs.d-path "/bookmarks")
+ bmkp-last-as-first-bookmark-file (concat local-emacs.d-path "bookmarks")
  )
 
 (nobreak
@@ -199,7 +225,10 @@
 
  ;(require 'smex) ; autoloaded
  ;(require 'rainbow-delimiters) ; autoloaded
- (load-library "package-conf")
+
+ ;;(load-library "package-conf")
+ (load-library "straight-install")
+
  ;(load-library "yasnippet-conf")
  (require 'indent-tree)
  (load-library "org-mode-conf")
@@ -261,9 +290,9 @@
  ;(load-library "keyfreq-conf")
 )
 
-(let ((file (concat dotfileswgh-pri "/emacs/def.el")))
+(let ((file (concat dotfileswgh-pri "emacs/def.el")))
   (if (file-exists-p file) (load-file file) nil))
-(let ((file (concat dotfileswgh-dotlocal "/emacs/def.el")))
+(let ((file (concat dotfileswgh-dotlocal "emacs/def.el")))
   (if (file-exists-p file) (load-file file) nil))
 
 

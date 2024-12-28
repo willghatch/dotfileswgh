@@ -1,16 +1,22 @@
 ;; Environment setup
 
-(setq dotfileswgh (concat (getenv "DOTFILESWGH") "/"))
-(setq dotfileswgh-dotlocal (concat (getenv "DOTFILESWGH_DOTLOCAL") "/"))
-(setq dotfileswgh-pri (concat (getenv "DOTFILESWGH_PRI") "/"))
+(defun ensure-final-slash (str)
+  "If the string doesn't end in a final slash, add one."
+  (if (string-suffix-p "/" str)
+      str
+    (concat str "/")))
+
+(setq dotfileswgh (ensure-final-slash (getenv "DOTFILESWGH")))
+(setq dotfileswgh-dotlocal (ensure-final-slash (getenv "DOTFILESWGH_DOTLOCAL")))
+(setq dotfileswgh-pri (ensure-final-slash (getenv "DOTFILESWGH_PRI")))
 
 (setq local-emacs.d-path
-      (let ((emacs.d-path (getenv "EMACS_DOT_D_PATH")))
-        (if emacs.d-path
-            emacs.d-path
-          (concat dotfileswgh-dotlocal "/emacs.d/"))))
-(when (not (string-suffix-p "/" local-emacs.d-path))
-  (setq local-emacs.d-path (concat local-emacs.d-path "/")))
+      (ensure-final-slash
+       (let ((emacs.d-path (getenv "EMACS_DOT_D_PATH")))
+         (if emacs.d-path
+             emacs.d-path
+           (concat dotfileswgh-dotlocal "emacs.d/")))))
+
 ;; Set the name that emacs actually knows...
 (setq user-emacs-directory local-emacs.d-path)
 
