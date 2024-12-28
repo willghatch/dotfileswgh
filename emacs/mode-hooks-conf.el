@@ -131,12 +131,19 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;; magit
 
+(with-eval-after-load 'git-rebase
+  (setq auto-mode-alist (rassq-delete-all 'git-rebase-mode auto-mode-alist))
+  (fset magit-git-rebase-mode-really git-rebase-mode)
+  ;; This eval-after-load is loaded after the auto-mode-alist has done its work, so the best way to disable git-rebase-mode seems to be to undefine the symbol.
+  (fset git-rebase-mode nil)
+  )
 (add-hook 'git-rebase-mode-hook
           (lambda ()
             ;; git-rebase-mode does some things that are convenient, but also
             ;; several really annoying things.
             (read-only-mode -1)
-            (setcdr git-rebase-mode-map nil)
+            ;;(setcdr git-rebase-mode-map nil)
+            ;;(git-rebase-mode) ;; Ugh, just turn off git-rebase-mode!
             ))
 
 (defun wgh/magit-keys-setup ()
