@@ -805,7 +805,7 @@ is the opposite."
 ; TODO - indent tree slurp
 (emmap "ensi" 'ignore)
 (emmap "onsi" 'ignore)
-(emmap "enso" 'wgh/org-forward-slurp-heading)
+(emmap "enso" 'wgh/outline-forward-slurp-heading)
 (emmap "onso" 'ignore)
 (emmap "ensx" 'ignore)
 (emmap "onsx" 'ignore)
@@ -815,7 +815,7 @@ is the opposite."
 ; TODO - indent tree barf
 (emmap "enbi" 'ignore)
 (emmap "onbi" 'ignore)
-(emmap "enbo" 'wgh/org-forward-barf-heading)
+(emmap "enbo" 'wgh/outline-forward-barf-heading)
 (emmap "onbo" 'ignore)
 (emmap "enbx" 'ignore)
 (emmap "onbx" 'ignore)
@@ -824,8 +824,8 @@ is the opposite."
 (emmap "onhp" 'rmo/sptw-backward-sexp)
 (emmap "enhi" 'rmo/indent-tree-forward-sibling)
 (emmap "onhi" 'rmo/indent-tree-backward-sibling)
-(emmap "enho" 'rmo/org-forward-heading-same-level)
-(emmap "onho" 'rmo/org-backward-heading-same-level)
+(emmap "enho" 'rmo/outline-forward-same-level)
+(emmap "onho" 'rmo/outline-backward-same-level)
 ;; TODO - make rmo versions
 (emmap "enhx" 'on-xml-forward)
 (emmap "onhx" 'on-xml-backward)
@@ -845,7 +845,7 @@ is the opposite."
 (emmap "enpi" 'ignore)
 (emmap "onpi" 'rmo/indent-tree-up-to-parent)
 (emmap "enpo" 'ignore)
-(emmap "onpo" 'rmo/org-up-element)
+(emmap "onpo" 'rmo/outline-up-heading)
 (emmap "enpx" 'on-xml-up-end)
 (emmap "onpx" 'on-xml-up)
 ;; "enc_" down to first child / "onc_" down to last child
@@ -853,8 +853,8 @@ is the opposite."
 (emmap "oncp" 'rmo/sptw-down-sexp-end)
 (emmap "enci" 'rmo/indent-tree-down-to-first-child)
 (emmap "onci" 'rmo/indent-tree-down-to-last-child)
-(emmap "enco" 'rmo/org-down-element)
-(emmap "onco" 'ignore)
+(emmap "enco" 'rmo/wgh/outline-down-to-first-child)
+(emmap "onco" 'rmo/wgh/outline-down-to-last-child)
 (emmap "encx" 'ignore)
 (emmap "oncx" 'ignore)
 ;; TODO - down to end of last child (on-parens-down-sexp-end)
@@ -866,8 +866,8 @@ is the opposite."
 (emmap "ontp" 'ignore)
 (emmap "enti" 'rmo/indent-tree-inorder-traversal-forward)
 (emmap "onti" 'rmo/indent-tree-inorder-traversal-backward)
-(emmap "ento" 'rmo/wgh/org-inorder-traversal-forward)
-(emmap "onto" 'rmo/wgh/org-inorder-traversal-backward)
+(emmap "ento" 'rmo/wgh/outline-inorder-traversal-forward)
+(emmap "onto" 'rmo/wgh/outline-inorder-traversal-backward)
 (emmap "entx" 'ignore)
 (emmap "ontx" 'ignore)
 ;; "end_" down to last descendant
@@ -875,15 +875,15 @@ is the opposite."
 (emmap "ondp" 'ignore)
 (emmap "endi" 'rmo/indent-tree-down-to-last-descendant)
 (emmap "ondi" 'ignore)
-(emmap "endo" 'rmo/wgh/org-down-to-last-descendant)
+(emmap "endo" 'rmo/wgh/outline-down-to-last-descendant)
 (emmap "ondo" 'ignore)
 ;; "enw_" wrap/demote unwrap/promote
 (emmap "enwp" 'ignore) ;; TODO - wrap with paren, the default wrapper
 (emmap "onwp" 'ignore) ;; TODO - delete outer paren (of any type?  It's not symmetric, but maybe more useful?)
 (emmap "enwi" 'indent-tree-demote)
 (emmap "onwi" 'indent-tree-promote)
-(emmap "enwo" 'org-demote-subtree)
-(emmap "onwo" 'org-promote-subtree)
+(emmap "enwo" 'outline-demote-subtree)
+(emmap "onwo" 'outline-promote-subtree)
 ;; TODO - insertions, like wgh/org-add-heading-above/below
 
 ;; TODO - other useful tree operations:
