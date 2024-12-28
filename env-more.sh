@@ -4,6 +4,7 @@ export WGHHOME="${WGHHOME:-$HOME}"
 export DOTFILESWGH="${DOTFILESWGH:-$WGHHOME/dotfileswgh}"
 export DOTFILESWGH_DOTLOCAL="${DOTFILESWGH_DOTLOCAL:-$WGHHOME/dotfileswgh-dotlocal}"
 export DOTFILESWGH_PRI="${DOTFILESWGH_PRI:-$WGHHOME/dotfileswgh-pri}"
+export DOTFILESWGH_PRI_DOTLOCAL="${DOTFILESWGH_PRI_DOTLOCAL:-$WGHHOME/dotfileswgh-pri-dotlocal}"
 
 export HROOT=$WGHHOME/hroot
 
