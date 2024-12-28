@@ -401,7 +401,6 @@ If a predicate matches, the first match is used, and pre-move is done before act
     (if matched
         (progn
           (funcall (cadr matched))
-          (message "action: %s" action)
           (funcall action action-arg)
           (funcall (caddr matched)))
       (funcall action action-arg))))
@@ -492,7 +491,7 @@ Specifically it moves inside the parens."
   "Call EXPANSION-FUNC until PREDICATE is true.
 If the expansion func stops expanding the region before the predicate is ever true, return to the original region and return nil.
 If the predicate succeeds, leave the expanded region and return the new bounds."
-  (let ((orig-bounds (cons (region-beginning) (region-end)))
+  (let ((orig-bounds (if (region-active-p) (cons (region-beginning) (region-end)) (cons (point) (point))))
         result)
     (save-mark-and-excursion
       (while (and (not result)
@@ -518,7 +517,7 @@ If the predicate succeeds, leave the expanded region and return the new bounds."
    'sptw-expand-region
    (lambda () (save-mark-and-excursion
                 (and (region-active-p)
-                     (goto-char (region-beginning))
+                     (goto-char (if (region-active-p) (region-beginning) (point)))
                      (sptw-at-open-delimiter-p))))))
 
 (defun sptw-expand-region-to-delimiter (delimiter)

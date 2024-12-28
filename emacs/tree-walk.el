@@ -231,19 +231,14 @@ If r2 is not in order, a successful return has in ordered."
   "Transpose a tree node forward by swapping it with its next neighbor forward, based on the given functions to operate on it.
 If GOTO-ANCHOR-FUNC is nil, then the beginning of the bounds is assumed to be the anchor point.
 Leave the cursor on the original thing, so you can keep dragging it forward or back."
-(message "in tree-walk--transpase-sibling-once with move-func: %s" move-func)
   (let ((bounds-1 (funcall bounds-func (point))))
-(message "bounds-1: %s" bounds-1)
     (and bounds-1
          (let* ((bounds-2 (save-mark-and-excursion
                             (if goto-anchor-func
                                 (funcall goto-anchor-func)
                               (goto-char (car bounds-1)))
-                            (message "about to move...")
                             (and (tree-walk--motion-moved move-func)
-                                 (message "post-move at point: %s" (point))
                                  (funcall bounds-func (point))))))
-           (message "bounds-2: %s" bounds-2)
            (when (and bounds-2
                       (tree-walk--regions-not-overlapping bounds-1 bounds-2))
              (let* ((s1 (buffer-substring-no-properties (car bounds-1)
@@ -255,7 +250,6 @@ Leave the cursor on the original thing, so you can keep dragging it forward or b
                     (bounds-later (if b1-earlier-p bounds-2 bounds-1))
                     (s-earlier (if b1-earlier-p s1 s2))
                     (s-later (if b1-earlier-p s2 s1)))
-               (message "s1: %s, s2: %s, s-earlier: %s, s-later: %s" s1 s2 s-earlier s-later)
                ;; swap regions
                (atomic-change-group
                  (delete-region (car bounds-later) (cdr bounds-later))
@@ -275,7 +269,6 @@ Leave the cursor on the original thing, so you can keep dragging it forward or b
   (setq count (or count 1))
   (let ((fwd (< 0 count))
         (count (abs count)))
-(message "in tree-walk--transpose-siblings with count: %s" count)
     (while (< 0 count)
       (if fwd
           (tree-walk--transpose-sibling-once bounds-func move-func goto-anchor-func)
