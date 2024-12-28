@@ -19,8 +19,8 @@
  ;; Set up load path for requires
  ;;(let ((default-directory local-emacs.d-path))
  ;;  (normal-top-level-add-subdirs-to-load-path))
- (let ((default-directory "/usr/share/emacs/site-lisp/"))
-   (normal-top-level-add-subdirs-to-load-path))
+ ;;(let ((default-directory "/usr/share/emacs/site-lisp/"))
+ ;;  (normal-top-level-add-subdirs-to-load-path))
  (let ((default-directory (concat dotfileswgh "emacs/")))
    (normal-top-level-add-subdirs-to-load-path))
  (let ((default-directory (concat dotfileswgh "external/emacs/")))
@@ -33,6 +33,12 @@
  (setq load-path (cons (concat dotfileswgh "emacs/") load-path))
  (setq load-path (cons (concat dotfileswgh-pri "emacs/") load-path))
  (setq load-path (cons (concat dotfileswgh-dotlocal "emacs/") load-path))
+ ;; Add straight build dirs, so that emacs can search in them, rather than using
+ ;; straight on every emacs load.  It won't process autoloads, but I can wrap
+ ;; key bindings with requires or otherwise force autoload evaluation for things
+ ;; that I care about.
+ (let ((default-directory (concat straight-base-dir "straight/build")))
+   (normal-top-level-add-subdirs-to-load-path))
  )
 
 (defun load-library--around (orig-fun &rest args)
@@ -51,30 +57,6 @@
 (setq custom-file (concat local-emacs.d-path "custom-file.el"))
 (nobreak (load custom-file))
 
-;; straight.el package install
-(progn
-  (defvar bootstrap-version)
-  (setq straight-base-dir (concat local-emacs.d-path "straight/"))
-  (setq wgh/straight-first-install-p (not (file-exists-p straight-base-dir)))
-  ;; The default for this has find-at-startup, which runs find(1) and is slow.
-  (setq straight-check-for-modifications '(check-on-save find-when-checking))
-  (setq straight-profiles `((nil . ,(concat dotfileswgh "emacs/straight-lockfile-for-dotfileswgh.el"))))
-
-  (let ((bootstrap-file
-         (concat dotfileswgh "external/emacs/straight.el/bootstrap.el"))
-        (bootstrap-version 7))
-    (load bootstrap-file nil 'nomessage))
-
-  (when wgh/straight-first-install-p
-    (straight-thaw-versions))
-
-  ;; Load core packages most critical to my config running at all.
-  (straight-use-package 'repeatable-motion)
-  (straight-use-package 'smartparens)
-  (straight-use-package 'hydra)
-  (straight-use-package 'undo-tree)
-  ;; The above are the most critical to getting my config running at all.
-  )
 
 ;; backup settings
 (nobreak (load-library "sensitive-mode"))
@@ -229,7 +211,7 @@
  ;(require 'rainbow-delimiters) ; autoloaded
 
  ;;(load-library "package-conf")
- (load-library "straight-install")
+ ;;(load-library "straight-install")
 
  ;(load-library "yasnippet-conf")
  (require 'indent-tree)

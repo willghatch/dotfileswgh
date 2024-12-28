@@ -1,104 +1,132 @@
 ;; Install files with straight.el
+(let ((conf-dir (file-name-directory load-file-name)))
+  (load-file (expand-file-name "./env-conf.el" conf-dir))
+  ;;(load-file (expand-file-name "./package-conf.el" conf-dir))
+  )
 
-(straight-use-package 'evil)
-(straight-use-package 'on-parens)
-(straight-use-package 'key-chord)
-(straight-use-package 'auto-compile)
-(straight-use-package 'evil-surround)
-(straight-use-package 'evil-search-highlight-persist)
+(defun in (package)
+  (with-demoted-errors "Error installing: %S" (straight-use-package package)))
+
+(message "Current user-emacs-directory: %S" user-emacs-directory)
+(message "Current package-user-dir: %S" package-user-dir)
+(message "Installing packages...")
+
+
+(progn
+  (let ((bootstrap-file
+         (concat dotfileswgh "external/emacs/straight.el/bootstrap.el"))
+        (bootstrap-version 7))
+    (load bootstrap-file nil 'nomessage))
+
+  (straight-thaw-versions)
+
+  ;; Load core packages most critical to my config running at all.
+  (straight-use-package 'repeatable-motion)
+  (straight-use-package 'smartparens)
+  (straight-use-package 'hydra)
+  (straight-use-package 'undo-tree)
+  ;; The above are the most critical to getting my config running at all.
+  )
+
+(in 'evil)
+(in 'on-parens)
+(in 'key-chord)
+(in 'auto-compile)
+(in 'evil-surround)
+(in 'evil-search-highlight-persist)
 ;; TODO - eventually targets.el (https://github.com/noctuid/targets.el) should
 ;; replace evil-textobj-anyblock.  But it's not ready yet, apparently.
-(straight-use-package 'evil-textobj-anyblock)
-(straight-use-package 'evil-cleverparens)
-(straight-use-package 'evil-terminal-cursor-changer)
-(straight-use-package 'evil-anzu)
-(straight-use-package 'yafolding)
-(straight-use-package 'company)
+(in 'evil-textobj-anyblock)
+(in 'evil-cleverparens)
+(in 'evil-terminal-cursor-changer)
+(in 'evil-anzu)
+(in 'yafolding)
+(in 'company)
 
-(straight-use-package 'evil-args)
-(straight-use-package 'rainbow-delimiters)
-(straight-use-package 'rainbow-identifiers)
-(straight-use-package 'rainbow-mode) ; for #123456 colors
-(straight-use-package 'ace-jump-mode)
-(straight-use-package 'markchars)
+(in 'evil-args)
+(in 'rainbow-delimiters)
+(in 'rainbow-identifiers)
+(in 'rainbow-mode) ; for #123456 colors
+(in 'ace-jump-mode)
+(in 'markchars)
 
-(straight-use-package 'elscreen)
-(straight-use-package 'xclip)
-(straight-use-package 'ag)
-(straight-use-package 'smex)
-(straight-use-package 'flycheck)
-(straight-use-package 'highlight-chars)
-(straight-use-package 'hlinum)
-(straight-use-package 'elisp-slime-nav)
-;(straight-use-package 'projectile)
-(straight-use-package 'flx-ido)
-(straight-use-package 'expand-region)
-;(straight-use-package 'popwin)
-;(straight-use-package 'linum-relative)
-(straight-use-package 'smooth-scrolling)
-(straight-use-package 'guide-key)
-(straight-use-package 'magit)
-(straight-use-package 'git-gutter)
-(straight-use-package 'blamer) ;; show git blame on line
+(in 'elscreen)
+(in 'xclip)
+(in 'ag)
+(in 'smex)
+(in 'flycheck)
+(in 'highlight-chars)
+(in 'hlinum)
+(in 'elisp-slime-nav)
+                                        ;(in 'projectile)
+(in 'flx-ido)
+(in 'expand-region)
+                                        ;(in 'popwin)
+                                        ;(in 'linum-relative)
+(in 'smooth-scrolling)
+(in 'guide-key)
+(in 'magit)
+(in 'git-gutter)
+(in 'blamer) ;; show git blame on line
 
-(straight-use-package 'helm)
-(straight-use-package 'helm-lsp)
-(straight-use-package 'helm-swoop)
-(straight-use-package 'helm-ag)
-(straight-use-package 'helm-ag-r)
-(straight-use-package 'helm-projectile)
-;(straight-use-package 'helm-package)
-(straight-use-package 'helm-mode-manager)
-(straight-use-package 'helm-helm-commands)
-;(straight-use-package 'helm-c-yasnippet)
-;(straight-use-package 'helm-company)
-(straight-use-package 'helm-descbinds)
+(in 'helm)
+(in 'helm-lsp)
+(in 'helm-swoop)
+(in 'helm-ag)
+(in 'helm-ag-r)
+(in 'helm-projectile)
+                                        ;(in 'helm-package)
+(in 'helm-mode-manager)
+(in 'helm-helm-commands)
+                                        ;(in 'helm-c-yasnippet)
+                                        ;(in 'helm-company)
+(in 'helm-descbinds)
 
 ;; Let's try ivy and friends
 ;; On second thought, ivy requires that the snippets you type are in order, which is usually not what I want.  So I prefer Helm's functionality.
-;(straight-use-package 'ivy)
-;(straight-use-package 'swiper)
-;(straight-use-package 'counsel)
+                                        ;(in 'ivy)
+                                        ;(in 'swiper)
+                                        ;(in 'counsel)
 
 
-(straight-use-package 'js2-mode)
-(straight-use-package 'js2-refactor)
-(straight-use-package 'typescript-mode)
+(in 'js2-mode)
+(in 'js2-refactor)
+(in 'typescript-mode)
 ;; prettier code formatter integration
-(straight-use-package 'prettier)
-(straight-use-package 'haskell-mode)
-(straight-use-package 'lsp-haskell)
-(straight-use-package 'lsp-ui)
-(straight-use-package 'dap-mode)
-(straight-use-package 'all-the-icons) ;; used by dap-mode...
-(straight-use-package 'eglot)
-(straight-use-package 'racket-mode)
-(straight-use-package 'scribble-mode)
-(straight-use-package 'clojure-mode)
-(straight-use-package 'markdown-mode)
-(straight-use-package 'slime)
-(straight-use-package 'lua-mode)
-;(straight-use-package 'vimrc-mode)
-(straight-use-package 'anaconda-mode)
-(straight-use-package 'company-anaconda)
-(straight-use-package 'web-mode)
-;(straight-use-package 'indent-guide)
-(straight-use-package 'highlight-indent-guides)
-;(straight-use-package 'hl-todo)
-;(straight-use-package 'git-commit)
-(straight-use-package 'systemd)
-(straight-use-package 'lsp-java)
-(straight-use-package 'solidity-mode)
+(in 'prettier)
+(in 'haskell-mode)
+(in 'lsp-haskell)
+(in 'lsp-ui)
+(in 'dap-mode)
+(in 'all-the-icons) ;; used by dap-mode...
+(in 'eglot)
+(in 'racket-mode)
+(in 'scribble-mode)
+(in 'clojure-mode)
+(in 'markdown-mode)
+(in 'slime)
+(in 'lua-mode)
+                                        ;(in 'vimrc-mode)
+(in 'anaconda-mode)
+(in 'company-anaconda)
+(in 'web-mode)
+                                        ;(in 'indent-guide)
+(in 'highlight-indent-guides)
+                                        ;(in 'hl-todo)
+                                        ;(in 'git-commit)
+(in 'systemd)
+(in 'lsp-java)
+(in 'solidity-mode)
 
-(straight-use-package 'rust-mode)
+(in 'rust-mode)
 ;; Rustic is recommended as being better, but also has more dependencies and I don't want to sort it out right now, I really just want syntax highlighting.
-;;(straight-use-package 'rustic)
+;;(in 'rustic)
 
-(straight-use-package 'keyfreq)
+(in 'keyfreq)
 
-(straight-use-package 'fzf)
+(in 'fzf)
 
-(straight-use-package 'scad-mode)
+(in 'scad-mode)
 
 ;; some other packages I don't currently use, but might want to later:
 
@@ -110,10 +138,10 @@
 ;; an issue than recognizing and handling the link.
 ;;
 ;; Ace link doesn't support many modes (eg. it doesn't work in fundamental or markdown mode)
-;; (straight-use-package ace-link) ; -- ace jump to navigation links in info, help, eww, or compilation mode
+;; (in ace-link) ; -- ace jump to navigation links in info, help, eww, or compilation mode
 ;; link-hint -- I'm not sure there's a good way of defining new link types (eg. define a regex and a handler function).
 ;;              Also, it auto-follows a link if there is only one, which I don't like (may be configurable).
-;; (straight-use-package 'link-hint)
+;; (in 'link-hint)
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;; Single files to install without straight.el.
@@ -145,7 +173,9 @@ file from a large repository."
   (let ((install-dir (concat local-emacs.d-path "single-files/")))
     (make-directory install-dir t)
     (download-checked url (concat install-dir path-in-install-dir)
-                      hash-name hash-value nil)))
+                      hash-name
+                      hash-value
+                      'check-if-exists-p)))
 
 (install-file-checked "tablegen-mode.el"
                       "https://raw.githubusercontent.com/llvm/llvm-project/llvmorg-16.0.6/llvm/utils/emacs/tablegen-mode.el"
@@ -164,3 +194,4 @@ file from a large repository."
                       'sha256
                       "37761e19d08895298bbb04882a9d9810a718a2fb776e1ab4ef85877bf0886762")
 
+(straight-thaw-versions)
