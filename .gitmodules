@@ -22,3 +22,6 @@
 [submodule "external/misc/dictionaries"]
 	path = external/misc/dictionaries
 	url = https://github.com/willghatch/dictionaries
+[submodule "external/emacs/straight.el"]
+	path = external/emacs/straight.el
+	url = https://github.com/radian-software/straight.el
