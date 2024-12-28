@@ -4,6 +4,7 @@
 (add-to-list 'auto-mode-alist '("\\.ts\\'" . (lambda () (require 'typescript-mode) (typescript-mode))))
 
 (defun js-conf-setup ()
+  (setq-local outline-regexp wgh/c-outline-regexp)
   ;; Define whether I want to end everything with semicolons,
   ;; for my snippets to know whether to add them
   (defvar-local js-want-semicolon nil)

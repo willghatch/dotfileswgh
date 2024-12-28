@@ -215,6 +215,26 @@
 
  ;(load-library "yasnippet-conf")
  (require 'indent-tree)
+ (setq wgh/lisp-outline-regexp
+       (rx (or
+            ;; Allow headings to be after comment characters, or anywhere in a blank indented line.
+            (seq (* blank) (* ";") (* blank) (+ "*"))
+            )))
+ (setq wgh/c-outline-regexp
+       (rx (or
+            ;; Allow headings to be after comment characters, or anywhere in a blank indented line.
+            (seq (* blank) (? (seq "//" (* "/"))) (* blank) (+ "*"))
+            )))
+ (setq wgh/bash-outline-regexp
+       (rx (or
+            ;; Allow headings to be after comment characters, or anywhere in a blank indented line.
+            (seq (* blank) (* "#") (* blank) (+ "*"))
+            )))
+ (setq wgh/lua-outline-regexp
+       (rx (or
+            ;; Allow headings to be after comment characters, or anywhere in a blank indented line.
+            (seq (* blank) (? (seq "--" (* "-"))) (* blank) (+ "*"))
+            )))
  (load-library "org-mode-conf")
  (setq-default fill-column 80)
  (global-display-fill-column-indicator-mode 1)

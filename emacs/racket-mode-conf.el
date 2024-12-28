@@ -13,6 +13,7 @@
             (define-key racket-mode-map "]" nil)
             (define-key racket-mode-map "}" nil)
             (racket-xp-mode 1)
+            (setq-local outline-regexp wgh/lisp-outline-regexp)
             ))
 
 ;; Remove usage highlighting in racket-xp-mode by default.  It starts enabled.

@@ -3,6 +3,7 @@
 
 (add-hook 'haskell-mode-hook
           (lambda ()
+            (setq-local outline-regexp wgh/lua-outline-regexp)
             ;; This could probably be useful, this activates flymake, which gives a bunch of lame Haskell warnings.  These warnings are suspect for pushing point-free style (which can apparently have some efficiency gains in Haskell, but which is poor for reading code).  And I get these warnings for other people's code, which I don't want.  So... let's just not have this at all right now.
             (setq lsp-diagnostics-provider nil)
 

@@ -80,15 +80,18 @@
             (global-git-gutter-mode 1)
             (require 'highlight-indent-guides)
             (highlight-indent-guides-mode 1)
+            (outline-minor-mode 1)
             ))
 
 
 (add-hook 'lua-mode-hook
           (lambda ()
+            (setq-local outline-regexp wgh/lua-outline-regexp)
             (setq lua-indent-level 2)))
 
 (add-hook 'python-mode-hook
           (lambda ()
+            (setq-local outline-regexp wgh/bash-outline-regexp)
             ))
 
 (autoload 'web-mode "web-mode")
@@ -107,6 +110,7 @@
             ;; This lsp download url should work with openjdk11.
             ;(setq lsp-java-jdt-download-url  "https://download.eclipse.org/jdtls/milestones/0.57.0/jdt-language-server-0.57.0-202006172108.tar.gz")
             (lsp)
+            (setq-local outline-regexp wgh/c-outline-regexp)
             ))
 
 (add-to-hooks
@@ -116,6 +120,7 @@
    (define-key evil-motion-state-local-map "gdp" 'pop-tag-mark)
    (define-key evil-motion-state-local-map "gD" 'elisp-slime-nav-describe-elisp-thing-at-point)
    (eldoc-mode 1)
+   (setq-local outline-regexp wgh/lisp-outline-regexp)
    )
  '(emacs-lisp-mode-hook
    lisp-interaction-mode-hook))
@@ -276,6 +281,7 @@
             ))
 
 (defun cpp-conf-setup ()
+  (setq-local outline-regexp wgh/c-outline-regexp)
   ;; This really ought to be set per-file or per-project
   (setq c-basic-offset 2)
 
