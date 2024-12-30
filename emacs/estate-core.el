@@ -44,7 +44,7 @@
 (defvar estate-state-change-hook '())
 
 (defun estate--keymap-name (state)
-  (intern (format "estate-%s-keymap" state)))
+  (intern (format "estate-%s-state-keymap" state)))
 (defun estate--enter-hook-name (state)
   (intern (format "estate-%s-state-enter-hook" state)))
 (defun estate--leave-hook-name (state)

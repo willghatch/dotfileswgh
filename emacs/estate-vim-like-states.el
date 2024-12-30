@@ -26,15 +26,15 @@
 
 ;; Motion map is a core map that suppresses everything not bound, and is the basis for most non-insert modes.
 (estate-define-state motion nil)
-(suppress-keymap estate-motion-keymap)
+(suppress-keymap estate-motion-state-keymap)
 
 
 
 ;; Command state is like “normal” mode in vim/evil-mode.
-(estate-define-state command estate-motion-keymap)
+(estate-define-state command estate-motion-state-keymap)
 
 ;; Let's set one key here so the estate keymap isn't a death trap if not configured further.
-(define-key estate-command-keymap "i" 'estate-insert-state)
+(define-key estate-command-state-keymap "i" 'estate-insert-state)
 
 (defun estate-command-state ()
   (interactive)
@@ -42,7 +42,7 @@
   (estate-state-activate 'command))
 
 ;; A pager state is nice to have -- it's basically motion state but maybe with some extra keys.  The idea is that it's like command mode but you won't accidentally hit editing keys or such.
-(estate-define-state pager estate-motion-keymap)
+(estate-define-state pager estate-motion-state-keymap)
 (defun estate-pager-state ()
   (interactive)
   (deactivate-mark)
@@ -77,9 +77,9 @@
 ;; Visual states.
 ;; I've made visual states use a hook so that commands that activate the region will activate visual modes.
 ;; All of these visual modes presuppose that you are using and want to use transient-mark-mode.
-(estate-define-state visual estate-command-keymap)
-(estate-define-state visual-rectangle estate-visual-keymap)
-(estate-define-state visual-line estate-visual-keymap)
+(estate-define-state visual estate-command-state-keymap)
+(estate-define-state visual-rectangle estate-visual-state-keymap)
+(estate-define-state visual-line estate-visual-state-keymap)
 ;; TODO - the more I think about it, the more I think visual-line mode is more complexity than it is worth.  I'm going to expand the line selection text object behavior to expand the region to fill both begin and end lines for the region, then disable visual line mode for a while to see if I'm sure about it.
 
 (defvar-local estate--visual-line nil)
