@@ -11,8 +11,7 @@
 ;; TODO - split into estate-core.el that has the minor mode definition and the infrastructure to define modes, but with no modes defined, and estate-vim-like-states.el that defines the core states that I want and their hooks and such, but with no bindings.  Add maybe another file with function definitions.  Add one more with vim-like bindings as a demo.
 
 (setq -estate-original-global-map (current-global-map))
-(defvar-local -estate-mode-current-keymap (make-sparse-keymap))
-(defvar-local -estate-mode-map-alist `((estate-local-mode . ,-estate-mode-current-keymap)))
+(defvar-local estate--estate-mode-map-alist `())
 
 (defvar estate-activate-hook '())
 (defvar estate-deactivate-hook '())
@@ -25,12 +24,13 @@
   ;; The solution is to use emulation-mod-map-alist, which can consult a buffer-local variable, and is read before minor-mode maps.
   (if estate-local-mode
       (progn
-        (setq-local -estate-mode-current-keymap (make-sparse-keymap))
-        (add-to-list 'emulation-mode-map-alists '-estate-mode-map-alist)
+        (add-to-list 'emulation-mode-map-alists 'estate--estate-mode-map-alist)
         (run-hooks 'estate-activate-hook)
         )
     (progn
-      (run-hooks 'estate-activate-hook)
+      (setq emulation-mode-map-alists
+            (assoc-delete-all 'estate--estate-mode-map-alist emulation-mode-map-alists))
+      (run-hooks 'estate-deactivate-hook)
       )))
 
 (defun -estate-mode-initialize ()
@@ -77,7 +77,7 @@ The keymap gets the specified parent."
           (progn
             (setq-local estate--previous-state estate-state)
             (setq-local estate-state state)
-            (setq-local -estate-mode-map-alist `((estate-local-mode . ,(symbol-value keymap-sym))))
+            (setq-local estate--estate-mode-map-alist `((estate-local-mode . ,(symbol-value keymap-sym))))
             (unless skip-undo-grouping
               (estate-mode-with-change-group-handler))
             (when (symbol-value leave-hook)
