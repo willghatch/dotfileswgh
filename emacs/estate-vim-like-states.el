@@ -354,6 +354,7 @@ TODO - maybe I should also save the recording to some data structure?
   "Start recording a nestable keyboard macro that will stop recording automatically once the buffer has been changed and estate is back in command state.
 Uses `estate-nestable-keyboard-macro-start', and thus is incompatible with other keyboard macro tools that don't.
 "
+;; TODO - integrate this better with record-to-register, and make the register it records to be configurable.
   (interactive)
   (when estate--kmacro-to-buffer-change-state
     (error "estate--kmacro-to-buffer-change-state error, alread: recording in %s state"
@@ -373,7 +374,8 @@ Uses `estate-nestable-keyboard-macro-start', and thus is incompatible with other
                     (puthash "kmacro-to-buffer-change"
                              (estate-nestable-keyboard-macro-end
                               'estate--to-change-keyboard-macro)
-                             estate--registers))
+                             estate--registers)
+                    (setq estate--most-recent-register-macro-recorded "kmacro-to-buffer-change"))
                 (progn
                   (setq-local estate--kmacro-to-buffer-change-state 'changed)
                   (letrec ((command-state-kmacro-hook
@@ -393,28 +395,14 @@ Uses `estate-nestable-keyboard-macro-start', and thus is incompatible with other
                                        (vconcat (estate-nestable-keyboard-macro-end
                                                  'estate--to-change-keyboard-macro)
                                                 (this-command-keys-vector))
-                                       estate--registers))))
+                                       estate--registers)
+                              (setq estate--most-recent-register-macro-recorded "kmacro-to-buffer-change"))))
                     (add-hook 'estate-command-state-enter-hook
                               command-state-kmacro-hook
                               0 t)))))))
     (add-hook 'after-change-functions
               kmacro-record-until-buffer-change-func
               0 t)))
-
-
-(defun estate-execute-quick-keyboard-macro-to-buffer-change (count)
-  "
-Execute the last keyboard macro recorded by `estate-record-quick-keyboard-macro-to-buffer-change'
-"
-  (interactive "p")
-  (dotimes (i count)
-    (execute-kbd-macro (gethash "kmacro-to-buffer-change"
-                                estate--registers
-                                ""))))
-
-(defun estate-get-last-quick-keyboard-macro-to-buffer-change ()
-  "Return the last keyboard macro recorded by `estate-record-quick-keyboard-macro-to-buffer-change', as a string or vector."
-  (gethash "kmacro-to-buffer-change" estate--registers ""))
 
 
 (setq estate--most-recent-register-macro-recorded nil)
@@ -425,7 +413,7 @@ Execute the last keyboard macro recorded by `estate-record-quick-keyboard-macro-
   (estate-nestable-keyboard-macro-start
    (cons 'estate--keyboard-macro-to-register char)))
 
-(defun estate-keyboard-macro-to-register-end (char)
+(defun estate--keyboard-macro-to-register-end (char)
   "Finish recording a keyboard macro to register CHAR."
   (let ((value (estate-nestable-keyboard-macro-end
                 (cons 'estate--keyboard-macro-to-register char))))
@@ -446,7 +434,7 @@ Execute the last keyboard macro recorded by `estate-record-quick-keyboard-macro-
                         'estate--keyboard-macro-to-register-assoc-helper)))
     (when (not found)
       (error "estate-keyboard-macro-to-register-end-most-recent: not currently recording any"))
-    (estate-keyboard-macro-to-register-end (cdar found))))
+    (estate--keyboard-macro-to-register-end (cdar found))))
 
 (defun estate-keyboard-macro-execute-from-register (count char)
   (interactive "p\ncregister char:\n")
@@ -470,7 +458,7 @@ Otherwise, start recording to the register \"default\".
                         'estate--keyboard-macro-to-register-assoc-helper)))
     (if found
         (puthash (cdar found)
-                 (estate-keyboard-macro-to-register-end (cdar found))
+                 (estate--keyboard-macro-to-register-end (cdar found))
                  estate--registers)
       (estate-keyboard-macro-to-register-start "default"))))
 ;; TODO - probably use the character for default register a la vim, so it can still be selected by char.

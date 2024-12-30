@@ -289,7 +289,6 @@
 (ecmap "r" 'estate-keyboard-macro-execute-from-most-recently-macro-recorded-register)
 (ecmap "R" 'estate-keyboard-macro-execute-from-register)
 (ecmap "h" 'estate-record-quick-keyboard-macro-to-buffer-change)
-(ecmap "l" 'estate-execute-quick-keyboard-macro-to-buffer-change)
 
 (ecmap "@" 'wgh/call-macro-by-name)
 (ecmap "x" 'delete-char)
