@@ -106,9 +106,12 @@
   (nobreak-define-key estate-insert-state-keymap keys func))
 (defun pkmap (keys func)
   (nobreak-define-key estate-pager-state-keymap keys func))
+
 ;; TODO - do I want to add something like evil-normal-state-local-map?  The only place I have used this is in org-mode to overwrite bindings to be org-specific.  Only I haven't liked that, because then I can't use the bindings that they shadow, which I also sometimes want.  This is part of the motivation to design a more composable and prefix-heavy keymap -- so that I can have more things bound in a way that I can remember them, and use all of the commands together.
 (defun lnkmap (keys func)
-  (nobreak-define-key evil-normal-state-local-map keys func))
+  (when (not estate-command-state-buffer-local-keymap)
+    (setq-local estate-command-state-buffer-local-keymap (make-sparse-keymap)))
+  (nobreak-define-key estate-command-state-buffer-local-keymap keys func))
 
 
 ;; TODOs
