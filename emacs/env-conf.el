@@ -27,6 +27,7 @@
 ;; The default for this has find-at-startup, which runs find(1) and is slow.
 (setq straight-check-for-modifications '(check-on-save find-when-checking))
 (setq straight-profiles `((nil . ,(concat dotfileswgh "emacs/straight-lockfile-for-dotfileswgh.el"))))
+(setq straight-vc-git-default-clone-depth 1)
 
 
 (let ((local-f (concat dotfileswgh-dotlocal "/emacs/env-conf.el")))
