@@ -1,0 +1,69 @@
+
+position = "top"
+height = 32
+#start = []
+#center = []
+#end = []
+
+# TODO - what am I missing in this config vs my waybar config?
+# * wl-gammarelay controls
+# * laptop backlight control
+# * idle inhibit
+# * on both I want better volume status for different outputs
+
+
+# toml notes -- [[end]] means that it is a dictionary in a list for end, eg. end = [{...}] with one object for each section starting with [[end]]
+[[start]]
+type = "workspaces"
+# I don't like this launcher one, it shows all open programs not limited to the current workspace.
+#[[start]]
+#type = "launcher"
+#show_names = true
+[[start]]
+type = "focused"
+show_names = true
+[[start]]
+type = "clipboard"
+
+[[end]]
+type = "music"
+[[end]]
+type = "custom"
+bar = [{type = "label", label = "| {{60000:waybar-hmcount.sh}} | "}]
+
+[[end]]
+type = 'sys_info'
+format = [
+    ' {cpu_percent}%',
+    #'| {temp_c:k10temp-Tccd1}°C',
+    '| {memory_percent}%🐏',
+    #'| {swap_used} / {swap_total} GB ({swap_percent}%)',
+    #'󰋊 {disk_used:/} / {disk_total:/} GB ({disk_percent:/}%)',
+    #'󰓢 {net_down:enp39s0} / {net_up:enp39s0} Mbps',
+    #'󰖡 {load_average:1} | {load_average:5} | {load_average:15}',
+    #'󰥔 {uptime}',
+]
+
+[end.interval]
+cpu = 1
+disks = 300
+memory = 30
+networks = 3
+temps = 5
+
+
+
+[[end]]
+type = "network_manager"
+format = "{title} - {artist} - {album}"
+[[end]]
+type = "tray"
+[[end]]
+type = "volume"
+format = "{icon} {percentage}%"
+[[end]]
+type = "upower"
+[[end]]
+type = "clock"
+format = "%a, %Y-%m-%d %H:%M"
+

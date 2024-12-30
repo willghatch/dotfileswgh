@@ -1,0 +1,4 @@
+#!/bin/sh
+export IRONBAR_CONFIG=$DOTFILESWGH/ironbar-config.toml
+export IRONBAR_CSS=$DOTFILESWGH/ironbar-style.css
+exec ironbar "$@"
