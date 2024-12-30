@@ -60,8 +60,12 @@
 
 (defmacro estate-define-state (state-name parent-keymap)
   "Define a new state with STATE-NAME.
-Defines estate-X-keymap, estate-X-state-enter-hook, estate-X-state-leave-hook.
-The keymap gets the specified parent."
+STATE-NAME should be a symbol.
+Defines estate-X-keymap, estate-X-buffer-local-keymap, estate-X-state-enter-hook, estate-X-state-leave-hook.
+The keymap gets the specified parent.
+The buffer-local-keymap has default value of nil, and so must be initialized to a keymap (eg. with `make-sparse-keymap') before first use in each buffer.
+States can be switched with `estate-activate-state' using STATE-NAME.
+"
   (let ((keymap (estate--keymap-name state-name))
         (local-keymap (estate--local-keymap-name state-name))
         (enter-hook (estate--enter-hook-name state-name))
@@ -81,11 +85,14 @@ The keymap gets the specified parent."
        (defvar ,leave-hook '()
          ,(format "Hook for leaving estate %s state." state-name)))))
 
-(defvar-local estate-state nil)
+(defvar-local estate-state nil
+  "The current estate-mode state.
+Don't manually set this variable, use `estate-activate-state' instead if you want to change states.")
 (defvar-local estate--previous-state nil)
 
-;; TODO - this undo grouping is terrible.  I should re-work it.  It should be probably an insert-state hook.
-(defun estate-state-activate (state &optional skip-undo-grouping)
+
+(defun estate-activate-state (state)
+  "Activate the estate state STATE, which should be a symbol."
   (unless (eq estate-state state)
     (let ((keymap-sym (estate--keymap-name state))
           (local-keymap-sym (estate--local-keymap-name state))
@@ -98,8 +105,6 @@ The keymap gets the specified parent."
             (setq-local estate-state state)
             (setq-local estate--estate-mode-map-alist `((estate-local-mode . ,(symbol-value keymap-sym))))
             (setq-local estate--estate-mode-map-local-alist `((estate-local-mode . ,(symbol-value local-keymap-sym))))
-            (unless skip-undo-grouping
-              (estate-mode-with-change-group-handler))
             (when (symbol-value leave-hook)
               (run-hooks leave-hook))
             (run-hooks 'estate-state-change-hook)

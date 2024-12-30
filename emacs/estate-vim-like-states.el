@@ -39,39 +39,42 @@
 (defun estate-command-state ()
   (interactive)
   (deactivate-mark)
-  (estate-state-activate 'command))
+  (estate-activate-state 'command))
 
 ;; A pager state is nice to have -- it's basically motion state but maybe with some extra keys.  The idea is that it's like command mode but you won't accidentally hit editing keys or such.
 (estate-define-state pager estate-motion-state-keymap)
 (defun estate-pager-state ()
   (interactive)
   (deactivate-mark)
-  (estate-state-activate 'pager))
+  (estate-activate-state 'pager))
 
 ;; Insert state inherits the global keymap.  It's basically emacs mode.
 (estate-define-state insert -estate-original-global-map)
 
-(defvar-local estate--mode-change-with-group-marker nil)
-(defun estate-mode-with-change-group-handler ()
-  (when estate--mode-change-with-group-marker
-    (undo-amalgamate-change-group estate--mode-change-with-group-marker)
-    (setq-local estate--mode-change-with-group-marker nil)))
+(defvar-local estate--state-change-with-group-marker nil)
 
-(defun estate-mode-with-change-group (new-state pre-change-thunk)
+(defun estate--state-with-change-group-handler ()
+  (when estate--state-change-with-group-marker
+    (undo-amalgamate-change-group estate--state-change-with-group-marker)
+    (setq-local estate--state-change-with-group-marker nil)))
+
+(defun estate-state-with-change-group (new-state pre-change-thunk)
   "Do all operations in pre-change-thunk and new-state as one change group (undo group)."
-  (estate-mode-with-change-group-handler)
+  (estate--state-with-change-group-handler)
   (let ((estate-change-group-marker (prepare-change-group)))
-    (setq-local estate--mode-change-with-group-marker estate-change-group-marker)
+    (setq-local estate--state-change-with-group-marker estate-change-group-marker)
     (funcall pre-change-thunk)
-    (estate-state-activate new-state 'skip-undo-group)))
+    (estate-activate-state new-state)))
+
+(add-hook 'estate-insert-state-leave-hook 'estate--state-with-change-group-handler)
 
 (defun estate-insert-state ()
   (interactive)
-  (estate-mode-with-change-group 'insert (lambda () nil)))
+  (estate-state-with-change-group 'insert (lambda () nil)))
 
 (defun estate-insert-state-with-thunk (thunk)
   "enter insert state, but execute thunk as part of the change group"
-  (estate-mode-with-change-group 'insert thunk))
+  (estate-state-with-change-group 'insert thunk))
 
 
 ;; Visual states.
@@ -100,17 +103,17 @@
   (let ((previous-state-was-visual (member estate-state '(visual visual-rectangle visual-line))))
     (cond
      ((and (eq reason 'explicit) (not (region-active-p)))
-      (estate-state-activate estate--pre-visual-state 'skip-undo-group))
+      (estate-activate-state estate--pre-visual-state))
      ((and (region-active-p) (boundp 'rectangle-mark-mode) rectangle-mark-mode)
-      (estate-state-activate 'visual-rectangle))
+      (estate-activate-state 'visual-rectangle))
      ((and (region-active-p) estate--visual-line)
-      (estate-state-activate 'visual-line))
+      (estate-activate-state 'visual-line))
      ((region-active-p)
-      (estate-state-activate 'visual))
+      (estate-activate-state 'visual))
      (t
       ;; This is from something deactivating the mark.
       ;(message "mark deactivation state change...")
-      (estate-state-activate estate--pre-visual-state 'skip-undo-group)
+      (estate-activate-state estate--pre-visual-state)
       ;nil
       )
      ;(t (error "estate--visual-state-change fall through"))
@@ -251,7 +254,7 @@
   (let ((last-state estate--previous-state))
     (activate-mark)
     (when (member last-state '(visual-line visual-rectangle))
-      (estate-state-activate last-state))))
+      (estate-activate-state last-state))))
 
 (defvar-local estate--visual-line-overlays '())
 (defun estate--visual-line-overlay-helper ()

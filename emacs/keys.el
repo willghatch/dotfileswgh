@@ -245,7 +245,7 @@
                                            (deactivate-mark)
                                            (estate-insert-state))))
 (ecmap "c" (lambda () (interactive) (message "c not really implemented yet")))
-(evmap "c" (lambda () (interactive) (estate-mode-with-change-group
+(evmap "c" (lambda () (interactive) (estate-state-with-change-group
                                      'insert
                                      (lambda () (kill-region (region-beginning)
                                                              (region-end))))))
