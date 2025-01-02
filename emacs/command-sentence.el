@@ -264,23 +264,46 @@ Otherwise, return a cons pair (PARAMS . EXECUTOR), containing the final paramete
          .
          ((move (direction . forward) (num . 1))
           ;; TODO - add registers for delete-move and change-move to copy their old contents.  Also to copy-move.
+          ;; TODO - what arguments do most of these mean?  Eg. tree movement also needs arguments about up/down, when going down you can have a child index, etc.  I generally want an idempotence argument for movements, though maybe it's really only useful for things like “go to the end of the line” without going to the next line, but it's likely a useful option in principle especially for keyboard macros.  Also want movement to sibling vs strict full/half sibling (indent/org trees) vs unbound by tree (eg. move to next s-expression beginning whether or not it moves out of the current tree).
+          ;; TODO - should I have “select” separate from “move”?  And maybe deleting, changing, or copying could be an action parameter for moving, rather than a separate action?
           (delete-move (direction . forward) (num . 1))
           (change-move (direction . forward) (num . 1))
           (copy-move (direction . forward) (num . 1))
           (transpose (direction . forward) (num . 1))
           (join (direction . forward) (num . 1))
           (split)
+          (slurp (direction . forward) (num . 1))
+          (barf (direction . forward) (num . 1))
+          (open (direction . forward)) ;; IE new sibling
+          ;; TODO - what verbs?  Tree promote/demote, but eg. for paren trees we care about which kind of paren/bracket/brace/etc is used, or for xml we need a specific tag.  Tree splice - works for symex and xml, but less clearly useful for outline-mode or indent trees.  Tree change node type, eg. symex change paren type, xml change tag.  Tree raise - IE replace parent with child, except I'm used to the workflow of select-element, copy, expand to parent, paste.
           ))
         (objects
          .
-         ((word (location-within . beginning))
+         ((character (location-within . beginning) (specific . nil))
+          (word (location-within . beginning))
           (sentence (location-within . beginning))
           (line (location-within . beginning))
           (sptw (location-within . beginning))
+          (outline (location-within . beginning))
+          (region)
           ))
         (match-table
          .
          (
+          ;; TODO - I just wrote this encoding but it's not quite what I want and doesn't actually work right now the way I was thinking when writing it, either.  I need to decide how I want this.
+          (move character
+                ((direction forward) (specific t ,(lambda (actual expected) actual)))
+                (rmo/wgh/find-char-beginning-in-line-forward) (num))
+          (move character
+                ((direction backward) (specific t ,(lambda (actual expected) actual)))
+                (rmo/wgh/find-char-beginning-in-line-backward) (num))
+          (move character
+                ((direction forward) (specific nil))
+                (rmo/forward-char (num)))
+          (move character
+                ((direction backward) (specific nil))
+                (rmo/forward-char (num)))
+
           (move word
                 ((direction forward) (location-within beginning))
                 (rmo/wgh/forward-word-beginning (num)))
@@ -294,6 +317,32 @@ Otherwise, return a cons pair (PARAMS . EXECUTOR), containing the final paramete
                 ((direction backward) (location-within end))
                 (rmo/wgh/backward-word-end (num)))
 
+          (move vi-like-word
+                ((direction forward) (location-within beginning))
+                (rmo/wgh/forward-vi-like-word-beginning (num)))
+          (move vi-like-word
+                ((direction backward) (location-within beginning))
+                (rmo/wgh/backward-vi-like-word-beginning (num)))
+          (move vi-like-word
+                ((direction forward) (location-within end))
+                (rmo/wgh/forward-vi-like-word-end (num)))
+          (move vi-like-word
+                ((direction backward) (location-within end))
+                (rmo/wgh/backward-vi-like-word-end (num)))
+
+          (move symbol
+                ((direction forward) (location-within beginning))
+                (rmo/wgh/forward-symbol-beginning (num)))
+          (move symbol
+                ((direction backward) (location-within beginning))
+                (rmo/wgh/backward-symbol-beginning (num)))
+          (move symbol
+                ((direction forward) (location-within end))
+                (rmo/wgh/forward-symbol-end (num)))
+          (move symbol
+                ((direction backward) (location-within end))
+                (rmo/wgh/backward-symbol-end (num)))
+
           (move sentence
                 ((direction forward) (location-within beginning))
                 (rmo/wgh/forward-sentence-beginning (num)))
@@ -306,6 +355,19 @@ Otherwise, return a cons pair (PARAMS . EXECUTOR), containing the final paramete
           (move sentence
                 ((direction backward) (location-within end))
                 (rmo/wgh/backward-sentence-end (num)))
+
+          (move paragraph
+                ((direction forward) (location-within beginning))
+                (rmo/wgh/forward-paragraph-beginning (num)))
+          (move paragraph
+                ((direction backward) (location-within beginning))
+                (rmo/wgh/backward-paragraph-beginning (num)))
+          (move paragraph
+                ((direction forward) (location-within end))
+                (rmo/wgh/forward-paragraph-end (num)))
+          (move paragraph
+                ((direction backward) (location-within end))
+                (rmo/wgh/backward-paragraph-end (num)))
 
           (move line
                 ((direction forward) (location-within beginning))
@@ -333,33 +395,62 @@ Otherwise, return a cons pair (PARAMS . EXECUTOR), containing the final paramete
                 ((direction backward) (location-within end))
                 (rmo/sptw-backward-sibling-end (num)))
 
+          (move outline
+                ((direction forward) (location-within beginning))
+                (rmo/outline-forward-same-level (num)))
+          (move outline
+                ((direction backward) (location-within beginning))
+                (rmo/outline-backward-same-level (num)))
+          ;; TODO - end of outline?
+          (move indent-tree
+                ((direction forward) (location-within beginning))
+                (indent-tree-forward-full-or-half-sibling (num)))
+          (move indent-tree
+                ((direction backward) (location-within beginning))
+                (indent-tree-backward-full-or-half-sibling (num)))
 
-          (transpose word
-                ((direction forward))
-                (wgh/transpose-word-forward (num)))
-          (transpose word
-                ((direction backward))
-                (wgh/transpose-word-backward (num)))
-          (transpose sentence
-                ((direction forward))
-                (wgh/transpose-sentence-forward (num)))
-          (transpose sentence
-                ((direction backward))
-                (wgh/transpose-sentence-backward (num)))
-          (transpose line
-                ((direction forward))
-                (wgh/transpose-line-forward (num)))
-          (transpose line
-                ((direction backward))
-                (wgh/transpose-line-backward (num)))
-          (transpose sptw
-                ((direction forward))
-                (sptw-transpose-sibling-forward (num)))
-          (transpose sptw
-                ((direction backward))
-                (sptw-transpose-sibling-backward (num)))
+
+          ;; TODO - for transpose character, implement something that follows the character explicitly forward/backward.
+          (transpose word ((direction forward)) (wgh/transpose-word-forward (num)))
+          (transpose word ((direction backward)) (wgh/transpose-word-backward (num)))
+          (transpose vi-like-word ((direction forward)) (wgh/transpose-vi-like-word-forward (num)))
+          (transpose vi-like-word ((direction backward)) (wgh/transpose-vi-like-word-backward (num)))
+          (transpose symbol ((direction forward)) (wgh/transpose-symbol-forward (num)))
+          (transpose symbol ((direction backward)) (wgh/transpose-symbol-backward (num)))
+          (transpose sentence ((direction forward)) (wgh/transpose-sentence-forward (num)))
+          (transpose sentence ((direction backward)) (wgh/transpose-sentence-backward (num)))
+          (transpose paragraph ((direction forward)) (wgh/transpose-paragraph-forward (num)))
+          (transpose paragraph ((direction backward)) (wgh/transpose-paragraph-backward (num)))
+          (transpose line ((direction forward)) (wgh/transpose-line-forward (num)))
+          (transpose line ((direction backward)) (wgh/transpose-line-backward (num)))
+          (transpose sptw ((direction forward)) (sptw-transpose-sibling-forward (num)))
+          (transpose sptw ((direction backward)) (sptw-transpose-sibling-backward (num)))
+          (transpose outline ((direction forward)) (wgh/outline-transpose-sibling-forward (num)))
+          (transpose outline ((direction backward)) (wgh/outline-transpose-sibling-backward (num)))
+          (transpose indent-tree ((direction forward)) (indent-tree-transpose-sibling-forward (num)))
+          (transpose indent-tree ((direction backward)) (indent-tree-transpose-sibling-backward (num)))
+
+          ;; TODO - rename and put this vilish-open-line stuff... somewhere reasonable
+          (open line ((direction forward)) (vilish-open-line-below))
+          (open line ((direction backward)) (vilish-open-line-above))
+          (open outline ((direction forward)) (wgh/outline-add-heading-below))
+          (open outline ((direction backward)) (wgh/outline-add-heading-above))
+          ;; TODO - indent tree open
+          ;; TODO - symex open - ignore unwrapped forms and open a sibling form with the same paren type, hopefully matching indentation...
+
+          (split line () (open-line))
+          ;; TODO - is there something useful to do for split for outline or indent tree?  For symex or XML it has obvious meaning, but is used in the middle of a thing.  Maybe for outline it means to split the parent on the current header, inserting a new header above at the parent level.  And similar for indent tree.  Need to implement this...
+          (split sptw () (sp-split-sexp))
+          ;; TODO - split for non-tree objects has reasonably defined meaning, I suppose, but isn't very interesting.
+
+          ;; TODO - I need to fix my join-line implementation to take a numerical argument
+          (join line ((direction forward)) (join-line/default-forward))
+          (join line ((direction forward)) (,(lambda () (join-line/default-forward -1))))
+          ;; TODO - sptw - make a join-sexp function that takes a forward or backward argument
+
 
           ;; TODO - implement the ANY thing for object...
+          ;; TODO - actually, maybe a predicate instead, eg. I would like to wrap the movement action for most, but for region object and for i/a full object selection
           (delete-move ANY
                        ()
                        (function-to-delete-after-moving sentence-with-defaults)))

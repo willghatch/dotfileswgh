@@ -99,6 +99,8 @@
  :def-expand-region-idempotent wgh/outline-expand-region-idempotent
  :def-select-children-once wgh/outline-region-to-children
  :def-expand-region-to-children/ancestor-generation wgh/outline-expand-region/children-region
+ :def-transpose-sibling-forward wgh/outline-transpose-sibling-forward
+ :def-transpose-sibling-backward wgh/outline-transpose-sibling-backward
 
  :use-up-to-parent (lambda () (outline-up-heading 1))
  :use-down-to-first-child #'wgh/outline-down-to-first-child
