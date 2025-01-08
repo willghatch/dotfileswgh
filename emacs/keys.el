@@ -159,9 +159,9 @@
   (interactive "p")
   (wgh/forward-line-keep-column/qd (- (or count 1))))
 
-;(ecmap "j" 'wgh/forward-line-keep-column/qd)
-;(ecmap "k" 'wgh/backward-line-keep-column/qd)
-;(repeatable-motion-define-pair 'forward-line 'previous-line)
+;;(ecmap "j" 'wgh/forward-line-keep-column/qd)
+;;(ecmap "k" 'wgh/backward-line-keep-column/qd)
+;;(repeatable-motion-define-pair 'forward-line 'previous-line)
 (defun wgh/next-line (&optional arg)
   (interactive "p")
   (let ((line-move-visual nil))
@@ -185,9 +185,9 @@
 
 
 ;; Wow.  I've stopped using this organically over time due to inherent issues in timing based key chords.  But it turns out that removing this single require cut my load time by nearly half.
-;(require 'key-chord)
-;(key-chord-mode 1)
-;(key-chord-define estate-insert-keymap (kbd "kj") 'estate-command-state)
+;;(require 'key-chord)
+;;(key-chord-mode 1)
+;;(key-chord-define estate-insert-keymap (kbd "kj") 'estate-command-state)
 
 
 (progn
@@ -292,9 +292,9 @@
 (emmap "h" (lambda () (interactive) (message "use oc")))
 (emmap "l" (lambda () (interactive) (message "use ec")))
 
-;(ecmap "O" 'baddd-open-above)
+;;(ecmap "O" 'baddd-open-above)
 ;; I really prefer vim's terminology for copy/paste...
-;(ecmap "p" 'yank)
+;;(ecmap "p" 'yank)
 (ecmap "p" 'estate-paste)
 (evmap "p" 'estate-paste)
 (ecmap "P" 'estate-paste/swap)
@@ -319,13 +319,13 @@
 (ecmap "X" 'delete-char-backward)
 (emmap "y" (lambda () (interactive)
              (message "y not fully implemented yet")))
-;(evmap "y" (lambda () (interactive)
-;             (save-excursion
-;               (estate-visual-execution-helper
-;                (lambda () (kill-ring-save (region-beginning) (region-end)))))))
+;;(evmap "y" (lambda () (interactive)
+;;             (save-excursion
+;;               (estate-visual-execution-helper
+;;                (lambda () (kill-ring-save (region-beginning) (region-end)))))))
 (evmap "y" 'estate-copy)
 (ecmap "Y" (lambda () (interactive) (message "Y not yet implemented")))
-;(ecmap "&" 'baddd-ex-repeat-substitute)
+;;(ecmap "&" 'baddd-ex-repeat-substitute)
 (ecmap "gq" (with-evil 'evil-fill-and-move))
 (ecmap "gw" (with-evil 'evil-fill))
 ;;(ecmap "zo" 'baddd-open-fold)
@@ -334,19 +334,19 @@
 ;;(ecmap "zr" 'baddd-open-folds)
 ;;(ecmap "zm" 'baddd-close-folds)
 ;;(ecmap "z=" 'ispell-word)
-;(ecmap "\C-n" 'baddd-paste-pop-next)
-;(ecmap "\C-p" 'baddd-paste-pop)
+;;(ecmap "\C-n" 'baddd-paste-pop-next)
+;;(ecmap "\C-p" 'baddd-paste-pop)
 (ecmap "\C-t" 'pop-tag-mark)
-;(ecmap (kbd "C-.") 'baddd-repeat-pop)
-;(ecmap (kbd "M-.") 'baddd-repeat-pop-next)
+;;(ecmap (kbd "C-.") 'baddd-repeat-pop)
+;;(ecmap (kbd "M-.") 'baddd-repeat-pop-next)
 (ecmap "." 'baddd-repeat) ;; TODO - repeat is an important evil-mode thing to replace!
 (ecmap "\"" 'baddd-use-register)
 (ecmap "~" (with-evil 'evil-invert-char))
-;(ecmap "=" 'baddd-indent)
+;;(ecmap "=" 'baddd-indent)
 (ecmap "<" (with-evil 'evil-shift-left))
 (ecmap ">" (with-evil 'evil-shift-right))
-;(ecmap "ZZ" 'baddd-save-modified-and-close)
-;(ecmap "ZQ" 'baddd-quit)
+;;(ecmap "ZZ" 'baddd-save-modified-and-close)
+;;(ecmap "ZQ" 'baddd-quit)
 (ecmap (kbd "DEL") 'rmo/backward-char)
 (ecmap (kbd "<deletechar>") 'rmo/forward-char)
 
@@ -366,8 +366,8 @@
 ;;; Motion state
 
 ;; "0" is a special command when called first
-;(baddd-redirect-digit-argument baddd-motion-state-map "0" 'baddd-beginning-of-line)
-;(emmap "0" 'baddd-beginning-of-line)
+;;(baddd-redirect-digit-argument baddd-motion-state-map "0" 'baddd-beginning-of-line)
+;;(emmap "0" 'baddd-beginning-of-line)
 (emmap "0" 'digit-argument)
 (emmap "1" 'digit-argument)
 (emmap "2" 'digit-argument)
@@ -389,12 +389,12 @@
         ((consp n) (goto-line (car n)))
         (t (error))))
 (emmap "G" 'vilish/goto-line/end)
-;(emmap "H" 'baddd-window-top)
+;;(emmap "H" 'baddd-window-top)
 (emmap "j" 'rmo-c/wgh/next-line)
 (emmap "k" 'rmo-c/wgh/prev-line)
-;(emmap "K" 'baddd-lookup)
-;(emmap "L" 'baddd-window-bottom)
-;(emmap "M" 'baddd-window-middle)
+;;(emmap "K" 'baddd-lookup)
+;;(emmap "L" 'baddd-window-bottom)
+;;(emmap "M" 'baddd-window-middle)
 (defun wgh/isearch-repeat (&optional count)
   (let* ((count-fwd (<= 0 (or count 1)))
          (count-num (abs (or count 1)))
@@ -411,45 +411,45 @@
 (emmap "n" (lambda (&optional n) (interactive "p") (wgh/isearch-repeat (or n 1))))
 (emmap "N" (lambda (&optional n) (interactive "p") (wgh/isearch-repeat (- (or n 1)))))
 
-;(emmap "w" 'rmo/wgh/forward-word-beginning)
-;(emmap "b" 'rmo/wgh/backward-word-beginning)
+;;(emmap "w" 'rmo/wgh/forward-word-beginning)
+;;(emmap "b" 'rmo/wgh/backward-word-beginning)
 (emmap "w" 'rmo/wgh/forward-vi-like-word-beginning)
 (emmap "b" 'rmo/wgh/backward-vi-like-word-beginning)
 
-;(emmap "W" 'rmo/baddd-forward-WORD-begin)
-;(emmap "B" 'rmo/baddd-backward-WORD-begin)
-;(emmap "ge" 'rmo/baddd-backward-word-end)
-;(emmap "gE" 'rmo/baddd-backward-WORD-end)
+;;(emmap "W" 'rmo/baddd-forward-WORD-begin)
+;;(emmap "B" 'rmo/baddd-backward-WORD-begin)
+;;(emmap "ge" 'rmo/baddd-backward-word-end)
+;;(emmap "gE" 'rmo/baddd-backward-WORD-end)
 (emmap "gg" 'vilish/goto-line/beginning)
-;(emmap "g_" 'baddd-last-non-blank)
+;;(emmap "g_" 'baddd-last-non-blank)
 (emmap "g\C-]" 'find-tag)
 (emmap "{" 'rmo/wgh/backward-paragraph-beginning)
 (emmap "}" 'rmo/wgh/forward-paragraph-beginning)
 (emmap "#" 'rmo/baddd-search-word-backward)
 (emmap "g#" 'rmo/baddd-search-unbounded-word-backward)
-;(emmap "$" 'end-of-line)
+;;(emmap "$" 'end-of-line)
 (emmap "%" 'sptw-move-to-other-end-of-sexp)
 (emmap "`" (with-evil 'evil-goto-mark))
 (emmap "'" (with-evil 'evil-goto-mark-line))
-;(emmap "]]" 'rmo/baddd-forward-section-begin)
-;(emmap "][" 'rmo/baddd-forward-section-end)
-;(emmap "[[" 'rmo/baddd-backward-section-begin)
-;(emmap "[]" 'rmo/baddd-backward-section-end)
-;(emmap "[(" 'rmo/baddd-previous-open-paren)
-;(emmap "])" 'rmo/baddd-next-close-paren)
-;(emmap "[{" 'rmo/baddd-previous-open-brace)
-;(emmap "]}" 'rmo/baddd-next-close-brace)
+;;(emmap "]]" 'rmo/baddd-forward-section-begin)
+;;(emmap "][" 'rmo/baddd-forward-section-end)
+;;(emmap "[[" 'rmo/baddd-backward-section-begin)
+;;(emmap "[]" 'rmo/baddd-backward-section-end)
+;;(emmap "[(" 'rmo/baddd-previous-open-paren)
+;;(emmap "])" 'rmo/baddd-next-close-paren)
+;;(emmap "[{" 'rmo/baddd-previous-open-brace)
+;;(emmap "]}" 'rmo/baddd-next-close-brace)
 (emmap "*" 'rmo/baddd-search-word-forward)
 (emmap "g*" 'rmo/baddd-search-unbounded-word-forward)
-;(emmap "," 'baddd-repeat-find-char-reverse)
+;;(emmap "," 'baddd-repeat-find-char-reverse)
 
 ;; TODO - how to configure isearch to be more like evil-mode search without importing all of evil-mode
 (emmap "/" (lambda () (interactive) (setq wgh/isearch-repeat-forward-p t) (call-interactively 'isearch-forward)))
 (emmap "?" (lambda () (interactive) (setq wgh/isearch-repeat-forward-p nil) (call-interactively 'isearch-backward)))
 (emmap ";" 'er/expand-region)
 (emmap "^" 'baddd-first-non-blank) ;; TODO - re-impl using back-to-indentation...
-;(emmap "+" 'baddd-next-line-first-non-blank)
-;(emmap "_" 'baddd-next-line-1-first-non-blank)
+;;(emmap "+" 'baddd-next-line-first-non-blank)
+;;(emmap "_" 'baddd-next-line-1-first-non-blank)
 ;;(emmap "-" 'baddd-previous-line-first-non-blank)
 (emmap "\C-w" 'baddd-window-map)
 (emmap "\C-]" 'baddd-jump-to-tag)
@@ -485,15 +485,15 @@
 
 ;;; Replace state
 
-;(define-key baddd-replace-state-map (kbd "DEL") 'baddd-replace-backspace)
-;(define-key baddd-replace-state-map [escape] 'baddd-normal-state)
+;;(define-key baddd-replace-state-map (kbd "DEL") 'baddd-replace-backspace)
+;;(define-key baddd-replace-state-map [escape] 'baddd-normal-state)
 
 ;;; Minibuffer
 
-;(define-key minibuffer-local-map "\C-p" 'baddd-complete-next)
-;(define-key minibuffer-local-map "\C-n" 'baddd-complete-previous)
-;(define-key minibuffer-local-map "\C-x\C-p" 'baddd-complete-next-line)
-;(define-key minibuffer-local-map "\C-x\C-n" 'baddd-complete-previous-line)
+;;(define-key minibuffer-local-map "\C-p" 'baddd-complete-next)
+;;(define-key minibuffer-local-map "\C-n" 'baddd-complete-previous)
+;;(define-key minibuffer-local-map "\C-x\C-p" 'baddd-complete-next-line)
+;;(define-key minibuffer-local-map "\C-x\C-n" 'baddd-complete-previous-line)
 
 ;; Ex
 (emmap ":" (lambda () (interactive)
@@ -516,7 +516,7 @@
              (require 'evil) (call-interactively 'evil-shell-command)))
 ;
 ;;; search command line
-;(define-key baddd-ex-search-keymap "\d" #'baddd-ex-delete-backward-char)
+;;(define-key baddd-ex-search-keymap "\d" #'baddd-ex-delete-backward-char)
 ;
 
 
@@ -573,25 +573,25 @@
 (defalias 'fc 'flycheck-mode)
 
 ;; More text objects!
-;(define-key baddd-inner-text-objects-map "a" 'baddd-inner-arg)
-;(define-key baddd-outer-text-objects-map "a" 'baddd-outer-arg)
-;(define-key baddd-inner-text-objects-map "c" 'baddd-cp-inner-comment)
-;(define-key baddd-outer-text-objects-map "c" 'baddd-cp-a-comment)
-;(define-key baddd-inner-text-objects-map "d" 'baddd-cp-inner-defun)
-;(define-key baddd-outer-text-objects-map "d" 'baddd-cp-a-defun)
-;(define-key baddd-inner-text-objects-map "b" 'baddd-textobj-anyblock-inner-block)
-;(define-key baddd-outer-text-objects-map "b" 'baddd-textobj-anyblock-a-block)
-;(define-key baddd-inner-text-objects-map "i" 'indent-tree-inner)
-;(define-key baddd-outer-text-objects-map "i" 'indent-tree-outer)
+;;(define-key baddd-inner-text-objects-map "a" 'baddd-inner-arg)
+;;(define-key baddd-outer-text-objects-map "a" 'baddd-outer-arg)
+;;(define-key baddd-inner-text-objects-map "c" 'baddd-cp-inner-comment)
+;;(define-key baddd-outer-text-objects-map "c" 'baddd-cp-a-comment)
+;;(define-key baddd-inner-text-objects-map "d" 'baddd-cp-inner-defun)
+;;(define-key baddd-outer-text-objects-map "d" 'baddd-cp-a-defun)
+;;(define-key baddd-inner-text-objects-map "b" 'baddd-textobj-anyblock-inner-block)
+;;(define-key baddd-outer-text-objects-map "b" 'baddd-textobj-anyblock-a-block)
+;;(define-key baddd-inner-text-objects-map "i" 'indent-tree-inner)
+;;(define-key baddd-outer-text-objects-map "i" 'indent-tree-outer)
 ;;; These are also on t, which I'm already used to, but to fix the tree thing...
-;(define-key baddd-inner-text-objects-map "x" 'baddd-inner-tag)
-;(define-key baddd-outer-text-objects-map "x" 'baddd-a-tag)
+;;(define-key baddd-inner-text-objects-map "x" 'baddd-inner-tag)
+;;(define-key baddd-outer-text-objects-map "x" 'baddd-a-tag)
 
 ;; Normal state switch!
 (eimap (kbd "C-c") 'estate-command-state)
 (emmap (kbd "C-c") 'ignore)
 
-; Keys unbound and reserved for future use - bind to nop so they don't input
+;; Keys unbound and reserved for future use - bind to nop so they don't input
 (emmap (kbd "RET") 'ignore)
 (emmap "S" 'ignore)
 (emmap "T" 'ignore)
@@ -600,7 +600,7 @@
 ;; I'm not sure a better place to put this...
 (ecmap (kbd "TAB") 'sp-indent-defun)
 
-; g map
+;; g map
 (emmap "gr" 'baddd-ace-jump-word-mode)
 (emmap "gc" 'baddd-ace-jump-char-mode)
 (emmap "gf" 'baddd-ace-jump-line-mode)
@@ -628,13 +628,7 @@
 (ecmap "g;" 'goto-last-change)
 (ecmap "g," 'goto-last-change-reverse)
 
-; o and e maps - o is left/back, e is right/forward
-;(emmap "ee" 'rmo/wgh/forward-word-end)
-;(emmap "oe" 'rmo/wgh/backward-word-end)
-(emmap "ee" 'rmo/wgh/forward-vi-like-word-end)
-(emmap "oe" 'rmo/wgh/backward-vi-like-word-end)
-(emmap "eE" 'rmo/baddd-forward-WORD-end)
-(emmap "oE" 'rmo/baddd-backward-WORD-end)
+;; TODO - move these
 (defun vilish-open-line-below ()
   ;; TODO - evil takes a numeric argument, and when you are done entering text it copies that line N times.  I never use that feature though, so... maybe I don't care.
   (interactive)
@@ -647,13 +641,7 @@
   (estate-insert-state-with-thunk (lambda ()
                                     (beginning-of-line)
                                     (open-line 1))))
-(evmap "eo" (lambda () (interactive) (exchange-point-and-mark)))
-(ecmap "eo" (lambda () (interactive) (vilish-open-line-below)))
-(evmap "oo" (lambda () (interactive) (exchange-point-and-mark)))
-(ecmap "oo" (lambda () (interactive) (vilish-open-line-above)))
-;(evmap "o" nil)
-;(evmap "oo" 'exchange-point-and-mark)
-;(evmap "eo" 'exchange-point-and-mark)
+
 (defun wgh/forward-char/no-line-wrap (&optional count)
   (interactive "p")
   (let ((fwd (< 0 count))
@@ -669,14 +657,36 @@
   (wgh/forward-char/no-line-wrap (- count)))
 (repeatable-motion-define-pair 'wgh/forward-char/no-line-wrap
                                'wgh/backward-char/no-line-wrap)
+
+
+;; o and e maps - o is left/back, e is right/forward
+;;(emmap "ee" 'rmo/wgh/forward-word-end)
+;;(emmap "oe" 'rmo/wgh/backward-word-end)
+(emmap "ee" (cs/ae (cs/mod 'direction 'forward)
+                   (cs/mod 'location-within 'end)
+                   (cs/obj 'vi-like-word)))
+;;(emmap "ee" 'rmo/wgh/forward-vi-like-word-end)
+(emmap "oe" (cs/ae (cs/mod 'direction 'backward)
+                   (cs/mod 'location-within 'end)
+                   (cs/obj 'vi-like-word)))
+;;(emmap "oe" 'rmo/wgh/backward-vi-like-word-end)
+(emmap "eE" 'rmo/baddd-forward-WORD-end)
+(emmap "oE" 'rmo/baddd-backward-WORD-end)
+(evmap "eo" (lambda () (interactive) (exchange-point-and-mark)))
+(ecmap "eo" (lambda () (interactive) (vilish-open-line-below)))
+(evmap "oo" (lambda () (interactive) (exchange-point-and-mark)))
+(ecmap "oo" (lambda () (interactive) (vilish-open-line-above)))
+;;(evmap "o" nil)
+;;(evmap "oo" 'exchange-point-and-mark)
+;;(evmap "eo" 'exchange-point-and-mark)
 (emmap "ec" 'rmo/wgh/forward-char/no-line-wrap)
 (emmap "oc" 'rmo/wgh/backward-char/no-line-wrap)
-;(emmap "ec" 'rmo/forward-char)
-;(emmap "oc" 'rmo/backward-char)
-;(emmap "ed" 'rmo/baddd-next-close-paren)
-;(emmap "od" 'rmo/baddd-previous-open-paren)
-;(emmap "ed" 'rmo/baddd-next-close-brace)
-;(emmap "od" 'rmo/baddd-previous-open-brace)
+;;(emmap "ec" 'rmo/forward-char)
+;;(emmap "oc" 'rmo/backward-char)
+;;(emmap "ed" 'rmo/baddd-next-close-paren)
+;;(emmap "od" 'rmo/baddd-previous-open-paren)
+;;(emmap "ed" 'rmo/baddd-next-close-brace)
+;;(emmap "od" 'rmo/baddd-previous-open-brace)
 (emmap "ed" 'rmo/sptw-down-last-child-end)
 (emmap "od" 'rmo/sptw-down-first-child-beginning)
 (emmap "eg" 'rmo/sptw-up-parent-end)
@@ -688,8 +698,8 @@
 (emmap "oh" 'rmo/sptw-backward-sibling-beginning)
 (emmap "em" 'rmo/sptw-forward-sibling-end)
 (emmap "om" 'rmo/sptw-backward-sibling-end)
-;(emmap "eH" 'rmo/sptw-forward-sexp-in-supersexp)
-;(emmap "oH" 'rmo/sptw-backward-sexp-in-supersexp)
+;;(emmap "eH" 'rmo/sptw-forward-sexp-in-supersexp)
+;;(emmap "oH" 'rmo/sptw-backward-sexp-in-supersexp)
 (emmap "ea" 'rmo/baddd-forward-arg)
 (emmap "oa" 'rmo/baddd-backward-arg)
 (emmap "ew" 'rmo/baddd-forward-little-word-begin)
@@ -700,10 +710,10 @@
 (emmap "os" 'rmo/wgh/backward-sentence-beginning)
 (emmap "ep" 'rmo/wgh/forward-paragraph-beginning)
 (emmap "op" 'rmo/wgh/backward-paragraph-beginning)
-;(emmap "eS" 'rmo/baddd-forward-section-begin)
-;(emmap "oS" 'rmo/baddd-backward-section-begin)
-;(emmap "eP" 'rmo/baddd-forward-section-end)
-;(emmap "oP" 'rmo/baddd-backward-section-end)
+;;(emmap "eS" 'rmo/baddd-forward-section-begin)
+;;(emmap "oS" 'rmo/baddd-backward-section-begin)
+;;(emmap "eP" 'rmo/baddd-forward-section-end)
+;;(emmap "oP" 'rmo/baddd-backward-section-end)
 (setq -wgh/find-char-in-line/impl-last-char nil)
 (setq -wgh/find-char-in-line/impl-last-style 'reverse-emacs)
 (defun wgh/find-char-in-line/impl (char count style)
@@ -814,7 +824,7 @@ is the opposite."
 (emmap "ous" 'sptw-backward-slurp)
 (emmap "eub" 'sptw-forward-barf)
 (emmap "oub" 'sptw-backward-barf)
-;(emmap "euj" 'sptw-join-neighbor-sexp)
+;;(emmap "euj" 'sptw-join-neighbor-sexp)
 (emmap "ouj" 'sp-split-sexp)
 ;; this one doesn't really belong...
 (emmap "eup" 'sptw-splice)
@@ -828,7 +838,7 @@ is the opposite."
 ;; "ens_" forward slurp
 (emmap "ensp" 'sptw-forward-slurp)
 (emmap "onsp" 'sptw-backward-slurp)
-; TODO - indent tree slurp
+;; TODO - indent tree slurp
 (emmap "ensi" 'ignore)
 (emmap "onsi" 'ignore)
 (emmap "enso" 'wgh/outline-forward-slurp-heading)
@@ -838,7 +848,7 @@ is the opposite."
 ;; "enb_" forward barf
 (emmap "enbp" 'sptw-forward-barf)
 (emmap "onbp" 'sptw-backward-barf)
-; TODO - indent tree barf
+;; TODO - indent tree barf
 (emmap "enbi" 'ignore)
 (emmap "onbi" 'ignore)
 (emmap "enbo" 'wgh/outline-forward-barf-heading)
@@ -858,7 +868,7 @@ is the opposite."
 ;; "enm_" forward sibling end
 (emmap "enmp" 'rmo/sptw-forward-sexp-end)
 (emmap "onmp" 'rmo/sptw-backward-sexp-end)
-; TODO - indent tree moving by end of line
+;; TODO - indent tree moving by end of line
 (emmap "enmi" 'ignore)
 (emmap "onmi" 'ignore)
 (emmap "enmo" 'ignore)
@@ -916,12 +926,12 @@ is the opposite."
 ;; * make new next sibling (useful in particular for trees without an end delimiter like indent trees or org-mode, especially to easily make a next sibling for the last sibling, because you can't go to its end delimiter.)  I think this means it goes to the sibling's location, enters any necessary stuff (eg. indentation or org-mode header bullets), and maybe enters insert mode.
 
 ;; TODO - tree text objects
-;(define-key baddd-inner-text-objects-map "np" 'inner-parens-textobj)
-;(define-key baddd-outer-text-objects-map "np" 'outer-parens-textobj)
-;(define-key baddd-inner-text-objects-map "ni" 'indent-tree-inner)
-;(define-key baddd-outer-text-objects-map "ni" 'indent-tree-outer)
-;(define-key baddd-inner-text-objects-map "no" 'wgh/org-tree-inner)
-;(define-key baddd-outer-text-objects-map "no" 'wgh/org-tree-outer)
+;;(define-key baddd-inner-text-objects-map "np" 'inner-parens-textobj)
+;;(define-key baddd-outer-text-objects-map "np" 'outer-parens-textobj)
+;;(define-key baddd-inner-text-objects-map "ni" 'indent-tree-inner)
+;;(define-key baddd-outer-text-objects-map "ni" 'indent-tree-outer)
+;;(define-key baddd-inner-text-objects-map "no" 'wgh/org-tree-inner)
+;;(define-key baddd-outer-text-objects-map "no" 'wgh/org-tree-outer)
 ;;;;
 
 
@@ -934,14 +944,14 @@ is the opposite."
 ;; You can also do combos with special regions where the mouse is, eg. [mode-line mouse-1] to bind to something different when clicking in the mode-line.
 (emmap [mouse-4] 'mwheel-scroll)
 (emmap [mouse-5] 'mwheel-scroll)
-;(global-set-key [mouse-4] (lambda () (interactive) (scroll-down 4)))
-;(global-set-key [mouse-5] (lambda () (interactive) (scroll-up 4)))
+;;(global-set-key [mouse-4] (lambda () (interactive) (scroll-down 4)))
+;;(global-set-key [mouse-5] (lambda () (interactive) (scroll-up 4)))
 
 
 (emmap "f" 'repeatable-motion-forward)
 (emmap "F" 'repeatable-motion-backward)
 
-; t map
+;; t map
 (emmap "tt" 'temp-key-map)
 
 (emmap "tia" 'switch-to-buffer)
@@ -1011,16 +1021,16 @@ is the opposite."
     ("f" list-faces-display "faces")
     ("r" (with-evil 'evil-show-registers) "registers")
     ))
-; TODO - list jumps, maybe
+;; TODO - list jumps, maybe
 
 ;; s map
-;(ecmap "ss" 'baddd-substitute)
-;(ecmap "sS" 'baddd-change-whole-line)
-;(baddd-define-key 'visual baddd-surround-mode-map "s" nil)
-;(baddd-define-key 'visual baddd-surround-mode-map "S" 'ignore)
-;(defun surround-region-with-parens (beg end)
-;  (interactive "r")
-;  (baddd-surround-region beg end nil ?\)))
+;;(ecmap "ss" 'baddd-substitute)
+;;(ecmap "sS" 'baddd-change-whole-line)
+;;(baddd-define-key 'visual baddd-surround-mode-map "s" nil)
+;;(baddd-define-key 'visual baddd-surround-mode-map "S" 'ignore)
+;;(defun surround-region-with-parens (beg end)
+;;  (interactive "r")
+;;  (baddd-surround-region beg end nil ?\)))
 (evmap "ss" 'baddd-surround-region)
 (evmap "sS" 'baddd-Surround-region)
 (evmap "sh" 'shell-command-on-region)
@@ -1038,7 +1048,7 @@ is the opposite."
 (global-set-key (kbd "M-c") 'helm-M-x)
 (emmap "sx" 'eval-expression)
 
-;(evmap (kbd "C-s") 'yas-insert-with-region)
+;;(evmap (kbd "C-s") 'yas-insert-with-region)
 
 ;; command modes and macros
 
@@ -1048,7 +1058,7 @@ is the opposite."
 ;;              ;;(call-interactively 'helm-M-x)
 ;;              ))
 (emmap "z" 'helm-M-x)
-;(emmap "|" 'execute-extended-command)
+;;(emmap "|" 'execute-extended-command)
 (emmap "|" 'eval-expression)
 (emmap "_" 'eval-expression)
 (emmap "Q" 'call-last-kbd-macro)
@@ -1079,7 +1089,7 @@ is the opposite."
 (emmap "to" 'estate-pager-state)
 
 
-; space map
+;; space map
 (emmap "sj" 'rmo/pscroll-down-half)
 (emmap "sk" 'rmo/pscroll-up-half)
 (emmap "sf" 'fold-toggle-wgh)
@@ -1112,7 +1122,7 @@ is the opposite."
 ;; input mode
 (eimap (kbd "DEL") 'delete-backward-char) ; remap away from the baddd-version backspace
 (eimap "\C-v" #'quoted-insert) ; more vim-like
-;(eimap "\M-r" 'baddd-paste-from-register)
+;;(eimap "\M-r" 'baddd-paste-from-register)
 (eimap "\M-w" 'baddd-window-map)
 
 ;; helm map to match what I've got going in zsh with zaw...
@@ -1137,15 +1147,15 @@ is the opposite."
 (eimap (kbd "C-@ TAB") 'completer-map/body)
 (eimap (kbd "TAB") 'company-complete-common-wgh)
 ;; put indentation on something...
-;(define-key 'completer-map (kbd "TAB") 'indent-for-tab-command)
+;;(define-key 'completer-map (kbd "TAB") 'indent-for-tab-command)
 (eimap (kbd "<backtab>") 'indent-for-tab-command)
 
 (global-set-key (kbd "C-\\") 'baddd-execute-in-normal-state)
 
 ;; Default mode settings
-;(setq baddd-normal-state-modes (append baddd-emacs-state-modes baddd-normal-state-modes))
-;(setq baddd-emacs-state-modes nil)
-;(setq baddd-insert-state-modes (cons 'racket-repl-mode baddd-insert-state-modes))
+;;(setq baddd-normal-state-modes (append baddd-emacs-state-modes baddd-normal-state-modes))
+;;(setq baddd-emacs-state-modes nil)
+;;(setq baddd-insert-state-modes (cons 'racket-repl-mode baddd-insert-state-modes))
 
 
 (define-key tty-menu-navigation-map "j" 'tty-menu-next-item)
@@ -1155,15 +1165,15 @@ is the opposite."
 
 (define-key help-map "\C-h" 'describe-prefix-bindings)
 
-;(define-key baddd-ex-completion-map "\C-a" 'move-beginning-of-line)
-;(define-key baddd-ex-completion-map "\C-e" 'move-end-of-line)
-;(define-key baddd-ex-completion-map "\C-d" 'delete-char)
-;(define-key baddd-ex-completion-map "\C-k" 'kill-line)
-;(define-key baddd-ex-completion-map "\C-p" 'previous-complete-history-element)
-;(define-key baddd-ex-completion-map "\C-n" 'next-complete-history-element)
-;(define-key baddd-ex-completion-map "\C-f" 'forward-char)
-;(define-key baddd-ex-completion-map "\C-b" 'backward-char)
-;(define-key baddd-ex-completion-map "\M-r" 'baddd-paste-from-register)
+;;(define-key baddd-ex-completion-map "\C-a" 'move-beginning-of-line)
+;;(define-key baddd-ex-completion-map "\C-e" 'move-end-of-line)
+;;(define-key baddd-ex-completion-map "\C-d" 'delete-char)
+;;(define-key baddd-ex-completion-map "\C-k" 'kill-line)
+;;(define-key baddd-ex-completion-map "\C-p" 'previous-complete-history-element)
+;;(define-key baddd-ex-completion-map "\C-n" 'next-complete-history-element)
+;;(define-key baddd-ex-completion-map "\C-f" 'forward-char)
+;;(define-key baddd-ex-completion-map "\C-b" 'backward-char)
+;;(define-key baddd-ex-completion-map "\M-r" 'baddd-paste-from-register)
 
 
 (defun my-isearch-bor-exit ()
