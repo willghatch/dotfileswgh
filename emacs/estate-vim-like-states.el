@@ -112,12 +112,7 @@
       (estate-activate-state 'visual))
      (t
       ;; This is from something deactivating the mark.
-      ;(message "mark deactivation state change...")
-      (estate-activate-state estate--pre-visual-state)
-      ;nil
-      )
-     ;(t (error "estate--visual-state-change fall through"))
-     )))
+      (estate-activate-state estate--pre-visual-state)))))
 
 (defun estate--visual-state-helper (line-mode)
   (setq-local estate--visual-line line-mode)
@@ -295,8 +290,8 @@ Creates overlays for the areas that would be included in the line-based selectio
 ;; TODO - I want to have some kind of nested kmacro recording.  Eg. I want to be able to start recording a specific named macro, then start recording another specific named macro inside, finish the inner one and probably call it, then end the outer macro.  In part I want to use this because I want to have various commands that implicitly record named macros, mostly as an implementation detail, then allow calling them outside.
 ;;      - it looks like start-kbd-macro with an arg lets you start editing.  So If I keep state of a list of macro tags, and change behavior based on tag state, I can juggle multiple macro definitions.
 
-(defvar-local estate--nested-macro-states-alist nil
-  "Alist of tags to nested macro recording state.
+(defvar-local estate--nested-keyboard-macro-states-alist nil
+  "Alist of tags to nested keyboard macro recording state.
 For each (potentially) nested macro recording, the list stores the prefix length of the kbd macro when the nested macro recording started.
 When a macro recording ends, it ends recording, reads the state of last-kbd-macro, and removes the prefix as appropriate.
 Then, if there are other macros being recorded, it starts a macro edit so that the other macro can continue.
@@ -309,43 +304,47 @@ TAG must be a unique key as tested by `equal', and it is an error to start recor
 
 TODO - maybe I should add a counter like kmacro has, that is tag-specific?
 "
-  (cond ((assoc tag estate--nested-macro-states-alist)
+  (cond ((assoc tag estate--nested-keyboard-macro-states-alist)
          (error "estate-nestable-keyboard-macro-start error: tag already in use: %s"
                 tag))
-        ((and (null estate--nested-macro-states-alist)
+        ((and (null estate--nested-keyboard-macro-states-alist)
               defining-kbd-macro)
          (error "estate-nestable-keyboard-macro-start error: already defining kbd macro outside of this framework"))
-        ((null estate--nested-macro-states-alist)
+        ((null estate--nested-keyboard-macro-states-alist)
          ;; Non-nested call.
-         (setq estate--nested-macro-states-alist (list (list tag 0)))
+         (setq estate--nested-keyboard-macro-states-alist (list (list tag 0)))
          (start-kbd-macro nil))
         (t
          ;; Nested call.
          (end-kbd-macro)
-         (setq estate--nested-macro-states-alist
+         (setq estate--nested-keyboard-macro-states-alist
                (cons (list tag (length last-kbd-macro))
-                     estate--nested-macro-states-alist))
+                     estate--nested-keyboard-macro-states-alist))
          (start-kbd-macro t t))))
 
 (defun estate-nestable-keyboard-macro-end (tag)
-"Stop recording a nestable keyboard macro for TAG.
+  "Stop recording a nestable keyboard macro for TAG.
 Return the keyboard macro as a string or vector.
 TODO - maybe I should also save the recording to some data structure?
 "
-(let* ((found (assoc tag estate--nested-macro-states-alist))
-       (prefix-length (and found (cadr found))))
-  (cond ((not defining-kbd-macro)
-         (error "estate-nestable-keyboard-macro-end: not currently defining kbd macro"))
-        ((not found)
-         (error "estate-nestable-keyboard-macro-end: tag not found: %s" tag))
-        (t
-         (end-kbd-macro)
-         (let ((last-val last-kbd-macro))
-           (setq estate--nested-macro-states-alist
-                 (assoc-delete-all tag estate--nested-macro-states-alist))
-           (when (not (null estate--nested-macro-states-alist))
-             (start-kbd-macro t t))
-           (seq-drop last-val prefix-length))))))
+  (let* ((found (assoc tag estate--nested-keyboard-macro-states-alist))
+         (prefix-length (and found (cadr found))))
+    (cond ((not found)
+           (error "estate-nestable-keyboard-macro-end: tag not found: %s" tag))
+          (t
+           (let ((not-defining-error nil))
+             (if defining-kbd-macro
+                 (end-kbd-macro)
+               (setq not-defining-error t)
+               )
+             (let ((last-val last-kbd-macro))
+               (setq estate--nested-keyboard-macro-states-alist
+                     (assoc-delete-all tag estate--nested-keyboard-macro-states-alist))
+               (when not-defining-error
+                 (error "estate-nestable-keyboard-macro-end: not currently defining kbd macro"))
+               (when (not (null estate--nested-keyboard-macro-states-alist))
+                 (start-kbd-macro t t))
+               (seq-drop last-val prefix-length)))))))
 
 
 (setq-local estate--kmacro-to-buffer-change-state nil)
@@ -354,7 +353,7 @@ TODO - maybe I should also save the recording to some data structure?
   "Start recording a nestable keyboard macro that will stop recording automatically once the buffer has been changed and estate is back in command state.
 Uses `estate-nestable-keyboard-macro-start', and thus is incompatible with other keyboard macro tools that don't.
 "
-;; TODO - integrate this better with record-to-register, and make the register it records to be configurable.
+  ;; TODO - integrate this better with record-to-register, and make the register it records to be configurable.
   (interactive)
   (when estate--kmacro-to-buffer-change-state
     (error "estate--kmacro-to-buffer-change-state error, alread: recording in %s state"
@@ -430,8 +429,8 @@ Uses `estate-nestable-keyboard-macro-start', and thus is incompatible with other
   "Finish recording a keyboard macro to a register, the most recent one started."
   (interactive)
   (let* ((found (assoc 'estate--keyboard-macro-to-register
-                        estate--nested-macro-states-alist
-                        'estate--keyboard-macro-to-register-assoc-helper)))
+                       estate--nested-keyboard-macro-states-alist
+                       'estate--keyboard-macro-to-register-assoc-helper)))
     (when (not found)
       (error "estate-keyboard-macro-to-register-end-most-recent: not currently recording any"))
     (estate--keyboard-macro-to-register-end (cdar found))))
@@ -454,8 +453,8 @@ Otherwise, start recording to the register \"default\".
 "
   (interactive)
   (let* ((found (assoc 'estate--keyboard-macro-to-register
-                        estate--nested-macro-states-alist
-                        'estate--keyboard-macro-to-register-assoc-helper)))
+                       estate--nested-keyboard-macro-states-alist
+                       'estate--keyboard-macro-to-register-assoc-helper)))
     (if found
         (puthash (cdar found)
                  (estate--keyboard-macro-to-register-end (cdar found))
