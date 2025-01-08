@@ -34,6 +34,20 @@
 ;; * the symbol 'original-sentence to pass the original command sentence.
 ;;
 
+(defun command-sentence--get-spec-from-symbol (given-v-or-o given-verb-p config)
+  "Takes a symbol name for a verb or an object, returns the spec from the config."
+  (cdr (assq given-v-or-o
+             (cdr (assq (if given-verb-p 'verbs 'objects) config)))))
+(defun command-sentence--get-verb-or-obj-name (given-v-or-o)
+  "Takes a command-sentence-word or a symbol."
+  (if (symbolp given-v-or-o)
+      given-v-or-o
+    (cdr (assq 'contents given-v-or-o))))
+(defun command-sentence--get-default-verb-or-obj (given-v-or-o given-verb-p config)
+  "Given a verb or object (as a command-sentence-word), get the symbol for the default of the other one."
+  (let* ((given-name (command-sentence--get-verb-or-obj-name given-v-or-o))
+         (given-spec (command-sentence--get-spec-from-symbol given-name given-verb-p config)))
+    (cdr (assq (if given-verb-p 'default-object 'default-verb) given-spec))))
 
 (defun command-sentence--match (sentence config)
   "Find a match for SENTENCE using the CONFIG.
@@ -50,18 +64,20 @@ Otherwise, return a cons pair (PARAMS . EXECUTOR), containing the final paramete
                            (cl-remove-if-not
                             (lambda (word) (eq 'modifier
                                                 (cdr (assq 'word-type word))))
-                                             sentence))))
-    (when (not verb)
-      (error "No verb in command sentence: %s" sentence))
-    (when (not object)
-      (error "No object in command sentence: %s" sentence))
+                            sentence))))
+    (when (and (not verb) (not object))
+      (error "command-sentence: sentence lacks both verb and object: %s" sentence))
     ;; TODO - deeper validation of the structure of command sentence words, to be sure all parts are there.
-    (let* ((verb-name (cdr (assq 'contents verb)))
-           (object-name (cdr (assq 'contents object)))
-           (verb-spec (cdr (assq verb-name
-                                 (cdr (assq 'verbs config)))))
-           (object-spec (cdr (assq object-name
-                                   (cdr (assq 'objects config)))))
+    (let* ((verb (or verb
+                     (command-sentence--get-default-verb-or-obj object nil config)
+                     (error "command-sentence: can't resolve a verb for sentence: %s" sentence)))
+           (object (or object
+                       (command-sentence--get-default-verb-or-obj verb t config)
+                       (error "command-sentence: can't resolve an object for sentence: %s" sentence)))
+           (verb-name (command-sentence--get-verb-or-obj-name verb))
+           (object-name (command-sentence--get-verb-or-obj-name object))
+           (verb-spec (command-sentence--get-spec-from-symbol verb-name t config))
+           (object-spec (command-sentence--get-spec-from-symbol object-name nil config))
            ;; TODO - check for duplicate param names, and probably error.
            (full-default-params (append verb-spec object-spec))
            (params (mapcar (lambda (param-spec)
@@ -73,10 +89,24 @@ Otherwise, return a cons pair (PARAMS . EXECUTOR), containing the final paramete
       (while (and (not matched)
                   match-table)
         (let* ((entry (car match-table))
-               (entry-mods (and (eq verb-name (car entry))
-                                (eq object-name (cadr entry))
+               (verb-sym-match (eq verb-name (car entry)))
+               (object-sym-match (eq object-name (cadr entry)))
+               (verb-match (or verb-sym-match
+                               (and (not (symbolp (car entry)))
+                                    (functionp (car entry))
+                                    ;; Don't try to match predicate if object
+                                    ;; match already failed symbol eq
+                                    (or object-sym-match (functionp (cadr entry)))
+                                    (funcall (car entry) verb-name))))
+               (object-match (or object-sym-match
+                                 (and verb-match
+                                      (not (symbolp (cadr entry)))
+                                      (functionp (cadr entry))
+                                      (funcall (cadr entry) object-name))))
+               (vo-match (and verb-match object-match))
+               (entry-mods (and vo-match
                                 (caddr entry)))
-               (full-match (and entry-mods
+               (full-match (and vo-match
                                 (command-sentence--match-table-modifiers-match-p
                                  params
                                  entry-mods))))
@@ -185,22 +215,22 @@ Otherwise, return a cons pair (PARAMS . EXECUTOR), containing the final paramete
 (setq command-sentence--test-config
       `((verbs
          .
-         ((move (direction . forward) (count . 1))
-          (delete-move (direction . forward))
+         ((move (default-object . word) (direction . forward) (count . 1))
+          (delete (default-object . word) (direction . forward))
           ))
         (objects
          .
-         ((word (location-within . beginning))
-          (sentence (location-within . beginning))
+         ((word (default-verb . move) (location-within . beginning))
+          (sentence (default-verb . move) (location-within . beginning))
           ))
         (match-table
          .
          ((move word
                 ((direction forward) (location-within beginning eq))
                 (forward-word (count)))
-          (delete-move ANY
-                       ()
-                       (function-to-delete-after-moving sentence-with-defaults)))
+          (delete ,(lambda (x) t)
+                  ()
+                  (function-to-delete-after-moving sentence-with-defaults)))
          )))
 
 
@@ -209,6 +239,8 @@ Otherwise, return a cons pair (PARAMS . EXECUTOR), containing the final paramete
   "Test matching functionality of `command-sentence--match`."
   (let ((mv '((word-type . verb)
               (contents . move)))
+        (del '((word-type . verb)
+               (contents . delete)))
         (wd '((word-type . object)
               (contents . word)))
         (fwd '((word-type . modifier)
@@ -218,26 +250,36 @@ Otherwise, return a cons pair (PARAMS . EXECUTOR), containing the final paramete
                (parameter-name . location-within)
                (contents . beginning))))
 
-    (let ((result (command-sentence--match (list mv fwd beg wd) command-sentence--test-config)))
-      (should result)
-      (let ((params (car result))
-            (executor (cdr result)))
-(message "result: %s" result)
+    (let ((result1 (command-sentence--match (list mv fwd beg wd) command-sentence--test-config)))
+      (should result1)
+      (let ((params (car result1))
+            (executor (cdr result1)))
         (should (equal 'forward (cdr (assq 'direction params))))
         (should (equal 'beginning (cdr (assq 'location-within params))))
         (should (equal 'forward-word (car executor)))
         ))
 
     ;; Same as above, but with default values
-    (let ((result (command-sentence--match (list mv wd) command-sentence--test-config)))
-      (should result)
-      (let ((params (car result))
-            (executor (cdr result)))
+    (let ((result2 (command-sentence--match (list mv wd) command-sentence--test-config)))
+      (should result2)
+      (let ((params (car result2))
+            (executor (cdr result2)))
         (should (equal 'forward (cdr (assq 'direction params))))
         (should (equal 'beginning (cdr (assq 'location-within params))))
         (should (equal 'forward-word (car executor)))
         ))
+
+    ;; Predicate matcher
+    (let ((result3 (command-sentence--match (list del wd) command-sentence--test-config)))
+      (should result3)
+      (let ((params (car result3))
+            (executor (cdr result3)))
+        ;;(should (equal 'forward (cdr (assq 'direction params))))
+        ;;(should (equal 'beginning (cdr (assq 'location-within params))))
+        (should (equal 'function-to-delete-after-moving (car executor)))
+        ))
     )
+
 
   (let ((non-matching-sentence '(((word-type . verb)
                                   (contents . jump))
@@ -255,9 +297,9 @@ Otherwise, return a cons pair (PARAMS . EXECUTOR), containing the final paramete
 ;; TODO - put this somewhere else
 ;; TODO - add convenient commands to add to a config, especially the default config
 (defun command-sequence--config-add (config section-key spec)
-"Update the given config, mutating it."
-(let ((section (assq section-key config)))
-  (setcdr section (cons spec (cdr section)))))
+  "Update the given config, mutating it."
+  (let ((section (assq section-key config)))
+    (setcdr section (cons spec (cdr section)))))
 
 (setq command-sentence--my-config
       `((verbs
@@ -279,12 +321,12 @@ Otherwise, return a cons pair (PARAMS . EXECUTOR), containing the final paramete
           ))
         (objects
          .
-         ((character (location-within . beginning) (specific . nil))
-          (word (location-within . beginning))
-          (sentence (location-within . beginning))
-          (line (location-within . beginning))
-          (sptw (location-within . beginning))
-          (outline (location-within . beginning))
+         ((character (default-verb . move) (location-within . beginning) (specific . nil))
+          (word (default-verb . move) (location-within . beginning))
+          (sentence (default-verb . move) (location-within . beginning))
+          (line (default-verb . move) (location-within . beginning))
+          (sptw (default-verb . move) (location-within . beginning))
+          (outline (default-verb . move) (location-within . beginning))
           (region)
           ))
         (match-table
