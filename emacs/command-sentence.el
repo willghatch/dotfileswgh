@@ -305,12 +305,12 @@ Otherwise, return a cons pair (PARAMS . EXECUTOR), containing the final paramete
       `((verbs
          .
          ((move (direction . forward) (num . 1))
-          ;; TODO - add registers for delete-move and change-move to copy their old contents.  Also to copy-move.
+          ;; TODO - add registers for delete and change-move to copy their old contents.  Also to copy-move.
           ;; TODO - what arguments do most of these mean?  Eg. tree movement also needs arguments about up/down, when going down you can have a child index, etc.  I generally want an idempotence argument for movements, though maybe it's really only useful for things like “go to the end of the line” without going to the next line, but it's likely a useful option in principle especially for keyboard macros.  Also want movement to sibling vs strict full/half sibling (indent/org trees) vs unbound by tree (eg. move to next s-expression beginning whether or not it moves out of the current tree).
           ;; TODO - should I have “select” separate from “move”?  And maybe deleting, changing, or copying could be an action parameter for moving, rather than a separate action?
-          (delete-move (direction . forward) (num . 1))
-          (change-move (direction . forward) (num . 1))
-          (copy-move (direction . forward) (num . 1))
+          (delete (direction . forward) (num . 1))
+          (change (direction . forward) (num . 1))
+          (copy (direction . forward) (num . 1))
           (transpose (direction . forward) (num . 1))
           (join (direction . forward) (num . 1))
           (split)
@@ -491,12 +491,55 @@ Otherwise, return a cons pair (PARAMS . EXECUTOR), containing the final paramete
           ;; TODO - sptw - make a join-sexp function that takes a forward or backward argument
 
 
-          ;; TODO - implement the ANY thing for object...
-          ;; TODO - actually, maybe a predicate instead, eg. I would like to wrap the movement action for most, but for region object and for i/a full object selection
-          (delete-move ANY
-                       ()
-                       (function-to-delete-after-moving sentence-with-defaults)))
-         )))
+          ;; TODO - optional register for delete to be delete-copy
+          (delete region
+                  ()
+                  (,(lambda () (delete-region (region-beginning) (region-end)))))
+          (delete ,(lambda (x) (not (memq x '(region))))
+                  ()
+                  (,(lambda (sentence-with-defaults)
+                      (let ((orig-point (point)))
+                        (command-sentence-execute
+                         ;; TODO - I should maybe delete the old verb, but I'll just use alist shadowing...
+                         (cons '((word-type . verb) (contents . move)) sentence-with-defaults)
+                         command-sentence-current-configuration)
+                        (delete-region (min (point) orig-point)
+                                       (max (point) orig-point))))
+                   sentence-with-defaults))
+
+          (change region
+                  ()
+                  (,(lambda ()
+                      (delete-region (region-beginning) (region-end))
+                      (estate-insert-state))))
+          (change ,(lambda (x) (not (memq x '(region))))
+                  ()
+                  (,(lambda (sentence-with-defaults)
+                      (let ((orig-point (point)))
+                        (command-sentence-execute
+                         ;; TODO - I should maybe delete the old verb, but I'll just use alist shadowing...
+                         (cons '((word-type . verb) (contents . move)) sentence-with-defaults)
+                         command-sentence-current-configuration)
+                        (delete-region (min (point) orig-point)
+                                       (max (point) orig-point))
+                        (estate-insert-state)))
+                   sentence-with-defaults))
+
+          (copy region
+                  ()
+                  (estate-copy))
+          (copy ,(lambda (x) (not (memq x '(region))))
+                ()
+                (,(lambda (sentence-with-defaults)
+                    (let ((orig-point (point)))
+                      (command-sentence-execute
+                       ;; TODO - I should maybe delete the old verb, but I'll just use alist shadowing...
+                       (cons '((word-type . verb) (contents . move)) sentence-with-defaults)
+                       command-sentence-current-configuration)
+                      (estate-copy (cons (min (point) orig-point)
+                                         (max (point) orig-point)))))
+                 sentence-with-defaults))
+          ))))
 
 ;; temporary convenience...
 (setq command-sentence-current-configuration command-sentence--my-config)

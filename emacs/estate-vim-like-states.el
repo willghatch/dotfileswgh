@@ -192,14 +192,16 @@
 (defun estate--get-register (reg)
   (gethash reg estate--registers (cons "" nil)))
 
-(defun estate-copy ()
-  "TODO - copy but with extra handling"
+;; TODO - I probably want to just get rid of extra visual states like visual-line and visual-block for now.
+(defun estate-copy (&optional region)
+  "TODO - copy but with extra handling, REGION is nil or a cons pair (beg . end)."
   (interactive)
   (let ((copy-metadata (and (eq estate-state 'visual-line) 'line)))
     (save-mark-and-excursion
       (estate-visual-execution-helper
        (lambda ()
-         (let ((str (buffer-substring-no-properties (region-beginning) (region-end))))
+         (let ((str (buffer-substring-no-properties (if region (car region) (region-beginning))
+                                                    (if region (cdr region) (region-end)))))
            (puthash estate-current-register (cons str copy-metadata) estate--registers)
            (when (equal estate-current-register "default")
              (kill-new str))))))))
@@ -208,8 +210,8 @@
   "TODO - paste but with extra handling"
   ;; TODO - currently this also copies if region is active.  Do I want to do that?
   (let* ((to-paste (estate--get-register estate-current-register))
-         (to-paste-text (car to-paste))
-         (to-paste-metadata (cdr to-paste)))
+         (to-paste-text (if (stringp to-paste) to-paste (car to-paste)))
+         (to-paste-metadata (if (stringp to-paste) nil (cdr to-paste))))
     (cond
      ((and (eq estate-state 'visual-line) (eq to-paste-metadata 'line))
       (when copy-from-active-region
