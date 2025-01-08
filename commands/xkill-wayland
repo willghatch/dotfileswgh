@@ -1,0 +1,13 @@
+#!/usr/bin/env bash
+
+# I know the name xkill, so let's use that name for this wrapper...
+
+if [[ "$XDG_SESSION_DESKTOP" = "hyprland" ]]; then
+    # esc to escape kill mode
+    hyprctl kill
+elif [[ "$XDG_SESSION_TYPE" = "x11" ]]; then
+    xkill
+else
+    echo "XDG_SESSION_DESKTOP=${XDG_SESSION_DESKTOP} not yet supported by this script"
+    notify "XDG_SESSION_DESKTOP=${XDG_SESSION_DESKTOP} not yet supported by this script"
+fi
