@@ -65,6 +65,27 @@
 (require 'estate-core)
 (require 'estate-vim-like-states)
 (estate-mode 1)
+(require 'command-sentence)
+
+(defun cs/verb (name)
+  `((word-type . verb)
+    (contents . ,name)))
+(defun cs/obj (name)
+  `((word-type . object)
+    (contents . ,name)))
+(defun cs/mod (name contents)
+  `((word-type . modifier)
+    (parameter-name . ,name)
+    (contents . ,contents)))
+(defun cs/ae (&rest words)
+  (apply 'command-sentence-add-to-current-with-numeric-handling
+         'exec-after
+         words))
+(defun cs/add (&rest words)
+  (apply 'command-sentence-att-to-current-with-numeric-handling
+         nil
+         words))
+
 
 (load-library "text-object-stuff")
 (load-library "tree-walk-smartparens-integration.el")

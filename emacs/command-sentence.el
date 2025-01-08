@@ -191,6 +191,18 @@ Otherwise, return a cons pair (PARAMS . EXECUTOR), containing the final paramete
                         word1)))
     (setq command-sentence-current-sentence (append (list word1) words-rest command-sentence-current-sentence))))
 
+(defun command-sentence-add-to-current-with-numeric-handling (exec-after-p &rest words)
+  "Takes a list of command-sentence words, but returns an interactive function that takes a numeric argument, and adds the numeric argument to the modifier parameter 'num'."
+  (lambda (&optional num)
+    (interactive "p")
+    (apply 'command-sentence-add-to-current
+           (if num
+               (cons `((word-type . modifier) (parameter-name . num) (contents . ,num))
+                     words)
+             words))
+    (when exec-after-p
+      (command-sentence-execute-current))))
+
 (defun command-sentence-execute-current ()
   "Executes command-sentence-current-sentence and clears it."
   (interactive)
@@ -308,6 +320,7 @@ Otherwise, return a cons pair (PARAMS . EXECUTOR), containing the final paramete
           ;; TODO - add registers for delete and change-move to copy their old contents.  Also to copy-move.
           ;; TODO - what arguments do most of these mean?  Eg. tree movement also needs arguments about up/down, when going down you can have a child index, etc.  I generally want an idempotence argument for movements, though maybe it's really only useful for things like “go to the end of the line” without going to the next line, but it's likely a useful option in principle especially for keyboard macros.  Also want movement to sibling vs strict full/half sibling (indent/org trees) vs unbound by tree (eg. move to next s-expression beginning whether or not it moves out of the current tree).
           ;; TODO - should I have “select” separate from “move”?  And maybe deleting, changing, or copying could be an action parameter for moving, rather than a separate action?
+          ;; TODO - add modifier limit-to-single-line.
           (delete (direction . forward) (num . 1))
           (change (direction . forward) (num . 1))
           (copy (direction . forward) (num . 1))
@@ -323,6 +336,7 @@ Otherwise, return a cons pair (PARAMS . EXECUTOR), containing the final paramete
          .
          ((character (default-verb . move) (location-within . beginning) (specific . nil))
           (word (default-verb . move) (location-within . beginning))
+          (vi-like-word (default-verb . move) (location-within . beginning))
           (sentence (default-verb . move) (location-within . beginning))
           (line (default-verb . move) (location-within . beginning))
           (sptw (default-verb . move) (location-within . beginning))
@@ -358,6 +372,19 @@ Otherwise, return a cons pair (PARAMS . EXECUTOR), containing the final paramete
           (move word
                 ((direction backward) (location-within end))
                 (rmo/wgh/backward-word-end (num)))
+
+          (move vi-like-word
+                ((direction forward) (location-within beginning))
+                (rmo/wgh/forward-vi-like-word-beginning (num)))
+          (move vi-like-word
+                ((direction backward) (location-within beginning))
+                (rmo/wgh/backward-vi-like-word-beginning (num)))
+          (move vi-like-word
+                ((direction forward) (location-within end))
+                (rmo/wgh/forward-vi-like-word-end (num)))
+          (move vi-like-word
+                ((direction backward) (location-within end))
+                (rmo/wgh/backward-vi-like-word-end (num)))
 
           (move vi-like-word
                 ((direction forward) (location-within beginning))
@@ -543,9 +570,9 @@ Otherwise, return a cons pair (PARAMS . EXECUTOR), containing the final paramete
 
 ;; temporary convenience...
 (setq command-sentence-current-configuration command-sentence--my-config)
-(defun cs/move ()
-  (command-sentence-add-to-current '((word-type . verb) (contents . move))))
-(defun cs/word ()
-  (command-sentence-add-to-current '((word-type . object) (contents . word))))
+;; (defun cs/move ()
+;;   (command-sentence-add-to-current '((word-type . verb) (contents . move))))
+;; (defun cs/word ()
+;;   (command-sentence-add-to-current '((word-type . object) (contents . word))))
 
 (provide 'command-sentence)
