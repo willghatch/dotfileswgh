@@ -167,7 +167,11 @@ Otherwise, return a cons pair (PARAMS . EXECUTOR), containing the final paramete
     (dolist (param params)
       (let ((param-name (car param))
             (param-value (cdr param)))
-        (unless (seq-find TODO-PRED old-sentence)
+        (unless (seq-find (lambda (word) (and (eq (cdr (assq 'word-type word))
+                                                  'modifier)
+                                              (eq (cdr (assq 'parameter-name word))
+                                                  param-name)))
+                          old-sentence)
           (push `((word-type . modifier)
                   (parameter-name . ,param-name)
                   (contents . ,param-value))
@@ -196,10 +200,10 @@ Otherwise, return a cons pair (PARAMS . EXECUTOR), containing the final paramete
   (lambda (&optional num)
     (interactive "p")
     (apply 'command-sentence-add-to-current
-           (if num
-               (cons `((word-type . modifier) (parameter-name . num) (contents . ,num))
-                     words)
-             words))
+            (if num
+                (cons `((word-type . modifier) (parameter-name . num) (contents . ,num))
+                      words)
+              words))
     (when exec-after-p
       (command-sentence-execute-current))))
 
@@ -316,14 +320,20 @@ Otherwise, return a cons pair (PARAMS . EXECUTOR), containing the final paramete
 (setq command-sentence--my-config
       `((verbs
          .
-         ((move (direction . forward) (num . 1))
+         ((move (direction . forward)
+                (tree-vertical . ,nil)
+                ;; TODO - tree-inner is very specific to smartparens object so I can go up to inner parent...
+                (tree-inner . ,nil)
+                (tree-traversal . ,nil)
+                (expand-region . ,nil)
+                (num . 1))
           ;; TODO - add registers for delete and change-move to copy their old contents.  Also to copy-move.
           ;; TODO - what arguments do most of these mean?  Eg. tree movement also needs arguments about up/down, when going down you can have a child index, etc.  I generally want an idempotence argument for movements, though maybe it's really only useful for things like “go to the end of the line” without going to the next line, but it's likely a useful option in principle especially for keyboard macros.  Also want movement to sibling vs strict full/half sibling (indent/org trees) vs unbound by tree (eg. move to next s-expression beginning whether or not it moves out of the current tree).
           ;; TODO - should I have “select” separate from “move”?  And maybe deleting, changing, or copying could be an action parameter for moving, rather than a separate action?
           ;; TODO - add modifier limit-to-single-line.
-          (delete (direction . forward) (num . 1))
-          (change (direction . forward) (num . 1))
-          (copy (direction . forward) (num . 1))
+          (delete)
+          (change)
+          (copy)
           (transpose (direction . forward) (num . 1))
           (join (direction . forward) (num . 1))
           (split)
@@ -334,25 +344,41 @@ Otherwise, return a cons pair (PARAMS . EXECUTOR), containing the final paramete
           ))
         (objects
          .
-         ((character (default-verb . move) (location-within . beginning) (specific . nil))
+         ((character (default-verb . move) (location-within . beginning) (specific . ,nil))
           (word (default-verb . move) (location-within . beginning))
           (vi-like-word (default-verb . move) (location-within . beginning))
           (sentence (default-verb . move) (location-within . beginning))
           (line (default-verb . move) (location-within . beginning))
-          (sptw (default-verb . move) (location-within . beginning))
+          (symbol (default-verb . move) (location-within . beginning))
+          (sptw (default-verb . move) (location-within . beginning) (delimiter . ,nil))
+          (indent-tree (default-verb . move) (location-within . beginning))
           (outline (default-verb . move) (location-within . beginning))
+          (xml (default-verb . move) (location-within . beginning))
           (region)
+          (repeatable-motion-repeat (default-verb . move)) ;; This is not really an object, but it makes composition easier with delete, change, yank
           ))
         (match-table
          .
          (
-          ;; TODO - I just wrote this encoding but it's not quite what I want and doesn't actually work right now the way I was thinking when writing it, either.  I need to decide how I want this.
+          (move repeatable-motion-repeat
+                ((direction forward))
+                (repeatable-motion-forward (num)))
+          (move repeatable-motion-repeat
+                ((direction backward))
+                (repeatable-motion-backward (num)))
+
           (move character
-                ((direction forward) (specific t ,(lambda (actual expected) actual)))
+                ((direction forward) (specific ,t) (location-within beginning))
                 (rmo/wgh/find-char-beginning-in-line-forward) (num))
           (move character
-                ((direction backward) (specific t ,(lambda (actual expected) actual)))
+                ((direction backward) (specific ,t) (location-within beginning))
                 (rmo/wgh/find-char-beginning-in-line-backward) (num))
+          (move character
+                ((direction forward) (specific ,t) (location-within end))
+                (rmo/wgh/find-char-end-in-line-forward) (num))
+          (move character
+                ((direction backward) (specific ,t) (location-within end))
+                (rmo/wgh/find-char-end-in-line-backward) (num))
           (move character
                 ((direction forward) (specific nil))
                 (rmo/forward-char (num)))
@@ -360,6 +386,9 @@ Otherwise, return a cons pair (PARAMS . EXECUTOR), containing the final paramete
                 ((direction backward) (specific nil))
                 (rmo/forward-char (num)))
 
+          (move word
+                ((direction ,nil) (expand-region ,t))
+                (expand-region-to-word ()))
           (move word
                 ((direction forward) (location-within beginning))
                 (rmo/wgh/forward-word-beginning (num)))
@@ -374,18 +403,8 @@ Otherwise, return a cons pair (PARAMS . EXECUTOR), containing the final paramete
                 (rmo/wgh/backward-word-end (num)))
 
           (move vi-like-word
-                ((direction forward) (location-within beginning))
-                (rmo/wgh/forward-vi-like-word-beginning (num)))
-          (move vi-like-word
-                ((direction backward) (location-within beginning))
-                (rmo/wgh/backward-vi-like-word-beginning (num)))
-          (move vi-like-word
-                ((direction forward) (location-within end))
-                (rmo/wgh/forward-vi-like-word-end (num)))
-          (move vi-like-word
-                ((direction backward) (location-within end))
-                (rmo/wgh/backward-vi-like-word-end (num)))
-
+                ((direction ,nil) (expand-region ,t))
+                (expand-region-to-vi-like-word ()))
           (move vi-like-word
                 ((direction forward) (location-within beginning))
                 (rmo/wgh/forward-vi-like-word-beginning (num)))
@@ -399,6 +418,9 @@ Otherwise, return a cons pair (PARAMS . EXECUTOR), containing the final paramete
                 ((direction backward) (location-within end))
                 (rmo/wgh/backward-vi-like-word-end (num)))
 
+          (move symbol
+                ((direction ,nil) (expand-region ,t))
+                (expand-region-to-symbol ()))
           (move symbol
                 ((direction forward) (location-within beginning))
                 (rmo/wgh/forward-symbol-beginning (num)))
@@ -413,6 +435,9 @@ Otherwise, return a cons pair (PARAMS . EXECUTOR), containing the final paramete
                 (rmo/wgh/backward-symbol-end (num)))
 
           (move sentence
+                ((direction ,nil) (expand-region ,t))
+                (expand-region-to-sentence ()))
+          (move sentence
                 ((direction forward) (location-within beginning))
                 (rmo/wgh/forward-sentence-beginning (num)))
           (move sentence
@@ -425,6 +450,9 @@ Otherwise, return a cons pair (PARAMS . EXECUTOR), containing the final paramete
                 ((direction backward) (location-within end))
                 (rmo/wgh/backward-sentence-end (num)))
 
+          (move paragraph
+                ((direction ,nil) (expand-region ,t))
+                (expand-region-to-paragraph ()))
           (move paragraph
                 ((direction forward) (location-within beginning))
                 (rmo/wgh/forward-paragraph-beginning (num)))
@@ -439,6 +467,12 @@ Otherwise, return a cons pair (PARAMS . EXECUTOR), containing the final paramete
                 (rmo/wgh/backward-paragraph-end (num)))
 
           (move line
+                ((direction ,nil) (expand-region inner))
+                (,(lambda () (wgh/expand-region-to-fill-lines nil)) ()))
+          (move line
+                ((direction ,nil) (expand-region ,t))
+                (,(lambda () (wgh/expand-region-to-fill-lines t)) ()))
+          (move line
                 ((direction forward) (location-within beginning))
                 (rmo/wgh/forward-line-beginning (num)))
           (move line
@@ -450,33 +484,169 @@ Otherwise, return a cons pair (PARAMS . EXECUTOR), containing the final paramete
           (move line
                 ((direction backward) (location-within end))
                 (rmo/wgh/backward-line-end (num)))
+          (move line
+                ((direction forward) (location-within keep-if-possible))
+                (rmo-c/wgh/next-line (num)))
+          (move line
+                ((direction backward) (location-within keep-if-possible))
+                (rmo-c/wgh/prev-line (num)))
 
           (move sptw
-                ((direction forward) (location-within beginning))
+                ((direction ,nil) (expand-region ,t) (delimiter any))
+                (sptw-expand-region-to-any-delimiter ()))
+          (move sptw
+                ((direction ,nil) (expand-region inner) (delimiter any))
+                (sptw-expand-region/children-region ()))
+
+          (move sptw
+                ((direction ,nil) (expand-region ,t) (delimiter t ,(lambda (actual expected) (stringp actual))))
+                (sptw-expand-region-to-delimiter (delimiter)))
+          (move sptw
+                ((direction ,nil) (expand-region inner) (delimiter t ,(lambda (actual expected) (stringp actual))))
+                (sptw-expand-region-to-delimiter/children-region (delimiter)))
+
+          (move sptw
+                ((direction ,nil) (expand-region ,t) (delimiter ,nil))
+                (sptw-expand-region ()))
+          (move sptw
+                ((direction ,nil) (expand-region inner) (delimiter ,nil))
+                (sptw-expand-region/children-region ()))
+
+          (move sptw
+                ((direction forward) (tree-traversal inorder))
+                (rmo/sptw-forward-inorder-traversal (num)))
+          (move sptw
+                ((direction backward) (tree-traversal inorder))
+                (rmo/sptw-backward-inorder-traversal (num)))
+          (move sptw
+                ((direction forward) (location-within beginning) (tree-vertical ,nil) (tree-traversal ,nil))
                 (rmo/sptw-forward-sibling-beginning (num)))
           (move sptw
-                ((direction backward) (location-within beginning))
+                ((direction backward) (location-within beginning) (tree-vertical ,nil) (tree-traversal ,nil))
                 (rmo/sptw-backward-sibling-beginning (num)))
           (move sptw
-                ((direction forward) (location-within end))
+                ((direction forward) (location-within end) (tree-vertical ,nil) (tree-traversal ,nil))
                 (rmo/sptw-forward-sibling-end (num)))
           (move sptw
-                ((direction backward) (location-within end))
+                ((direction backward) (location-within end) (tree-vertical ,nil) (tree-traversal ,nil))
                 (rmo/sptw-backward-sibling-end (num)))
+          (move sptw
+                ;; TODO - for my current key binding purposes, I want to use forward/backward to determine begin/end for parent...
+                ((direction forward) (tree-vertical up) (tree-inner ,nil))
+                (rmo/sptw-up-parent-end (num)))
+          (move sptw
+                ;; TODO - for my current key binding purposes, I want to use forward/backward to determine begin/end for parent...
+                ((direction backward) (tree-vertical up) (tree-inner ,nil))
+                (rmo/sptw-up-parent-beginning (num)))
+          (move sptw
+                ;; TODO - for my current key binding purposes, I want to use forward/backward to determine begin/end for parent...
+                ((direction backward) (tree-vertical down))
+                (rmo/sptw-down-first-child-beginning (num)))
+          (move sptw
+                ;; TODO - for my current key binding purposes, I want to use forward/backward to determine begin/end for parent...
+                ((direction forward) (tree-vertical down))
+                (rmo/sptw-down-last-child-end (num)))
+          (move sptw
+                ;; TODO - for my current key binding purposes, I want to use forward/backward to determine begin/end for parent...
+                ((direction forward) (tree-vertical up) (tree-inner ,t))
+                (rmo/sp-end-of-sexp (num)))
+          (move sptw
+                ;; TODO - for my current key binding purposes, I want to use forward/backward to determine begin/end for parent...
+                ((direction backward) (tree-vertical up) (tree-inner ,t))
+                (rmo/sp-beginning-of-sexp (num)))
+          (slurp sptw
+                 ((direction forward))
+                 (sptw-forward-slurp (num)))
+          (slurp sptw
+                 ((direction backward))
+                 (sptw-backward-slurp (num)))
+          (barf sptw
+                ((direction forward))
+                (sptw-forward-barf (num)))
+          (barf sptw
+                ((direction backward))
+                (sptw-backward-barf (num)))
+          (split sptw
+                 ()
+                 (sp-split-sexp (num)))
+
+          ;; TODO - for all xml stuff, I need to add repeatable motion, and consider wrapping nxml to explicitly go to begin/end, etc.  Also, a quick test shows this not working.  I'll figure it out later.
+          (move xml
+                ((direction forward) (location-within beginning) (tree-vertical ,nil))
+                (nxml-forward-element (num)))
+          (move xml
+                ((direction backward) (location-within beginning) (tree-vertical ,nil))
+                (nxml-backward-element (num)))
+          (move xml
+                ((direction backward) (tree-vertical ,t))
+                (nxml-backward-up-element))
+          (move xml
+                ((direction forward) (tree-vertical ,t))
+                (nxml-up-element))
 
           (move outline
-                ((direction forward) (location-within beginning))
+                ((direction ,nil) (expand-region ,t))
+                (wgh/outline-expand-region ()))
+          (move outline
+                ((direction ,nil) (expand-region inner))
+                (wgh/outline-expand-region/children-region ()))
+          (move outline
+                ((direction forward) (tree-traversal inorder))
+                (rmo/wgh/outline-inorder-traversal-forward (num)))
+          (move outline
+                ((direction backward) (tree-traversal inorder))
+                (rmo/wgh/outline-inorder-traversal-backward (num)))
+          (move outline
+                ((direction forward) (location-within beginning) (tree-vertical ,nil))
                 (rmo/outline-forward-same-level (num)))
           (move outline
-                ((direction backward) (location-within beginning))
+                ((direction backward) (location-within beginning) (tree-vertical ,nil))
                 (rmo/outline-backward-same-level (num)))
+          (move outline
+                ((tree-vertical up))
+                (rmo/outline-up-heading (num)))
+          (move outline
+                ((tree-vertical down) (direction backward))
+                (rmo/wgh/outline-down-to-first-child (num)))
+          (move outline
+                ((tree-vertical down) (direction forward))
+                (rmo/wgh/outline-down-to-last-child (num)))
           ;; TODO - end of outline?
+          (slurp outline
+                 ((direction forward))
+                 (wgh/outline-forward-slurp-heading ()))
+          (barf outline
+                ((direction forward))
+                (wgh/outline-forward-barf-heading ()))
+
+
           (move indent-tree
-                ((direction forward) (location-within beginning))
-                (indent-tree-forward-full-or-half-sibling (num)))
+                ((direction ,nil) (expand-region ,t))
+                (wgh/indent-tree-expand-region ()))
           (move indent-tree
-                ((direction backward) (location-within beginning))
-                (indent-tree-backward-full-or-half-sibling (num)))
+                ((direction ,nil) (expand-region inner))
+                (wgh/indent-tree-expand-region/children-region ()))
+          (move indent-tree
+                ((direction forward) (tree-traversal inorder))
+                (rmo/indent-tree-inorder-traversal-forward (num)))
+          (move indent-tree
+                ((direction backward) (tree-traversal inorder))
+                (rmo/indent-tree-inorder-traversal-backward (num)))
+          (move indent-tree
+                ((direction forward) (tree-vertical ,nil) (tree-traversal ,nil))
+                (rmo/indent-tree-forward-full-or-half-sibling (num)))
+          (move indent-tree
+                ((direction backward) (tree-vertical ,nil) (tree-traversal ,nil))
+                (rmo/indent-tree-backward-full-or-half-sibling (num)))
+          (move indent-tree
+                ((tree-vertical up))
+                (rmo/indent-tree-up-to-parent (num)))
+          (move indent-tree
+                ((tree-vertical down) (direction backward))
+                (rmo/indent-tree-down-to-first-child (num)))
+          (move indent-tree
+                ((tree-vertical down) (direction forward))
+                (rmo/indent-tree-down-to-last-child (num)))
 
 
           ;; TODO - for transpose character, implement something that follows the character explicitly forward/backward.
@@ -509,7 +679,6 @@ Otherwise, return a cons pair (PARAMS . EXECUTOR), containing the final paramete
 
           (split line () (open-line))
           ;; TODO - is there something useful to do for split for outline or indent tree?  For symex or XML it has obvious meaning, but is used in the middle of a thing.  Maybe for outline it means to split the parent on the current header, inserting a new header above at the parent level.  And similar for indent tree.  Need to implement this...
-          (split sptw () (sp-split-sexp))
           ;; TODO - split for non-tree objects has reasonably defined meaning, I suppose, but isn't very interesting.
 
           ;; TODO - I need to fix my join-line implementation to take a numerical argument
@@ -525,46 +694,65 @@ Otherwise, return a cons pair (PARAMS . EXECUTOR), containing the final paramete
           (delete ,(lambda (x) (not (memq x '(region))))
                   ()
                   (,(lambda (sentence-with-defaults)
-                      (let ((orig-point (point)))
-                        (command-sentence-execute
-                         ;; TODO - I should maybe delete the old verb, but I'll just use alist shadowing...
-                         (cons '((word-type . verb) (contents . move)) sentence-with-defaults)
-                         command-sentence-current-configuration)
-                        (delete-region (min (point) orig-point)
-                                       (max (point) orig-point))))
+                      (let ((orig-point (point))
+                            (new-point (save-mark-and-excursion
+                                         (command-sentence-execute
+                                          ;; TODO - I should maybe delete the old verb, but I'll just use alist shadowing...
+                                          (cons '((word-type . verb) (contents . move)) sentence-with-defaults)
+                                          command-sentence-current-configuration)
+                                         (if (region-active-p)
+                                             (cons (region-beginning) (region-end))
+                                           (point)))))
+                        (if (consp new-point)
+                            (delete-region (car new-point) (cdr new-point))
+                          (delete-region (min orig-point new-point)
+                                         (max orig-point new-point)))))
                    sentence-with-defaults))
 
           (change region
                   ()
                   (,(lambda ()
-                      (delete-region (region-beginning) (region-end))
-                      (estate-insert-state))))
+                      (estate-insert-state-with-thunk
+                       (lambda () (delete-region (region-beginning) (region-end)))))))
           (change ,(lambda (x) (not (memq x '(region))))
                   ()
                   (,(lambda (sentence-with-defaults)
-                      (let ((orig-point (point)))
-                        (command-sentence-execute
-                         ;; TODO - I should maybe delete the old verb, but I'll just use alist shadowing...
-                         (cons '((word-type . verb) (contents . move)) sentence-with-defaults)
-                         command-sentence-current-configuration)
-                        (delete-region (min (point) orig-point)
-                                       (max (point) orig-point))
-                        (estate-insert-state)))
+                      (let ((orig-point (point))
+                            (new-point (save-mark-and-excursion
+                                         (command-sentence-execute
+                                          ;; TODO - I should maybe delete the old verb, but I'll just use alist shadowing...
+                                          (cons '((word-type . verb) (contents . move)) sentence-with-defaults)
+                                          command-sentence-current-configuration)
+                                         (if (region-active-p)
+                                             (cons (region-beginning) (region-end))
+                                           (point)))))
+                        (estate-insert-state-with-thunk
+                         (lambda () (if (consp new-point)
+                                        (delete-region (car new-point) (cdr new-point))
+                                      (delete-region (min orig-point new-point)
+                                                     (max orig-point new-point)))))))
                    sentence-with-defaults))
 
           (copy region
-                  ()
-                  (estate-copy))
+                ()
+                (estate-copy))
           (copy ,(lambda (x) (not (memq x '(region))))
                 ()
                 (,(lambda (sentence-with-defaults)
-                    (let ((orig-point (point)))
-                      (command-sentence-execute
-                       ;; TODO - I should maybe delete the old verb, but I'll just use alist shadowing...
-                       (cons '((word-type . verb) (contents . move)) sentence-with-defaults)
-                       command-sentence-current-configuration)
-                      (estate-copy (cons (min (point) orig-point)
-                                         (max (point) orig-point)))))
+                    (save-mark-and-excursion
+                      (let ((orig-point (point))
+                            (new-point (save-mark-and-excursion
+                                         (command-sentence-execute
+                                          ;; TODO - I should maybe delete the old verb, but I'll just use alist shadowing...
+                                          (cons '((word-type . verb) (contents . move)) sentence-with-defaults)
+                                          command-sentence-current-configuration)
+                                         (if (region-active-p)
+                                             (cons (region-beginning) (region-end))
+                                           (point)))))
+                        (estate-copy (if (consp new-point)
+                                         new-point
+                                       (cons (min orig-point new-point)
+                                             (max orig-point new-point)))))))
                  sentence-with-defaults))
           ))))
 

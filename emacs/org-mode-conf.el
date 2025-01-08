@@ -1,6 +1,7 @@
 (require 'tree-walk)
 
 (defun wgh/outline-forward-slurp-heading ()
+;; TODO - this is broken, outline-demote isn't working right, at least in org-mode
   (interactive)
   (let ((start-line (line-number-at-pos))
         (line-at-next-heading (save-excursion

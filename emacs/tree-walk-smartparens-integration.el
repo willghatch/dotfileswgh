@@ -462,8 +462,8 @@ Specifically it moves inside the parens."
 (tree-walk-define-operations
  ;; For all of these tree-walk operations, we move to the beginning of the tree node.
  ;; TODO - the traversal is inconsistent in handling string contents for forward vs backward.
- :def-inorder-forward sptw-inorder-traversal-forward
- :def-inorder-backward sptw-inorder-traversal-backward
+ :def-inorder-forward sptw-forward-inorder-traversal
+ :def-inorder-backward sptw-backward-inorder-traversal
  :def-down-to-last-descendant sptw-down-to-last-descendant
 
  :def-expand-region sptw-expand-region
