@@ -191,13 +191,13 @@
 
 
 (progn
-     (repeatable-motion-define-pair 'sptw-forward-sibling-beginning 'sptw-backward-sibling-beginning)
-     (repeatable-motion-define-pair 'sptw-forward-sibling-end 'sptw-backward-sibling-end)
-     (repeatable-motion-define-pair 'sptw-up-parent-beginning 'sptw-down-first-child-beginning)
-     (repeatable-motion-define 'sptw-up-parent-end 'sptw-down-first-child-beginning)
-     (repeatable-motion-define 'sptw-down-last-child-end 'sptw-up-parent-beginning)
-     ;(repeatable-motion-define-pair 'sptw-forward-sexp-in-supersexp 'sptw-backward-sexp-in-supersexp)
-     )
+  (repeatable-motion-define-pair 'sptw-forward-sibling-beginning 'sptw-backward-sibling-beginning)
+  (repeatable-motion-define-pair 'sptw-forward-sibling-end 'sptw-backward-sibling-end)
+  (repeatable-motion-define-pair 'sptw-up-parent-beginning 'sptw-down-first-child-beginning)
+  (repeatable-motion-define 'sptw-up-parent-end 'sptw-down-first-child-beginning)
+  (repeatable-motion-define 'sptw-down-last-child-end 'sptw-up-parent-beginning)
+                                        ;(repeatable-motion-define-pair 'sptw-forward-sexp-in-supersexp 'sptw-backward-sexp-in-supersexp)
+  )
 
 
 
@@ -514,10 +514,10 @@
              ))
 (emmap "!" (lambda () (interactive)
              (require 'evil) (call-interactively 'evil-shell-command)))
-;
+                                        ;
 ;;; search command line
 ;;(define-key baddd-ex-search-keymap "\d" #'baddd-ex-delete-backward-char)
-;
+                                        ;
 
 
 ;;; CUSTOM BINDINGS SECTION
@@ -530,25 +530,25 @@
   ("k" (lambda (&optional n) (interactive "p") (other-window (- n))) nil)
   ("c" delete-window nil)
   ("h" (lambda () (interactive)
-     (let ((current-prefix-arg '(5)))
-       (call-interactively 'shrink-window-horizontally))) "skinny")
+         (let ((current-prefix-arg '(5)))
+           (call-interactively 'shrink-window-horizontally))) "skinny")
   ("l" (lambda () (interactive)
-     (let ((current-prefix-arg '(5)))
-       (call-interactively 'enlarge-window-horizontally))) "fat")
+         (let ((current-prefix-arg '(5)))
+           (call-interactively 'enlarge-window-horizontally))) "fat")
   ("H" (lambda () (interactive)
-     (let ((current-prefix-arg '(5)))
-       (call-interactively 'enlarge-window))) "tall")
+         (let ((current-prefix-arg '(5)))
+           (call-interactively 'enlarge-window))) "tall")
   ("L" (lambda () (interactive)
-     (let ((current-prefix-arg '(5)))
-       (call-interactively 'shrink-window))) "short")
+         (let ((current-prefix-arg '(5)))
+           (call-interactively 'shrink-window))) "short")
   ("f" delete-other-windows "full")
   ;; Space will be for layout concerns
-  ;(" f" delete-other-windows)
-  ;(" u" winner-undo)
-  ;(" r" winner-redo)
-  ;(" j" window-swap-next)
-  ;(" k" window-swap-prev)
-  ;("p" popwin-map)
+                                        ;(" f" delete-other-windows)
+                                        ;(" u" winner-undo)
+                                        ;(" r" winner-redo)
+                                        ;(" j" window-swap-next)
+                                        ;(" k" window-swap-prev)
+                                        ;("p" popwin-map)
   ("=" balance-windows "balance")
   ("g" elscreen-create)
   ("G" elscreen-kill)
@@ -558,7 +558,7 @@
   ;;        have a key inside the map to make it sticky (switch modes).
   ("m" nil)
   ("e" nil)
-)
+  )
 
 
 
@@ -984,43 +984,43 @@ is the opposite."
 (ecmap "tac" 'comment-region)
 (ecmap "taC" 'uncomment-region)
 (emmap "ts"
-  (defhydra settings-toggle (:foreign-keys warn :exit t) "Toggle:"
-    ("p" smartparens-mode "smartparens")
-    ("b" (lambda () (interactive) (require 'blamer (blamer-mode))) "git blame")
-    ("w" whitespace "whitespace")
-    ("C" (lambda () (interactive) (require 'rainbow-mode) (rainbow-mode)) "#aabbcc")
-    ("c" company-mode "company")
-    ("t" toggle-truncate-lines "trunc")
-    ("i" toggle-case-fold-search "/? case")
-    ("W" toggle-wrap-scan "search-wrap")
-    ("f" flycheck-mode "flycheck")
-    ("F" display-fill-column-indicator-mode "fill-col")
-    ("s" flyspell-mode "flyspell")
-    ("S" flyspell-prog-mode "flyspell-prog")
-    ;("e" electric-indent-mode "el.indent")
-    ("d" rainbow-delimiters-mode "rainbow{}")
-    ("r" linum-relative-toggle "linum-rel")
-    ("h" isearch-exit "clear-search-highlight")
-    ;;("h" baddd-search-highlight-persist-remove-all "search-highlight-now")
-    ;;("H" baddd-search-highlight-persist "search-highlight-ever")
-    ("M" menu-bar-mode "menu-bar")
-    ("l" lsp-lens-mode "lsp-lens") ;; lsp-lens is the thing that shows eg. haskell imports in an overlay
-    ("m" (lambda () (interactive) (menu-bar-mode 1) (menu-bar-open)) "menu-open")
-    ("n" display-line-numbers-mode "line-numbers")
-    ("I" indent-guide-mode "indent-guide")
-    ("x" wgh/racket-xp-pre-redisplay-toggle "racket-xp-hl")
-    ))
+       (defhydra settings-toggle (:foreign-keys warn :exit t) "Toggle:"
+         ("p" smartparens-mode "smartparens")
+         ("b" (lambda () (interactive) (require 'blamer (blamer-mode))) "git blame")
+         ("w" whitespace "whitespace")
+         ("C" (lambda () (interactive) (require 'rainbow-mode) (rainbow-mode)) "#aabbcc")
+         ("c" company-mode "company")
+         ("t" toggle-truncate-lines "trunc")
+         ("i" toggle-case-fold-search "/? case")
+         ("W" toggle-wrap-scan "search-wrap")
+         ("f" flycheck-mode "flycheck")
+         ("F" display-fill-column-indicator-mode "fill-col")
+         ("s" flyspell-mode "flyspell")
+         ("S" flyspell-prog-mode "flyspell-prog")
+                                        ;("e" electric-indent-mode "el.indent")
+         ("d" rainbow-delimiters-mode "rainbow{}")
+         ("r" linum-relative-toggle "linum-rel")
+         ("h" isearch-exit "clear-search-highlight")
+         ;;("h" baddd-search-highlight-persist-remove-all "search-highlight-now")
+         ;;("H" baddd-search-highlight-persist "search-highlight-ever")
+         ("M" menu-bar-mode "menu-bar")
+         ("l" lsp-lens-mode "lsp-lens") ;; lsp-lens is the thing that shows eg. haskell imports in an overlay
+         ("m" (lambda () (interactive) (menu-bar-mode 1) (menu-bar-open)) "menu-open")
+         ("n" display-line-numbers-mode "line-numbers")
+         ("I" indent-guide-mode "indent-guide")
+         ("x" wgh/racket-xp-pre-redisplay-toggle "racket-xp-hl")
+         ))
 
 (emmap "tl"
-  (defhydra list-stuff-map (:foreign-keys warn :exit t) "List:"
-    ("b" list-buffers "buffers")
-    ("m" (with-evil 'evil-show-marks) "marks")
-    ("M" bookmark-bmenu-list "bookmarks")
+       (defhydra list-stuff-map (:foreign-keys warn :exit t) "List:"
+         ("b" list-buffers "buffers")
+         ("m" (with-evil 'evil-show-marks) "marks")
+         ("M" bookmark-bmenu-list "bookmarks")
                                         ;("tlk" 'list-keymaps) ; TODO - make this function
-    ("c" list-colors-display "colors")
-    ("f" list-faces-display "faces")
-    ("r" (with-evil 'evil-show-registers) "registers")
-    ))
+         ("c" list-colors-display "colors")
+         ("f" list-faces-display "faces")
+         ("r" (with-evil 'evil-show-registers) "registers")
+         ))
 ;; TODO - list jumps, maybe
 
 ;; s map
@@ -1095,12 +1095,12 @@ is the opposite."
 (emmap "sf" 'fold-toggle-wgh)
 (emmap "sF" 'fold-toggle-wgh-all)
 (emmap " /"
-  (myhydradef search-hydra
-              ("s" helm-swoop "swoop")
-              ("a" helm-multi-swoop-all "multi-swoop all")
-              ("m" helm-multi-swoop "multi-swoop")
-              ("r" wgh/fzf-repo "fzf-repo")
-  ))
+       (myhydradef search-hydra
+                   ("s" helm-swoop "swoop")
+                   ("a" helm-multi-swoop-all "multi-swoop all")
+                   ("m" helm-multi-swoop "multi-swoop")
+                   ("r" wgh/fzf-repo "fzf-repo")
+                   ))
 (emmap " -h" 'helm-M-x)
 (emmap " &g" 'baddd-ex-repeat-global-substitute)
 (emmap " va" 'mark-whole-buffer)
@@ -1113,10 +1113,10 @@ is the opposite."
   (interactive "P")
   (join-line (not arg)))
 (emmap " j"
-  (myhydradef j-hydra
-              ("l" join-line/default-forward "join lines")
-              ("w" baddd-join-whitespace "join whitespace")
-              ))
+       (myhydradef j-hydra
+                   ("l" join-line/default-forward "join lines")
+                   ("w" baddd-join-whitespace "join whitespace")
+                   ))
 
 
 ;; input mode
@@ -1141,7 +1141,7 @@ is the opposite."
             ("f" he-expand-file-name "file")
             ("l" he-expand-lisp-symbol "lisp")
             ("s" yas-expand "yas")
-)
+            )
 (eimap "\M-h" 'completer-map/body)
 (eimap (kbd "C-SPC TAB") 'completer-map/body)
 (eimap (kbd "C-@ TAB") 'completer-map/body)
