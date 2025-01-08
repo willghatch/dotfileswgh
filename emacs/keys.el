@@ -339,6 +339,9 @@
 (ecmap "u" 'undo)
 (ecmap "\C-r" 'undo-tree-redo)
 
+(evmap "u" (lambda () (interactive) (require 'evil) (evil-downcase (region-beginning) (region-end))))
+(evmap "U" (lambda () (interactive) (require 'evil) (evil-upcase (region-beginning) (region-end))))
+
 ;;; Motion state
 
 ;; "0" is a special command when called first
