@@ -353,6 +353,7 @@ Otherwise, return a cons pair (PARAMS . EXECUTOR), containing the final paramete
           (word (default-verb . move) (location-within . beginning))
           (vi-like-word (default-verb . move) (location-within . beginning))
           (sentence (default-verb . move) (location-within . beginning))
+          (paragraph (default-verb . move) (location-within . beginning))
           (line (default-verb . move) (location-within . beginning))
           (symbol (default-verb . move) (location-within . beginning))
           (sptw (default-verb . move) (location-within . beginning) (delimiter . ,nil))
@@ -415,7 +416,7 @@ Otherwise, return a cons pair (PARAMS . EXECUTOR), containing the final paramete
 
           (move word
                 ((direction ,nil) (expand-region ,t))
-                (expand-region-to-word ()))
+                (wgh/expand-region-to-word ()))
           (move word
                 ((direction forward) (location-within beginning))
                 (rmo/wgh/forward-word-beginning (num)))
@@ -431,7 +432,7 @@ Otherwise, return a cons pair (PARAMS . EXECUTOR), containing the final paramete
 
           (move vi-like-word
                 ((direction ,nil) (expand-region ,t))
-                (expand-region-to-vi-like-word ()))
+                (wgh/expand-region-to-vi-like-word ()))
           (move vi-like-word
                 ((direction forward) (location-within beginning))
                 (rmo/wgh/forward-vi-like-word-beginning (num)))
@@ -447,7 +448,7 @@ Otherwise, return a cons pair (PARAMS . EXECUTOR), containing the final paramete
 
           (move symbol
                 ((direction ,nil) (expand-region ,t))
-                (expand-region-to-symbol ()))
+                (wgh/expand-region-to-symbol ()))
           (move symbol
                 ((direction forward) (location-within beginning))
                 (rmo/wgh/forward-symbol-beginning (num)))
@@ -463,7 +464,7 @@ Otherwise, return a cons pair (PARAMS . EXECUTOR), containing the final paramete
 
           (move sentence
                 ((direction ,nil) (expand-region ,t))
-                (expand-region-to-sentence ()))
+                (wgh/expand-region-to-sentence ()))
           (move sentence
                 ((direction forward) (location-within beginning))
                 (rmo/wgh/forward-sentence-beginning (num)))
@@ -479,7 +480,7 @@ Otherwise, return a cons pair (PARAMS . EXECUTOR), containing the final paramete
 
           (move paragraph
                 ((direction ,nil) (expand-region ,t))
-                (expand-region-to-paragraph ()))
+                (wgh/expand-region-to-paragraph ()))
           (move paragraph
                 ((direction forward) (location-within beginning))
                 (rmo/wgh/forward-paragraph-beginning (num)))

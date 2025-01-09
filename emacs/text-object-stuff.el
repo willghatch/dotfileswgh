@@ -22,6 +22,18 @@
             (let ((b (bounds-of-thing-at-point thing)))
               (and b (= (cdr b) p-orig) b)))))))
 
+(defun text-object-stuff--bounds-extend (old new)
+  ;; TODO - I have basically this same function defined elsewhere, too.  I should deduplicate.
+  (and old new
+       (and
+        ;; The new bounds include the old bounds.
+        (and (<= (car new) (car old))
+             (<= (cdr old) (cdr new)))
+        ;; At least one of the new bounds goes beyond
+        ;; the old ones.
+        (or (< (car new) (car old))
+            (< (cdr old) (cdr new))))))
+
 (defun wgh/forward-thing (strict thing &optional count)
   "Like forward-thing, but add strict param. If strict, it only goes forward/back if at the end it is actually on a thing.  Return the number of things left to move."
   (setq count (or count 1))
@@ -32,17 +44,7 @@
       (let ((pos (point))
             (bounds-begin-l (wgh/at-thing-end-p thing))
             (bounds-begin-r (wgh/at-thing-beginning-p thing))
-            (bounds-begin (bounds-of-thing-at-point thing))
-            (bounds-extend (lambda (old new)
-                             (and old new
-                                  (and
-                                   ;; The new bounds include the old bounds.
-                                   (and (<= (car new) (car old))
-                                        (<= (cdr old) (cdr new)))
-                                   ;; At least one of the new bounds goes beyond
-                                   ;; the old ones.
-                                   (or (< (car new) (car old))
-                                       (< (cdr old) (cdr new))))))))
+            (bounds-begin (bounds-of-thing-at-point thing)))
         (if fwd-p
             (forward-thing thing 1)
           (forward-thing thing -1))
@@ -54,9 +56,9 @@
                  ;; If there are no bounds, we have not actually moved to a thing, just moved without finding one.
                  (not bounds-end)
                  ;; If the new bounds of the thing include the old bounds and more, we have gone up in a tree of things, which is not a strict behavior.
-                 (funcall bounds-extend bounds-begin-l bounds-end)
-                 (funcall bounds-extend bounds-begin-r bounds-end)
-                 (funcall bounds-extend bounds-begin bounds-end))
+                 (text-object-stuff--bounds-extend bounds-begin-l bounds-end)
+                 (text-object-stuff--bounds-extend bounds-begin-r bounds-end)
+                 (text-object-stuff--bounds-extend bounds-begin bounds-end))
             (setq keep-going nil)
             (when strict (goto-char pos))))))
     (if keep-going 0 (+ count 1))))
@@ -103,9 +105,11 @@
   (-wgh/fwd-beg_or_bwd-end_thing strict thing count nil))
 
 
-(defun wgh/-expanded-region-to-bounds-of-thing-at-point (strictly-grow thing &optional region)
+(defun wgh/-expanded-region-to-bounds-of-thing-at-point
+    (strictly-grow sloppy-overlap thing &optional region)
   "Returns the new bounds or nil.
 If STRICTLY-GROW, only return the bounds if they are strictly greater than the original region.
+If SLOPPY-GROW is true, grows the region to include both the original region and the region of the thing at point.
 If REGION is not given, uses `region-bounds`, but either way the region must be a single contiguous region.
 If no region is active, it will use (point . point)."
   (let* ((orig-regions (or (and region (list region))
@@ -125,10 +129,16 @@ If no region is active, it will use (point . point)."
                (right-grow (< (cdr orig-region) (cdr bounds)))
                (nonstrict-ok (and left-ok right-ok))
                (strict-ok (and nonstrict-ok (or left-grow right-grow))))
-          (if (or (and strictly-grow strict-ok)
-                  (and (not strictly-grow) nonstrict-ok))
-              bounds
-            nil))
+          (cond ((or (and strictly-grow strict-ok)
+                     (and (not strictly-grow) nonstrict-ok))
+                 bounds)
+                (sloppy-grow
+                 (let ((combined (cons (min (car orig-region) (car bounds))
+                                       (max (cdr orig-region) (cdr bounds)))))
+                   (if strictly-grow
+                       (and (text-object-stuff--bounds-extend orig-region combined) combined)
+                     combined)))
+                (t nil)))
       nil)))
 
 (defun wgh/-set-region (bounds)
@@ -136,10 +146,11 @@ If no region is active, it will use (point . point)."
   (set-mark (car bounds))
   (goto-char (cdr bounds)))
 
-(defun wgh/expand-region-to-thing (thing)
+(defun wgh/expand-region-to-thing (thing &optional sloppy-grow)
   (interactive)
   ;; TODO - handle trees and count?
-  (let ((new-bounds (wgh/-expanded-region-to-bounds-of-thing-at-point t thing)))
+  ;; TODO - do I want sloppy expansion?  I definitely do for lines, but I'm not yet certain about other things...  I should revisit this.
+  (let ((new-bounds (wgh/-expanded-region-to-bounds-of-thing-at-point t sloppy-grow thing)))
     (when new-bounds
       (wgh/-set-region new-bounds))))
 
@@ -149,7 +160,7 @@ If no region is active, it will use (point . point)."
     `(progn
        (defun ,sym ()
          (interactive)
-         (wgh/expand-region-to-thing ',thing)))))
+         (wgh/expand-region-to-thing ',thing t)))))
 
 ;;;;;;
 
@@ -384,5 +395,5 @@ If no region is active, it will use (point . point)."
       (goto-char 6)
       (message "region active in test: %s" (region-active-p))
       (should (equal (cons 5 10)
-                     (wgh/-expanded-region-to-bounds-of-thing-at-point t 'word (cons 7 9))))))
+                     (wgh/-expanded-region-to-bounds-of-thing-at-point t nil 'word (cons 7 9))))))
   )
