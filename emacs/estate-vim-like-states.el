@@ -34,7 +34,7 @@
 (estate-define-state command estate-motion-state-keymap)
 
 ;; Let's set one key here so the estate keymap isn't a death trap if not configured further.
-(define-key estate-command-state-keymap "i" 'estate-insert-state)
+;;(define-key estate-command-state-keymap "i" 'estate-insert-state)
 
 (defun estate-command-state ()
   (interactive)
