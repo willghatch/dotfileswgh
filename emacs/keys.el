@@ -385,21 +385,16 @@
 (evmap "A" (lambda () (interactive) (progn (goto-char (region-end))
                                            (deactivate-mark)
                                            (estate-insert-state))))
-(evmap "c" (lambda () (interactive) (estate-state-with-change-group
-                                     'insert
-                                     (lambda () (kill-region (region-beginning)
-                                                             (region-end))))))
+(evmap "c" (cs/ae (cs/verb 'change)
+                  (cs/obj 'region)))
 (ecmap "c" (cs/add (cs/verb 'change)))
 (ecmap "C" (lambda () (interactive) (progn (kill-line) (estate-insert-state))))
 (evmap "C" (lambda () (interactive (progn (kill-region (region-beginning)
                                                        (region-end))
                                           (estate-insert-state)))))
 (ecmap "d" (cs/add (cs/verb 'delete)))
-(evmap "d" (lambda () (interactive)
-             (estate-visual-execution-helper (lambda () (delete-region (region-beginning) (region-end))))
-             ;; Even without putting this switch to command state, kill-region disables the region and exits... I'm not sure whether that's a bug or a feature.
-             ;;(estate-command-state)
-             ))
+(evmap "d" (cs/ae (cs/verb 'delete)
+                  (cs/obj 'region)))
 (ecmap "D" (lambda () (interactive) (progn (kill-line) (estate-insert-state))))
 (evmap "D" (lambda () (interactive) (progn (kill-region nil nil t))))
 (ecmap "I" (lambda () (interactive)
@@ -441,7 +436,8 @@
 ;;             (save-excursion
 ;;               (estate-visual-execution-helper
 ;;                (lambda () (kill-ring-save (region-beginning) (region-end)))))))
-(evmap "y" 'estate-copy)
+(evmap "y" (cs/ae (cs/verb 'copy)
+                  (cs/obj 'region)))
 (ecmap "Y" (lambda () (interactive) (message "Y not yet implemented")))
 ;;(ecmap "&" 'baddd-ex-repeat-substitute)
 (ecmap "gq" (with-evil 'evil-fill-and-move))
