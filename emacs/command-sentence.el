@@ -181,6 +181,9 @@ Otherwise, return a cons pair (PARAMS . EXECUTOR), containing the final paramete
 (defvar-local command-sentence-current-sentence nil)
 (defvar command-sentence-current-configuration nil)
 
+;; TODO - should I have just one previous sentence, or have a history that keeps up to N elements?  For now I'll do the simplest thing for my immediate wants.
+(defvar-local command-sentence-previous-sentence nil)
+
 (defun command-sentence-clear-current ()
   (interactive)
   (setq command-sentence-current-sentence nil))
@@ -214,13 +217,19 @@ Otherwise, return a cons pair (PARAMS . EXECUTOR), containing the final paramete
   "Executes command-sentence-current-sentence and clears it."
   (interactive)
   (let ((sentence command-sentence-current-sentence))
+    (setq command-sentence-previous-sentence sentence)
     (command-sentence-clear-current)
     (command-sentence-execute sentence command-sentence-current-configuration)))
 
 (defun command-sentence-keyboard-macro-from-sentence (sentence)
   "Get a vector or string of keys used to create SENTENCE."
-  (apply append (map (lambda (word) (cdr (assq 'keys word)))
-                     (reverse sentence))))
+  ;; TODO -- I need better handling to always get keys used.  I'm currently always missing keys used for numeric arguments, and I'm missing some keys used for prefix maps.  I would like at least my config to consistently work for this, even if I can't consistently get all keys in a general way that anyone could use with arbitrary configurations.
+  (apply (lambda (&rest args)
+           (apply #'seq-concatenate 'vector args))
+         (mapcar (lambda (x) (if (vectorp x) x (seq--into-vector x)))
+                 (seq-filter #'identity
+                             (mapcar (lambda (word) (cdr (assq 'keys word)))
+                                     (reverse sentence))))))
 
 ;; TODO - add command-sentence-configuration-compose that can merge configs
 ;; TODO - add macro for use as key bind RHS such that you write a list of words to add, an option to execute, and it implicitly takes a numeric argument.
@@ -333,7 +342,7 @@ Otherwise, return a cons pair (PARAMS . EXECUTOR), containing the final paramete
           ;; TODO - add registers for delete and change-move to copy their old contents.  Also to copy-move.
           ;; TODO - what arguments do most of these mean?  Eg. tree movement also needs arguments about up/down, when going down you can have a child index, etc.  I generally want an idempotence argument for movements, though maybe it's really only useful for things like “go to the end of the line” without going to the next line, but it's likely a useful option in principle especially for keyboard macros.  Also want movement to sibling vs strict full/half sibling (indent/org trees) vs unbound by tree (eg. move to next s-expression beginning whether or not it moves out of the current tree).
           ;; TODO - add modifier limit-to-single-line.
-;; TODO - modifier for surrounding white space.  Eg. for expand-region to expand to the object, then expand again to include surrounding white space.  But there are several versions of this that I may want... sometimes I want all surrounding space, sometimes just the space before or after.  And for lines, by default I want to include the white space, but I want a modifier for eg. back-to-indentation and a similar one for the line end before extra white space.  So I probably want the key to invert for that case, or have some kind of special handling.
+          ;; TODO - modifier for surrounding white space.  Eg. for expand-region to expand to the object, then expand again to include surrounding white space.  But there are several versions of this that I may want... sometimes I want all surrounding space, sometimes just the space before or after.  And for lines, by default I want to include the white space, but I want a modifier for eg. back-to-indentation and a similar one for the line end before extra white space.  So I probably want the key to invert for that case, or have some kind of special handling.
           (delete)
           (change)
           (copy)
@@ -350,6 +359,7 @@ Otherwise, return a cons pair (PARAMS . EXECUTOR), containing the final paramete
           (promote) ;; TODO - promote makes sense for org/outline trees, as well as indent-tree, and could maybe mean splice for lift-out-of-parent for symex...
           (demote) ;; For symex you should be prompted to choose a tag to wrap with, and for xml you should be prompted for a tag.
           (change-delimiter) ;; This really only makes sense for a few things... how many operators do I want to have that aren't really composable?  That said, it's a common operation, so I want it to be convenient in the layout even if it doesn't apply to most objects.
+          ;; TODO - something like insert-move, eg. vi's I and A move to a useful place before inserting, which is useful for command repetition.  I can encapsulate a move then an edit with macros, which I want to use more frequently and have easily accessible.  But the command repetition of evil-mode is just so convenient, and if I implement something similar it would be nice to have a “move to relevant location then insert” as a single command to be captured for repetition.
           ;; TODO - what verbs?  Tree promote/demote, but eg. for paren trees we care about which kind of paren/bracket/brace/etc is used, or for xml we need a specific tag.  Tree splice - works for symex and xml, but less clearly useful for outline-mode or indent trees.  Tree change node type, eg. symex change paren type, xml change tag.  Tree raise - IE replace parent with child, except I'm used to the workflow of select-element, copy, expand to parent, paste.
           ))
         (objects
@@ -378,7 +388,7 @@ Otherwise, return a cons pair (PARAMS . EXECUTOR), containing the final paramete
           (goto-marker-line (default-verb . move))
 
           ;; TODO - some objects that I don't really have anything implemented for, but that I want.
-          (treesitter)
+          (treesitter) ;; TODO - I probably want some modifiers or alternate objects for various things within tree-sitter, to target specific nodes or families of nodes.  Eg. I want to be able to select operators but also use having the cursor at an operator as an anchor point to mean that it handles the tree for that operator, and I want to be able to select a function name and argument list both, but also the overall function call node, etc.  Maybe I should use a symbol or identifier object for operators and function names, while making the overall tree object at those points operate on the larger parse nodes those points represent?  Or maybe to select a function arg list, I should use the smartparens object, but making the treesitter object on the parens mean the function call.  Probably using the parens as the call anchor point is best, since higher-order calls and bracket indexing can lead to multiple levels of application and index nodes for a single function name.
           (xml-tag)
           (xml (default-verb . move) (location-within . beginning))
           (json) ;; Do I care about json outside of other things that already handle it?  Eg. smartparens does a good job with it, if not perfect, and treesitter probably does a good job.  But maybe I could improve handling of eg. commas with slurp/barf if I have a json-specific object.
@@ -413,6 +423,13 @@ Otherwise, return a cons pair (PARAMS . EXECUTOR), containing the final paramete
           (move goto-marker-line () (wgh/evil-goto-marker-line ()))
 
 
+          (move buffer
+                ((direction ,nil) (expand-region ,t))
+                (,(lambda ()
+                    (activate-mark)
+                    (set-mark (point-min))
+                    (goto-char (point-max)))
+                 ()))
           (move buffer ((direction forward) (location-within ,nil)) (,(lambda () (goto-char (point-max))) ()))
           (move buffer ((direction backward) (location-within ,nil)) (,(lambda (x) (goto-char x)) (num)))
           (move buffer ((location-within beginning)) (,(lambda () (goto-char (point-min))) ()))
@@ -420,6 +437,7 @@ Otherwise, return a cons pair (PARAMS . EXECUTOR), containing the final paramete
           (move buffer ((location-within x ,(lambda (actual expected) (numberp actual)))) (,(lambda (x) (goto-char x)) (location-within)))
           ;; TODO - how do I want to encode go-to-line-number-X and go-to-column-X?  I'm considering an “absolute” modifier, that ignores forward/backward to go to the Nth thing.  But that's probably only useful for going to numbered line, column, or point.  I have buffer with a numeric arg as going to point.  Do I want absolute-char to mean column, and absolute line to mean go-to-line?
 
+          ;; TODO - expand region to specific char inner/outer -- good for ad-hoc regions delimited by the same character, can be used for '' strings and "" strings that don't have escapes, for $$ regions in latex, etc.
           (move character
                 ((direction forward) (specific ,t) (location-within beginning))
                 (rmo/wgh/find-char-beginning-in-line-forward) (num))
@@ -439,6 +457,7 @@ Otherwise, return a cons pair (PARAMS . EXECUTOR), containing the final paramete
                 ((direction backward) (specific nil))
                 (rmo/backward-char (num)))
 
+          ;; TODO - I really want more kinds of word objects, eg. to select camelCase word parts, to transpose them keeping the overall casing correct, etc.  Is there a useful way that I can specify ad-hoc word types and what delimiters should be allowed?  Eg. people use each of camelCase, snake_case, kebab-case, and more.  Sometimes they are mixed together or with extra separators like / or sigils, and can have ad-hoc meaning for the hierarchy of the different groupings.  Some people balk at mixing, but using more than one kind of case can be useful and meaningful, and sometimes mixing is out of your hands.  But I want tools to easily use all of these and select sub-parts at different levels of granularity.
           (move word
                 ((direction ,nil) (expand-region ,t))
                 (wgh/expand-region-to-word ()))
@@ -544,6 +563,7 @@ Otherwise, return a cons pair (PARAMS . EXECUTOR), containing the final paramete
                 ((direction backward) (location-within keep-if-possible))
                 (rmo-c/wgh/prev-line (num)))
 
+          ;; TODO -- for all tree objects, I want a convenient modifier to go all the way to the root.  I guess I could give a big number and rely on it stopping when hitting the root, but it would be nice to have something symbolic to go to the root, or maybe to depth N.
           (move sptw
                 ((direction ,nil) (expand-region ,t) (delimiter any))
                 (sptw-expand-region-to-any-delimiter ()))
@@ -729,7 +749,7 @@ Otherwise, return a cons pair (PARAMS . EXECUTOR), containing the final paramete
           (open outline ((direction backward)) (wgh/outline-add-heading-above))
           (open indent-tree ((direction forward)) (indent-tree-open-sibling-forward))
           (open indent-tree ((direction backward)) (indent-tree-open-sibling-backward))
-          ;; TODO - indent tree open
+          ;; TODO - argument to open child instead of sibling -- particularly useful for outline and indent trees
           ;; TODO - symex open - ignore unwrapped forms and open a sibling form with the same paren type, hopefully matching indentation...
 
           (split line () (,(lambda () (open-line 1))))
@@ -833,35 +853,31 @@ Otherwise, return a cons pair (PARAMS . EXECUTOR), containing the final paramete
                                        (max orig-point new-point)))))
                    sentence-with-defaults))
           (downcase region
-                  ()
-                  (,(lambda () (require 'evil) (evil-downcase (region-beginning) (region-end)))))
+                    ()
+                    (,(lambda () (require 'evil) (evil-downcase (region-beginning) (region-end)))))
           (downcase ,(lambda (x) (not (memq x '(region))))
-                  ()
-                  (,(lambda (sentence-with-defaults)
-                      (let ((orig-point (point))
-                            (new-point (save-mark-and-excursion
-                                         (command-sentence-execute
-                                          ;; TODO - I should maybe delete the old verb, but I'll just use alist shadowing...
-                                          (cons '((word-type . verb) (contents . move)) sentence-with-defaults)
-                                          command-sentence-current-configuration)
-                                         (if (region-active-p)
-                                             (cons (region-beginning) (region-end))
-                                           (point)))))
-                        (require 'evil)
-                        (if (consp new-point)
-                            (evil-downcase (car new-point) (cdr new-point))
-                          (evil-downcase (min orig-point new-point)
-                                       (max orig-point new-point)))))
-                   sentence-with-defaults))
+                    ()
+                    (,(lambda (sentence-with-defaults)
+                        (let ((orig-point (point))
+                              (new-point (save-mark-and-excursion
+                                           (command-sentence-execute
+                                            ;; TODO - I should maybe delete the old verb, but I'll just use alist shadowing...
+                                            (cons '((word-type . verb) (contents . move)) sentence-with-defaults)
+                                            command-sentence-current-configuration)
+                                           (if (region-active-p)
+                                               (cons (region-beginning) (region-end))
+                                             (point)))))
+                          (require 'evil)
+                          (if (consp new-point)
+                              (evil-downcase (car new-point) (cdr new-point))
+                            (evil-downcase (min orig-point new-point)
+                                           (max orig-point new-point)))))
+                     sentence-with-defaults))
 
 
           ))))
 
 ;; temporary convenience...
 (setq command-sentence-current-configuration command-sentence--my-config)
-;; (defun cs/move ()
-;;   (command-sentence-add-to-current '((word-type . verb) (contents . move))))
-;; (defun cs/word ()
-;;   (command-sentence-add-to-current '((word-type . object) (contents . word))))
 
 (provide 'command-sentence)
