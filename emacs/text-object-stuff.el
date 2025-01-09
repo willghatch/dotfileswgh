@@ -184,8 +184,11 @@ If no region is active, it will use (point . point)."
     (and bounds-1
          (let ((bounds-2 (save-mark-and-excursion
                            (goto-char (cdr bounds-1))
-                           (wgh/forward-thing-beginning t thing 1)
-                           (bounds-of-thing-at-point thing))))
+                           (let ((bounds-at-end (bounds-of-thing-at-point thing)))
+                             (if (not (equal bounds-1 bounds-at-end))
+                                 bounds-at-end
+                               (progn (wgh/forward-thing-beginning t thing 1)
+                                      (bounds-of-thing-at-point thing)))))))
            (when (and bounds-2
                       (<= (cdr bounds-1) (car bounds-2)))
              (let ((s1 (buffer-substring-no-properties (car bounds-1)
@@ -212,7 +215,7 @@ If no region is active, it will use (point . point)."
                            (wgh/backward-thing-beginning t thing 1)
                            (bounds-of-thing-at-point thing))))
            (when (and bounds-2
-                      (< (cdr bounds-2) (car bounds-1)))
+                      (<= (cdr bounds-2) (car bounds-1)))
              (goto-char (car bounds-2))
              (wgh/transpose-thing-forward-once thing)
              (goto-char (car bounds-2)))))))
@@ -257,6 +260,7 @@ If no region is active, it will use (point . point)."
 (wgh/def-move-thing paragraph)
 (wgh/def-transpose-thing paragraph)
 (wgh/def-expand-region-to-thing paragraph)
+
 (wgh/def-move-thing line)
 (wgh/def-transpose-thing line)
 (wgh/def-expand-region-to-thing line)
