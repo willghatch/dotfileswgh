@@ -324,16 +324,16 @@ Otherwise, return a cons pair (PARAMS . EXECUTOR), containing the final paramete
       `((verbs
          .
          ((move (direction . forward)
-                (tree-vertical . ,nil)
+                (tree-vertical . ,nil) ;; options, nil, 'up, 'down
                 ;; TODO - tree-inner is very specific to smartparens object so I can go up to inner parent...
-                (tree-inner . ,nil)
-                (tree-traversal . ,nil)
-                (expand-region . ,nil)
+                (tree-inner . ,nil) ;; boolean
+                (tree-traversal . ,nil) ;; nil or 'inorder
+                (expand-region . ,nil) ;; t for object selection, 'inner where that makes sense (eg. selecting tree children), may add more if more make sense, eg. 'space for adding surrounding white space.
                 (num . 1))
           ;; TODO - add registers for delete and change-move to copy their old contents.  Also to copy-move.
           ;; TODO - what arguments do most of these mean?  Eg. tree movement also needs arguments about up/down, when going down you can have a child index, etc.  I generally want an idempotence argument for movements, though maybe it's really only useful for things like “go to the end of the line” without going to the next line, but it's likely a useful option in principle especially for keyboard macros.  Also want movement to sibling vs strict full/half sibling (indent/org trees) vs unbound by tree (eg. move to next s-expression beginning whether or not it moves out of the current tree).
-          ;; TODO - should I have “select” separate from “move”?  And maybe deleting, changing, or copying could be an action parameter for moving, rather than a separate action?
           ;; TODO - add modifier limit-to-single-line.
+;; TODO - modifier for surrounding white space.  Eg. for expand-region to expand to the object, then expand again to include surrounding white space.  But there are several versions of this that I may want... sometimes I want all surrounding space, sometimes just the space before or after.  And for lines, by default I want to include the white space, but I want a modifier for eg. back-to-indentation and a similar one for the line end before extra white space.  So I probably want the key to invert for that case, or have some kind of special handling.
           (delete)
           (change)
           (copy)
@@ -345,11 +345,19 @@ Otherwise, return a cons pair (PARAMS . EXECUTOR), containing the final paramete
           (slurp (direction . forward) (num . 1))
           (barf (direction . forward) (num . 1))
           (open (direction . forward)) ;; IE new sibling
+          ;; TODO - none of the below are really implemented yet.
+          (splice) ;; TODO - splice makes sense for delimited trees (s-expressions, xml), meaning delete the parentheses or enclosing tags, but less so for eg. org or indent trees, but could maybe mean promote.
+          (promote) ;; TODO - promote makes sense for org/outline trees, as well as indent-tree, and could maybe mean splice for lift-out-of-parent for symex...
+          (demote) ;; For symex you should be prompted to choose a tag to wrap with, and for xml you should be prompted for a tag.
+          (change-delimiter) ;; This really only makes sense for a few things... how many operators do I want to have that aren't really composable?  That said, it's a common operation, so I want it to be convenient in the layout even if it doesn't apply to most objects.
           ;; TODO - what verbs?  Tree promote/demote, but eg. for paren trees we care about which kind of paren/bracket/brace/etc is used, or for xml we need a specific tag.  Tree splice - works for symex and xml, but less clearly useful for outline-mode or indent trees.  Tree change node type, eg. symex change paren type, xml change tag.  Tree raise - IE replace parent with child, except I'm used to the workflow of select-element, copy, expand to parent, paste.
           ))
         (objects
          .
-         ((character (default-verb . move) (location-within . beginning) (specific . ,nil))
+         ((character (default-verb . move)
+                     (location-within . beginning) ;; Most objects support location-within, which can be 'beginning, 'end, 'emacs-style (to match emacs-style going to end when forward, or beginning when backward), 'reverse-emacs-style, or in some cases a number (eg. the Nth tree child, a line or column number, or some other kind of offset), or nil (nil is mostly needed for matching region expansion instead of forward/backward movement).  Though since I'm partial to using beginning as a default and end sometimes as a modifier, most things only have those implemented so far...
+                     (specific . ,nil) ;; This is specific to character, to implement something like vi's find character in line, but more consistent with this system.
+                     )
           (word (default-verb . move) (location-within . beginning))
           (vi-like-word (default-verb . move) (location-within . beginning))
           (sentence (default-verb . move) (location-within . beginning))
@@ -359,15 +367,24 @@ Otherwise, return a cons pair (PARAMS . EXECUTOR), containing the final paramete
           (sptw (default-verb . move) (location-within . beginning) (delimiter . ,nil))
           (indent-tree (default-verb . move) (location-within . beginning))
           (outline (default-verb . move) (location-within . beginning))
-          (xml (default-verb . move) (location-within . beginning))
           (region)
           (buffer (default-verb . move) (location-within . ,nil))
+
           ;; These are not really “text objects”, but I want composition with delete, change, yank, etc, to work with these.
           (repeatable-motion-repeat (default-verb . move))
           (isearch-new (default-verb . move))
           (isearch-repeat (default-verb . move))
           (goto-marker (default-verb . move))
           (goto-marker-line (default-verb . move))
+
+          ;; TODO - some objects that I don't really have anything implemented for, but that I want.
+          (treesitter)
+          (xml-tag)
+          (xml (default-verb . move) (location-within . beginning))
+          (json) ;; Do I care about json outside of other things that already handle it?  Eg. smartparens does a good job with it, if not perfect, and treesitter probably does a good job.  But maybe I could improve handling of eg. commas with slurp/barf if I have a json-specific object.
+          (function-arg)
+          (definition) ;; this could be defun in elisp, and hopefully for treesitter I can typically find a good node to make this go to.
+          ;; TODO - I want some modifier to go to a tree node with a given tag.  Eg. this could be a lisp form that starts with a particular symbol, or a specific xml tag, or a treesitter node of particular type.  For org-mode or indent-tree it could be a particular indentation depth or something that I can match about the header or line.
           ))
         (match-table
          .
