@@ -200,10 +200,13 @@ Otherwise, return a cons pair (PARAMS . EXECUTOR), containing the final paramete
   (lambda (&optional num)
     (interactive "p")
     (apply 'command-sentence-add-to-current
-            (if num
-                (cons `((word-type . modifier) (parameter-name . num) (contents . ,num))
-                      words)
-              words))
+           (if (and num (not (equal num 1)))
+             (cons `((word-type . modifier)
+                     (parameter-name . num)
+                     (contents . ,num)
+                     (ui-hint . ,num))
+                   words)
+             words))
     (when exec-after-p
       (command-sentence-execute-current))))
 
@@ -384,7 +387,7 @@ Otherwise, return a cons pair (PARAMS . EXECUTOR), containing the final paramete
                 (rmo/forward-char (num)))
           (move character
                 ((direction backward) (specific nil))
-                (rmo/forward-char (num)))
+                (rmo/backward-char (num)))
 
           (move word
                 ((direction ,nil) (expand-region ,t))

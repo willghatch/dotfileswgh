@@ -132,6 +132,14 @@
                              (equal coding 'prefer-utf-8-unix))
                    (propertize (symbol-name coding) 'face 'font-lock-warning-face))))
        "%]%["
+       '(:eval (or (and (boundp 'command-sentence-current-sentence)
+                        (let ((ui-hints (seq-filter
+                                         #'identity
+                                         (mapcar (lambda (x) (cdr (assq 'ui-hint x)))
+                                                 command-sentence-current-sentence))))
+                          (and ui-hints
+                               (format " %s" ui-hints))))
+                   ""))
        " {"
        '(:eval (mapconcat (lambda (buffer)
                             (buffer-name buffer))
