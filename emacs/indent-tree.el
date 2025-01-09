@@ -341,6 +341,7 @@ It always moves to the FIRST sibling in the full sibling region, regardless of m
 (repeatable-motion-define 'indent-tree-down-to-last-descendant nil)
 
 ;; TODO - for things like python, there is already a variable that this should match, and it should generally be customizable.
+;; TODO - also, it might be nice to just check for an existing indentation amount, especially for promoting to promote specifically to parent level.
 (setq indent-tree--indent-amount 2)
 
 (defun indent-tree--promote-demote-helper (positive-p)
@@ -354,14 +355,15 @@ It always moves to the FIRST sibling in the full sibling region, regardless of m
            (save-mark-and-excursion
              (goto-char (region-beginning))
              (set-mark (point))
-             (indent-tree-outer 1 (point) (point))
+             (indent-tree-expand-region)
              (and (= orig-beg (region-beginning))
                   (= orig-end (region-end)))))))
     (save-mark-and-excursion
       (unless tree-highlighted-p
-        (let ((reg (indent-tree-outer 1 orig-beg orig-end)))
+        (let ((reg (progn (indent-tree-expand-region)
+                          (cons (region-beginning) (region-end)))))
           (goto-char (car reg))
-          (set-mark (cadr reg))))
+          (set-mark (cdr reg))))
       (indent-rigidly (region-beginning)
                       (region-end)
                       (funcall (if positive-p
@@ -374,5 +376,21 @@ It always moves to the FIRST sibling in the full sibling region, regardless of m
 (defun indent-tree-promote ()
   (interactive)
   (indent-tree--promote-demote-helper nil))
+
+(defun indent-tree-open-sibling-forward ()
+  (interactive)
+  (let ((indentation (current-indentation))
+        (reg (indent-tree-bounds (point))))
+    (and reg
+         (progn (goto-char (cdr reg))
+                (insert "\n")
+                (dotimes (i indentation) (insert " "))))))
+(defun indent-tree-open-sibling-backward ()
+  (interactive)
+  (let ((indentation (current-indentation)))
+    (beginning-of-line)
+    (insert "\n")
+    (backward-char 1)
+    (dotimes (i indentation) (insert " "))))
 
 (provide 'indent-tree)

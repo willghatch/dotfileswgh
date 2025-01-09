@@ -424,7 +424,14 @@ is the opposite."
   (delete-char (- n)))
 (ecmap "X" 'delete-char-backward)
 
-(ecmap "y" (cs/add (cs/verb 'copy)))
+;; TODO - I have this in the command map, but I find that I care more about having quick access to copy than I do about most commands.
+(ecmap "y" (lambda (n) (interactive "p")
+             (if (region-active-p)
+                 (funcall (cs/ae (cs/verb 'copy)
+                                 (cs/obj 'region))
+                          n)
+               (funcall (cs/add (cs/verb 'copy))
+                        n))))
 
 (ecmap "Y" (lambda () (interactive) (message "Y not yet implemented")))
 ;;(ecmap "&" 'baddd-ex-repeat-substitute)

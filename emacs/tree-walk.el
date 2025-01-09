@@ -284,24 +284,28 @@ It takes motion functions up, down, down-to-last-descendant.
 It takes finalize functions that take a point and give a final full region.
 "
   (let ((bounds-of-thing
-         (lambda (anchor-point)
-           "Takes ANCHOR-POINT (buffer location) and returns region as (beg . end), or nil if it can't find the thing at the anchor point."
-           (let ((left (funcall (tree-walk--outer-bounds-no-end-tree-for-point_left
-                                 finalize-left)
-                                anchor-point))
-                 (right (funcall (tree-walk--outer-bounds-no-end-tree-for-point_right
-                                  up down-to-last-descendant finalize-right)
-                                 anchor-point)))
-             (and left right (cons left right)))))
+         (lambda (&optional anchor-point)
+           "Takes ANCHOR-POINT (buffer location, default to `point') and returns region as (beg . end), or nil if it can't find the thing at the anchor point."
+           (let ((anchor-point (or anchor-point (point))))
+             (let ((left (funcall (tree-walk--outer-bounds-no-end-tree-for-point_left
+                                   finalize-left)
+                                  anchor-point))
+                   (right (funcall (tree-walk--outer-bounds-no-end-tree-for-point_right
+                                    up down-to-last-descendant finalize-right)
+                                   anchor-point)))
+               (and left right (cons left right))))))
         (bounds-of-children
-         (lambda (anchor-point)
-           (let ((left (funcall (tree-walk--inner-bounds-no-end-tree-for-point_left
-                                 up down (or finalize-left-inner finalize-left))
-                                anchor-point))
-                 (right (funcall (tree-walk--inner-bounds-no-end-tree-for-point_right
-                                  up down-to-last-descendant finalize-right)
-                                 anchor-point)))
-             (and left right (cons left right))))))
+         (lambda (&optional anchor-point)
+           "Takes ANCHOR-POINT (buffer location, default to `point') and returns region as (beg . end), or nil if it can't find the thing at the anchor point.
+Returns the region of the children, not the full tree."
+           (let ((anchor-point (or anchor-point (point))))
+             (let ((left (funcall (tree-walk--inner-bounds-no-end-tree-for-point_left
+                                   up down (or finalize-left-inner finalize-left))
+                                  anchor-point))
+                   (right (funcall (tree-walk--inner-bounds-no-end-tree-for-point_right
+                                    up down-to-last-descendant finalize-right)
+                                   anchor-point)))
+               (and left right (cons left right)))))))
     (list
      bounds-of-thing
      bounds-of-children

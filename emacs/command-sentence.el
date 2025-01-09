@@ -63,7 +63,7 @@ Otherwise, return a cons pair (PARAMS . EXECUTOR), containing the final paramete
                                                 (cdr (assq 'contents word))))
                            (cl-remove-if-not
                             (lambda (word) (eq 'modifier
-                                                (cdr (assq 'word-type word))))
+                                               (cdr (assq 'word-type word))))
                             sentence))))
     (when (and (not verb) (not object))
       (error "command-sentence: sentence lacks both verb and object: %s" sentence))
@@ -201,11 +201,11 @@ Otherwise, return a cons pair (PARAMS . EXECUTOR), containing the final paramete
     (interactive "p")
     (apply 'command-sentence-add-to-current
            (if (and num (not (equal num 1)))
-             (cons `((word-type . modifier)
-                     (parameter-name . num)
-                     (contents . ,num)
-                     (ui-hint . ,num))
-                   words)
+               (cons `((word-type . modifier)
+                       (parameter-name . num)
+                       (contents . ,num)
+                       (ui-hint . ,num))
+                     words)
              words))
     (when exec-after-p
       (command-sentence-execute-current))))
@@ -702,6 +702,8 @@ Otherwise, return a cons pair (PARAMS . EXECUTOR), containing the final paramete
           (open line ((direction backward)) (vilish-open-line-above))
           (open outline ((direction forward)) (wgh/outline-add-heading-below))
           (open outline ((direction backward)) (wgh/outline-add-heading-above))
+          (open indent-tree ((direction forward)) (indent-tree-open-sibling-forward))
+          (open indent-tree ((direction backward)) (indent-tree-open-sibling-backward))
           ;; TODO - indent tree open
           ;; TODO - symex open - ignore unwrapped forms and open a sibling form with the same paren type, hopefully matching indentation...
 
