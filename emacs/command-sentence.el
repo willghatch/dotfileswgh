@@ -337,6 +337,8 @@ Otherwise, return a cons pair (PARAMS . EXECUTOR), containing the final paramete
           (delete)
           (change)
           (copy)
+          (upcase)
+          (downcase)
           (transpose (direction . forward) (num . 1))
           (join (direction . forward) (num . 1))
           (split)
@@ -625,10 +627,10 @@ Otherwise, return a cons pair (PARAMS . EXECUTOR), containing the final paramete
 
           (move indent-tree
                 ((direction ,nil) (expand-region ,t))
-                (wgh/indent-tree-expand-region ()))
+                (indent-tree-expand-region ()))
           (move indent-tree
                 ((direction ,nil) (expand-region inner))
-                (wgh/indent-tree-expand-region/children-region ()))
+                (indent-tree-expand-region/children-region ()))
           (move indent-tree
                 ((direction forward) (tree-traversal inorder))
                 (rmo/indent-tree-inorder-traversal-forward (num)))
@@ -680,17 +682,18 @@ Otherwise, return a cons pair (PARAMS . EXECUTOR), containing the final paramete
           ;; TODO - indent tree open
           ;; TODO - symex open - ignore unwrapped forms and open a sibling form with the same paren type, hopefully matching indentation...
 
-          (split line () (open-line))
+          (split line () (,(lambda () (open-line 1))))
           ;; TODO - is there something useful to do for split for outline or indent tree?  For symex or XML it has obvious meaning, but is used in the middle of a thing.  Maybe for outline it means to split the parent on the current header, inserting a new header above at the parent level.  And similar for indent tree.  Need to implement this...
           ;; TODO - split for non-tree objects has reasonably defined meaning, I suppose, but isn't very interesting.
 
           ;; TODO - I need to fix my join-line implementation to take a numerical argument
-          (join line ((direction forward)) (join-line/default-forward))
-          (join line ((direction forward)) (,(lambda () (join-line/default-forward -1))))
+          (join line ((direction forward)) (,(lambda () (join-line/default-forward nil))))
+          (join line ((direction backward)) (,(lambda () (join-line/default-forward -1))))
           ;; TODO - sptw - make a join-sexp function that takes a forward or backward argument
 
 
           ;; TODO - optional register for delete to be delete-copy
+          ;; TODO - deduplicate these operations that delegate to the move command...
           (delete region
                   ()
                   (,(lambda () (delete-region (region-beginning) (region-end)))))
@@ -757,6 +760,51 @@ Otherwise, return a cons pair (PARAMS . EXECUTOR), containing the final paramete
                                        (cons (min orig-point new-point)
                                              (max orig-point new-point)))))))
                  sentence-with-defaults))
+
+          (upcase region
+                  ()
+                  (,(lambda () (require 'evil) (evil-upcase (region-beginning) (region-end)))))
+          (upcase ,(lambda (x) (not (memq x '(region))))
+                  ()
+                  (,(lambda (sentence-with-defaults)
+                      (let ((orig-point (point))
+                            (new-point (save-mark-and-excursion
+                                         (command-sentence-execute
+                                          ;; TODO - I should maybe delete the old verb, but I'll just use alist shadowing...
+                                          (cons '((word-type . verb) (contents . move)) sentence-with-defaults)
+                                          command-sentence-current-configuration)
+                                         (if (region-active-p)
+                                             (cons (region-beginning) (region-end))
+                                           (point)))))
+                        (require 'evil)
+                        (if (consp new-point)
+                            (evil-upcase (car new-point) (cdr new-point))
+                          (evil-upcase (min orig-point new-point)
+                                       (max orig-point new-point)))))
+                   sentence-with-defaults))
+          (downcase region
+                  ()
+                  (,(lambda () (require 'evil) (evil-downcase (region-beginning) (region-end)))))
+          (downcase ,(lambda (x) (not (memq x '(region))))
+                  ()
+                  (,(lambda (sentence-with-defaults)
+                      (let ((orig-point (point))
+                            (new-point (save-mark-and-excursion
+                                         (command-sentence-execute
+                                          ;; TODO - I should maybe delete the old verb, but I'll just use alist shadowing...
+                                          (cons '((word-type . verb) (contents . move)) sentence-with-defaults)
+                                          command-sentence-current-configuration)
+                                         (if (region-active-p)
+                                             (cons (region-beginning) (region-end))
+                                           (point)))))
+                        (require 'evil)
+                        (if (consp new-point)
+                            (evil-downcase (car new-point) (cdr new-point))
+                          (evil-downcase (min orig-point new-point)
+                                       (max orig-point new-point)))))
+                   sentence-with-defaults))
+
+
           ))))
 
 ;; temporary convenience...

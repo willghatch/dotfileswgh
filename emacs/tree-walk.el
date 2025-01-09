@@ -604,7 +604,7 @@ If no region is given, it uses the current region (or ((point) . (point))).
              :def-expand-region-to-children/ancestor-generation ,def-expand-region-to-children/ancestor-generation
              ;; TODO - generalize this
              :bounds-func ,(or use-bounds `',def-bounds-for-tree-with-no-end-delimiter)
-             :children-bounds-func ,(or use-children-bounds `'def-children-bounds-for-tree-with-no-end-delimiter)
+             :children-bounds-func ,(or use-children-bounds `',def-children-bounds-for-tree-with-no-end-delimiter)
              :up-func ,use-up-to-parent))
          (when (or def-transpose-sibling-forward def-transpose-sibling-backward)
            `(progn
