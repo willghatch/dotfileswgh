@@ -360,7 +360,12 @@ Otherwise, return a cons pair (PARAMS . EXECUTOR), containing the final paramete
           (outline (default-verb . move) (location-within . beginning))
           (xml (default-verb . move) (location-within . beginning))
           (region)
-          (repeatable-motion-repeat (default-verb . move)) ;; This is not really an object, but it makes composition easier with delete, change, yank
+          ;; These are not really “text objects”, but I want composition with delete, change, yank, etc, to work with these.
+          (repeatable-motion-repeat (default-verb . move))
+          (isearch-new (default-verb . move))
+          (isearch-repeat (default-verb . move))
+          (goto-marker (default-verb . move))
+          (goto-marker-line (default-verb . move))
           ))
         (match-table
          .
@@ -371,6 +376,22 @@ Otherwise, return a cons pair (PARAMS . EXECUTOR), containing the final paramete
           (move repeatable-motion-repeat
                 ((direction backward))
                 (repeatable-motion-backward (num)))
+          ;; TODO - isearch-new should still take a num arg
+          (move isearch-new
+                ((direction forward))
+                (wgh/isearch-start-forward ()))
+          (move isearch-new
+                ((direction backward))
+                (wgh/isearch-start-backward ()))
+          (move isearch-repeat
+                ((direction forward))
+                (wgh/isearch-repeat-forward (num)))
+          (move isearch-repeat
+                ((direction backward))
+                (wgh/isearch-repeat-backward (num)))
+          (move goto-marker () (wgh/evil-goto-marker ()))
+          (move goto-marker-line () (wgh/evil-goto-marker-line ()))
+
 
           (move character
                 ((direction forward) (specific ,t) (location-within beginning))

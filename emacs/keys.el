@@ -99,6 +99,36 @@
 ;; TODO - I would like a system for writing an escape in the search for where the cursor should go.
 (setq wgh/isearch-go-part 'beginning)
 
+(defun wgh/isearch-start-forward ()
+  (interactive)
+  (setq wgh/isearch-repeat-forward-p t)
+  (funcall 'isearch-forward))
+(defun wgh/isearch-start-backward ()
+  (interactive)
+  (setq wgh/isearch-repeat-forward-p nil)
+  (funcall 'isearch-backward))
+
+;; TODO - this has an issue when changing direction.  The first time it repeats backward after going forward, it skips one.
+(defun wgh/isearch-repeat-forward (&optional count)
+  (interactive "p")
+  (let* ((count-fwd (<= 0 (or count 1)))
+         (count-num (abs (or count 1)))
+         (fwd (not (xor count-fwd wgh/isearch-repeat-forward-p)))
+         (repeat-func (if fwd #'isearch-repeat-forward #'isearch-repeat-backward))
+         (moved (tree-walk--motion-moved (lambda () (funcall repeat-func count-num)))))
+    (cond ((not moved) nil)
+          ((and (equal wgh/isearch-go-part 'beginning)
+                (< isearch-other-end (point)))
+           (goto-char isearch-other-end))
+          ((and (equal wgh/isearch-go-part 'end)
+                (>= isearch-other-end (point)))
+           (goto-char isearch-other-end)))))
+(defun wgh/isearch-repeat-backward (&optional count)
+  (interactive "p")
+  (wgh/isearch-repeat-forward (- (or count 1))))
+
+
+
 ;; isearch-wrap-pause can be t (default) to signal an error, then actually wrap the next time, 'no to wrap immediately but flash, 'no-ding to wrap immediately but not flash, or nil to disallow wrapping entirely.
 (setq isearch-wrap-pause 'no)
 
@@ -152,6 +182,15 @@
      (interactive)
      (require 'evil)
      (call-interactively ,func)))
+
+(defun wgh/evil-goto-marker ()
+  (interactive)
+  (require 'evil)
+  (call-interactively 'evil-goto-mark))
+(defun wgh/evil-goto-marker-line ()
+  (interactive)
+  (require 'evil)
+  (call-interactively 'evil-goto-mark-line))
 
 (cl-defun wgh/forward-line-keep-column/qd (&optional count)
   ;; Well, not as good as evil mode... maybe I'll do this properly later?
@@ -460,22 +499,6 @@ is the opposite."
 ;;(emmap "K" 'baddd-lookup)
 ;;(emmap "L" 'baddd-window-bottom)
 ;;(emmap "M" 'baddd-window-middle)
-(defun wgh/isearch-repeat (&optional count)
-  (let* ((count-fwd (<= 0 (or count 1)))
-         (count-num (abs (or count 1)))
-         (fwd (not (xor count-fwd wgh/isearch-repeat-forward-p)))
-         (repeat-func (if fwd #'isearch-repeat-forward #'isearch-repeat-backward))
-         (moved (tree-walk--motion-moved (lambda () (funcall repeat-func count-num)))))
-    (cond ((not moved) nil)
-          ((and (equal wgh/isearch-go-part 'beginning)
-                (< isearch-other-end (point)))
-           (goto-char isearch-other-end))
-          ((and (equal wgh/isearch-go-part 'end)
-                (>= isearch-other-end (point)))
-           (goto-char isearch-other-end)))))
-(emmap "n" (lambda (&optional n) (interactive "p") (wgh/isearch-repeat (or n 1))))
-(emmap "N" (lambda (&optional n) (interactive "p") (wgh/isearch-repeat (- (or n 1)))))
-
 ;;(emmap "w" 'rmo/wgh/forward-word-beginning)
 ;;(emmap "b" 'rmo/wgh/backward-word-beginning)
 ;;(emmap "w" 'rmo/wgh/forward-vi-like-word-beginning)
@@ -498,8 +521,8 @@ is the opposite."
 (emmap "g#" 'rmo/baddd-search-unbounded-word-backward)
 ;;(emmap "$" 'end-of-line)
 (emmap "%" 'sptw-move-to-other-end-of-sexp)
-(emmap "`" (with-evil 'evil-goto-mark))
-(emmap "'" (with-evil 'evil-goto-mark-line))
+(emmap "`" (with-evil (cs/ae (cs/obj 'goto-marker))))
+(emmap "'" (with-evil (cs/ae (cs/obj 'goto-marker-line))))
 ;;(emmap "]]" 'rmo/baddd-forward-section-begin)
 ;;(emmap "][" 'rmo/baddd-forward-section-end)
 ;;(emmap "[[" 'rmo/baddd-backward-section-begin)
@@ -512,9 +535,17 @@ is the opposite."
 (emmap "g*" 'rmo/baddd-search-unbounded-word-forward)
 ;;(emmap "," 'baddd-repeat-find-char-reverse)
 
-;; TODO - how to configure isearch to be more like evil-mode search without importing all of evil-mode
-(emmap "/" (lambda () (interactive) (setq wgh/isearch-repeat-forward-p t) (call-interactively 'isearch-forward)))
-(emmap "?" (lambda () (interactive) (setq wgh/isearch-repeat-forward-p nil) (call-interactively 'isearch-backward)))
+(emmap "/" (cs/ae (cs/mod 'direction 'forward)
+                  (cs/obj 'isearch-new)))
+(emmap "?" (cs/ae (cs/mod 'direction 'backward)
+                  (cs/obj 'isearch-new)))
+(emmap "n" (cs/ae (cs/mod 'direction 'forward)
+                  (cs/obj 'isearch-repeat)))
+(emmap "N" (cs/ae (cs/mod 'direction 'backward)
+                  (cs/obj 'isearch-repeat)))
+
+
+
 (emmap ";" 'er/expand-region)
 (emmap "^" 'baddd-first-non-blank) ;; TODO - re-impl using back-to-indentation...
 ;;(emmap "+" 'baddd-next-line-first-non-blank)
@@ -993,7 +1024,7 @@ is the opposite."
 (evmap "s/" (kbd ":s/ ")) ; TODO - fix this...
 (ecmap "sm" (with-evil 'evil-set-marker))
 (ecmap "sM" 'bookmark-set)
-(ecmap "sg" (with-evil 'evil-goto-mark))
+(ecmap "sg" (cs/ae (cs/obj 'goto-marker)))
 (ecmap "sG" 'bookmark-jump)
 (eimap (kbd "M-c") 'helm-M-x)
 (emmap (kbd "M-c") 'helm-M-x)
