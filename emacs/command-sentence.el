@@ -370,6 +370,7 @@ Otherwise, return a cons pair (PARAMS . EXECUTOR), containing the final paramete
         (match-table
          .
          (
+          ;; TODO - consider using more params and matching less.  I can replace several matches of forward/back begin/end by turning those things into parameters, if there is a function that implements them.  Though I need to consider repeatable motion.
           (move repeatable-motion-repeat
                 ((direction forward))
                 (repeatable-motion-forward (num)))
@@ -500,16 +501,16 @@ Otherwise, return a cons pair (PARAMS . EXECUTOR), containing the final paramete
                 (,(lambda () (wgh/expand-region-to-fill-lines t)) ()))
           (move line
                 ((direction forward) (location-within beginning))
-                (rmo/wgh/forward-line-beginning (num)))
+                (rmo/wgh/forward-line-no-newline-beginning (num)))
           (move line
                 ((direction backward) (location-within beginning))
-                (rmo/wgh/backward-line-beginning (num)))
+                (rmo/wgh/backward-line-no-newline-beginning (num)))
           (move line
                 ((direction forward) (location-within end))
-                (rmo/wgh/forward-line-end (num)))
+                (rmo/wgh/forward-line-no-newline-end (num)))
           (move line
                 ((direction backward) (location-within end))
-                (rmo/wgh/backward-line-end (num)))
+                (rmo/wgh/backward-line-no-newline-end (num)))
           (move line
                 ((direction forward) (location-within keep-if-possible))
                 (rmo-c/wgh/next-line (num)))

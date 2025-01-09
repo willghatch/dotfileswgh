@@ -143,7 +143,6 @@ If no region is active, it will use (point . point)."
     (when new-bounds
       (wgh/-set-region new-bounds))))
 
-;; TODO - need an inner region for at least some objects.  Can use sp-beginning-of-sexp for smartparens, but point has to be inside the parens.  IE can combo sp-down-sexp with sp-beginning-of-sexp and sp-end-of-sexp.
 
 (cl-defmacro wgh/def-expand-region-to-thing (thing)
   (let ((sym (intern (format "wgh/expand-region-to-%s" thing))))
@@ -270,6 +269,28 @@ If no region is active, it will use (point . point)."
 
 ;;;;;
 
+(defun forward-line-no-newline (&optional count)
+  (interactive "p")
+  (let* ((count (or count 1))
+         (fwd (<= 0 count))
+         (left (abs count)))
+    (while (< 0 left)
+      (if fwd
+          (if (eolp)
+              (progn (forward-char 1)
+                     (end-of-line))
+            (end-of-line))
+        (if (bolp)
+            (progn (backward-char 1)
+                   (beginning-of-line))
+          (beginning-of-line)))
+      (setq left (- left 1)))))
+(defun line-no-newline-bounds-at-point (&optional pt)
+  (let ((pt (or pt (point))))
+    (cons (save-mark-and-excursion (beginning-of-line) (point))
+          (save-mark-and-excursion (end-of-line) (point)))))
+(put 'line-no-newline 'bounds-of-thing-at-point #'line-no-newline-bounds-at-point)
+(wgh/def-move-thing line-no-newline)
 
 ;;;;;
 
