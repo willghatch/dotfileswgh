@@ -361,6 +361,7 @@ Otherwise, return a cons pair (PARAMS . EXECUTOR), containing the final paramete
           (outline (default-verb . move) (location-within . beginning))
           (xml (default-verb . move) (location-within . beginning))
           (region)
+          (buffer (default-verb . move) (location-within . ,nil))
           ;; These are not really “text objects”, but I want composition with delete, change, yank, etc, to work with these.
           (repeatable-motion-repeat (default-verb . move))
           (isearch-new (default-verb . move))
@@ -394,6 +395,13 @@ Otherwise, return a cons pair (PARAMS . EXECUTOR), containing the final paramete
           (move goto-marker () (wgh/evil-goto-marker ()))
           (move goto-marker-line () (wgh/evil-goto-marker-line ()))
 
+
+          (move buffer ((direction forward) (location-within ,nil)) (,(lambda () (goto-char (point-max))) ()))
+          (move buffer ((direction backward) (location-within ,nil)) (,(lambda (x) (goto-char x)) (num)))
+          (move buffer ((location-within beginning)) (,(lambda () (goto-char (point-min))) ()))
+          (move buffer ((location-within end)) (,(lambda () (goto-char (point-max))) ()))
+          (move buffer ((location-within x ,(lambda (actual expected) (numberp actual)))) (,(lambda (x) (goto-char x)) (location-within)))
+          ;; TODO - how do I want to encode go-to-line-number-X and go-to-column-X?  I'm considering an “absolute” modifier, that ignores forward/backward to go to the Nth thing.  But that's probably only useful for going to numbered line, column, or point.  I have buffer with a numeric arg as going to point.  Do I want absolute-char to mean column, and absolute line to mean go-to-line?
 
           (move character
                 ((direction forward) (specific ,t) (location-within beginning))

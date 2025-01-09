@@ -843,6 +843,7 @@ is the opposite."
   ("y" (funcall (cs/ae (cs/obj 'symbol))) "symbol" :exit t)
   ("p" (funcall (cs/ae (cs/obj 'paragraph))) "paragraph" :exit t)
   ("S" (funcall (cs/ae (cs/obj 'sentence))) "sentence" :exit t)
+  ("B" (funcall (cs/ae (cs/obj 'buffer))) "buffer" :exit t)
   ;; TODO - more objects -- defun/definition, comment, function arg, need to actually implement tree-sitter stuff, ...
 
 
