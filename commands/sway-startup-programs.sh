@@ -7,7 +7,8 @@
 
 swayidle-configured &
 
-waybar-configured &
+#waybar-configured &
+ironbar-configured &
 
 wallpaper-sway-random-rotate &
 
