@@ -377,6 +377,7 @@ Otherwise, return a cons pair (PARAMS . EXECUTOR), containing the final paramete
           (sptw (default-verb . move) (location-within . beginning) (delimiter . ,nil))
           (indent-tree (default-verb . move) (location-within . beginning))
           (outline (default-verb . move) (location-within . beginning))
+          (tstw-thumb (default-verb . move) (location-within . anchor))
           (region)
           (buffer (default-verb . move) (location-within . ,nil))
 
@@ -643,6 +644,42 @@ Otherwise, return a cons pair (PARAMS . EXECUTOR), containing the final paramete
                  ()
                  (sp-split-sexp (num)))
 
+
+
+          (move tstw-thumb
+                ((direction ,nil) (expand-region ,t))
+                (tstw-thumb-expand-region ()))
+          (move tstw-thumb
+                ((direction ,nil) (expand-region inner))
+                (tstw-thumb-expand-region/children-region ()))
+
+          (move tstw-thumb
+                ((direction forward) (tree-traversal inorder))
+                (rmo/tstw-thumb-forward-inorder-traversal (num)))
+          (move tstw-thumb
+                ((direction backward) (tree-traversal inorder))
+                (rmo/tstw-thumb-backward-inorder-traversal (num)))
+          (move tstw-thumb
+                ((direction forward) (location-within anchor) (tree-vertical ,nil) (tree-traversal ,nil))
+                (rmo/tstw-thumb-forward-sibling-anchor-point (num)))
+          (move tstw-thumb
+                ((direction backward) (location-within anchor) (tree-vertical ,nil) (tree-traversal ,nil))
+                (rmo/tstw-thumb-backward-sibling-anchor-point (num)))
+          (move tstw-thumb
+                ((direction forward) (tree-vertical up) (tree-inner ,nil))
+                (rmo/tstw-thumb-up-to-parent-anchor-point (num)))
+          (move tstw-thumb
+                ((direction backward) (tree-vertical up) (tree-inner ,nil))
+                (rmo/tstw-thumb-up-to-parent-anchor-point (num)))
+          (move tstw-thumb
+                ((direction backward) (tree-vertical down))
+                (rmo/tstw-thumb-down-to-first-child-anchor-point (num)))
+          (move tstw-thumb
+                ((direction forward) (tree-vertical down))
+                (rmo/tstw-thumb-down-to-last-child-anchor-point (num)))
+
+
+
           ;; TODO - for all xml stuff, I need to add repeatable motion, and consider wrapping nxml to explicitly go to begin/end, etc.  Also, a quick test shows this not working.  I'll figure it out later.
           (move xml
                 ((direction forward) (location-within beginning) (tree-vertical ,nil))
@@ -737,6 +774,8 @@ Otherwise, return a cons pair (PARAMS . EXECUTOR), containing the final paramete
           (transpose line ((direction backward)) (wgh/transpose-line-backward (num)))
           (transpose sptw ((direction forward)) (sptw-transpose-sibling-forward (num)))
           (transpose sptw ((direction backward)) (sptw-transpose-sibling-backward (num)))
+          (transpose tstw-thumb ((direction forward)) (tstw-thumb-transpose-sibling-forward (num)))
+          (transpose tstw-thumb ((direction backward)) (tstw-thumb-transpose-sibling-backward (num)))
           (transpose outline ((direction forward)) (wgh/outline-transpose-sibling-forward (num)))
           (transpose outline ((direction backward)) (wgh/outline-transpose-sibling-backward (num)))
           (transpose indent-tree ((direction forward)) (indent-tree-transpose-sibling-forward (num)))
