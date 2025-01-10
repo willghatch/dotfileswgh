@@ -33,7 +33,7 @@ box, menubar {
     padding:2px;
 }
 .workspaces .item.visible {
-    background-color: #2442ad;
+    background-color: #84929d;
 }
 
 .workspaces .item.focused {
@@ -46,4 +46,16 @@ box, menubar {
 
 .workspaces .item:hover {
     box-shadow: inset 0 -3px;
+}
+
+.upower .icon {
+    background-color: #f0c253;
+}
+
+.focused .icon {
+    background-color: @color_bg;
+}
+
+.network_manager .icon {
+    background-color: #00a233;
 }

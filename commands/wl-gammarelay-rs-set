@@ -1,0 +1,25 @@
+#!/usr/bin/env bash
+
+if [[ -z "$1" || "$@" =~ "--help" ]]; then
+    echo "usage... here is the source:"
+    cat "${BASH_SOURCE[0]}"
+    exit 1
+elif [[ "$1" = "temp-rel" ]]; then
+    # Temperature default is 6500K, update probably in steps of +/- 100
+    busctl --user -- call rs.wl-gammarelay / rs.wl.gammarelay UpdateTemperature n "$2"
+elif [[ "$1" = "temp-abs" ]]; then
+    busctl --user -- call rs.wl-gammarelay / rs.wl.gammarelay Temperature q "$2"
+elif [[ "$1" = "bright-rel" ]]; then
+    # Brightness is 0-1, default 1
+    busctl --user -- call rs.wl-gammarelay / rs.wl.gammarelay UpdateBrightness d "$2"
+elif [[ "$1" = "bright-abs" ]]; then
+    busctl --user -- call rs.wl-gammarelay / rs.wl.gammarelay Brightness d "$2"
+elif [[ "$1" = "gamma-rel" ]]; then
+    # Gamma is default 1, step maybe by 0.1 or 0.05
+    busctl --user -- call rs.wl-gammarelay / rs.wl.gammarelay UpdateGamma d "$2"
+elif [[ "$1" = "gamma-abs" ]]; then
+    busctl --user -- call rs.wl-gammarelay / rs.wl.gammarelay Gamma d "$2"
+elif [[ "$1" = "toggle-invert" ]]; then
+    busctl --user -- call rs.wl-gammarelay / rs.wl.gammarelay ToggleInverted
+fi
+

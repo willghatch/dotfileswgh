@@ -6,37 +6,66 @@ height = 32
 #end = []
 
 # TODO - what am I missing in this config vs my waybar config?
-# * wl-gammarelay controls
-# * laptop backlight control
 # * idle inhibit
+# * list of open windows, maybe just icons?
+# * laptop backlight control
+# * ip address
 # * on both I want better volume status for different outputs
-
+#
+# * styling
+# ** icon color -- a lot of icons are black or dark gray, and I've only been able to get them to show by making the background light behind them.  How to change this?  Eg. this affects the default program icon when it can't find the program's icon.
 
 # toml notes -- [[end]] means that it is a dictionary in a list for end, eg. end = [{...}] with one object for each section starting with [[end]]
+
 [[start]]
 type = "workspaces"
+
 # I don't like this launcher one, it shows all open programs not limited to the current workspace.
 #[[start]]
 #type = "launcher"
 #show_names = true
+
 [[start]]
 type = "focused"
 show_names = true
-[[start]]
+
+[[end]]
+type = "custom"
+bar = [{type = "button", label = "idle: {{10000:wayland-idle-inhibit status}}", on_click = "! wayland-idle-inhibit toggle"}]
+
+[[end]]
 type = "clipboard"
 
 [[end]]
 type = "music"
+format = "{title} • {artist} • {album}"
+
 [[end]]
 type = "custom"
-bar = [{type = "label", label = "| {{60000:waybar-hmcount.sh}} | "}]
+bar = [{type = "label", label = "| {{60000:waybar-hmcount.sh}} "}]
+
+[[end]]
+type = "custom"
+bar = [{type = "label", label = "| {{watch:wl-gammarelay-rs watch '{t}K'}}"}]
+on_scroll_up = "busctl --user -- call rs.wl-gammarelay / rs.wl.gammarelay UpdateTemperature n +100"
+on_scroll_down = "busctl --user -- call rs.wl-gammarelay / rs.wl.gammarelay UpdateTemperature n -100"
+[[end]]
+type = "custom"
+bar = [{type = "label", label = " {{watch:wl-gammarelay-rs watch '{bp}%B'}}"}]
+on_scroll_up = "busctl --user -- call rs.wl-gammarelay / rs.wl.gammarelay UpdateBrightness d +0.02"
+on_scroll_down = "busctl --user -- call rs.wl-gammarelay / rs.wl.gammarelay UpdateBrightness d -0.02"
+[[end]]
+type = "custom"
+bar = [{type = "label", label = " {{watch:wl-gammarelay-rs watch '{g} γ'}} |"}]
+on_scroll_up = "busctl --user -- call rs.wl-gammarelay / rs.wl.gammarelay UpdateGamma d +0.02"
+on_scroll_down = "busctl --user -- call rs.wl-gammarelay / rs.wl.gammarelay UpdateGamma d -0.02"
 
 [[end]]
 type = 'sys_info'
 format = [
     ' {cpu_percent}%',
     #'| {temp_c:k10temp-Tccd1}°C',
-    '| {memory_percent}%🐏',
+    ' 🐏{memory_percent}% ',
     #'| {swap_used} / {swap_total} GB ({swap_percent}%)',
     #'󰋊 {disk_used:/} / {disk_total:/} GB ({disk_percent:/}%)',
     #'󰓢 {net_down:enp39s0} / {net_up:enp39s0} Mbps',
@@ -53,9 +82,10 @@ temps = 5
 
 
 
-[[end]]
-type = "network_manager"
-format = "{title} - {artist} - {album}"
+## the network_manager widget doesn't seem to do anything useful -- it just shows an icon for the connection type, which is redundant with what nm-applet shows in the system tray.
+#[[end]]
+#type = "network_manager"
+
 [[end]]
 type = "tray"
 [[end]]
@@ -63,6 +93,7 @@ type = "volume"
 format = "{icon} {percentage}%"
 [[end]]
 type = "upower"
+format = "{percentage}% {state} {time_remaining}"
 [[end]]
 type = "clock"
 format = "%a, %Y-%m-%d %H:%M"

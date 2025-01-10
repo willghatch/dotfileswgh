@@ -1,0 +1,27 @@
+#!/usr/bin/env bash
+
+if [[ -z "$1" || "$@" =~ "--help" ]]; then
+    echo "usage... here is the source:"
+    cat "${BASH_SOURCE[0]}"
+    exit 1
+fi
+
+function status() {
+    if pidof wlinhibit >/dev/null 2>/dev/null ; then
+        echo "inhibited"
+    else
+        echo "no-inhibit"
+    fi
+}
+
+if [[ "$1" = "toggle" ]]; then
+    if ! killall wlinhibit >/dev/null 2>/dev/null ; then
+        wlinhibit &
+        disown
+    fi
+    status
+elif [[ "$1" = "status" ]]; then
+    status
+else
+    echo "unknown command: $1"
+fi
