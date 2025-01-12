@@ -7,8 +7,9 @@
 
 swayidle-configured &
 
-#waybar-configured &
-ironbar-configured &
+# TODO - I'm frustrated with both of these bars.  Waybar keeps crashing, but ironbar has issues when a monitor disconnects/reconnects (eg. due to idle).
+waybar-configured &
+#ironbar-configured &
 
 wallpaper-sway-random-rotate &
 
