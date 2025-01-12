@@ -218,9 +218,9 @@ set shell=bash
 source `FILE=~/dotfileswgh/mutt-dark-theme; if [ $(lightdark-status) = "light" ]; then FILE=~/dotfileswgh/mutt-light-theme; fi; echo "$FILE"`
 
 # TODO - maybe put this pattern in a helper script
-source `FILE=~/dotfileswgh/pri/mutt/rc; if [ ! -s "$FILE" ]; then FILE=/dev/null; fi; echo "$FILE"`
+source `FILE=~/dotfileswgh-pri/mutt/rc; if [ ! -s "$FILE" ]; then FILE=/dev/null; fi; echo "$FILE"`
 source `FILE=~/rootgit-dotfiles/muttrc; if [ ! -s "$FILE" ]; then FILE=/dev/null; fi; echo "$FILE"`
-source `FILE=~/dotfileswgh/dotlocal/muttrc; if [ ! -s "$FILE" ]; then FILE=/dev/null; fi; echo "$FILE"`
+source `FILE=~/dotfileswgh-dotlocal/muttrc; if [ ! -s "$FILE" ]; then FILE=/dev/null; fi; echo "$FILE"`
 
 
 set status_format="Unread:%u Box:%f Msgs:%m Flagged:%F Boxes-with-new:%b Postponed: %p Bytes-used:%l Pattern:%V Status:%r"
