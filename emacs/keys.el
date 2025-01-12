@@ -971,10 +971,18 @@ is the opposite."
 (autoload 'projectile-command-map "projectile-conf" "" t 'keymap)
 (emmap "tp" 'projectile-command-map)
 (emmap "tr" 'baddd-use-register)
-;; "ts" will stand for "toggle setting"
+
+;; "ta" will be an assortment of handy stuff...
 (ecmap "tac" 'comment-region)
 (ecmap "taC" 'uncomment-region)
 (ecmap "tam" (lambda () (interactive) (exchange-point-and-mark)))
+(ecmap "tad" 'insert-date)
+(ecmap "taD" 'insert-date-time)
+(ecmap "tara" (lambda () (interactive) (require 'alternate-region) (alternate-region-activate)))
+(ecmap "tars" (lambda () (interactive) (require 'alternate-region) (alternate-region-swap)))
+(ecmap "tarc" (lambda () (interactive) (require 'alternate-region) (alternate-region-cycle)))
+
+;; "ts" will stand for "toggle setting"
 (emmap "ts"
        (defhydra settings-toggle (:foreign-keys warn :exit t) "Toggle:"
          ("p" smartparens-mode "smartparens")
