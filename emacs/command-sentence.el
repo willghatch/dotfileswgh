@@ -377,7 +377,7 @@ Otherwise, return a cons pair (PARAMS . EXECUTOR), containing the final paramete
           (sptw (default-verb . move) (location-within . beginning) (delimiter . ,nil))
           (indent-tree (default-verb . move) (location-within . beginning))
           (outline (default-verb . move) (location-within . beginning))
-          (tstw-thumb (default-verb . move) (location-within . anchor))
+          (tstw-qd (default-verb . move) (location-within . anchor))
           (region)
           (buffer (default-verb . move) (location-within . ,nil))
 
@@ -649,37 +649,37 @@ Otherwise, return a cons pair (PARAMS . EXECUTOR), containing the final paramete
 
 
 
-          (move tstw-thumb
+          (move tstw-qd
                 ((direction ,nil) (expand-region ,t))
-                (tstw-thumb-expand-region ()))
-          (move tstw-thumb
+                (tstw-qd-expand-region ()))
+          (move tstw-qd
                 ((direction ,nil) (expand-region inner))
-                (tstw-thumb-expand-region/children-region ()))
+                (tstw-qd-expand-region/children-region ()))
 
-          (move tstw-thumb
+          (move tstw-qd
                 ((direction forward) (tree-traversal inorder))
-                (rmo/tstw-thumb-forward-inorder-traversal (num)))
-          (move tstw-thumb
+                (rmo/tstw-qd-forward-inorder-traversal (num)))
+          (move tstw-qd
                 ((direction backward) (tree-traversal inorder))
-                (rmo/tstw-thumb-backward-inorder-traversal (num)))
-          (move tstw-thumb
+                (rmo/tstw-qd-backward-inorder-traversal (num)))
+          (move tstw-qd
                 ((direction forward) (location-within anchor) (tree-vertical ,nil) (tree-traversal ,nil))
-                (rmo/tstw-thumb-forward-sibling-anchor-point (num)))
-          (move tstw-thumb
+                (rmo/tstw-qd-forward-sibling-anchor-point (num)))
+          (move tstw-qd
                 ((direction backward) (location-within anchor) (tree-vertical ,nil) (tree-traversal ,nil))
-                (rmo/tstw-thumb-backward-sibling-anchor-point (num)))
-          (move tstw-thumb
+                (rmo/tstw-qd-backward-sibling-anchor-point (num)))
+          (move tstw-qd
                 ((direction forward) (tree-vertical up) (tree-inner ,nil))
-                (rmo/tstw-thumb-up-to-parent-anchor-point (num)))
-          (move tstw-thumb
+                (rmo/tstw-qd-up-to-parent-anchor-point (num)))
+          (move tstw-qd
                 ((direction backward) (tree-vertical up) (tree-inner ,nil))
-                (rmo/tstw-thumb-up-to-parent-anchor-point (num)))
-          (move tstw-thumb
+                (rmo/tstw-qd-up-to-parent-anchor-point (num)))
+          (move tstw-qd
                 ((direction backward) (tree-vertical down))
-                (rmo/tstw-thumb-down-to-first-child-anchor-point (num)))
-          (move tstw-thumb
+                (rmo/tstw-qd-down-to-first-child-anchor-point (num)))
+          (move tstw-qd
                 ((direction forward) (tree-vertical down))
-                (rmo/tstw-thumb-down-to-last-child-anchor-point (num)))
+                (rmo/tstw-qd-down-to-last-child-anchor-point (num)))
 
 
 
@@ -777,8 +777,8 @@ Otherwise, return a cons pair (PARAMS . EXECUTOR), containing the final paramete
           (transpose line ((direction backward)) (wgh/transpose-line-backward (num)))
           (transpose sptw ((direction forward)) (sptw-transpose-sibling-forward (num)))
           (transpose sptw ((direction backward)) (sptw-transpose-sibling-backward (num)))
-          (transpose tstw-thumb ((direction forward)) (tstw-thumb-transpose-sibling-forward (num)))
-          (transpose tstw-thumb ((direction backward)) (tstw-thumb-transpose-sibling-backward (num)))
+          (transpose tstw-qd ((direction forward)) (tstw-qd-transpose-sibling-forward (num)))
+          (transpose tstw-qd ((direction backward)) (tstw-qd-transpose-sibling-backward (num)))
           (transpose outline ((direction forward)) (wgh/outline-transpose-sibling-forward (num)))
           (transpose outline ((direction backward)) (wgh/outline-transpose-sibling-backward (num)))
           (transpose indent-tree ((direction forward)) (indent-tree-transpose-sibling-forward (num)))

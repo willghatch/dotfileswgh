@@ -844,7 +844,7 @@ is the opposite."
   ;;("o" (funcall (cs/ae (cs/obj 'outline))) "outline" :exit t)
   ("o" (funcall (cs/ae (cs/obj 'NOOP-STOP-USING-THIS-BINDING-FOR-OLD-PURPOSE))) "break habit!" :exit t)
   ("O" (funcall (cs/ae (cs/obj 'outline))) "outline" :exit t)
-  ("t" (funcall (cs/ae (cs/obj 'tstw-thumb))) "treesitter-thumb" :exit t)
+  ("t" (funcall (cs/ae (cs/obj 'tstw-qd))) "treesitter-thumb" :exit t)
   ("x" (funcall (cs/ae (cs/obj 'xml))) "xml" :exit t)
   ("y" (funcall (cs/ae (cs/obj 'symbol))) "symbol" :exit t)
   ("p" (funcall (cs/ae (cs/obj 'paragraph))) "paragraph" :exit t)
