@@ -94,6 +94,7 @@
 (require 'cl-lib)
 
 (defun tree-walk--motion-moved (motion)
+  "Take MOTION, some movement function of no args.  Call it, and return true if the motion moved, leaving point where the motion moved it."
   (let ((start-pos (point)))
     (funcall motion)
     (not (= (point) start-pos))))

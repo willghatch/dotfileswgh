@@ -156,30 +156,38 @@ Note that point can be both at the end and start of two different sexps, and com
   (or (sptw-at-close-delimiter-p)
       (sptw--at-end-of-symbol-sexp?)))
 
-(defun sptw-bounds-of-sexp-at-point ()
+(defun sptw-bounds-of-sexp-at-point (&optional point)
   "Return the bounds of the smartparens sexp at point as (beg . end), or nil if there is no sexp at point.
 Note that if point is just before an opening delimiter or just after a closing delimiter, the sexp will be the one for those delimiters.
 But if point is both after an end delimiter and before an open delimiter, it will prefer the open delimiter."
-  (cond ((sptw-at-sexp-beginning-p)
-         (cons (point) (save-mark-and-excursion (sp-forward-sexp) (point))))
-        ;; TODO - sptw-at-sexp-end-p is causing a problem here for cases where the end delimiter matches the opening delimiter.
-        ((sptw-at-sexp-end-p)
-         (cons (save-mark-and-excursion (sp-backward-sexp) (point)) (point)))
-        (t
-         (let ((orig-point (point)))
-           (save-mark-and-excursion
-             (sp-forward-sexp)
-             (let ((end-point (point)))
-               (sp-backward-sexp)
-               (if (<= (point) orig-point end-point)
-                   (cons (point) end-point)
-                 nil)))))))
+  (let ((point (or point (point))))
+    (save-mark-and-excursion
+      (goto-char point)
+      (cond ((sptw-at-sexp-beginning-p)
+             (cons (point) (save-mark-and-excursion (sp-forward-sexp) (point))))
+            ;; TODO - sptw-at-sexp-end-p is causing a problem here for cases where the end delimiter matches the opening delimiter.
+            ((sptw-at-sexp-end-p)
+             (cons (save-mark-and-excursion (sp-backward-sexp) (point)) (point)))
+            (t
+             (let ((orig-point (point)))
+               (save-mark-and-excursion
+                 (sp-forward-sexp)
+                 (let ((end-point (point)))
+                   (sp-backward-sexp)
+                   (if (<= (point) orig-point end-point)
+                       (cons (point) end-point)
+                     nil)))))))))
 
-(defun sptw-bounds-of-sexp (point)
-  ;; TODO - I should give the other one an optional argument instead...
-  (save-mark-and-excursion
-    (goto-char point)
-    (sptw-bounds-of-sexp-at-point)))
+(defun sptw-bounds-of-delimited-sexp-at-point (&optional point)
+  "Like `sptw-bounds-of-sexp-at-point' except if the sexp-at-point is a symbol sexp, then use the parent instead."
+  (let ((bounds (sptw-bounds-of-sexp-at-point point)))
+    (and bounds
+         (if (save-mark-and-excursion (goto-char (car bounds))
+                                      (sptw-at-open-delimiter-p))
+             bounds
+           (save-mark-and-excursion (goto-char (car bounds))
+                                    (and (tree-walk--motion-moved 'sptw-up-parent-beginning)
+                                         (sptw-bounds-of-sexp-at-point)))))))
 
 (defun sptw-move-to-current-sexp-beginning ()
   "Move to the beginning of the current sexp at point."
@@ -454,9 +462,22 @@ Specifically it moves inside the parens."
     (sp-kill-sexp arg)))
 
 
-;; TODO - sp-split-sexp is defined in a useful way that works, it doesn't need a wrapper.
-;; TODO - sp-join-sexp is useful, but needs some tweaking, but I want to move on for now.
+;; sp-split-sexp is defined in a useful way that works for the model that I want, it doesn't need a wrapper.
 
+;;;###autoload (autoload 'sptw-join-sexp-forward "tree-walk-smartparens-integration.el" "" t)
+(defun sptw-join-sexp-forward (&optional count)
+  "Join the delimited sexp at point with the one before it, if they have the same delimiter type."
+  (interactive "p")
+  (let ((count (or count 1)))
+    (let ((bounds (sptw-bounds-of-delimited-sexp-at-point)))
+      (when bounds
+        (goto-char (if (<= 0 count) (cdr bounds) (car bounds)))
+        (sp-join-sexp count)))))
+;;;###autoload (autoload 'sptw-join-sexp-backward "tree-walk-smartparens-integration.el" "" t)
+(defun sptw-join-sexp-backward (&optional count)
+  "Join the delimited sexp at point with the one after it, if they have the same delimiter type."
+  (interactive "p")
+  (sptw-join-sexp-forward (- (or count 1))))
 
 
 (tree-walk-define-operations
@@ -482,7 +503,7 @@ Specifically it moves inside the parens."
  :use-next-sibling 'sptw-forward-sibling-beginning
  :use-previous-sibling (lambda () (and (tree-walk--motion-moved 'sptw-backward-sibling-end)
                                        (sptw-backward-sibling-beginning)))
- :use-bounds 'sptw-bounds-of-sexp
+ :use-bounds 'sptw-bounds-of-sexp-at-point
  :use-children-bounds 'sptw-bounds-of-sexp-children
  )
 
