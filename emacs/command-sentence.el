@@ -335,7 +335,7 @@ Otherwise, return a cons pair (PARAMS . EXECUTOR), containing the final paramete
          ((move (direction . forward)
                 (tree-vertical . ,nil) ;; options, nil, 'up, 'down
                 ;; TODO - tree-inner is very specific to smartparens object so I can go up to inner parent...
-                (tree-inner . ,nil) ;; boolean
+                (tree-inner . ,nil)     ;; boolean
                 (tree-traversal . ,nil) ;; nil or 'inorder
                 (expand-region . ,nil) ;; t for object selection, 'inner where that makes sense (eg. selecting tree children), may add more if more make sense, eg. 'space for adding surrounding white space.
                 (num . 1))
@@ -787,20 +787,24 @@ Otherwise, return a cons pair (PARAMS . EXECUTOR), containing the final paramete
           ;; TODO - rename and put this vilish-open-line stuff... somewhere reasonable
           (open line ((direction forward)) (vilish-open-line-below))
           (open line ((direction backward)) (vilish-open-line-above))
-          (open outline ((direction forward)) (wgh/outline-add-heading-below))
-          (open outline ((direction backward)) (wgh/outline-add-heading-above))
-          (open indent-tree ((direction forward)) (indent-tree-open-sibling-forward))
-          (open indent-tree ((direction backward)) (indent-tree-open-sibling-backward))
-          ;; TODO - argument to open child instead of sibling -- particularly useful for outline and indent trees
+          (open outline ((direction forward) (tree-vertical ,nil)) (,(lambda () (wgh/outline-add-heading-below) (estate-insert-state))))
+          (open outline ((direction backward) (tree-vertical ,nil)) (,(lambda () (wgh/outline-add-heading-above) (estate-insert-state))))
+          (open outline ((tree-vertical down)) (,(lambda () (message "TODO - implement open outline child"))))
+          (open indent-tree ((direction forward) (tree-vertical ,nil)) (,(lambda () (estate-insert-state-with-thunk 'indent-tree-open-sibling-forward))))
+          (open indent-tree ((direction backward) (tree-vertical ,nil)) (,(lambda () (estate-insert-state-with-thunk 'indent-tree-open-sibling-backward))))
+          (open indent-tree ((tree-vertical down)) (,(lambda () (message "TODO - implement open indent-tree child"))))
           ;; TODO - symex open - ignore unwrapped forms and open a sibling form with the same paren type, hopefully matching indentation...
 
           (split line () (,(lambda () (open-line 1))))
+          (split sptw () (sp-split-sexp))
           ;; TODO - is there something useful to do for split for outline or indent tree?  For symex or XML it has obvious meaning, but is used in the middle of a thing.  Maybe for outline it means to split the parent on the current header, inserting a new header above at the parent level.  And similar for indent tree.  Need to implement this...
           ;; TODO - split for non-tree objects has reasonably defined meaning, I suppose, but isn't very interesting.
 
           ;; TODO - I need to fix my join-line implementation to take a numerical argument
           (join line ((direction forward)) (,(lambda () (join-line/default-forward nil))))
           (join line ((direction backward)) (,(lambda () (join-line/default-forward -1))))
+          (join sptw ((direction backward)) (sptw-join-sexp-backward (num)))
+          (join sptw ((direction forward)) (sptw-join-sexp-forward (num)))
           ;; TODO - sptw - make a join-sexp function that takes a forward or backward argument
 
 
