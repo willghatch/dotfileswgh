@@ -42,6 +42,7 @@
   (estate-activate-state 'command))
 
 ;; A pager state is nice to have -- it's basically motion state but maybe with some extra keys.  The idea is that it's like command mode but you won't accidentally hit editing keys or such.
+;; TODO - ensure that when in pager state, the buffer is read-only, but when exiting go back to the previous read status.
 (estate-define-state pager estate-motion-state-keymap)
 (defun estate-pager-state ()
   (interactive)
