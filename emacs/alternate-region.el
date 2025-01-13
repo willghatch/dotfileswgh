@@ -16,7 +16,9 @@
 When there is an alternate region, it is a list (BUFFER BEGIN END).")
 
 (defface alternate-region-face
-  '((t (:inherit 'highlight)))
+  '((default (:inherit region))
+    (((background dark)) (:background "#105010"))
+    (((background light)) (:background "#a0cfaf")))
   "Face for alternate-region.")
 
 (defvar alternate-region--overlay nil
@@ -29,17 +31,47 @@ When there is an alternate region, it is a list (BUFFER BEGIN END).")
   (with-current-buffer (or buffer (current-buffer))
     (if region
         (let ((begin (car region))
-              (end (cdr region)))
+              (end (cdr region))
+              (prev-buffer (and alternate-region--current
+                                (car alternate-region--current))))
           (setq alternate-region--current (list (current-buffer) begin end))
+          (when (and prev-buffer (not (eq prev-buffer (current-buffer))))
+            (with-current-buffer prev-buffer
+              (remove-hook 'after-change-functions 'alternate-region--update t)))
           (when alternate-region--overlay
             (delete-overlay alternate-region--overlay)
             (setq alternate-region--overlay nil))
           (setq alternate-region--overlay (make-overlay begin end))
-          (overlay-put alternate-region--overlay 'face 'alternate-region-face))
+          (overlay-put alternate-region--overlay 'face 'alternate-region-face)
+          (add-hook 'after-change-functions 'alternate-region--update 10 t))
       (setq alternate-region--current nil)
+      (remove-hook 'after-change-functions 'alternate-region--update t)
       (when alternate-region--overlay
         (delete-overlay alternate-region--overlay)
         (setq alternate-region--overlay nil)))))
+
+(defun alternate-region--update (beg end prev-length)
+  "Update the alternate region when a change is made in its buffer.
+BEG and END indicate the boundaries of the changed region.
+PREV-LENGTH is the length of the text that was in the modified region."
+  (when alternate-region--current
+    (let* ((alt-buffer (car alternate-region--current))
+           (alt-start (cadr alternate-region--current))
+           (alt-end (caddr alternate-region--current))
+           (change-length (- (- end beg) prev-length)))
+
+      (when (eq (current-buffer) alt-buffer)
+        (cond
+         ((<= alt-end beg)
+          ;; Do nothing
+          )
+         ((<= end alt-start)
+          (let ((new-alt-start (+ alt-start change-length))
+                (new-alt-end (+ alt-end change-length)))
+            (alternate-region-set (cons new-alt-start new-alt-end) alt-buffer)))
+         (t
+          ;; Change overlaps with the alternate region, so just clear the alternate-region.
+          (alternate-region-set nil)))))))
 
 (defun alternate-region-activate ()
   "Activate the alternate region by setting it to the current active region."
