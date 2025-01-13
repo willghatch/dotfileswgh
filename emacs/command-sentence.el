@@ -793,6 +793,8 @@ Otherwise, return a cons pair (PARAMS . EXECUTOR), containing the final paramete
           (open indent-tree ((direction forward) (tree-vertical ,nil)) (,(lambda () (estate-insert-state-with-thunk 'indent-tree-open-sibling-forward))))
           (open indent-tree ((direction backward) (tree-vertical ,nil)) (,(lambda () (estate-insert-state-with-thunk 'indent-tree-open-sibling-backward))))
           (open indent-tree ((tree-vertical down)) (,(lambda () (message "TODO - implement open indent-tree child"))))
+          (open sptw ((direction forward) (tree-vertical ,nil)) (,(lambda () (estate-insert-state-with-thunk 'sptw-open-sibling-forward)) ()))
+          (open sptw ((direction backward) (tree-vertical ,nil)) (,(lambda () (estate-insert-state-with-thunk 'sptw-open-sibling-backward)) ()))
           ;; TODO - symex open - ignore unwrapped forms and open a sibling form with the same paren type, hopefully matching indentation...
 
           (split line () (,(lambda () (open-line 1))))

@@ -564,4 +564,108 @@ Except only expand to the inner area inside the parens."
                      (progn (backward-char (length delimiter))
                             (looking-at (regexp-quote delimiter))))))))
 
+(defun sptw--open-sibling-extra-lines (bounds)
+  "Get the number of extra lines to add.
+This is already assuming that the sibling will have newlines added.
+BOUNDS is the bounds of the current sexp."
+  (or (let ((prev-sib-bounds (save-mark-and-excursion
+                               (goto-char (car bounds))
+                               (and (tree-walk--motion-moved 'sptw-backward-sibling-beginning)
+                                    (sptw-bounds-of-sexp-at-point)))))
+        (if prev-sib-bounds
+            (let* ((sib-end-line (line-number-at-pos (cdr prev-sib-bounds)))
+                   (this-start-line (line-number-at-pos (car bounds)))
+                   (line-diff (- this-start-line sib-end-line)))
+              (when (<= 2 line-diff)
+                (- line-diff 1)))
+          (let* ((next-sib-bounds (save-mark-and-excursion
+                                    (goto-char (car bounds))
+                                    (and (tree-walk--motion-moved 'sptw-forward-sibling-beginning)
+                                         (sptw-bounds-of-sexp-at-point))))
+                 (sib-start-line (and next-sib-bounds
+                                      (line-number-at-pos (car next-sib-bounds))))
+                 (this-end-line (line-number-at-pos (cdr bounds)))
+                 (line-diff (and sib-start-line (- sib-start-line this-end-line))))
+            (when (and line-diff
+                       (<= 2 line-diff))
+              (- line-diff 1)))))
+      0))
+
+(defun sptw-open-sibling-forward ()
+  (interactive)
+  (let* ((same-line t)
+         (extra-lines 0)
+         (bounds (sptw-bounds-of-sexp-at-point)))
+    (when (not bounds)
+      (error "No smartparens object at point."))
+    (when (not (equal (line-number-at-pos (car bounds))
+                      (line-number-at-pos (cdr bounds))))
+      ;; When the current sexp is multi-line, the sibling should be on a new line.
+      (setq same-line nil))
+    (when (and same-line
+               (save-mark-and-excursion (goto-char (car bounds)) (bolp)))
+      ;; When the current sexp starts at the beginning of the line, if things
+      ;; are properly indented, it probably means that the sibling should be on
+      ;; the next line.
+      (setq same-line nil))
+    (when same-line
+      (let ((parent-bounds (save-mark-and-excursion
+                             (and (tree-walk--motion-moved 'sptw-up-parent-beginning)
+                                  (sptw-bounds-of-delimited-sexp-at-point)))))
+        (when (and parent-bounds (not (equal (line-number-at-pos (car parent-bounds))
+                                             (line-number-at-pos (cdr parent-bounds)))))
+          ;; When the parent is on a different line, the next sibling should
+          ;; probably be on a new line.
+          (setq same-line nil))))
+    (when (and same-line
+               ;; TODO - make this column number adjustable...
+               (<= 80
+                   (- (cdr bounds) (save-mark-and-excursion
+                                     (beginning-of-line) (point)))))
+      (setq same-line nil))
+
+    (when (not same-line)
+      (setq extra-lines (sptw--open-sibling-extra-lines bounds)))
+
+    (goto-char (cdr bounds))
+    (if same-line
+        (progn (insert " "))
+      (progn
+        (dotimes (i extra-lines) (insert "\n"))
+        (newline-and-indent)))))
+
+(defun sptw-open-sibling-backward ()
+  (interactive)
+  (let* ((same-line t)
+         (extra-lines 0)
+         (bounds (sptw-bounds-of-sexp-at-point)))
+    (when (not bounds)
+      (error "No smartparens object at point."))
+    (when (not (equal (line-number-at-pos (car bounds))
+                      (line-number-at-pos (cdr bounds))))
+      (setq same-line nil))
+    (when (and same-line
+               (save-mark-and-excursion (goto-char (car bounds)) (bolp)))
+      (setq same-line nil))
+    (when same-line
+      (let ((parent-bounds (save-mark-and-excursion
+                             (and (tree-walk--motion-moved 'sptw-up-parent-beginning)
+                                  (sptw-bounds-of-delimited-sexp-at-point)))))
+        (when (and parent-bounds (not (equal (line-number-at-pos (car parent-bounds))
+                                             (line-number-at-pos (cdr parent-bounds)))))
+          (setq same-line nil))))
+
+    (when (not same-line)
+      (setq extra-lines (sptw--open-sibling-extra-lines bounds)))
+
+    (goto-char (car bounds))
+    (if same-line
+        (progn (insert " ")
+               (backward-char 1))
+      (let ((indent (current-indentation)))
+        (insert "\n")
+        (dotimes (i indent) (insert " "))
+        (goto-char (car bounds))
+        (dotimes (i extra-lines) (insert "\n") (backward-char 1))))))
+
 (provide 'tree-walk-smartparens-integration)
