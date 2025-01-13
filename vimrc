@@ -236,113 +236,162 @@ command! -nargs=0 Rot13 normal ggg?G
 set timeout timeoutlen=10000 ttimeoutlen=50
 set <f13>=jk
 set <f14>=kj
-inoremap <f13> <esc>
-inoremap <f14> <esc>
-noremap - :
-inoremap <C-\> <C-o>
-inoremap <M-c> <C-o>:
-inoremap <esc>c <C-o>:
-inoremap <M-x> <C-o>:
-inoremap <esc>x <C-o>:
-noremap <M-c> :
-noremap <esc>c :
-noremap <M-x> :
-noremap <esc>x :
 
-" make C-y default paste, like in emacs
-cnoremap <C-y> <C-r>"
-inoremap <C-y> <C-r>"
-cnoremap <esc>r <C-r>
-inoremap <esc>r <C-r>
 
-" emacs style kill line in insert mode
-inoremap <C-k> <C-o>D
+"" I don't want to delete this all right now, maybe just so I can refer to it later if I ever decide to get back into using vim, although that seems very unlikely.  I guess I want it more to keep around a snapshot of the key bindings I used for so long without having to dig through git history?  But I want to go back to using vim with default key bindings.  It can be my "live off the land" editor, since I still remember most of its keybindings.  And since I am moving farther away from vim bindings, my current bindings will maybe be less of an issue for those occasions when I pull up vim.
+function! DoOldConfigBinds(n)
 
-" o and e maps - o is left/back, e is right/forward
-noremap e <nop>
-noremap o <nop>
-noremap ee e
-noremap oe ge
-noremap eo o
-noremap oo O
-noremap ec l
-noremap oc h
-noremap eE E
-noremap oE gE
-noremap ea a
-noremap oE gE
-" ghetto forward/backward arg
-noremap ea f,w
-noremap oa F,;w
-noremap eA :SidewaysRight<cr>
-noremap oA :SidewaysLeft<cr>
-omap aa <Plug>SidewaysArgumentTextobjA
-xmap aa <Plug>SidewaysArgumentTextobjA
-omap ia <Plug>SidewaysArgumentTextobjI
-xmap ia <Plug>SidewaysArgumentTextobjI
-map ew <Plug>CamelCaseMotion_w
-map ow <Plug>CamelCaseMotion_b
-map eW <Plug>CamelCaseMotion_e
-map oW <Plug>CamelCaseMotion_ge
-onoremap ilw <Plug>CamelCaseMotion_iw
-vnoremap ilw <Plug>CamelCaseMotion_iw
-noremap es )
-noremap os (
-noremap ep }
-noremap op {
-noremap eh /
-noremap oh ?
-noremap ef f
-noremap of F
-noremap et t
-noremap ot T
-noremap em ;
-noremap om ,
-noremap en n
-noremap on N
-noremap ol <bar>
-noremap o<space>l ^
-noremap el $
-noremap oL g0
-noremap eL g$
-noremap eb +
-noremap ob -
-noremap oB ^
-noremap eB _
-noremap oj <C-o>
-noremap ej <C-i>
+    inoremap <f13> <esc>
+    inoremap <f14> <esc>
+    noremap - :
+    inoremap <C-\> <C-o>
+    inoremap <M-c> <C-o>:
+    inoremap <esc>c <C-o>:
+    inoremap <M-x> <C-o>:
+    inoremap <esc>x <C-o>:
+    noremap <M-c> :
+    noremap <esc>c :
+    noremap <M-x> :
+    noremap <esc>x :
 
-noremap f ;
-noremap F ,
-noremap t <nop>
-noremap T <nop>
-noremap tr "
+    " make C-y default paste, like in emacs
+    cnoremap <C-y> <C-r>"
+    inoremap <C-y> <C-r>"
+    cnoremap <esc>r <C-r>
+    inoremap <esc>r <C-r>
 
-" I really need to figure out something better here, this binding was
-" ill-advised but now I'm used to it
-noremap <space>jl J
+    " emacs style kill line in insert mode
+    inoremap <C-k> <C-o>D
 
-noremap <space>/s :call Swoop()<CR>
-vnoremap <space>/s :call SwoopSelection()<CR>
-noremap <space>/a :call SwoopMulti()<CR>
-vnoremap <space>/a :call SwoopMultiSelection()<CR>
+    " o and e maps - o is left/back, e is right/forward
+    noremap e <nop>
+    noremap o <nop>
+    noremap ee e
+    noremap oe ge
+    noremap eo o
+    noremap oo O
+    noremap ec l
+    noremap oc h
+    noremap eE E
+    noremap oE gE
+    noremap ea a
+    noremap oE gE
+    " ghetto forward/backward arg
+    noremap ea f,w
+    noremap oa F,;w
+    noremap eA :SidewaysRight<cr>
+    noremap oA :SidewaysLeft<cr>
+    omap aa <Plug>SidewaysArgumentTextobjA
+    xmap aa <Plug>SidewaysArgumentTextobjA
+    omap ia <Plug>SidewaysArgumentTextobjI
+    xmap ia <Plug>SidewaysArgumentTextobjI
+    map ew <Plug>CamelCaseMotion_w
+    map ow <Plug>CamelCaseMotion_b
+    map eW <Plug>CamelCaseMotion_e
+    map oW <Plug>CamelCaseMotion_ge
+    onoremap ilw <Plug>CamelCaseMotion_iw
+    vnoremap ilw <Plug>CamelCaseMotion_iw
+    noremap es )
+    noremap os (
+    noremap ep }
+    noremap op {
+    noremap eh /
+    noremap oh ?
+    noremap ef f
+    noremap of F
+    noremap et t
+    noremap ot T
+    noremap em ;
+    noremap om ,
+    noremap en n
+    noremap on N
+    noremap ol <bar>
+    noremap o<space>l ^
+    noremap el $
+    noremap oL g0
+    noremap eL g$
+    noremap eb +
+    noremap ob -
+    noremap oB ^
+    noremap eB _
+    noremap oj <C-o>
+    noremap ej <C-i>
 
-nnoremap tia :BufSwitch<space>
-nnoremap tic :call BufDelOrQuit()<CR>
-nnoremap <space>tica :qa<CR>
-nnoremap tis :w<CR>
-nnoremap <space>tisa :wall<CR>
-nnoremap tie :w<CR>:call BufDelOrQuit()<CR>
-nnoremap <space>tiea :wqall<CR>
-" open file in same directory as current file
-" % mean current buffer (like with %s/foo/bar/)
-" :p means expand to full path
-" :h means head -- ie remove last component
-nnoremap tif :e <C-R>=expand("%:p:h") . "/" <CR>
-" open file from PWD
-nnoremap <space>tifd :e<space>
-nnoremap tib :bp<CR>
-nnoremap tiw :bn<CR>
+    noremap f ;
+    noremap F ,
+    noremap t <nop>
+    noremap T <nop>
+    noremap tr "
+
+    " I really need to figure out something better here, this binding was
+    " ill-advised but now I'm used to it
+    noremap <space>jl J
+
+    noremap <space>/s :call Swoop()<CR>
+    vnoremap <space>/s :call SwoopSelection()<CR>
+    noremap <space>/a :call SwoopMulti()<CR>
+    vnoremap <space>/a :call SwoopMultiSelection()<CR>
+
+    nnoremap tia :BufSwitch<space>
+    nnoremap tic :call BufDelOrQuit()<CR>
+    nnoremap <space>tica :qa<CR>
+    nnoremap tis :w<CR>
+    nnoremap <space>tisa :wall<CR>
+    nnoremap tie :w<CR>:call BufDelOrQuit()<CR>
+    nnoremap <space>tiea :wqall<CR>
+    " open file in same directory as current file
+    " % mean current buffer (like with %s/foo/bar/)
+    " :p means expand to full path
+    " :h means head -- ie remove last component
+    nnoremap tif :e <C-R>=expand("%:p:h") . "/" <CR>
+    " open file from PWD
+    nnoremap <space>tifd :e<space>
+    nnoremap tib :bp<CR>
+    nnoremap tiw :bn<CR>
+
+
+
+
+    nnoremap tst :set wrap!<CR>
+    nnoremap tsW :set wrapscan!<CR>
+    nnoremap tsh :nohl<CR>
+    nnoremap tsH :set hlsearch!<CR>
+    nnoremap tsr :set relativenumber!<CR>
+    nnoremap tsi :set ignorecase!<CR>
+    nnoremap tsa :set autoindent!<CR>
+
+    nnoremap tlb :buffers<CR>
+    nnoremap tlm :marks<CR>
+    nnoremap tlj :jumps<CR>
+    nnoremap tlr :registers<CR>
+
+    noremap <Space>h <PageDown>
+    noremap <Space>t <PageUp>
+    noremap sj <PageDown>
+    noremap sk <PageUp>
+    nnoremap <Space> v ggVG
+
+    inoremap <C-g> <esc>
+    noremap <C-g> <esc>
+    vnoremap <C-g> <esc>
+    cnoremap <C-g> <C-c>
+
+    nnoremap sm m
+    nnoremap sg `
+    nnoremap ss s
+    nnoremap sh :!
+    vnoremap sh :!
+    noremap sa :
+    vnoremap s/ :s/
+
+    noremap <space>pc "+p
+    vnoremap <space>yc "+y
+    noremap <space>ps "*p
+    vnoremap <space>ys "*y
+
+    inoremap <c-s> <c-w>
+
+endfunction
 
 " fix directory view keybindings
 augroup netrw_dir_fix
@@ -356,47 +405,6 @@ function! Fix_netrw_maps()
     nnoremap <buffer> tia :BufSwitch<space>
     nnoremap <buffer> tif :e <C-R>=expand("%:p:h") . "/" <CR>
 endfunction
-
-
-
-nnoremap tst :set wrap!<CR>
-nnoremap tsW :set wrapscan!<CR>
-nnoremap tsh :nohl<CR>
-nnoremap tsH :set hlsearch!<CR>
-nnoremap tsr :set relativenumber!<CR>
-nnoremap tsi :set ignorecase!<CR>
-nnoremap tsa :set autoindent!<CR>
-
-nnoremap tlb :buffers<CR>
-nnoremap tlm :marks<CR>
-nnoremap tlj :jumps<CR>
-nnoremap tlr :registers<CR>
-
-noremap <Space>h <PageDown>
-noremap <Space>t <PageUp>
-noremap sj <PageDown>
-noremap sk <PageUp>
-nnoremap <Space> v ggVG
-
-inoremap <C-g> <esc>
-noremap <C-g> <esc>
-vnoremap <C-g> <esc>
-cnoremap <C-g> <C-c>
-
-nnoremap sm m
-nnoremap sg `
-nnoremap ss s
-nnoremap sh :!
-vnoremap sh :!
-noremap sa :
-vnoremap s/ :s/
-
-noremap <space>pc "+p
-vnoremap <space>yc "+y
-noremap <space>ps "*p
-vnoremap <space>ys "*y
-
-inoremap <c-s> <c-w>
 
 
 " Highlighting
