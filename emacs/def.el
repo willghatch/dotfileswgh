@@ -61,20 +61,20 @@
 ;; backup settings
 (nobreak (load-library "sensitive-mode"))
 (setq
-   backup-by-copying t      ; don't clobber symlinks
-   backup-directory-alist '(("." . "~/.cache/emacs/bak"))    ; don't litter my fs tree
+   backup-by-copying t      ;; don't clobber symlinks
+   backup-directory-alist '(("." . "~/.cache/emacs/bak"))    ;; don't litter my fs tree
    delete-old-versions t
    kept-new-versions 8
    kept-old-versions 4
-   version-control t)       ; use versioned backups
-(setq auto-save-file-name-transforms '((".*" "~/.cache/emacs/auto/\\1" t))) ; auto-saves (## files) here
+   version-control t)       ;; use versioned backups
+(setq auto-save-file-name-transforms '((".*" "~/.cache/emacs/auto/\\1" t))) ;; auto-saves (## files) here
 (make-directory "~/.cache/emacs/bak/" t)
 (make-directory "~/.cache/emacs/auto/" t)
 ;; For now, just don't make backups -- I haven't needed them since I started using git everywhere.
 (setq make-backup-files nil)
 
 ;; mouse settings
-(if (fboundp 'xterm-mouse-mode) (xterm-mouse-mode) nil) ; shift-click for normal xterm mouse behavior
+(if (fboundp 'xterm-mouse-mode) (xterm-mouse-mode) nil) ;; shift-click for normal xterm mouse behavior
 (if (fboundp 'mouse-wheel-mode) (mouse-wheel-mode) nil)
 
 ;; settings that need to be loaded before their packages
@@ -95,14 +95,14 @@
 (nobreak
  ;; compile settings
  (setq load-prefer-newer t)
- ;(require 'auto-compile)
- ;(auto-compile-on-load-mode 1)
- ;(auto-compile-on-save-mode 1)
+ ;;(require 'auto-compile)
+ ;;(auto-compile-on-load-mode 1)
+ ;;(auto-compile-on-save-mode 1)
 
- (setq vc-follow-symlinks t) ; Don't prompt to follow symlinks of version-controlled files
+ (setq vc-follow-symlinks t) ;; Don't prompt to follow symlinks of version-controlled files
  (setq-default tab-width 2)
- (setq-default indent-tabs-mode nil) ; use spaces, not tabs
- (setq tab-stop-list (number-sequence 2 120 2)) ; setting tab expansion by setting stops
+ (setq-default indent-tabs-mode nil) ;; use spaces, not tabs
+ (setq tab-stop-list (number-sequence 2 120 2)) ;; setting tab expansion by setting stops
  (defun set-indent-auto (indent-p)
    "Set whether to indent when you hit enter"
    (interactive)
@@ -111,14 +111,14 @@
      (global-set-key (kbd "RET") 'newline)))
  (set-indent-auto t)
 
- (setq echo-keystrokes 0.01) ; echo keystrokes faster than default 1s
+ (setq echo-keystrokes 0.01) ;; echo keystrokes faster than default 1s
 
  (setq c-default-style "k&r"
        c-basic-offset 2)
  (setq org-startup-folded nil)
- (global-auto-revert-mode t) ; auto-reload files when they change on disk
+ (global-auto-revert-mode t) ;; auto-reload files when they change on disk
 
- (menu-bar-mode -1) ; no menu-bar
+ (menu-bar-mode -1) ;; no menu-bar
  (tool-bar-mode -1)
  (setq inhibit-splash-screen t)
  (setq inhibit-startup-message t)
@@ -129,8 +129,8 @@
  ;;; these are the most critical loads
  (load-library "init-helpers")
 
- ;(require 'evil)
- ;(evil-mode 1)
+ ;;(require 'evil)
+ ;;(evil-mode 1)
 
  ;; Don't litter with undo-tree history files everywhere.
  ;; But maybe I should also look for how to put them in my emacs cache dir?
@@ -146,14 +146,14 @@
  (setq repeatable-motion-definition-prefix "rmo/")
  (setq repeatable-motion-training-wheels-p nil)
  (require 'repeatable-motion)
- (load-library "vfuncs")
+ (require 'vfuncs)
  (load-library "keys")
  (setq evil-motion-state-local-map (make-sparse-keymap)) ;; To prevent breakage where this is still used.  TODO - delete this.
 
  ;; I wanted to try one more time to see if maybe I should just use evil-mode with some configuration changes.  But it's too set in its on-character addressing ways.  The evil-move-cursor-back setting only affects what happens when exiting insert mode.  It doesn't change the fact that evil-forward-word-end puts the cursor ON the last character (IE before it) instead of after the last character, and that it has a bunch of logic for adjusting the ranges used for operations (eg. delete forward word end deletes one character farther than the movement goes).  And I think working my full plans in with evil-mode will be difficult, at best.  And the main parts of evil-mode that I really care about that don't conflict with how evil-mode is set up have been relatively easy to re-implement in a much smaller way.  The remaining parts that I care about I can mostly just keep using from evil-mode as a lazy require.
- ;(setq evil-move-cursor-back nil)
- ;(setq evil-move-beyond-eol t)
- ;(load-library "keys-old-evil-mode")
+ ;;(setq evil-move-cursor-back nil)
+ ;;(setq evil-move-beyond-eol t)
+ ;;(load-library "keys-old-evil-mode")
  )
 
 (nobreak
@@ -166,14 +166,14 @@
    (setq evil-emacs-state-cursor 'hbar); _
    ;; evil-terminal-cursor-changer makes the font size reset (at least in Konsole)...
    ;; it's clearly a bug, and has annoyed me for a long time.  Let's not use it until it is fixed.
-   ;(require 'evil-terminal-cursor-changer)
+   ;;(require 'evil-terminal-cursor-changer)
    )
 
  ;; elscreen must start before other mode-line stuff, or it wouldn't be this high...
  ;; Elscreen is for making tabs tike I used to use in Vim... but I haven't used it for a long time, so let's disable it.
- ;(require 'elscreen)
- ;(setq elscreen-display-tab nil)
- ;(elscreen-start)
+ ;;(require 'elscreen)
+ ;;(setq elscreen-display-tab nil)
+ ;;(elscreen-start)
  (load-library "modeline-conf")
  ;; reset the header line in initial buffer, which gets messed up by elscreen
  (setq header-line-format (default-value 'header-line-format))
@@ -183,14 +183,14 @@
 
 (nobreak
  ;;(load-library "ace-jump-mode-conf")
- ;(require 'evil-little-word)
- ;;(require 'evil-args) ; autoloaded
- ;(require 'evil-surround)
- ;(global-evil-surround-mode 1)
+ ;;(require 'evil-little-word)
+ ;;(require 'evil-args) ;; autoloaded
+ ;;(require 'evil-surround)
+ ;;(global-evil-surround-mode 1)
  ;;(require 'evil-cleverparens-text-objects)
- ;(require 'evil-textobj-between)
- ;(require 'evil-textobj-anyblock)
- ;(require 'on-parens)
+ ;;(require 'evil-textobj-between)
+ ;;(require 'evil-textobj-anyblock)
+ ;;(require 'on-parens)
 
  (load-library "ido-conf")
  (ido-mode 1)
@@ -206,13 +206,13 @@
  ;; guide on disabling/enabling lsp-mode features: https://emacs-lsp.github.io/lsp-mode/tutorials/how-to-turn-off/
  (setq lsp-headerline-breadcrumb-enable nil)
 
- ;(require 'smex) ; autoloaded
- ;(require 'rainbow-delimiters) ; autoloaded
+ ;;(require 'smex) ;; autoloaded
+ ;;(require 'rainbow-delimiters) ;; autoloaded
 
  ;;(load-library "package-conf")
  ;;(load-library "straight-install")
 
- ;(load-library "yasnippet-conf")
+ ;;(load-library "yasnippet-conf")
  (setq wgh/lisp-outline-regexp
        (rx (or
             ;; Allow headings to be after comment characters, or anywhere in a blank indented line.
@@ -239,22 +239,22 @@
  (load-library "lsp-conf")
  (load-library "mode-hooks-conf")
  (load-library "company-conf")
- ;(load-library "auto-complete-conf")
+ ;;(load-library "auto-complete-conf")
  (load-library "hippie-expand-conf")
- ;(load-library "popwin-conf")
- ;(load-library "projectile-conf")
+ ;;(load-library "popwin-conf")
+ ;;(load-library "projectile-conf")
  (load-library "scratch-message")
- ;(winner-mode 1)
+ ;;(winner-mode 1)
  (load-library "delimiters-conf")
- (load-library "sexprw-conf")
+ ;;(load-library "sexprw-conf")
  ;;(show-smartparens-global-mode 1)
- ;(require 'yafolding)
- ;(yafolding-mode 1)
+ ;;(require 'yafolding)
+ ;;(yafolding-mode 1)
  (load-library "borrowed")
  ;; tty-format provides for coloring based on terminal escape codes.  I should set it to autoload at some point, but for now let's disable it.
- ;(load-library "tty-format")
- ;(require 'markchars)
- ;(markchars-global-mode t)
+ ;;(load-library "tty-format")
+ ;;(require 'markchars)
+ ;;(markchars-global-mode t)
  ;; highlight literal tab characters and trailing whitespace
  (setq whitespace-style '(face tabs trailing))
 
@@ -270,24 +270,24 @@
  (require 'smooth-scrolling)
 
  (setq highlight-indent-guides-auto-enabled nil)
- (load-library "windows")
+ ;;(load-library "windows")
  (setq hl-todo-activate-in-modes '(prog-mode))
- ;(require 'hl-todo)
- ;(global-hl-todo-mode 1)
- ;(require 'helm)
+ ;;(require 'hl-todo)
+ ;;(global-hl-todo-mode 1)
+ ;;(require 'helm)
  (load-library "helm-autoloads")
- (setq helm-swoop-pre-input-function (lambda () "")) ; disable symbol-at-point nonsense
- ;(global-anzu-mode 1)
+ (setq helm-swoop-pre-input-function (lambda () "")) ;; disable symbol-at-point nonsense
+ ;;(global-anzu-mode 1)
  (setq guide-key/guide-key-sequence '("SPC"))
  (setq guide-key/recursive-key-sequence-flag t)
  (require 'guide-key)
  (guide-key-mode 1)
- ;(global-git-commit-mode 1)
+ ;;(global-git-commit-mode 1)
  (setq whitespace-final-newline-message "\n<-- No final newline")
  (require 'whitespace-final-newline)
  (global-whitespace-final-newline-mode 1)
 
- ;(load-library "keyfreq-conf")
+ ;;(load-library "keyfreq-conf")
 )
 
 (let ((file (concat dotfileswgh-pri "emacs/def.el")))

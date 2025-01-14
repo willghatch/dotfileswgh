@@ -52,6 +52,7 @@ buffer, it will call the next-buffer-func once more if advance-on-failure-p."
 
 (defun ido-ffap-no ()
   (interactive)
+  (require 'ido)
   (let ((ido-use-filename-at-point nil))
     (call-interactively 'ido-find-file)
     ;; Say that all clients are using it.
@@ -64,6 +65,7 @@ buffer, it will call the next-buffer-func once more if advance-on-failure-p."
       (setq server-buffer-clients server-clients))))
 (defun ido-ffap-yes ()
   (interactive)
+  (require 'ido)
   (let ((ido-use-filename-at-point 'guess))
     (call-interactively 'ido-find-file)
     (when (boundp 'server-clients)
@@ -73,6 +75,7 @@ buffer, it will call the next-buffer-func once more if advance-on-failure-p."
       (setq server-buffer-clients server-clients))))
 (defun ido-find-file-from-pwd ()
   (interactive)
+  (require 'ido)
   (let* ((pwd (getenv "PWD"))
          (default-directory (if (string-suffix-p "/" pwd)
                                 pwd

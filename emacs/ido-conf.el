@@ -1,6 +1,6 @@
 
 ; ido-completion-map inherits from ido-buffer-completion-map or ido-common-completion-map
-(require 'ido)
+;;(require 'ido)
 (add-hook 'ido-setup-hook
           (lambda ()
             (define-key ido-completion-map (kbd "C-l") 'ignore)
