@@ -1,0 +1,3 @@
+#!/usr/bin/env bash
+
+nix-shell --pure --keep DOTFILESWGH ./fhs-env.nix
