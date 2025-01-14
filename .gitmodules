@@ -67,3 +67,42 @@
 [submodule "external/emacs/evil"]
 	path = external/emacs/evil
 	url = https://github.com/emacs-evil/evil
+[submodule "external/zsh/zsh-megaprompt"]
+	path = external/zsh/zsh-megaprompt
+	url = https://github.com/willghatch/zsh-megaprompt
+[submodule "external/zsh/zsh-snippets"]
+	path = external/zsh/zsh-snippets
+	url = https://github.com/willghatch/zsh-snippets
+[submodule "external/zsh/vzsh"]
+	path = external/zsh/vzsh
+	url = https://github.com/willghatch/vzsh
+[submodule "external/zsh/zsh-grml-funcs"]
+	path = external/zsh/zsh-grml-funcs
+	url = https://github.com/willghatch/zsh-grml-funcs
+[submodule "external/zsh/zsh-cdr"]
+	path = external/zsh/zsh-cdr
+	url = https://github.com/willghatch/zsh-cdr
+[submodule "external/zsh/zaw"]
+	path = external/zsh/zaw
+	url = https://github.com/zsh-users/zaw
+[submodule "external/zsh/zsh-zaw-mpd"]
+	path = external/zsh/zsh-zaw-mpd
+	url = https://github.com/willghatch/zsh-zaw-mpd
+[submodule "external/zsh/zsh-zaw-todoman"]
+	path = external/zsh/zsh-zaw-todoman
+	url = https://github.com/willghatch/zsh-zaw-todoman
+[submodule "external/zsh/zsh-hooks"]
+	path = external/zsh/zsh-hooks
+	url = https://github.com/willghatch/zsh-hooks
+[submodule "external/zsh/zsh-saneopt"]
+	path = external/zsh/zsh-saneopt
+	url = https://github.com/willghatch/zsh-saneopt
+[submodule "external/zsh/zsh-history-substring-search"]
+	path = external/zsh/zsh-history-substring-search
+	url = https://github.com/zsh-users/zsh-history-substring-search
+[submodule "external/zsh/zsh-syntax-highlighting"]
+	path = external/zsh/zsh-syntax-highlighting
+	url = https://github.com/zsh-users/zsh-syntax-highlighting
+[submodule "external/zsh/racket-shell-completion"]
+	path = external/zsh/racket-shell-completion
+	url = https://github.com/racket/shell-completion

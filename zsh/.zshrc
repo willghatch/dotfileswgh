@@ -1,14 +1,9 @@
 
-tf=$HOME/.zshrc.pre
-if [ -f "$tf" ]
-then
-    source $tf
-fi
-tf=$HOME/.bazshrc.pre
-if [ -f "$tf" ]
-then
-    source $tf
-fi
+source-if-exists() {
+    if [[ -f "$1" ]]; then
+        source "$1"
+    fi
+}
 
 if [[ -z "$WGHHOME" ]]; then
     export WGHHOME=$HOME # I want to be able to reference this, and when it's
@@ -119,40 +114,57 @@ lazy_source () {
     eval "$1 () { [ -f $2 ] && source $2 && $1 \$@ }"
 }
 
-ZGEN_AUTOLOAD_COMPINIT=false
-ZGEN_DIR=~/dotfileswgh-dotlocal/zsh/zgen
-lazy_source zgen $DOTFILESWGH/external/zsh/zgen/zgen.zsh
-#if ! zgen saved; then
-if ! source "$ZGEN_DIR/init.zsh"; then
-    echo "zgen not set up -- cloning repos"
-    zgen load zsh-users/zsh-history-substring-search
-    #zgen load hchbaw/opp.zsh
-    zgen load willghatch/zsh-cdr
-    zgen load zsh-users/zaw
-    zgen load willghatch/zsh-zaw-mpd
-    zgen load willghatch/zsh-zaw-todoman
-    zgen load willghatch/zsh-saneopt
-    zgen load willghatch/zsh-hooks
-    zgen load willghatch/zsh-megaprompt
-    zgen load willghatch/zsh-snippets
-    zgen load willghatch/zsh-grml-funcs
-    zgen load willghatch/vzsh
-    #zgen load termoshtt/zaw-systemd
-    #zgen load junkblocker/calibre-zaw-source
-    #zgen load tarrasch/zsh-colors
-    #zgen load tarrasch/zsh-bd
-    #zgen load tarrasch/zsh-functional
-    #zgen load jocelynmallon/zshmarks
-    #zgen load skx/sysadmin-util
-    #zgen load ehamberg/zsh-cabal-completion
-    zgen load zsh-users/zsh-syntax-highlighting
-    zgen load racket/shell-completion
-    # this one doesn't seem to work...
-    #zgen load RobSis/zsh-reentry-hook
+# ZGEN_AUTOLOAD_COMPINIT=false
+# ZGEN_DIR=~/dotfileswgh-dotlocal/zsh/zgen
+# lazy_source zgen $DOTFILESWGH/external/zsh/zgen/zgen.zsh
+# #if ! zgen saved; then
+# if ! source "$ZGEN_DIR/init.zsh"; then
+#     echo "zgen not set up -- cloning repos"
+#     zgen load zsh-users/zsh-history-substring-search
+#     #zgen load hchbaw/opp.zsh
+#     zgen load willghatch/zsh-cdr
+#     zgen load zsh-users/zaw
+#     zgen load willghatch/zsh-zaw-mpd
+#     zgen load willghatch/zsh-zaw-todoman
+#     zgen load willghatch/zsh-saneopt
+#     zgen load willghatch/zsh-hooks
+#     zgen load willghatch/zsh-megaprompt
+#     zgen load willghatch/zsh-snippets
+#     zgen load willghatch/zsh-grml-funcs
+#     zgen load willghatch/vzsh
+#     #zgen load termoshtt/zaw-systemd
+#     #zgen load junkblocker/calibre-zaw-source
+#     #zgen load tarrasch/zsh-colors
+#     #zgen load tarrasch/zsh-bd
+#     #zgen load tarrasch/zsh-functional
+#     #zgen load jocelynmallon/zshmarks
+#     #zgen load skx/sysadmin-util
+#     #zgen load ehamberg/zsh-cabal-completion
+#     zgen load zsh-users/zsh-syntax-highlighting
+#     zgen load racket/shell-completion
+#     # this one doesn't seem to work...
+#     #zgen load RobSis/zsh-reentry-hook
+#
+#     echo "saving zgen init file"
+#     zgen save
+# fi
 
-    echo "saving zgen init file"
-    zgen save
-fi
+source-if-exists "$DOTFILESWGH/external/zsh/zsh-history-substring-search/zsh-history-substring-search.plugin.zsh"
+source-if-exists "$DOTFILESWGH/external/zsh/zsh-cdr/cdr.plugin.zsh"
+source-if-exists "$DOTFILESWGH/external/zsh/zaw/zaw.plugin.zsh"
+source-if-exists "$DOTFILESWGH/external/zsh/zsh-zaw-mpd/zaw-mpd.plugin.zsh"
+source-if-exists "$DOTFILESWGH/external/zsh/zsh-zaw-todoman/zaw-todoman.plugin.zsh"
+source-if-exists "$DOTFILESWGH/external/zsh/zsh-saneopt/saneopt.plugin.zsh"
+source-if-exists "$DOTFILESWGH/external/zsh/zsh-hooks/zsh-hooks.plugin.zsh"
+source-if-exists "$DOTFILESWGH/external/zsh/zsh-megaprompt/zsh-megaprompt.plugin.zsh"
+source-if-exists "$DOTFILESWGH/external/zsh/zsh-snippets/snippets.plugin.zsh"
+source-if-exists "$DOTFILESWGH/external/zsh/zsh-grml-funcs/zsh-grml-funcs.plugin.zsh"
+source-if-exists "$DOTFILESWGH/external/zsh/vzsh/vzsh.plugin.zsh"
+source-if-exists "$DOTFILESWGH/external/zsh/zsh-syntax-highlighting/zsh-syntax-highlighting.plugin.zsh"
+source-if-exists "$DOTFILESWGH/external/zsh/racket-shell-completion/racket-completion.zsh"
+
+
+
 
 VZSH_MATCHER_STR='m:{a-z-}={A-Z_} m:{b,m,w,v,h,t,n,g,c,r}={0,1,2,3,4,5,6,7,8,9}'
 VZSH_ANYWHERE_MATCHER_STR='m:{a-z-}={A-Z_} m:{b,m,w,v,h,t,n,g,c,r}={0,1,2,3,4,5,6,7,8,9} l:|=* r:|=*'
@@ -552,27 +564,10 @@ fi
 #alias mv="echo training wheels: use muv wrapper"
 #alias rm="echo training wheels: use rb wrapper"
 
-tf=$WGHHOME/rootgit-dotfiles/env.sh
-if [ -f "$tf" ]
-then
-    source $tf
-fi
-tf=$WGHHOME/rootgit-dotfiles/bazshrc
-if [ -f "$tf" ]
-then
-    source $tf
-fi
-tf=$WGHHOME/rootgit-dotfiles/zshrc
-if [ -f "$tf" ]
-then
-    source $tf
-fi
-tf=$DOTFILESWGH/dotlocal/zshrc
-if [ -f "$tf" ]
-then
-    source $tf
-fi
-unset tf
+source-if-exists "$WGHHOME/rootgit-dotfiles/env.sh"
+source-if-exists "$WGHHOME/rootgit-dotfiles/bazshrc"
+source-if-exists "$WGHHOME/rootgit-dotfiles/zshrc"
+source-if-exists "$DOTFILESWGH_DOTLOCAL/zshrc"
 
 if [ -x ~/vscripts/motd.sh ]
 then
