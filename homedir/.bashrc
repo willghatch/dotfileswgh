@@ -21,7 +21,17 @@ if [[ -z "$WGHHOME" ]]; then
     export WGHHOME=$HOME # I want to be able to reference this, and when it's
     #not true(IE when I use su), I'll set this elsewhere
 fi
-export DOTFILESWGH=${DOTFILESWGH:-$WGHHOME/dotfileswgh}
+
+### detect dotfileswgh snippet
+if [ -z "$DOTFILESWGH" ]; then
+    if [ -d "$HOME/dotfileswgh" ]; then
+        export DOTFILESWGH="$HOME/dotfileswgh"
+    elif [ -d /rootgit/base.rootgit/dotfileswgh ]; then
+        export DOTFILESWGH=/rootgit/base.rootgit/dotfileswgh
+    fi
+fi
+export DOTFILESWGH="${DOTFILESWGH:-$HOME/dotfileswgh}"
+###
 
 bazsh_common=$DOTFILESWGH/bazshrc
 if [ -f $bazsh_common ]; then

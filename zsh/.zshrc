@@ -24,7 +24,19 @@ VZSH_REMAP_KEYS_P=true
 ZSH_HIGHLIGHT_HIGHLIGHTERS=(main brackets pattern cursor)
 
 # source fasd before bazsh, because they add some aliases that I will overwrite
-eval "$(fasd --init auto >/dev/null 2>&1)"
+#eval "$(fasd --init auto >/dev/null 2>&1)"
+
+### detect dotfileswgh snippet
+if [ -z "$DOTFILESWGH" ]; then
+    if [ -d "$HOME/dotfileswgh" ]; then
+        export DOTFILESWGH="$HOME/dotfileswgh"
+    elif [ -d /rootgit/base.rootgit/dotfileswgh ]; then
+        export DOTFILESWGH=/rootgit/base.rootgit/dotfileswgh
+    fi
+fi
+export DOTFILESWGH="${DOTFILESWGH:-$HOME/dotfileswgh}"
+###
+
 
 source $DOTFILESWGH/bazshrc
 typeset -U PATH
