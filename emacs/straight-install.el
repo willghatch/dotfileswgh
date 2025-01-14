@@ -28,20 +28,20 @@
   )
 
 (in 'smartparens)
-(in 'evil)
-;;(in 'key-chord)
-(in 'auto-compile)
-(in 'yafolding)
-(in 'company)
-
 (in 'rainbow-delimiters)
 (in 'rainbow-identifiers)
+(in 'company)
 (in 'rainbow-mode) ; for #123456 colors
+(in 'xclip)
+(in 'evil)
+(in 'auto-compile)
+(in 'yafolding)
+;;(in 'key-chord)
+
 (in 'ace-jump-mode)
 (in 'markchars)
 
 (in 'elscreen)
-(in 'xclip)
 (in 'ag)
 (in 'smex)
 (in 'flycheck)
