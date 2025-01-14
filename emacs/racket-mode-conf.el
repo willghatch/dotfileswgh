@@ -1,17 +1,14 @@
-(load-library "racket-mode-autoloads")
+(autoload 'racket-mode "racket-mode")
+(add-to-list 'auto-mode-alist '("\\.rkt" . racket-mode))
 
-(defun racket-close-paren-hack (&optional arg)
-  (interactive "p")
-  (if (on-parens-on-close?)
-      (self-insert-command arg)
-    (racket-insert-closing)))
 (add-hook 'racket-mode-hook
           (lambda ()
+            (require 'racket-mode-autoloads)
             (setq racket-show-functions '(racket-show-echo-area))
-            (define-key racket-mode-map "[" nil)
-            (define-key racket-mode-map ")" 'racket-close-paren-hack)
-            (define-key racket-mode-map "]" nil)
-            (define-key racket-mode-map "}" nil)
+            ;;(define-key racket-mode-map "[" nil)
+            ;;(define-key racket-mode-map ")" 'racket-close-paren-hack)
+            ;;(define-key racket-mode-map "]" nil)
+            ;;(define-key racket-mode-map "}" nil)
             (racket-xp-mode 1)
             (setq-local outline-regexp wgh/lisp-outline-regexp)
             ))
@@ -29,3 +26,8 @@
 (defun wgh/racket-xp-pre-redisplay-toggle ()
   (interactive)
   (setq wgh/racket-xp-pre-redisplay-active (not wgh/racket-xp-pre-redisplay-active)))
+
+
+(defun scribble-pdf ()
+  (interactive)
+  (start-process "scribble" "*scribble-output*" "scribble" "--pdf" (buffer-file-name)))

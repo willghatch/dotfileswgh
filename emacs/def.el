@@ -142,7 +142,6 @@
  (require 'mouse)
  (require 'mwheel)
  (setq hydra-lv nil)
- (load-library "scribble-funcs")
  (setq repeatable-motion-count-needed-prefix "rmo-c/")
  (setq repeatable-motion-definition-prefix "rmo/")
  (setq repeatable-motion-training-wheels-p nil)
