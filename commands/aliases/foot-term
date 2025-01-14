@@ -1,0 +1,2 @@
+#!/bin/sh
+exec foot --config $DOTFILESWGH/foot.ini
