@@ -22,6 +22,9 @@
 	url = https://gitlab.com/tsc25/undo-tree
 
 ### This next section is less critical to core functionality, but give most of the things I care most about when text editing.
+[submodule "external/emacs/compat"]
+	path = external/emacs/compat
+	url = https://github.com/emacs-compat/compat
 [submodule "external/emacs/dash.el"]
 	path = external/emacs/dash.el
 	url = https://github.com/magnars/dash.el

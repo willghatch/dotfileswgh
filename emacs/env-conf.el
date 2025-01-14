@@ -19,6 +19,7 @@
 
 ;; Set the name that emacs actually knows...
 (setq user-emacs-directory local-emacs.d-path)
+(setq native-comp-eln-load-path (list (concat local-emacs.d-path "eln-cache/")))
 
 ;; Straight.el config
 (defvar bootstrap-version)

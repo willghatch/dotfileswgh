@@ -65,3 +65,5 @@
    (magit-diff-range (format "%s..%s"
                              "HEAD"
                              (magit-commit-at-point)))))
+
+(provide 'magit-conf)

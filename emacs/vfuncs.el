@@ -54,6 +54,7 @@ buffer, it will call the next-buffer-func once more if advance-on-failure-p."
   (interactive)
   (require 'ido)
   (let ((ido-use-filename-at-point nil))
+    (ido-mode 1)
     (call-interactively 'ido-find-file)
     ;; Say that all clients are using it.
     ;; This is so that premacs won't close when I close the original buffer I
@@ -67,6 +68,7 @@ buffer, it will call the next-buffer-func once more if advance-on-failure-p."
   (interactive)
   (require 'ido)
   (let ((ido-use-filename-at-point 'guess))
+    (ido-mode 1)
     (call-interactively 'ido-find-file)
     (when (boundp 'server-clients)
       (mapcar (lambda (p) (process-put p 'buffers (cons (current-buffer)
@@ -76,6 +78,7 @@ buffer, it will call the next-buffer-func once more if advance-on-failure-p."
 (defun ido-find-file-from-pwd ()
   (interactive)
   (require 'ido)
+  (ido-mode 1)
   (let* ((pwd (getenv "PWD"))
          (default-directory (if (string-suffix-p "/" pwd)
                                 pwd

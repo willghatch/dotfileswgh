@@ -69,25 +69,27 @@
 ;(add-hook 'text-mode-hook #'flyspell-mode)
 (add-hook 'prog-mode-hook
           (lambda ()
-            (require 'smartparens)
-            (smartparens-mode 1)
-            (require 'rainbow-delimiters)
-            (rainbow-delimiters-mode-enable)
-            (require 'rainbow-identifiers)
-            (rainbow-identifiers-mode 1)
-            (whitespace-mode 1)
-            (company-conf-init)
-            (company-mode 1)
-            ;(projectile-mode 1)
-            ;; The electric-indent-mode adds a hook to the post-self-insert-hook, and then does auto-indentation on things like comma.  This is extremely annoying when editing a file that doesn't conform to my auto-indent rules (eg. javascript with a different style of indent for method calls on a new line).  Yet it's not necessary for indent-after-newline, which is done with the newline-and-indent command which I already have bound to enter.  So I think I prefer just using newline-and-indent and indent-region without electric-indent-mode.  But something seems to be turning it on automatically.
-            (electric-indent-mode -1)
-            (setq c-elecric-flag nil)
-            (require 'magit)
-            (require 'git-gutter)
-            (global-git-gutter-mode 1)
-            (require 'highlight-indent-guides)
-            (highlight-indent-guides-mode 1)
-            (outline-minor-mode 1)
+            (nobreak
+             (require 'smartparens)
+             (smartparens-mode 1)
+             (require 'rainbow-delimiters)
+             (rainbow-delimiters-mode-enable)
+             (require 'rainbow-identifiers)
+             (rainbow-identifiers-mode 1)
+             (whitespace-mode 1)
+             (company-conf-init)
+             (company-mode 1)
+             ;;(projectile-mode 1)
+             ;; The electric-indent-mode adds a hook to the post-self-insert-hook, and then does auto-indentation on things like comma.  This is extremely annoying when editing a file that doesn't conform to my auto-indent rules (eg. javascript with a different style of indent for method calls on a new line).  Yet it's not necessary for indent-after-newline, which is done with the newline-and-indent command which I already have bound to enter.  So I think I prefer just using newline-and-indent and indent-region without electric-indent-mode.  But something seems to be turning it on automatically.
+             (electric-indent-mode -1)
+             (setq c-elecric-flag nil)
+             (require 'magit)
+             (require 'git-gutter)
+             (global-git-gutter-mode 1)
+             (require 'highlight-indent-guides)
+             (highlight-indent-guides-mode 1)
+             (outline-minor-mode 1)
+             )
             ))
 
 
@@ -122,12 +124,14 @@
 
 (add-to-hooks
  (lambda ()
-   (require 'elisp-slime-nav)
-   (lnkmap "gdd" 'elisp-slime-nav-find-elisp-thing-at-point)
-   (lnkmap "gdp" 'pop-tag-mark)
-   (lnkmap "gD" 'elisp-slime-nav-describe-elisp-thing-at-point)
-   (eldoc-mode 1)
-   (setq-local outline-regexp wgh/lisp-outline-regexp)
+   (nobreak
+    (require 'elisp-slime-nav)
+    (lnkmap "gdd" 'elisp-slime-nav-find-elisp-thing-at-point)
+    (lnkmap "gdp" 'pop-tag-mark)
+    (lnkmap "gD" 'elisp-slime-nav-describe-elisp-thing-at-point)
+    (eldoc-mode 1)
+    (setq-local outline-regexp wgh/lisp-outline-regexp)
+    )
    )
  '(emacs-lisp-mode-hook
    lisp-interaction-mode-hook))
@@ -145,9 +149,9 @@
 
 (with-eval-after-load 'git-rebase
   (setq auto-mode-alist (rassq-delete-all 'git-rebase-mode auto-mode-alist))
-  (fset magit-git-rebase-mode-really git-rebase-mode)
+  ;;(fset magit-git-rebase-mode-really git-rebase-mode)
   ;; This eval-after-load is loaded after the auto-mode-alist has done its work, so the best way to disable git-rebase-mode seems to be to undefine the symbol.
-  (fset git-rebase-mode nil)
+  (fset 'git-rebase-mode nil)
   )
 (add-hook 'git-rebase-mode-hook
           (lambda ()
@@ -188,7 +192,7 @@
  'magit-log-mode-hook
  (lambda ()
    ;; Don't override my evil-mode keymap with your default bindings.
-   (load-library "magit-conf")
+   (require 'magit-conf)
    (setcdr magit-log-mode-map nil)
    (setq magit-log-margin
          (list

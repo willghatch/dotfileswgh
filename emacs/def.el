@@ -125,6 +125,11 @@
 ;; keys, keys, keys!!!
 (nobreak
 
+ (setq repeatable-motion-count-needed-prefix "rmo-c/")
+ (setq repeatable-motion-definition-prefix "rmo/")
+ (setq repeatable-motion-training-wheels-p nil)
+ (require 'repeatable-motion)
+
  ;; Don't litter with undo-tree history files everywhere.
  ;; But maybe I should also look for how to put them in my emacs cache dir?
  ;; Persistent undo would be useful, but also annoying for when I really want to just get a file to its original state when I opened it.
@@ -135,13 +140,8 @@
  (require 'mouse)
  (require 'mwheel)
  (setq hydra-lv nil)
- (setq repeatable-motion-count-needed-prefix "rmo-c/")
- (setq repeatable-motion-definition-prefix "rmo/")
- (setq repeatable-motion-training-wheels-p nil)
- (require 'repeatable-motion)
  (require 'vfuncs)
  (load-library "keys")
- (setq evil-motion-state-local-map (make-sparse-keymap)) ;; To prevent breakage where this is still used.  TODO - delete this.
 
  ;; I wanted to try one more time to see if maybe I should just use evil-mode with some configuration changes.  But it's too set in its on-character addressing ways.  The evil-move-cursor-back setting only affects what happens when exiting insert mode.  It doesn't change the fact that evil-forward-word-end puts the cursor ON the last character (IE before it) instead of after the last character, and that it has a bunch of logic for adjusting the ranges used for operations (eg. delete forward word end deletes one character farther than the movement goes).  And I think working my full plans in with evil-mode will be difficult, at best.  And the main parts of evil-mode that I really care about that don't conflict with how evil-mode is set up have been relatively easy to re-implement in a much smaller way.  The remaining parts that I care about I can mostly just keep using from evil-mode as a lazy require.
  ;;(setq evil-move-cursor-back nil)
@@ -152,15 +152,15 @@
 (nobreak
  ;;; secondarily important
  (require 'xclip-conf)
- (unless (display-graphic-p)
-   (setq evil-normal-state-cursor 'box); █
-   (setq evil-visual-state-cursor 'box); █
-   (setq evil-insert-state-cursor 'bar); ⎸
-   (setq evil-emacs-state-cursor 'hbar); _
-   ;; evil-terminal-cursor-changer makes the font size reset (at least in Konsole)...
-   ;; it's clearly a bug, and has annoyed me for a long time.  Let's not use it until it is fixed.
-   ;;(require 'evil-terminal-cursor-changer)
-   )
+ ;; (unless (display-graphic-p)
+ ;;   (setq evil-normal-state-cursor 'box); █
+ ;;   (setq evil-visual-state-cursor 'box); █
+ ;;   (setq evil-insert-state-cursor 'bar); ⎸
+ ;;   (setq evil-emacs-state-cursor 'hbar); _
+ ;;   ;; evil-terminal-cursor-changer makes the font size reset (at least in Konsole)...
+ ;;   ;; it's clearly a bug, and has annoyed me for a long time.  Let's not use it until it is fixed.
+ ;;   ;;(require 'evil-terminal-cursor-changer)
+ ;;   )
 
  ;; elscreen must start before other mode-line stuff, or it wouldn't be this high...
  ;; Elscreen is for making tabs tike I used to use in Vim... but I haven't used it for a long time, so let's disable it.
@@ -184,9 +184,9 @@
              (define-key ido-completion-map (kbd "M-r") 'evil-paste-from-register)
              ))
 
- (ido-mode 1)
- (setq ido-enable-flex-matching t
-       ido-everywhere t)
+ ;;(ido-mode 1)
+ ;; (setq ido-enable-flex-matching t
+ ;;       ido-everywhere t)
  ;;(require 'flx-ido)
  ;;(flx-ido-mode 1)
 
@@ -223,7 +223,7 @@
 
  (setq-default fill-column 80)
  (global-display-fill-column-indicator-mode 1)
- 
+
  (defun lsp-common-setup ()
    (require 'lsp)
    (setq lsp-headerline-breadcrumb-enable nil)
@@ -271,8 +271,9 @@
  (setq helm-swoop-pre-input-function (lambda () "")) ;; disable symbol-at-point nonsense
  (setq guide-key/guide-key-sequence '("SPC"))
  (setq guide-key/recursive-key-sequence-flag t)
- (require 'guide-key)
- (guide-key-mode 1)
+ ;; I like the idea of guide-key, but in practice it doesn't show up in most places where I want it, so I rarely get any benefit.  I think I need to set up my keymaps in a different way for it to work well.
+ ;;(require 'guide-key)
+ ;;(guide-key-mode 1)
  (setq whitespace-final-newline-message "\n<-- No final newline")
  (require 'whitespace-final-newline)
  (global-whitespace-final-newline-mode 1)
