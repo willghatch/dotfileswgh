@@ -518,7 +518,7 @@
 ;; t map
 (emmap "tt" 'temp-key-map)
 
-(emmap "tia" 'switch-to-buffer)
+(emmap "tia" 'wgh/ido-switch-buffer)
 (emmap "tic" 'kill-buffer-or-quit-emacs)
 (emmap " tica" 'save-buffers-kill-terminal)
 (emmap "tis" 'save-buffer)

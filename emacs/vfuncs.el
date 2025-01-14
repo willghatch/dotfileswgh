@@ -84,6 +84,11 @@ buffer, it will call the next-buffer-func once more if advance-on-failure-p."
                                 pwd
                               (concat pwd "/"))))
     (call-interactively 'ido-ffap-no)))
+(defun wgh/ido-switch-buffer ()
+  (interactive)
+  (require 'ido)
+  (ido-mode 1)
+  (ido-switch-buffer))
 (defun chdir (dir)
   (interactive "Dcd:")
   (if (file-directory-p dir)
