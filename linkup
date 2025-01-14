@@ -8,7 +8,7 @@ cd $DOTFILESWGH
 
 rglinkup="$DOTFILESWGH/external/misc/rootgit-tools/rootgit-linkup"
 
-dostuff() {
+do-base() {
     #stow --no-folding --restow homedir
     if [ "$DOTFILESWGH" = "$HOME/dotfileswgh" ]; then
         # relative link for this nice case
@@ -17,11 +17,25 @@ dostuff() {
         # but fall back to absolute link if necessary
         "$rglinkup" "$HOME" "$DOTFILESWGH/homedir"
     fi
+
+    # the cache could hold sensitive stuff
+    chmod 700 $HOME/.cache
+
+    # get terminfo set up
+    tic -x xterm-256color-italic.terminfo
+    tic -x xterm-24bit.terminfo
+    tic -x xterm-24bit-italic.terminfo
+
+        # Some programs like to modify config files without asking me about it.  Usually the diffs are for very unimportant things, or they can't keep separation between proper config and state (eg. last UI state) that they want to save.  Let's make some files read-only to stop getting stupid git changes.
+    chmod 444 config/konsolerc
+    chmod 444 config/htop/htoprc
+}
+
+
+do-more() {
     # Make sundry directories and files so things (especially vim) don't complain
     # and stuff that I just like to be there in general
     mkdir -p $HOME/.cache/vimtmp
-    # the cache could hold sensitive stuff
-    chmod 700 $HOME/.cache
     mkdir -p $HOME/prifs
     chmod 700 $HOME/prifs
     mkdir -p $HOME/dl # my default download directory
@@ -36,27 +50,22 @@ dostuff() {
     #ln -sf ../../../usercss dotlocal/firefox-default-profile/chrome/
     #echo '@import url("./usercss/master.css")' > dotlocal/firefox-default-profile/chrome/userContent.css
 
-    # get terminfo set up
-    tic -x xterm-256color-italic.terminfo
-    tic -x xterm-24bit.terminfo
-    tic -x xterm-24bit-italic.terminfo
 
     mkdir -p $HOME/.mozilla/firefox/
     cp -f firefox-profile.ini $HOME/.mozilla/firefox/profiles.ini
-
-    # Some programs like to modify config files without asking me about it.  Usually the diffs are for very unimportant things, or they can't keep separation between proper config and state (eg. last UI state) that they want to save.  Let's make some files read-only to stop getting stupid git changes.
-    chmod 444 config/konsolerc
-    chmod 444 config/htop/htoprc
 }
 
 
 #######################################
 
-if [ "s-$1" = "s-do" ]
-then
-    dostuff
+if [ "$1" = "base" ]; then
+    do-base
+elif [ "$1" = "more" ]; then
+    do-base
+    do-more
 else
-    echo "usage: linkup.bash < do >"
+    echo "usage: linkup.bash < base, more >"
     echo "       Be sure to run this IN the dotfileswgh directory."
+    echo "       With DOTFILESWGH set appropriately."
 fi
 
