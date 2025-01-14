@@ -7,6 +7,9 @@
 ### emacs
 
 ### These top few are the most important to have my core functionality.
+[submodule "external/emacs/repeatable-motion"]
+	path = external/emacs/repeatable-motion
+	url = https://github.com/willghatch/emacs-repeatable-motion
 [submodule "external/emacs/hydra"]
 	path = external/emacs/hydra
 	url = https://github.com/abo-abo/hydra
@@ -34,6 +37,9 @@
 [submodule "external/emacs/xclip"]
 	path = external/emacs/xclip
 	url = https://github.com/emacsmirror/xclip
+[submodule "external/emacs/company"]
+	path = external/emacs/company
+	url = https://github.com/company-mode/company-mode
 [submodule "external/emacs/rainbow-mode"]
 	path = external/emacs/rainbow-mode
 	url = https://github.com/emacsmirror/rainbow-mode
@@ -118,12 +124,9 @@
 [submodule "external/misc/dictionaries"]
 	path = external/misc/dictionaries
 	url = https://github.com/willghatch/dictionaries
+[submodule "external/misc/rootgit-tools"]
+	path = external/misc/rootgit-tools
+	url = https://github.com/willghatch/rootgit-tools
 
 ################################################################################
 
-[submodule "external/emacs/repeatable-motion"]
-	path = external/emacs/repeatable-motion
-	url = https://github.com/willghatch/emacs-repeatable-motion
-[submodule "external/emacs/company"]
-	path = external/emacs/company
-	url = https://github.com/company-mode/company-mode
