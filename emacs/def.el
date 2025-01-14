@@ -35,7 +35,8 @@
  ;; key bindings with requires or otherwise force autoload evaluation for things
  ;; that I care about.
  (let ((default-directory (concat straight-base-dir "straight/build")))
-   (normal-top-level-add-subdirs-to-load-path))
+   (when (file-exists-p default-directory)
+     (normal-top-level-add-subdirs-to-load-path)))
  )
 
 (defun load-library--around (orig-fun &rest args)
@@ -264,7 +265,7 @@
  (setq-default scroll-up-aggressively 0.0)
  (setq scroll-down-aggressively 0.0)
  (setq-default scroll-down-aggressively 0.0)
- (require 'smooth-scrolling)
+ ;;(require 'smooth-scrolling)
 
  (setq highlight-indent-guides-auto-enabled nil)
  (setq hl-todo-activate-in-modes '(prog-mode))
