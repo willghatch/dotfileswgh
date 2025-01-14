@@ -20,26 +20,30 @@
 
   (straight-thaw-versions)
 
-  ;; Load core packages most critical to my config running at all.
-  (straight-use-package 'repeatable-motion)
-  (straight-use-package 'hydra)
-  (straight-use-package 'undo-tree)
+  ;;; Load core packages most critical to my config running at all.
+  ;;; These are now dotfileswgh submodules
+  ;;(straight-use-package 'repeatable-motion)
+  ;;(straight-use-package 'hydra)
+  ;;(straight-use-package 'undo-tree)
   ;; The above are the most critical to getting my config running at all.
   )
 
-(in 'smartparens)
-(in 'rainbow-delimiters)
-(in 'rainbow-identifiers)
-(in 'company)
-(in 'rainbow-mode) ; for #123456 colors
-(in 'xclip)
+;;; Next most important group
+;;; These are also now submodules
+;;(in 'smartparens)
+;;(in 'rainbow-delimiters)
+;;(in 'rainbow-identifiers)
+;;(in 'company)
+;;(in 'rainbow-mode) ; for #123456 colors
+;;(in 'xclip)
+;;(in 'magit)
+;;(in 'evil)
+;;(in 'systemd)
+
 (in 'yafolding)
 (in 'smooth-scrolling)
-(in 'magit)
 (in 'git-gutter)
 (in 'blamer) ;; show git blame on line
-(in 'evil)
-(in 'systemd)
 ;;(in 'guide-key)
 ;;(in 'key-chord)
 

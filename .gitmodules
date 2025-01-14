@@ -34,3 +34,36 @@
 [submodule "external/emacs/emacs-repeatable-motion"]
 	path = external/emacs/emacs-repeatable-motion
 	url = https://github.com/willghatch/emacs-repeatable-motion
+[submodule "external/emacs/queue"]
+	path = external/emacs/queue
+	url = https://github.com/emacs-straight/queue
+[submodule "external/emacs/dash.el"]
+	path = external/emacs/dash.el
+	url = https://github.com/magnars/dash.el
+[submodule "external/emacs/smartparens"]
+	path = external/emacs/smartparens
+	url = https://github.com/Fuco1/smartparens
+[submodule "external/emacs/rainbow-delimiters"]
+	path = external/emacs/rainbow-delimiters
+	url = https://github.com/Fanael/rainbow-delimiters
+[submodule "external/emacs/rainbow-identifiers"]
+	path = external/emacs/rainbow-identifiers
+	url = https://github.com/Fanael/rainbow-identifiers
+[submodule "external/emacs/company-mode"]
+	path = external/emacs/company-mode
+	url = https://github.com/company-mode/company-mode
+[submodule "external/emacs/xclip"]
+	path = external/emacs/xclip
+	url = https://github.com/emacsmirror/xclip
+[submodule "external/emacs/rainbow-mode"]
+	path = external/emacs/rainbow-mode
+	url = https://github.com/emacsmirror/rainbow-mode
+[submodule "external/emacs/systemd-mode"]
+	path = external/emacs/systemd-mode
+	url = https://github.com/holomorph/systemd-mode
+[submodule "external/emacs/magit"]
+	path = external/emacs/magit
+	url = https://github.com/magit/magit
+[submodule "external/emacs/evil"]
+	path = external/emacs/evil
+	url = https://github.com/emacs-evil/evil
