@@ -240,7 +240,6 @@
                 (ansi-color-buffer)
                 ))))
 
-(load-library "js-conf")
 
 (add-hook 'solidity-mode-hook
           (lambda ()
@@ -321,3 +320,8 @@
   (lsp))
 (add-hook 'tablegen-mode-hook 'wgh/start-lsp-for-mlir)
 (add-hook 'mlir-mode-hook 'wgh/start-lsp-for-mlir)
+
+
+(load-library "js-conf")
+(load-library "racket-mode-conf")
+(load-library "haskell-mode-conf")

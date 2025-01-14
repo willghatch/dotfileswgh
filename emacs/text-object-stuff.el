@@ -386,14 +386,5 @@ If no region is active, it will use (point . point)."
 
 
 (defvar run-text-object-stuff-tests nil)
-(when run-text-object-stuff-tests
-  (require 'ert)
-  (setq some-words "The quick brown fox jumps over the lazy dog.")
-  (ert-deftest misc-tests ()
-    (with-temp-buffer
-      (insert some-words)
-      (goto-char 6)
-      (message "region active in test: %s" (region-active-p))
-      (should (equal (cons 5 10)
-                     (wgh/-expanded-region-to-bounds-of-thing-at-point t nil 'word (cons 7 9))))))
-  )
+
+(provide 'text-object-stuff)
