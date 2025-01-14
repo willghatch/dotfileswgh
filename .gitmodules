@@ -25,3 +25,12 @@
 [submodule "external/emacs/straight.el"]
 	path = external/emacs/straight.el
 	url = https://github.com/radian-software/straight.el
+[submodule "external/emacs/hydra"]
+	path = external/emacs/hydra
+	url = https://github.com/abo-abo/hydra
+[submodule "external/emacs/undo-tree"]
+	path = external/emacs/undo-tree
+	url = https://gitlab.com/tsc25/undo-tree
+[submodule "external/emacs/emacs-repeatable-motion"]
+	path = external/emacs/emacs-repeatable-motion
+	url = https://github.com/willghatch/emacs-repeatable-motion

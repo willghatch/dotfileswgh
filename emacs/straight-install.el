@@ -33,10 +33,17 @@
 (in 'company)
 (in 'rainbow-mode) ; for #123456 colors
 (in 'xclip)
-(in 'evil)
-(in 'auto-compile)
 (in 'yafolding)
+(in 'smooth-scrolling)
+(in 'magit)
+(in 'git-gutter)
+(in 'blamer) ;; show git blame on line
+(in 'evil)
+(in 'systemd)
+;;(in 'guide-key)
 ;;(in 'key-chord)
+
+
 
 (in 'ace-jump-mode)
 (in 'markchars)
@@ -46,18 +53,12 @@
 (in 'smex)
 (in 'flycheck)
 (in 'highlight-chars)
-(in 'hlinum)
 (in 'elisp-slime-nav)
 ;;(in 'projectile)
 (in 'flx-ido)
 (in 'expand-region)
 ;;(in 'popwin)
 ;;(in 'linum-relative)
-(in 'smooth-scrolling)
-(in 'guide-key)
-(in 'magit)
-(in 'git-gutter)
-(in 'blamer) ;; show git blame on line
 
 (in 'helm)
 (in 'helm-lsp)
@@ -79,6 +80,8 @@
 ;;(in 'counsel)
 
 
+(in 'hlinum)
+(in 'auto-compile)
 (in 'js2-mode)
 (in 'js2-refactor)
 (in 'typescript-mode)
@@ -104,7 +107,6 @@
 (in 'highlight-indent-guides)
 ;;(in 'hl-todo)
 ;;(in 'git-commit)
-(in 'systemd)
 (in 'lsp-java)
 (in 'solidity-mode)
 
