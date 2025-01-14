@@ -1,27 +1,13 @@
-# $WGHHOME is set so that I can su to other accounts and keep using my settings
-if [ -z "$WGHHOME" ]; then
-    export WGHHOME=$HOME
-fi
-export DOTFILESWGH="${DOTFILESWGH:-$WGHHOME/dotfileswgh}"
+export DOTFILESWGH="${DOTFILESWGH:-$HOME/dotfileswgh}"
 source $DOTFILESWGH/env-more.sh
 
-# When $WGHHOME is not equal to $HOME I've switched to another user, and while I'll
-# want to keep using my normal dotfiles and such for most things, some settings will
-# need to change.
-i-am-me() {
-    if [[ "$HOME" = "$WGHHOME" ]]; then
-        return 0
-    else
-        return 1
-    fi
-}
 
 if /system/bin/true >/dev/null 2>&1; then
     # I'm on android... bleh...
     export ANDROID_TERMUX_MODE=true
 fi
 
-export GUIX_PROFILE=$WGHHOME/.guix-profile
+export GUIX_PROFILE=$HOME/.guix-profile
 export GUIX_LOCPATH=$GUIX_PROFILE/lib/locale
 if [[ "$USE_GUIX" = "true" && -f "$GUIX_PROFILE/etc/profile" ]]; then
     source "$GUIX_PROFILE/etc/profile"
@@ -220,7 +206,7 @@ then
     source $bazsh_common_pri
 fi
 
-bazsh_common_rootgit=$WGHHOME/rootgit-dotfiles/bazshrc
+bazsh_common_rootgit=$HOME/rootgit-dotfiles/bazshrc
 if [ -f $bazsh_common_rootgit ]
 then
     source $bazsh_common_rootgit

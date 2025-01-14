@@ -5,10 +5,6 @@ source-if-exists() {
     fi
 }
 
-if [[ -z "$WGHHOME" ]]; then
-    export WGHHOME=$HOME # I want to be able to reference this, and when it's
-    #not true(IE when I use su), I'll set this elsewhere
-fi
 
 COMPDUMPFILE=$HOME/.cache/zshcompdump
 ZSH_COMPDUMP=$COMPDUMPFILE
@@ -30,7 +26,7 @@ ZSH_HIGHLIGHT_HIGHLIGHTERS=(main brackets pattern cursor)
 # source fasd before bazsh, because they add some aliases that I will overwrite
 eval "$(fasd --init auto >/dev/null 2>&1)"
 
-source $WGHHOME/dotfileswgh/bazshrc
+source $DOTFILESWGH/bazshrc
 typeset -U PATH
 fpath=($fpath /run/current-system/sw/share/zsh/site-functions)
 fpath=($fpath $DOTFILESWGH/zsh/completion/)
@@ -564,9 +560,9 @@ fi
 #alias mv="echo training wheels: use muv wrapper"
 #alias rm="echo training wheels: use rb wrapper"
 
-source-if-exists "$WGHHOME/rootgit-dotfiles/env.sh"
-source-if-exists "$WGHHOME/rootgit-dotfiles/bazshrc"
-source-if-exists "$WGHHOME/rootgit-dotfiles/zshrc"
+#source-if-exists "$WGHHOME/rootgit-dotfiles/env.sh"
+#source-if-exists "$WGHHOME/rootgit-dotfiles/bazshrc"
+#source-if-exists "$WGHHOME/rootgit-dotfiles/zshrc"
 source-if-exists "$DOTFILESWGH_DOTLOCAL/zshrc"
 
 if [ -x ~/vscripts/motd.sh ]

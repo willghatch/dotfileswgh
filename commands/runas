@@ -12,6 +12,11 @@
 # This will always run me with zsh, and needs sudo access, not just su.  For
 # when I don't have sudo, there is a similar be-su wrapper script.
 
+if [[ "$1" = "--keep" ]]; then
+    keep=true
+    shift
+fi
+
 user="$1"
 shift
 
@@ -24,9 +29,19 @@ unset XDG_RUNTIME_DIR
 unset MAIL
 
 if [[ "${0:$((${#0} - 2)):2}" = "be" ]]; then
-    # keep zdotdir by going through bash... somehow that works.
-    exec sudo -E -u $user bash --rcfile $WGHHOME/.bashrc -i -c zsh
+    if [[ "$keep" = true ]]; then
+        # keep zdotdir by going through bash... somehow that works.
+        exec sudo -E -u $user bash --rcfile $DOTFILESWGH/bashrc -i -c zsh
+    else
+        DOTFILESWGH="$(detect-dotfileswgh)"
+        exec sudo --preserve-env=DOTFILESWGH -u $user bash --rcfile $DOTFILESWGH/bashrc -i -c zsh
+    fi
 else
-    exec sudo -E -u $user "$@"
+    if [[ "$keep" = true ]]; then
+        exec sudo -E -u $user "$@"
+    else
+        DOTFILESWGH="$(detect-dotfileswgh)"
+        exec sudo --preserve-env=DOTFILESWGH -u $user "$@"
+    fi
 fi
 

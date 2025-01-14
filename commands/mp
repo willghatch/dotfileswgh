@@ -13,14 +13,14 @@ if [[ "--new" = "$name" ]]; then
 fi
 
 if [[ "$new" = 1 ]]; then
-    mkdir -p $WGHHOME/prifs/$name $WGHHOME/prifs/.enc/$name
+    mkdir -p $HOME/prifs/$name $HOME/prifs/.enc/$name
 fi
 
-if [[ ! -d $WGHHOME/prifs/.enc/$name ]]; then
+if [[ ! -d $HOME/prifs/.enc/$name ]]; then
     echo "Error, prifs enc doesn't exist for: $name"
     exit 1
 fi
-if [[ ! -d $WGHHOME/prifs/$name ]]; then
+if [[ ! -d $HOME/prifs/$name ]]; then
     echo "Error, prifs mount doesn't exist for: $name"
     exit 1
 fi
@@ -39,6 +39,6 @@ fi
 
 
 # Note that $idle is purposely not in quotes to splice away when empty.
-chmod 700 $WGHHOME/prifs/$name $WGHHOME/prifs/.enc/$name &&
-encfs $idle $WGHHOME/prifs/.enc/$name $WGHHOME/prifs/$name
+chmod 700 $HOME/prifs/$name $HOME/prifs/.enc/$name &&
+encfs $idle $HOME/prifs/.enc/$name $HOME/prifs/$name
 
