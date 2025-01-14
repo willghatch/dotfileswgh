@@ -3,11 +3,20 @@
 # Script to put symlinks for dotfiles
 # assumes my dotfiles git repo is at $HOME/dotfileswgh
 
-DOTFILESWGH=$HOME/dotfileswgh
+DOTFILESWGH=${DOTFILESWGH:-$HOME/dotfileswgh}
 cd $DOTFILESWGH
 
+rglinkup="$DOTFILESWGH/external/misc/rootgit-tools/rootgit-linkup"
+
 dostuff() {
-    stow --no-folding --restow homedir
+    #stow --no-folding --restow homedir
+    if [ "$DOTFILESWGH" = "$HOME/dotfileswgh" ]; then
+        # relative link for this nice case
+        "$rglinkup" "$HOME" dotfileswgh/homedir
+    else
+        # but fall back to absolute link if necessary
+        "$rglinkup" "$HOME" "$DOTFILESWGH/homedir"
+    fi
     # Make sundry directories and files so things (especially vim) don't complain
     # and stuff that I just like to be there in general
     mkdir -p $HOME/.cache/vimtmp
