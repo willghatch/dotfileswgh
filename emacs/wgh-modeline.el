@@ -193,3 +193,5 @@
                       (set-buffer b)
                       (setq mode-line-format (default-value 'mode-line-format))))
         (buffer-list))
+
+(provide 'wgh-modeline)

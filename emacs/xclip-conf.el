@@ -40,3 +40,5 @@
        (unless (eolp) (forward-char))
        (xpaste)
        (backward-char))
+
+(provide 'xclip-conf)

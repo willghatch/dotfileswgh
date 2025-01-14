@@ -17,10 +17,6 @@
 (nobreak
  (setq package-user-dir (concat local-emacs.d-path "elpa/"))
  ;; Set up load path for requires
- ;;(let ((default-directory local-emacs.d-path))
- ;;  (normal-top-level-add-subdirs-to-load-path))
- ;;(let ((default-directory "/usr/share/emacs/site-lisp/"))
- ;;  (normal-top-level-add-subdirs-to-load-path))
  (let ((default-directory (concat dotfileswgh "emacs/")))
    (normal-top-level-add-subdirs-to-load-path))
  (let ((default-directory (concat dotfileswgh "external/emacs/")))
@@ -28,7 +24,8 @@
  (let ((default-directory (concat dotfileswgh-pri "emacs/")))
    (normal-top-level-add-subdirs-to-load-path))
  (let ((default-directory (concat dotfileswgh-dotlocal "emacs/")))
-   (normal-top-level-add-subdirs-to-load-path))
+   (when (file-exists-p default-directory)
+     (normal-top-level-add-subdirs-to-load-path)))
  (setq load-path (cons (concat local-emacs.d-path "single-files/") load-path))
  (setq load-path (cons (concat dotfileswgh "emacs/") load-path))
  (setq load-path (cons (concat dotfileswgh-pri "emacs/") load-path))
@@ -55,11 +52,12 @@
 
 (nobreak (require 'wgh-theme))
 (setq custom-file (concat local-emacs.d-path "custom-file.el"))
-(nobreak (load custom-file))
+(nobreak (when (file-exists-p custom-file)
+           (load custom-file)))
 
 
 ;; backup settings
-(nobreak (load-library "sensitive-mode"))
+(nobreak (require 'sensitive-mode))
 (setq
    backup-by-copying t      ;; don't clobber symlinks
    backup-directory-alist '(("." . "~/.cache/emacs/bak"))    ;; don't litter my fs tree
@@ -126,11 +124,6 @@
 
 ;; keys, keys, keys!!!
 (nobreak
- ;;; these are the most critical loads
- (load-library "init-helpers")
-
- ;;(require 'evil)
- ;;(evil-mode 1)
 
  ;; Don't litter with undo-tree history files everywhere.
  ;; But maybe I should also look for how to put them in my emacs cache dir?
@@ -158,7 +151,7 @@
 
 (nobreak
  ;;; secondarily important
- (load-library "xclip-conf")
+ (require 'xclip-conf)
  (unless (display-graphic-p)
    (setq evil-normal-state-cursor 'box); █
    (setq evil-visual-state-cursor 'box); █
@@ -174,7 +167,7 @@
  ;;(require 'elscreen)
  ;;(setq elscreen-display-tab nil)
  ;;(elscreen-start)
- (load-library "modeline-conf")
+ (require 'wgh-modeline)
  ;; reset the header line in initial buffer, which gets messed up by elscreen
  (setq header-line-format (default-value 'header-line-format))
 
@@ -182,22 +175,20 @@
 
 
 (nobreak
- ;;(load-library "ace-jump-mode-conf")
- ;;(require 'evil-little-word)
- ;;(require 'evil-args) ;; autoloaded
- ;;(require 'evil-surround)
- ;;(global-evil-surround-mode 1)
- ;;(require 'evil-cleverparens-text-objects)
- ;;(require 'evil-textobj-between)
- ;;(require 'evil-textobj-anyblock)
- ;;(require 'on-parens)
+ ;; ido-completion-map inherits from ido-buffer-completion-map or ido-common-completion-map
+ (add-hook 'ido-setup-hook
+           (lambda ()
+             (define-key ido-completion-map (kbd "C-l") 'ignore)
+             (define-key ido-completion-map (kbd "C-f") 'ido-next-match)
+             (define-key ido-completion-map (kbd "C-b") 'ido-prev-match)
+             (define-key ido-completion-map (kbd "M-r") 'evil-paste-from-register)
+             ))
 
- (load-library "ido-conf")
  (ido-mode 1)
  (setq ido-enable-flex-matching t
        ido-everywhere t)
- (require 'flx-ido)
- (flx-ido-mode 1)
+ ;;(require 'flx-ido)
+ ;;(flx-ido-mode 1)
 
  ;; don't shrink the line number width
  (setq display-line-numbers-grow-only t)
@@ -206,11 +197,6 @@
  ;; guide on disabling/enabling lsp-mode features: https://emacs-lsp.github.io/lsp-mode/tutorials/how-to-turn-off/
  (setq lsp-headerline-breadcrumb-enable nil)
 
- ;;(require 'smex) ;; autoloaded
- ;;(require 'rainbow-delimiters) ;; autoloaded
-
- ;;(load-library "package-conf")
- ;;(load-library "straight-install")
 
  ;;(load-library "yasnippet-conf")
  (setq wgh/lisp-outline-regexp
@@ -233,28 +219,39 @@
             ;; Allow headings to be after comment characters, or anywhere in a blank indented line.
             (seq (* blank) (? (seq "--" (* "-"))) (* blank) (+ "*"))
             )))
- (load-library "org-mode-conf")
+ (require 'org-mode-conf)
+
  (setq-default fill-column 80)
  (global-display-fill-column-indicator-mode 1)
- (load-library "lsp-conf")
- (load-library "mode-hooks-conf")
- (load-library "company-conf")
- ;;(load-library "auto-complete-conf")
- (load-library "hippie-expand-conf")
+ 
+ (defun lsp-common-setup ()
+   (require 'lsp)
+   (setq lsp-headerline-breadcrumb-enable nil)
+   (require 'lsp-ui)
+   (require 'lsp-lens)
+   (require 'lsp-modeline)
+
+   ;; Unbind <mouse-movement> from showing documentation pop-ups.
+   ;; It's not that it's a bad idea, but that it catches “movements” spuriously, and makes it so I constantly have to move the mouse cursor to stop getting pop-ups when I'm not using the mouse.
+   (setcdr lsp-ui-mode-map nil)
+   ;; The above isn't working, so let's...
+   (defun lsp-ui-doc--handle-mouse-movement (event)
+     (interactive "e")
+     nil)
+
+   ;; I could enable it here, but let's wait until after requiring mode-specific things.
+   ;;(lsp)
+   )
+ (require 'mode-hooks-conf)
+ (require 'company-conf)
  ;;(load-library "popwin-conf")
  ;;(load-library "projectile-conf")
  (load-library "scratch-message")
- ;;(winner-mode 1)
- (load-library "delimiters-conf")
+ (require 'delimiters-conf)
  ;;(load-library "sexprw-conf")
- ;;(show-smartparens-global-mode 1)
- ;;(require 'yafolding)
- ;;(yafolding-mode 1)
  (load-library "borrowed")
  ;; tty-format provides for coloring based on terminal escape codes.  I should set it to autoload at some point, but for now let's disable it.
  ;;(load-library "tty-format")
- ;;(require 'markchars)
- ;;(markchars-global-mode t)
  ;; highlight literal tab characters and trailing whitespace
  (setq whitespace-style '(face tabs trailing))
 
@@ -270,25 +267,18 @@
  (require 'smooth-scrolling)
 
  (setq highlight-indent-guides-auto-enabled nil)
- ;;(load-library "windows")
  (setq hl-todo-activate-in-modes '(prog-mode))
- ;;(require 'hl-todo)
- ;;(global-hl-todo-mode 1)
- ;;(require 'helm)
- (load-library "helm-autoloads")
  (setq helm-swoop-pre-input-function (lambda () "")) ;; disable symbol-at-point nonsense
- ;;(global-anzu-mode 1)
  (setq guide-key/guide-key-sequence '("SPC"))
  (setq guide-key/recursive-key-sequence-flag t)
  (require 'guide-key)
  (guide-key-mode 1)
- ;;(global-git-commit-mode 1)
  (setq whitespace-final-newline-message "\n<-- No final newline")
  (require 'whitespace-final-newline)
  (global-whitespace-final-newline-mode 1)
 
  ;;(load-library "keyfreq-conf")
-)
+ )
 
 (let ((file (concat dotfileswgh-pri "emacs/def.el")))
   (if (file-exists-p file) (load-file file) nil))

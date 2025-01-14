@@ -23,3 +23,5 @@ Null prefix argument turns off the mode."
                                         ;resort to default auto save setting
     (if auto-save-default
         (auto-save-mode 1))))
+
+(provide 'sensitive-mode)

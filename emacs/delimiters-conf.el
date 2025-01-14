@@ -227,3 +227,5 @@
 
 
   )
+
+(provide 'delimiters-conf)

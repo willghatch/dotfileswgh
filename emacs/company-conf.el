@@ -59,5 +59,5 @@
       (setq company-completing-wgh t)
       (company-manual-begin))))
 
-
+(provide 'company-conf)
 

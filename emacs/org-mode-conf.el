@@ -62,3 +62,5 @@
                                     ;; It only seems to work when called interactively...
                                     (call-interactively 'current-theme-reapply)))
             ))
+
+(provide 'org-mode-conf)

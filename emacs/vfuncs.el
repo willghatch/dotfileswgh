@@ -281,9 +281,11 @@ abort."
 (make-variable-buffer-local 'fold-toggle-wgh-fold-all-func)
 (defun fold-toggle-wgh ()
   (interactive)
+  (require 'yafolding)
   (call-interactively fold-toggle-wgh-fold-func))
 (defun fold-toggle-wgh-all ()
   (interactive)
+  (require 'yafolding)
   (call-interactively fold-toggle-wgh-fold-all-func))
 
 ;;; checklist helpers

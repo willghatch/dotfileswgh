@@ -28,8 +28,8 @@
     (setq js2-strict-missing-semi-warning nil)
 
     (require 'js2-refactor)
-    (define-key evil-normal-state-local-map "es" 'js2r-forward-slurp)
-    (define-key evil-normal-state-local-map "eb" 'js2r-forward-barf)
+    (lnkmap "es" 'js2r-forward-slurp)
+    (lnkmap "eb" 'js2r-forward-barf)
     (define-prefix-command 'js2r-prefix-command)
     (define-key js2r-prefix-command "eo" 'js2r-expand-object)
     (define-key js2r-prefix-command "co" 'js2r-contract-object)
@@ -59,7 +59,7 @@
     (define-key js2r-prefix-command "sl" 'js2r-forward-slurp)
     (define-key js2r-prefix-command "ba" 'js2r-forward-barf)
     (define-key js2r-prefix-command "k" 'js2r-kill)
-    (define-key evil-normal-state-local-map "tm" 'js2r-prefix-command)
+    (lnkmap "tm" 'js2r-prefix-command)
     )
   )
 

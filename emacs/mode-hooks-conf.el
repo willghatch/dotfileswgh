@@ -44,7 +44,7 @@
 
 (add-hook 'xref--xref-buffer-mode-hook
           (lambda ()
-            (define-key evil-normal-state-local-map (kbd "RET") 'xref-goto-xref)))
+            (lnkmap (kbd "RET") 'xref-goto-xref)))
 
 (add-hook 'hexl-mode-hook
           (lambda ()
@@ -57,7 +57,7 @@
 (add-hook 'Buffer-menu-mode-hook
           (lambda ()
             (define-prefix-command 'my-buffer-menu-mode-map)
-            (define-key evil-motion-state-local-map "m" 'my-buffer-menu-mode-map)
+            (lnkmap "m" 'my-buffer-menu-mode-map)
             (set-keymap-parent 'my-buffer-menu-mode-map Buffer-menu-mode-map)))
 
 ;(add-hook 'text-mode-hook #'flyspell-mode)
@@ -117,9 +117,9 @@
 (add-to-hooks
  (lambda ()
    (require 'elisp-slime-nav)
-   (define-key evil-motion-state-local-map "gdd" 'elisp-slime-nav-find-elisp-thing-at-point)
-   (define-key evil-motion-state-local-map "gdp" 'pop-tag-mark)
-   (define-key evil-motion-state-local-map "gD" 'elisp-slime-nav-describe-elisp-thing-at-point)
+   (lnkmap "gdd" 'elisp-slime-nav-find-elisp-thing-at-point)
+   (lnkmap "gdp" 'pop-tag-mark)
+   (lnkmap "gD" 'elisp-slime-nav-describe-elisp-thing-at-point)
    (eldoc-mode 1)
    (setq-local outline-regexp wgh/lisp-outline-regexp)
    )
@@ -212,7 +212,7 @@
    ;; • stash operations
    (setq wgh/magit-log-m-keymap (make-sparse-keymap))
    (define-key magit-log-mode-map "m" wgh/magit-log-m-keymap)
-   (define-key evil-normal-state-local-map "m" wgh/magit-log-m-keymap)
+   (lnkmap "m" wgh/magit-log-m-keymap)
    (define-key magit-log-mode-map "C-l" 'magit-refresh)
    (define-key magit-log-mode-map (kbd "RET") 'magit-show-commit)
    (define-key wgh/magit-log-m-keymap "v" 'magit-show-commit)
@@ -309,7 +309,7 @@
 
   ;(require 'helm-lsp)
   ;; TODO - try helm-lsp
-  (nobreak-define-key evil-normal-state-local-map "m}" 'wgh/trivial-if-braces-remove)
+  (lnkmap "m}" 'wgh/trivial-if-braces-remove)
   )
 (add-hook 'c++-mode-hook 'cpp-conf-setup)
 
@@ -322,6 +322,10 @@
 (add-hook 'mlir-mode-hook 'wgh/start-lsp-for-mlir)
 
 
+
+
 (load-library "js-conf")
 (load-library "racket-mode-conf")
 (load-library "haskell-mode-conf")
+
+(provide 'mode-hooks-conf)

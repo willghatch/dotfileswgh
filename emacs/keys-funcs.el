@@ -18,6 +18,7 @@
 ;; TODO - this has an issue when changing direction.  The first time it repeats backward after going forward, it skips one.
 (defun wgh/isearch-repeat-forward (&optional count)
   (interactive "p")
+  (require 'tree-walk) ;; for tree-walk--motion-moved
   (let* ((count-fwd (<= 0 (or count 1)))
          (count-num (abs (or count 1)))
          (fwd (not (xor count-fwd wgh/isearch-repeat-forward-p)))
@@ -288,4 +289,18 @@ is the opposite."
 (defun delete-char-backward (&optional n)
   (interactive "p")
   (delete-char (- n)))
+
+
+;; default hippie expand list
+;; (try-complete-file-name-partially try-complete-file-name try-expand-all-abbrevs try-expand-list try-expand-line try-expand-dabbrev try-expand-dabbrev-all-buffers try-expand-dabbrev-from-kill try-complete-lisp-symbol-partially try-complete-lisp-symbol)
+
+(defun he-expand-file-name (prefix)
+  (interactive "P")
+  (let ((hippie-expand-try-functions-list '(try-complete-file-name-partially try-complete-file-name)))
+    (hippie-expand prefix)))
+
+(defun he-expand-lisp-symbol (prefix)
+  (interactive "P")
+  (let ((hippie-expand-try-functions-list '(try-complete-lisp-symbol-partially try-complete-lisp-symbol)))
+    (hippie-expand prefix)))
 

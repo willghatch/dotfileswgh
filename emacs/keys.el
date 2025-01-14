@@ -43,12 +43,14 @@
           words))
 
 
-(load-library "text-object-stuff")
+(require 'text-object-stuff)
 
 (load-library "keys-funcs")
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
+(defun nobreak-define-key (map keys func)
+  (nobreak (define-key map keys func)))
 (defun emmap (keys func)
   (nobreak-define-key estate-motion-state-keymap keys func))
 (defun ecmap (keys func)
@@ -117,6 +119,7 @@
 (emmap (kbd "C-z") 'suspend-frame)
 (eimap (kbd "C-z") 'suspend-frame)
 
+(autoload 'helm-M-x "helm-command" "" t)
 (emmap "z" 'helm-M-x)
 (eimap (kbd "M-c") 'helm-M-x)
 (emmap (kbd "M-c") 'helm-M-x)
@@ -307,6 +310,9 @@
 (emmap "N" (cs/ae (cs/mod 'direction 'backward)
                   (cs/obj 'isearch-repeat)))
 
+(autoload 'helm-swoop "helm-swoop" "" t)
+(autoload 'helm-multi-swoop-all "helm-swoop" "" t)
+(autoload 'helm-multi-swoop "helm-swoop" "" t)
 (emmap " /"
        (myhydradef search-hydra
                    ("s" helm-swoop "swoop")
@@ -337,9 +343,6 @@
              (require 'evil) (call-interactively 'evil-shell-command)))
 
 
-(defun with-sptw-req (x)
-  (require 'tree-walk-smartparens-integration)
-  x)
 
 ;; Quick select any delimiter
 (emmap "(" (lambda ()
@@ -431,6 +434,10 @@
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; command-sentence object-select map
+
+(defun with-sptw-req (x)
+  (require 'tree-walk-smartparens-integration)
+  x)
 (defhydra object-select (:foreign-keys warn :exit nil) "Obj:"
   ;; TODO - I need these bodies to be evaluated, but hydra does some macro magic.  Maybe I should use something else instead of hydra... Or I can wrap them all in funcall...
   ("c" (funcall (cs/ae (cs/obj 'character))) "character" :exit t)
