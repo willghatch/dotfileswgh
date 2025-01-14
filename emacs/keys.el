@@ -441,11 +441,11 @@
   ("w" (funcall (cs/ae (cs/obj 'vi-like-word))) "vi-like-word" :exit t)
   ("W" (funcall (cs/ae (cs/obj 'word))) "word" :exit t)
   ("s" (funcall (cs/ae (with-sptw-req (cs/obj 'sptw)))) "smartparens" :exit t)
-  ("i" (funcall (cs/ae (cs/obj 'indent-tree))) "indent-tree" :exit t)
+  ("i" (funcall (cs/ae (progn (require 'indent-tree) (cs/obj 'indent-tree)))) "indent-tree" :exit t)
   ;; TODO - I want this one, but I keep using this accidentally due to my old key bindings, and it is so frustrating.  So I'll leave it as a no-op for now.
   ;;("o" (funcall (cs/ae (cs/obj 'outline))) "outline" :exit t)
   ("o" (funcall (cs/ae (cs/obj 'NOOP-STOP-USING-THIS-BINDING-FOR-OLD-PURPOSE))) "break habit!" :exit t)
-  ("O" (funcall (cs/ae (cs/obj 'outline))) "outline" :exit t)
+  ("O" (funcall (cs/ae (progn (require 'tree-walk-outline-integration) (cs/obj 'outline)))) "outline" :exit t)
   ("t" (funcall (cs/ae (cs/obj 'tstw-qd))) "treesitter-thumb" :exit t)
   ("x" (funcall (cs/ae (cs/obj 'xml))) "xml" :exit t)
   ("y" (funcall (cs/ae (cs/obj 'symbol))) "symbol" :exit t)

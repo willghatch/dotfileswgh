@@ -214,7 +214,6 @@
  ;;(load-library "straight-install")
 
  ;(load-library "yasnippet-conf")
- (require 'indent-tree)
  (setq wgh/lisp-outline-regexp
        (rx (or
             ;; Allow headings to be after comment characters, or anywhere in a blank indented line.
