@@ -1,42 +1,27 @@
-[submodule "external/emacs/tarao-evil-plugins"]
-	path = external/emacs/tarao-evil-plugins
-	url = https://github.com/tarao/evil-plugins.git
-[submodule "external/zsh/zgen"]
-	path = external/zsh/zgen
-	url = https://github.com/tarjoilija/zgen.git
-[submodule "external/misc/libnotifylog"]
-	path = external/misc/libnotifylog
-	url = https://github.com/willghatch/libnotifylog.git
+### My keyboard layout!
 [submodule "external/misc/hatchak"]
 	path = external/misc/hatchak
 	url = https://github.com/willghatch/hatchak.git
-[submodule "external/misc/kbd-state-mon"]
-	path = external/misc/kbd-state-mon
-	url = https://github.com/willghatch/kbd-state-mon
-[submodule "external/emacs/sexp-rewrite"]
-	path = external/emacs/sexp-rewrite
-	url = https://github.com/rmculpepper/sexp-rewrite
-[submodule "external/emacs/whitespace-final-newline"]
-	path = external/emacs/whitespace-final-newline
-	url = https://github.com/adamsmd/whitespace-final-newline
-[submodule "external/misc/dictionaries"]
-	path = external/misc/dictionaries
-	url = https://github.com/willghatch/dictionaries
-[submodule "external/emacs/straight.el"]
-	path = external/emacs/straight.el
-	url = https://github.com/radian-software/straight.el
-[submodule "external/emacs/hydra"]
-	path = external/emacs/hydra
-	url = https://github.com/abo-abo/hydra
-[submodule "external/emacs/undo-tree"]
-	path = external/emacs/undo-tree
-	url = https://gitlab.com/tsc25/undo-tree
+
+################################################################################
+### emacs
+
+### These top few are the most important to have my core functionality.
 [submodule "external/emacs/emacs-repeatable-motion"]
 	path = external/emacs/emacs-repeatable-motion
 	url = https://github.com/willghatch/emacs-repeatable-motion
+[submodule "external/emacs/hydra"]
+	path = external/emacs/hydra
+	url = https://github.com/abo-abo/hydra
+## the queue package is required by undo-tree
 [submodule "external/emacs/queue"]
 	path = external/emacs/queue
 	url = https://github.com/emacs-straight/queue
+[submodule "external/emacs/undo-tree"]
+	path = external/emacs/undo-tree
+	url = https://gitlab.com/tsc25/undo-tree
+
+### This next section is less critical to core functionality, but give most of the things I care most about when text editing.
 [submodule "external/emacs/dash.el"]
 	path = external/emacs/dash.el
 	url = https://github.com/magnars/dash.el
@@ -58,15 +43,41 @@
 [submodule "external/emacs/rainbow-mode"]
 	path = external/emacs/rainbow-mode
 	url = https://github.com/emacsmirror/rainbow-mode
-[submodule "external/emacs/systemd-mode"]
-	path = external/emacs/systemd-mode
-	url = https://github.com/holomorph/systemd-mode
 [submodule "external/emacs/magit"]
 	path = external/emacs/magit
 	url = https://github.com/magit/magit
+## Ah, evil-mode.  I no longer use most of it, but I still want evil-ex mode.
 [submodule "external/emacs/evil"]
 	path = external/emacs/evil
 	url = https://github.com/emacs-evil/evil
+[submodule "external/emacs/systemd-mode"]
+	path = external/emacs/systemd-mode
+	url = https://github.com/holomorph/systemd-mode
+
+## Straight for installing other emacs packages not submoduled.
+[submodule "external/emacs/straight.el"]
+	path = external/emacs/straight.el
+	url = https://github.com/radian-software/straight.el
+
+## These ones aren't (or weren't when I added them) packaged eg. in melpa.
+[submodule "external/emacs/sexp-rewrite"]
+	path = external/emacs/sexp-rewrite
+	url = https://github.com/rmculpepper/sexp-rewrite
+[submodule "external/emacs/whitespace-final-newline"]
+	path = external/emacs/whitespace-final-newline
+	url = https://github.com/adamsmd/whitespace-final-newline
+#[submodule "external/emacs/tarao-evil-plugins"]
+#	path = external/emacs/tarao-evil-plugins
+#	url = https://github.com/tarao/evil-plugins.git
+
+################################################################################
+### zsh
+[submodule "external/zsh/zsh-hooks"]
+	path = external/zsh/zsh-hooks
+	url = https://github.com/willghatch/zsh-hooks
+[submodule "external/zsh/zsh-saneopt"]
+	path = external/zsh/zsh-saneopt
+	url = https://github.com/willghatch/zsh-saneopt
 [submodule "external/zsh/zsh-megaprompt"]
 	path = external/zsh/zsh-megaprompt
 	url = https://github.com/willghatch/zsh-megaprompt
@@ -91,12 +102,6 @@
 [submodule "external/zsh/zsh-zaw-todoman"]
 	path = external/zsh/zsh-zaw-todoman
 	url = https://github.com/willghatch/zsh-zaw-todoman
-[submodule "external/zsh/zsh-hooks"]
-	path = external/zsh/zsh-hooks
-	url = https://github.com/willghatch/zsh-hooks
-[submodule "external/zsh/zsh-saneopt"]
-	path = external/zsh/zsh-saneopt
-	url = https://github.com/willghatch/zsh-saneopt
 [submodule "external/zsh/zsh-history-substring-search"]
 	path = external/zsh/zsh-history-substring-search
 	url = https://github.com/zsh-users/zsh-history-substring-search
@@ -106,3 +111,18 @@
 [submodule "external/zsh/racket-shell-completion"]
 	path = external/zsh/racket-shell-completion
 	url = https://github.com/racket/shell-completion
+#[submodule "external/zsh/zgen"]
+#	path = external/zsh/zgen
+#	url = https://github.com/tarjoilija/zgen.git
+
+################################################################################
+### Miscellaneous
+[submodule "external/misc/libnotifylog"]
+	path = external/misc/libnotifylog
+	url = https://github.com/willghatch/libnotifylog.git
+[submodule "external/misc/kbd-state-mon"]
+	path = external/misc/kbd-state-mon
+	url = https://github.com/willghatch/kbd-state-mon
+[submodule "external/misc/dictionaries"]
+	path = external/misc/dictionaries
+	url = https://github.com/willghatch/dictionaries
