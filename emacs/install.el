@@ -1,7 +1,7 @@
 ;; TODO - switch to a package management system that lets me pin versions.  Ideally I'd really like to write git repository paths for each of these and be able to pin versions inline as well as have a lock file.
 
 (let ((conf-dir (file-name-directory load-file-name)))
-  (load-file (expand-file-name "./env-conf.el" conf-dir))
+  (load-file (expand-file-name "./dotfileswgh-env-conf.el" conf-dir))
   (load-file (expand-file-name "./package-conf.el" conf-dir)))
 
 (defun file-to-string (file-path)

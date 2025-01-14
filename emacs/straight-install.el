@@ -1,6 +1,6 @@
 ;; Install files with straight.el
 (let ((conf-dir (file-name-directory load-file-name)))
-  (load-file (expand-file-name "./env-conf.el" conf-dir))
+  (load-file (expand-file-name "./dotfileswgh-env-conf.el" conf-dir))
   ;;(load-file (expand-file-name "./package-conf.el" conf-dir))
   )
 
@@ -11,6 +11,9 @@
 (message "Current package-user-dir: %S" package-user-dir)
 (message "Installing packages...")
 
+(defun submod (name)
+  ;; :type nil to make it not clone it
+  `(,name :local-repo ,(concat dotfileswgh (format "external/emacs/%s/" name)) :type nil))
 
 (progn
   (let ((bootstrap-file
@@ -25,9 +28,26 @@
   ;;(straight-use-package 'repeatable-motion)
   ;;(straight-use-package 'hydra)
   ;;(straight-use-package 'undo-tree) ;; NOTE: this depends on the queue package, which is resolved by straight, but I want to remember why I have the queue package as a submodule now
+  (straight-use-package (submod 'repeatable-motion))
+  (straight-use-package (submod 'hydra))
+  (straight-use-package (submod 'queue))
+  (straight-use-package (submod 'undo-tree))
   ;; The above are the most critical to getting my config running at all.
   )
 
+(straight-use-package (submod 'sexp-rewrite))
+(straight-use-package (submod 'whitespace-final-newline))
+
+(straight-use-package (submod 'dash))
+(straight-use-package (submod 'smartparens))
+(straight-use-package (submod 'rainbow-delimiters))
+(straight-use-package (submod 'rainbow-identifiers))
+(straight-use-package (submod 'company))
+(straight-use-package (submod 'rainbow-mode))
+(straight-use-package (submod 'xclip))
+(straight-use-package (submod 'magit))
+(straight-use-package (submod 'evil))
+(straight-use-package (submod 'nix-mode))
 ;;; Next most important group
 ;;; These are also now submodules
 ;;(in 'smartparens)
@@ -38,9 +58,9 @@
 ;;(in 'xclip)
 ;;(in 'magit)
 ;;(in 'evil)
-;;(in 'systemd)
 ;;(in 'nix-mode)
 
+(in 'systemd)
 (in 'yafolding)
 (in 'smooth-scrolling)
 (in 'git-gutter)

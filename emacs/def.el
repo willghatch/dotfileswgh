@@ -12,7 +12,7 @@
                args)))
 
 (let ((conf-dir (file-name-directory load-file-name)))
-  (load-file (expand-file-name "./env-conf.el" conf-dir)))
+  (load-file (expand-file-name "./dotfileswgh-env-conf.el" conf-dir)))
 
 (nobreak
  (setq package-user-dir (concat local-emacs.d-path "elpa/"))

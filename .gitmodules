@@ -7,9 +7,6 @@
 ### emacs
 
 ### These top few are the most important to have my core functionality.
-[submodule "external/emacs/emacs-repeatable-motion"]
-	path = external/emacs/emacs-repeatable-motion
-	url = https://github.com/willghatch/emacs-repeatable-motion
 [submodule "external/emacs/hydra"]
 	path = external/emacs/hydra
 	url = https://github.com/abo-abo/hydra
@@ -22,11 +19,8 @@
 	url = https://gitlab.com/tsc25/undo-tree
 
 ### This next section is less critical to core functionality, but give most of the things I care most about when text editing.
-[submodule "external/emacs/compat"]
-	path = external/emacs/compat
-	url = https://github.com/emacs-compat/compat
-[submodule "external/emacs/dash.el"]
-	path = external/emacs/dash.el
+[submodule "external/emacs/dash"]
+	path = external/emacs/dash
 	url = https://github.com/magnars/dash.el
 [submodule "external/emacs/smartparens"]
 	path = external/emacs/smartparens
@@ -37,9 +31,6 @@
 [submodule "external/emacs/rainbow-identifiers"]
 	path = external/emacs/rainbow-identifiers
 	url = https://github.com/Fanael/rainbow-identifiers
-[submodule "external/emacs/company-mode"]
-	path = external/emacs/company-mode
-	url = https://github.com/company-mode/company-mode
 [submodule "external/emacs/xclip"]
 	path = external/emacs/xclip
 	url = https://github.com/emacsmirror/xclip
@@ -56,11 +47,6 @@
 [submodule "external/emacs/nix-mode"]
 	path = external/emacs/nix-mode
 	url = https://github.com/NixOS/nix-mode
-[submodule "external/emacs/systemd-mode"]
-	path = external/emacs/systemd-mode
-	url = https://github.com/holomorph/systemd-mode
-
-## Straight for installing other emacs packages not submoduled.
 [submodule "external/emacs/straight.el"]
 	path = external/emacs/straight.el
 	url = https://github.com/radian-software/straight.el
@@ -135,3 +121,9 @@
 
 ################################################################################
 
+[submodule "external/emacs/repeatable-motion"]
+	path = external/emacs/repeatable-motion
+	url = https://github.com/willghatch/emacs-repeatable-motion
+[submodule "external/emacs/company"]
+	path = external/emacs/company
+	url = https://github.com/company-mode/company-mode

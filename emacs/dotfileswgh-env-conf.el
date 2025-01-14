@@ -19,6 +19,7 @@
 
 ;; Set the name that emacs actually knows...
 (setq user-emacs-directory local-emacs.d-path)
+
 (setq native-comp-eln-load-path (list (concat local-emacs.d-path "eln-cache/")))
 
 ;; Straight.el config
@@ -34,3 +35,31 @@
 (let ((local-f (concat dotfileswgh-dotlocal "/emacs/env-conf.el")))
   (when (file-exists-p local-f)
     (with-demoted-errors "Warning: %S" (load-file local-f))))
+
+(setq package-enable-at-startup nil)
+(setq package-user-dir (concat local-emacs.d-path "elpa/"))
+
+;; Set up load path for requires
+(let ((default-directory (concat dotfileswgh "emacs/")))
+  (normal-top-level-add-subdirs-to-load-path))
+(let ((default-directory (concat dotfileswgh "external/emacs/")))
+  (normal-top-level-add-subdirs-to-load-path))
+(let ((default-directory (concat dotfileswgh-pri "emacs/")))
+  (when (file-exists-p default-directory)
+    (normal-top-level-add-subdirs-to-load-path)))
+(let ((default-directory (concat dotfileswgh-dotlocal "emacs/")))
+  (when (file-exists-p default-directory)
+    (normal-top-level-add-subdirs-to-load-path)))
+(setq load-path (cons (concat local-emacs.d-path "single-files/") load-path))
+(setq load-path (cons (concat dotfileswgh "emacs/") load-path))
+(setq load-path (cons (concat dotfileswgh-pri "emacs/") load-path))
+(setq load-path (cons (concat dotfileswgh-dotlocal "emacs/") load-path))
+;; Add straight build dirs, so that emacs can search in them, rather than using
+;; straight on every emacs load.  It won't process autoloads, but I can wrap
+;; key bindings with requires or otherwise force autoload evaluation for things
+;; that I care about.
+(let ((default-directory (concat straight-base-dir "straight/build")))
+  (when (file-exists-p default-directory)
+    (normal-top-level-add-subdirs-to-load-path)))
+
+(provide 'dotfileswgh-env-conf)
