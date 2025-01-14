@@ -251,7 +251,7 @@
  ;(winner-mode 1)
  (load-library "delimiters-conf")
  (load-library "sexprw-conf")
- (show-smartparens-global-mode 1)
+ ;;(show-smartparens-global-mode 1)
  ;(require 'yafolding)
  ;(yafolding-mode 1)
  (load-library "borrowed")

@@ -63,6 +63,7 @@
 ;(add-hook 'text-mode-hook #'flyspell-mode)
 (add-hook 'prog-mode-hook
           (lambda ()
+            (require 'smartparens)
             (smartparens-mode 1)
             (require 'rainbow-delimiters)
             (rainbow-delimiters-mode-enable)

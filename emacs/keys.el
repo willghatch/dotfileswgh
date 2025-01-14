@@ -44,8 +44,6 @@
 
 
 (load-library "text-object-stuff")
-;; TODO - make this lazily loaded
-(require 'tree-walk-smartparens-integration)
 
 (load-library "keys-funcs")
 
@@ -339,16 +337,25 @@
              (require 'evil) (call-interactively 'evil-shell-command)))
 
 
+(defun with-sptw-req (x)
+  (require 'tree-walk-smartparens-integration)
+  x)
 
 ;; Quick select any delimiter
-(emmap "(" (cs/ae (cs/mod 'direction nil)
-                  (cs/mod 'expand-region t)
-                  (cs/mod 'delimiter 'any)
-                  (cs/obj 'sptw)))
-(emmap ")" (cs/ae (cs/mod 'direction nil)
-                  (cs/mod 'expand-region 'inner)
-                  (cs/mod 'delimiter 'any)
-                  (cs/obj 'sptw)))
+(emmap "(" (lambda ()
+             (interactive)
+             (require 'tree-walk-smartparens-integration)
+             (funcall (cs/ae (cs/mod 'direction nil)
+                             (cs/mod 'expand-region t)
+                             (cs/mod 'delimiter 'any)
+                             (cs/obj 'sptw)))))
+(emmap ")" (lambda ()
+             (interactive)
+             (require 'tree-walk-smartparens-integration)
+             (funcall (cs/ae (cs/mod 'direction nil)
+                             (cs/mod 'expand-region 'inner)
+                             (cs/mod 'delimiter 'any)
+                             (cs/obj 'sptw)))))
 
 
 ;; TODO - obviously I want to integrate these into command-sentence, but I need to add keys for going forward/back to objects, including delimiters, without regard for tree boundaries.
@@ -433,7 +440,7 @@
   ("l" (funcall (cs/ae (cs/obj 'line))) "line" :exit t)
   ("w" (funcall (cs/ae (cs/obj 'vi-like-word))) "vi-like-word" :exit t)
   ("W" (funcall (cs/ae (cs/obj 'word))) "word" :exit t)
-  ("s" (funcall (cs/ae (cs/obj 'sptw))) "smartparens" :exit t)
+  ("s" (funcall (cs/ae (with-sptw-req (cs/obj 'sptw)))) "smartparens" :exit t)
   ("i" (funcall (cs/ae (cs/obj 'indent-tree))) "indent-tree" :exit t)
   ;; TODO - I want this one, but I keep using this accidentally due to my old key bindings, and it is so frustrating.  So I'll leave it as a no-op for now.
   ;;("o" (funcall (cs/ae (cs/obj 'outline))) "outline" :exit t)
@@ -458,19 +465,20 @@
   ("g" (funcall (cs/add (cs/mod 'current-line-only 'current-line-only))) "current-line-only" :exit nil)
 
 
-  ("\"" (funcall (cs/ae (cs/mod 'delimiter "\"") (cs/obj 'sptw))) "\"" :exit t)
-  ("(" (funcall (cs/ae (cs/mod 'delimiter "(") (cs/obj 'sptw))) "()" :exit t)
-  (")" (funcall (cs/ae (cs/mod 'delimiter "(") (cs/obj 'sptw))) "()" :exit t)
-  ("[" (funcall (cs/ae (cs/mod 'delimiter "[") (cs/obj 'sptw))) "[]" :exit t)
-  ("]" (funcall (cs/ae (cs/mod 'delimiter "[") (cs/obj 'sptw))) "[]" :exit t)
-  ("{" (funcall (cs/ae (cs/mod 'delimiter "{") (cs/obj 'sptw))) "{}" :exit t)
-  ("}" (funcall (cs/ae (cs/mod 'delimiter "{") (cs/obj 'sptw))) "{}" :exit t)
-  ("«" (funcall (cs/ae (cs/mod 'delimiter "«") (cs/obj 'sptw))) "«»" :exit t)
-  ("»" (funcall (cs/ae (cs/mod 'delimiter "«") (cs/obj 'sptw))) "«»" :exit t)
-  ("“" (funcall (cs/ae (cs/mod 'delimiter "“") (cs/obj 'sptw))) "“”" :exit t)
-  ("”" (funcall (cs/ae (cs/mod 'delimiter "“") (cs/obj 'sptw))) "“”" :exit t)
-  ("⟅" (funcall (cs/ae (cs/mod 'delimiter "⟅") (cs/obj 'sptw))) "⟅⟆" :exit t)
-  ("⟆" (funcall (cs/ae (cs/mod 'delimiter "⟅") (cs/obj 'sptw))) "⟅⟆" :exit t)
+  ("\"" (funcall (cs/ae (cs/mod 'delimiter "\"") (with-sptw-req (cs/obj 'sptw)))) "\"" :exit t)
+  ("(" (funcall (cs/ae (cs/mod 'delimiter "(") (with-sptw-req (cs/obj 'sptw)))) "()" :exit t)
+  (")" (funcall (cs/ae (cs/mod 'delimiter "(") (with-sptw-req (cs/obj 'sptw)))) "()" :exit t)
+  ("[" (funcall (cs/ae (cs/mod 'delimiter "[") (with-sptw-req (cs/obj 'sptw)))) "[]" :exit t)
+  ("]" (funcall (cs/ae (cs/mod 'delimiter "[") (with-sptw-req (cs/obj 'sptw)))) "[]" :exit t)
+  ("{" (funcall (cs/ae (cs/mod 'delimiter "{") (with-sptw-req (cs/obj 'sptw)))) "{}" :exit t)
+  ("}" (funcall (cs/ae (cs/mod 'delimiter "{") (with-sptw-req (cs/obj 'sptw)))) "{}" :exit t)
+  ("«" (funcall (cs/ae (cs/mod 'delimiter "«") (with-sptw-req (cs/obj 'sptw)))) "«»" :exit t)
+  ("»" (funcall (cs/ae (cs/mod 'delimiter "«") (with-sptw-req (cs/obj 'sptw)))) "«»" :exit t)
+  ("“" (funcall (cs/ae (cs/mod 'delimiter "“") (with-sptw-req (cs/obj 'sptw)))) "“”" :exit t)
+  ("”" (funcall (cs/ae (cs/mod 'delimiter "“") (with-sptw-req (cs/obj 'sptw)))) "“”" :exit t)
+  ("⟅" (funcall (cs/ae (cs/mod 'delimiter "⟅") (with-sptw-req (cs/obj 'sptw)))) "⟅⟆" :exit t)
+  ("⟆" (funcall (cs/ae (cs/mod 'delimiter "⟅") (with-sptw-req (cs/obj 'sptw)))) "⟅⟆" :exit t)
+  ("#" (funcall (cs/ae (cs/mod 'delimiter "#|") (with-sptw-req (cs/obj 'sptw)))) "#||#" :exit t)
 
   ("q" (funcall (cs/ae (cs/obj 'non-matching-bad-object-just-to-clear-things-out)))
    "quit-cancel-sentence" :exit t)
