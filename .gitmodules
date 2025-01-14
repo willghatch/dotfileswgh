@@ -50,6 +50,9 @@
 [submodule "external/emacs/evil"]
 	path = external/emacs/evil
 	url = https://github.com/emacs-evil/evil
+[submodule "external/emacs/nix-mode"]
+	path = external/emacs/nix-mode
+	url = https://github.com/NixOS/nix-mode
 [submodule "external/emacs/systemd-mode"]
 	path = external/emacs/systemd-mode
 	url = https://github.com/holomorph/systemd-mode
@@ -126,3 +129,6 @@
 [submodule "external/misc/dictionaries"]
 	path = external/misc/dictionaries
 	url = https://github.com/willghatch/dictionaries
+
+################################################################################
+

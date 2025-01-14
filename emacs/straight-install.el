@@ -39,6 +39,7 @@
 ;;(in 'magit)
 ;;(in 'evil)
 ;;(in 'systemd)
+;;(in 'nix-mode)
 
 (in 'yafolding)
 (in 'smooth-scrolling)

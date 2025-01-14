@@ -28,6 +28,12 @@
 (autoload 'markdown-mode "markdown-mode")
 (add-to-list 'auto-mode-alist '("\\.md" . markdown-mode))
 
+(add-to-list 'auto-mode-alist '(".gitmodules" . conf-unix-mode))
+(add-to-list 'auto-mode-alist '(".gitignore" . conf-unix-mode))
+
+(autoload 'nix-mode "nix-mode")
+(add-to-list 'auto-mode-alist '("\\.nix" . nix-mode))
+
 
 (add-hook 'after-save-hook 'executable-make-buffer-file-executable-if-script-p)
 
