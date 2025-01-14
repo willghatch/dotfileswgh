@@ -24,7 +24,7 @@
   ;;; These are now dotfileswgh submodules
   ;;(straight-use-package 'repeatable-motion)
   ;;(straight-use-package 'hydra)
-  ;;(straight-use-package 'undo-tree)
+  ;;(straight-use-package 'undo-tree) ;; NOTE: this depends on the queue package, which is resolved by straight, but I want to remember why I have the queue package as a submodule now
   ;; The above are the most critical to getting my config running at all.
   )
 
