@@ -8,7 +8,7 @@ cd $DOTFILESWGH
 
 rglinkup="$DOTFILESWGH/external/misc/rootgit-tools/rootgit-linkup"
 
-do-base() {
+do_base() {
     #stow --no-folding --restow homedir
     if [ "$DOTFILESWGH" = "$HOME/dotfileswgh" ]; then
         # relative link for this nice case
@@ -32,7 +32,7 @@ do-base() {
 }
 
 
-do-more() {
+do_more() {
     # Make sundry directories and files so things (especially vim) don't complain
     # and stuff that I just like to be there in general
     mkdir -p $HOME/.cache/vimtmp
@@ -59,10 +59,10 @@ do-more() {
 #######################################
 
 if [ "$1" = "base" ]; then
-    do-base
+    do_base
 elif [ "$1" = "more" ]; then
-    do-base
-    do-more
+    do_base
+    do_more
 else
     echo "usage: linkup.bash < base, more >"
     echo "       Be sure to run this IN the dotfileswgh directory."
