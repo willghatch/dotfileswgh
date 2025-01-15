@@ -214,10 +214,6 @@
 (emmap "m" nil) ;;;;;;;;;; m will be my prefix for mode-specific bindings
 
 
-
-;; TODO - delete this binding AND the functions that back it, once I make sure I don't accidentally depend on them.
-(ecmap "@" 'wgh/call-macro-by-name)
-
 ;; TODO - use command sentence
 (ecmap "x" 'delete-char)
 (ecmap "X" 'delete-char-backward)

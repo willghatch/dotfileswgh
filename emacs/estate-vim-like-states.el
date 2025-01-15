@@ -464,36 +464,15 @@ Otherwise, start recording to the register \"default\".
       (estate-keyboard-macro-to-register-start "default"))))
 ;; TODO - probably use the character for default register a la vim, so it can still be selected by char.
 
-(defvar-local wgh/-macro-recording nil)
-(defun wgh/macro-record (char)
-  (interactive "cmacro char:\n")
-  (setq-local wgh/-macro-recording char)
-  (kmacro-start-macro nil))
-(defun wgh/macro-finish-recording ()
-  (interactive)
-  (kmacro-end-macro nil)
-  (puthash wgh/-macro-recording last-kbd-macro estate--registers)
-  (setq-local wgh/-macro-recording nil))
-(defun wgh/macro-toggle ()
-  (interactive)
-  (if wgh/-macro-recording
-      (call-interactively 'wgh/macro-finish-recording)
-    (call-interactively 'wgh/macro-record)))
-(defun wgh/call-macro-by-name (count char)
-  (interactive "p\ncmacro char:\n")
-  (execute-kbd-macro (gethash char estate--registers "") count))
 
 
 ;; TODO - also shouldn't be in estate, but markers -- eg. evil-mode stores markers with buffer, line, and column, so you can hop between them.
 ;; TODO - not stuff to actually go in this file, but a checklist of things I want to replace evil-mode.  Note that many of these I can just fall back to requiring evil-mode and just using it...
-;; * quick-in-block/quick-a-block re-implementation
-;; * et/ot/ef/of - make them be “find to char begin/end” instead
 ;; * markers
 ;; * surround region - add delimiter
 ;; * surround - change delimiter, maybe
 ;; * . repeat, maybe, could just use macros more
 ;; * select register, maybe
-;; * d/c/y operators, maybe, could just get used to visual first -- I only use the operators for trivial cases
 ;; * select object modifiers to get surrounding whitespace
 ;; * isearch land on start of search string -- actually I would like both, but with a way to control it.  Maybe this already exists?
 ;;
