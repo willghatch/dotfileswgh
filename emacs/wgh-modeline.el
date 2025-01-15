@@ -57,8 +57,8 @@
        ;; Evil state
        '(:eval (cond ((and (boundp 'estate-state) estate-local-mode)
                       (cond
-                       ((eq estate-state 'command)
-                        (propertize "<CMD >" 'face 'wevil-normal-face))
+                       ((eq estate-state 'normal)
+                        (propertize "<NORM>" 'face 'wevil-normal-face))
                        ((eq estate-state 'visual)
                         (propertize "< VI >" 'face 'wevil-visual-face))
                        ((eq estate-state 'visual-rectangle)

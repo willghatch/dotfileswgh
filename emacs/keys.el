@@ -54,7 +54,7 @@
 (defun emmap (keys func)
   (nobreak-define-key estate-motion-state-keymap keys func))
 (defun ecmap (keys func)
-  (nobreak-define-key estate-command-state-keymap keys func))
+  (nobreak-define-key estate-normal-state-keymap keys func))
 (defun evmap (keys func)
   (nobreak-define-key estate-visual-state-keymap keys func))
 (defun evrmap (keys func)
@@ -71,7 +71,7 @@
 (defun mkmap (keys func)
   (nobreak-define-key estate-motion-state-keymap keys func))
 (defun nkmap (keys func)
-  (nobreak-define-key estate-command-state-keymap keys func))
+  (nobreak-define-key estate-normal-state-keymap keys func))
 (defun vkmap (keys func)
   (nobreak-define-key estate-visual-state-keymap keys func))
 (defun ikmap (keys func)
@@ -80,9 +80,9 @@
   (nobreak-define-key estate-pager-state-keymap keys func))
 
 (defun lnkmap (keys func)
-  (when (not estate-command-state-buffer-local-keymap)
-    (setq-local estate-command-state-buffer-local-keymap (make-sparse-keymap)))
-  (nobreak-define-key estate-command-state-buffer-local-keymap keys func))
+  (when (not estate-normal-state-buffer-local-keymap)
+    (setq-local estate-normal-state-buffer-local-keymap (make-sparse-keymap)))
+  (nobreak-define-key estate-normal-state-buffer-local-keymap keys func))
 
 ;; for temporary on-the-fly bindings
 (define-prefix-command 'temp-key-map)
@@ -108,9 +108,9 @@
 
 ;; Normal state switch!
 (emmap (kbd "C-c") 'ignore)
-(evmap "\C-c" 'estate-command-state)
-(eimap "\C-c" 'estate-command-state)
-(eimap "\C-l" 'estate-command-state)
+(evmap "\C-c" 'estate-normal-state)
+(eimap "\C-c" 'estate-normal-state)
+(eimap "\C-l" 'estate-normal-state)
 
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -750,9 +750,9 @@
 (epmap "K" 'rmo/pscroll-up-line)
 (epmap "sj" 'rmo/pscroll-down-full)
 (epmap "sk" 'rmo/pscroll-up-full)
-(epmap "e" 'estate-command-state)
+(epmap "e" 'estate-normal-state)
 ;; if I start in pager mode, this gets remapped to quit
-(epmap "q" 'estate-command-state)
+(epmap "q" 'estate-normal-state)
 
 
 

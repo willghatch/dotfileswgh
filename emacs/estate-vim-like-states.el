@@ -9,7 +9,7 @@
 (require 'estate-core)
 
 (defun estate--activate-initialize-core-states ()
-  (estate-command-state)
+  (estate-normal-state)
   (add-hook 'activate-mark-hook #'estate--mark-activate-hook 0 t)
   (add-hook 'deactivate-mark-hook #'estate--mark-deactivate-hook 0 t)
   (add-hook 'estate-visual-line-state-enter-hook #'estate--visual-line-on 0 t)
@@ -30,18 +30,17 @@
 
 
 
-;; Command state is like “normal” mode in vim/evil-mode.
-(estate-define-state command estate-motion-state-keymap)
+(estate-define-state normal estate-motion-state-keymap)
 
 ;; Let's set one key here so the estate keymap isn't a death trap if not configured further.
-;;(define-key estate-command-state-keymap "i" 'estate-insert-state)
+;;(define-key estate-normal-state-keymap "i" 'estate-insert-state)
 
-(defun estate-command-state ()
+(defun estate-normal-state ()
   (interactive)
   (deactivate-mark)
-  (estate-activate-state 'command))
+  (estate-activate-state 'normal))
 
-;; A pager state is nice to have -- it's basically motion state but maybe with some extra keys.  The idea is that it's like command mode but you won't accidentally hit editing keys or such.
+;; A pager state is nice to have -- it's basically motion state but maybe with some extra keys.  The idea is that it's like normal mode but you won't accidentally hit editing keys or such.
 ;; TODO - ensure that when in pager state, the buffer is read-only, but when exiting go back to the previous read status.
 (estate-define-state pager estate-motion-state-keymap)
 (defun estate-pager-state ()
@@ -81,7 +80,7 @@
 ;; Visual states.
 ;; I've made visual states use a hook so that commands that activate the region will activate visual modes.
 ;; All of these visual modes presuppose that you are using and want to use transient-mark-mode.
-(estate-define-state visual estate-command-state-keymap)
+(estate-define-state visual estate-normal-state-keymap)
 (estate-define-state visual-rectangle estate-visual-state-keymap)
 (estate-define-state visual-line estate-visual-state-keymap)
 ;; TODO - the more I think about it, the more I think visual-line mode is more complexity than it is worth.  I'm going to expand the line selection text object behavior to expand the region to fill both begin and end lines for the region, then disable visual line mode for a while to see if I'm sure about it.
@@ -353,7 +352,7 @@ TODO - maybe I should also save the recording to some data structure?
 (setq-local estate--kmacro-to-buffer-change-state nil)
 
 (defun estate-record-quick-keyboard-macro-to-buffer-change ()
-  "Start recording a nestable keyboard macro that will stop recording automatically once the buffer has been changed and estate is back in command state.
+  "Start recording a nestable keyboard macro that will stop recording automatically once the buffer has been changed and estate is back in normal state.
 Uses `estate-nestable-keyboard-macro-start', and thus is incompatible with other keyboard macro tools that don't.
 "
   ;; TODO - integrate this better with record-to-register, and make the register it records to be configurable.
@@ -369,7 +368,7 @@ Uses `estate-nestable-keyboard-macro-start', and thus is incompatible with other
               (remove-hook 'after-change-functions
                            kmacro-record-until-buffer-change-func
                            t)
-              (if (equal estate-state 'command)
+              (if (equal estate-state 'normal)
                   (progn
                     (setq-local estate--kmacro-to-buffer-change-state nil)
                     ;;(end-kbd-macro)
@@ -380,16 +379,16 @@ Uses `estate-nestable-keyboard-macro-start', and thus is incompatible with other
                     (setq estate--most-recent-register-macro-recorded "kmacro-to-buffer-change"))
                 (progn
                   (setq-local estate--kmacro-to-buffer-change-state 'changed)
-                  (letrec ((command-state-kmacro-hook
+                  (letrec ((normal-state-kmacro-hook
                             (lambda ()
-                              (remove-hook 'estate-command-state-enter-hook
-                                           command-state-kmacro-hook
+                              (remove-hook 'estate-normal-state-enter-hook
+                                           normal-state-kmacro-hook
                                            t)
                               (setq-local estate--kmacro-to-buffer-change-state nil)
                               ;;(end-kbd-macro)
                               (puthash "kmacro-to-buffer-change"
                                        ;; When using the
-                                       ;; estate-command-state-enter-hook, the
+                                       ;; estate-normal-state-enter-hook, the
                                        ;; kmacro has not yet recorded the
                                        ;; current keys.  I don't love this, but
                                        ;; I'm not sure a better way right now.
@@ -399,8 +398,8 @@ Uses `estate-nestable-keyboard-macro-start', and thus is incompatible with other
                                                 (this-command-keys-vector))
                                        estate--registers)
                               (setq estate--most-recent-register-macro-recorded "kmacro-to-buffer-change"))))
-                    (add-hook 'estate-command-state-enter-hook
-                              command-state-kmacro-hook
+                    (add-hook 'estate-normal-state-enter-hook
+                              normal-state-kmacro-hook
                               0 t)))))))
     (add-hook 'after-change-functions
               kmacro-record-until-buffer-change-func
