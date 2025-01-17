@@ -324,6 +324,10 @@ Otherwise, return a cons pair (PARAMS . EXECUTOR), containing the final paramete
           (region)
           (buffer (default-verb . move) (location-within . ,nil))
 
+          (url (default-verb . move) (location-within . beginning))
+          (email (default-verb . move) (location-within . beginning))
+
+
           ;; These are not really “text objects”, but I want composition with delete, change, yank, etc, to work with these.
           (repeatable-motion-repeat (default-verb . move))
           (isearch-new (default-verb . move))
@@ -704,6 +708,19 @@ Otherwise, return a cons pair (PARAMS . EXECUTOR), containing the final paramete
                 ((tree-vertical down) (direction forward))
                 (rmo/indent-tree-down-to-last-child (num)))
 
+
+          (move url ((direction ,nil) (expand-region ,t))
+                (wgh/expand-region-to-url))
+          (move url ((direction forward) (location-within beginning))
+                (rmo/wgh/forward-url-beginning (num)))
+          (move url ((direction backward) (location-within beginning))
+                (rmo/wgh/backward-url-beginning (num)))
+          (move email ((direction ,nil) (expand-region ,t))
+                (wgh/expand-region-to-email))
+          (move email ((direction forward) (location-within beginning))
+                (rmo/wgh/forward-email-beginning (num)))
+          (move email ((direction backward) (location-within beginning))
+                (rmo/wgh/backward-email-beginning (num)))
 
           ;; TODO - for transpose character, implement something that follows the character explicitly forward/backward.
           (transpose word ((direction forward)) (wgh/transpose-word-forward (num)))

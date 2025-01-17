@@ -276,6 +276,75 @@ If no region is active, it will use (point . point)."
 (wgh/def-expand-region-to-thing line)
 
 
+;;;;;
+
+
+(defun wgh/move-thing-with-bounds-but-no-motion-single (thing fwd-p beg-p)
+  "Move until hitting a THING with a bounds func but no motion func.  Extremely naive and inefficient. FWD-P determines whether to move forward or backward.  BEG-P determines whether it goes to the beginning or end of the thing."
+  (let* ((orig-point (point))
+         (bounds-orig (bounds-of-thing-at-point thing))
+         (bounds nil))
+    (cond ((and fwd-p
+                (not beg-p)
+                bounds-orig
+                (not (equal orig-point (cdr bounds-orig))))
+           (goto-char (cdr bounds-orig)))
+          ((and (not fwd-p)
+                beg-p
+                bounds-orig
+                (not (equal orig-point (car bounds-orig))))
+           (goto-char (car bounds-orig)))
+          (t
+           (save-mark-and-excursion
+             (when bounds-orig
+               (goto-char (if fwd-p (cdr bounds-orig) (car bounds-orig)))
+               (setq bounds (bounds-of-thing-at-point thing)))
+             (while (and (not (if fwd-p (eobp) (bobp)))
+                         (or (not bounds)
+                             (equal bounds bounds-orig)))
+               (if fwd-p (forward-char 1) (backward-char 1))
+               (setq bounds (bounds-of-thing-at-point thing))))
+           (when bounds
+             (goto-char (if beg-p (car bounds) (cdr bounds))))))))
+
+(defun wgh/move-thing-with-bounds-but-no-motion (thing fwd-p beg-p &optional count)
+  (let* ((count (or count 1))
+         (fwd-p (if (<= 0 count) fwd-p (not fwd-p))))
+    (dotimes (i (abs count))
+      (wgh/move-thing-with-bounds-but-no-motion-single thing fwd-p beg-p))))
+
+(cl-defmacro wgh/def-move-thing-with-bounds-but-no-motion (thing)
+  (let ((fwd-beg (intern (format "wgh/forward-%s-beginning" thing)))
+        (fwd-end (intern (format "wgh/forward-%s-end" thing)))
+        (bwd-end (intern (format "wgh/backward-%s-end" thing)))
+        (bwd-beg (intern (format "wgh/backward-%s-beginning" thing)))
+        )
+    `(progn
+       (defun ,fwd-beg (&optional count)
+         (interactive "p")
+         (wgh/move-thing-with-bounds-but-no-motion ',thing t count))
+       (defun ,fwd-end (&optional count)
+         (interactive "p")
+         (wgh/move-thing-with-bounds-but-no-motion ',thing nil count))
+       (defun ,bwd-end (&optional count)
+         (interactive "p")
+         (wgh/move-thing-with-bounds-but-no-motion ',thing nil nil count))
+       (defun ,bwd-beg (&optional count)
+         (interactive "p")
+         (wgh/move-thing-with-bounds-but-no-motion ',thing nil t count))
+       (repeatable-motion-define-pair ',fwd-beg ',bwd-beg)
+       (repeatable-motion-define-pair ',fwd-end ',bwd-end)
+       )))
+
+(wgh/def-move-thing-with-bounds-but-no-motion url)
+(wgh/def-expand-region-to-thing url)
+;; TODO - add keyword args for transpose functions to use different movement func.  But that said, these are so inefficient, they would be extremely frustrating if the things aren't quite close.  These movements really can't be generic and any good.
+;;(wgh/def-transpose-thing url)
+
+(wgh/def-move-thing-with-bounds-but-no-motion email)
+(wgh/def-expand-region-to-thing email)
+;;(wgh/def-transpose-thing email)
+
 
 
 ;;;;;

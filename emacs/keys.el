@@ -470,6 +470,8 @@
   (" " (funcall (cs/add (cs/mod 'surrounding-space 'surrounding-space))) "surrounding-space" :exit nil)
   ("g" (funcall (cs/add (cs/mod 'current-line-only 'current-line-only))) "current-line-only" :exit nil)
 
+  ("hu" (funcall (cs/ae (cs/obj 'url))) "url" :exit t)
+  ("he" (funcall (cs/ae (cs/obj 'email))) "email" :exit t)
 
   ("\"" (funcall (cs/ae (cs/mod 'delimiter "\"") (with-sptw-req (cs/obj 'sptw)))) "\"" :exit t)
   ("(" (funcall (cs/ae (cs/mod 'delimiter "(") (with-sptw-req (cs/obj 'sptw)))) "()" :exit t)
