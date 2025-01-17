@@ -96,7 +96,7 @@
                           (wgh/at-thing-beginning-p thing))))
             (if bounds (goto-char (if fwd-beg-p (car bounds) (cdr bounds)))))
           ;; I would use beginning/end-of-thing, but forward-thing is more robust due to nesting or adjacent things.
-          ;(if fwd-beg-p (forward-thing thing -1) (forward-thing thing 1))
+          ;;(if fwd-beg-p (forward-thing thing -1) (forward-thing thing 1))
           )
         ))))
 (defun wgh/forward-thing-beginning (strict thing &optional count)
@@ -322,10 +322,10 @@ If no region is active, it will use (point . point)."
     `(progn
        (defun ,fwd-beg (&optional count)
          (interactive "p")
-         (wgh/move-thing-with-bounds-but-no-motion ',thing t count))
+         (wgh/move-thing-with-bounds-but-no-motion ',thing t t count))
        (defun ,fwd-end (&optional count)
          (interactive "p")
-         (wgh/move-thing-with-bounds-but-no-motion ',thing nil count))
+         (wgh/move-thing-with-bounds-but-no-motion ',thing t nil count))
        (defun ,bwd-end (&optional count)
          (interactive "p")
          (wgh/move-thing-with-bounds-but-no-motion ',thing nil nil count))
