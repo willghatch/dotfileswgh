@@ -1,8 +1,18 @@
+;; Setting a higher gc threshold makes startup way faster
+(setq wgh/orig-gc-threshold gc-cons-threshold)
+(setq gc-cons-threshold 10000000)
+
 (setq term-file-aliases
       '(("xterm" . "xterm-256color")
         ("screen" . "xterm-256color")
         ("rackterm" . "xterm-256color")
         ("screen-256color" . "xterm-256color")))
+
+;; Silence warnings
+(setq byte-compile-warnings '(not obsolete))
+(setq warning-suppress-log-types '((comp) (bytecomp)))
+(setq native-comp-async-report-warnings-errors 'silent)
+
 
 ;; macro for more robust starting-up
 (defmacro nobreak (&rest args)
@@ -117,10 +127,12 @@
  (setq org-startup-folded nil)
  (global-auto-revert-mode t) ;; auto-reload files when they change on disk
 
- (menu-bar-mode -1) ;; no menu-bar
+ (menu-bar-mode -1)
  (tool-bar-mode -1)
  (setq inhibit-splash-screen t)
+ (setq inhibit-startup-echo-area-message (user-login-name))
  (setq inhibit-startup-message t)
+
  )
 
 ;; keys, keys, keys!!!
@@ -267,6 +279,8 @@
  (setq-default scroll-down-aggressively 0.0)
  ;;(require 'smooth-scrolling)
 
+ (setq frame-resize-pixelwise t)
+
  (setq highlight-indent-guides-auto-enabled nil)
  (setq hl-todo-activate-in-modes '(prog-mode))
  (setq helm-swoop-pre-input-function (lambda () "")) ;; disable symbol-at-point nonsense
@@ -313,4 +327,5 @@
 (message "---")
 (message (format "start time: %f" (time-to-seconds (time-subtract (current-time) before-init-time))))
 
+(setq gc-cons-threshold (or wgh/orig-gc-threshold 800000))
 
