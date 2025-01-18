@@ -69,11 +69,14 @@
   (in 'git-gutter)
   (in 'blamer) ;; show git blame on line
   ;;(in 'guide-key)
+  (in 'which-key)
   ;;(in 'key-chord)
 
 
 
-  (in 'ace-jump-mode)
+  ;; TODO - try avy as an ace-jump-mode replacement
+  ;;(in 'ace-jump-mode)
+
   (in 'markchars)
 
   (in 'elscreen)

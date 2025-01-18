@@ -122,9 +122,14 @@
 
  (setq echo-keystrokes 0.01) ;; echo keystrokes faster than default 1s
 
+ (setq enable-recursive-minibuffers t)
+
  (setq c-default-style "k&r"
        c-basic-offset 2)
  (setq org-startup-folded nil)
+
+ (setq auto-revert-avoid-polling t) ;; avoid polling every X seconds to automatically refresh buffer.  TODO - maybe I want polling?
+ (setq auto-revert-check-vc-info t)
  (global-auto-revert-mode t) ;; auto-reload files when they change on disk
 
  (menu-bar-mode -1)
@@ -132,6 +137,7 @@
  (setq inhibit-splash-screen t)
  (setq inhibit-startup-echo-area-message (user-login-name))
  (setq inhibit-startup-message t)
+ (setq display-time-default-load-average nil)
 
  )
 
@@ -292,6 +298,18 @@
  (setq whitespace-final-newline-message "\n<-- No final newline")
  (require 'whitespace-final-newline)
  (global-whitespace-final-newline-mode 1)
+
+ (savehist-mode 1) ;; Save minibuffer history.
+
+ ;; TODO - completion config -- there is a lot of completion config that I've never really used that I should consider.
+ ;;(setq completion-styles '(basic initials substring)) ;; default before editing was (basic partial-completion emacs22)
+ ;; completion-cycle-threshold
+ ;; completions-detailed
+ ;; completion-auto-help
+ ;; completions-max-height
+ ;; completions-format
+ ;; completions-group
+ ;; completion-auto-select
 
  ;;(load-library "keyfreq-conf")
  )
