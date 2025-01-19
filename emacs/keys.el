@@ -125,6 +125,12 @@
 (emmap (kbd "M-c") 'helm-M-x)
 (global-set-key (kbd "M-c") 'helm-M-x)
 
+(emmap "z" (lambda () (interactive) (require 'minad-stack-conf) (wgh/init-minad) (call-interactively 'execute-extended-command)))
+(eimap (kbd "M-c") (lambda () (interactive) (require 'minad-stack-conf) (wgh/init-minad) (call-interactively 'execute-extended-command)))
+(emmap (kbd "M-c") (lambda () (interactive) (require 'minad-stack-conf) (wgh/init-minad) (call-interactively 'execute-extended-command)))
+(global-set-key (kbd "M-c") (lambda () (interactive) (require 'minad-stack-conf) (wgh/init-minad) (call-interactively 'execute-extended-command)))
+
+
 (ecmap "=" 'indent-region)
 (ecmap "≠" 'wgh/racket-indent-region)
 (ecmap (kbd "TAB") 'sp-indent-defun)
@@ -141,6 +147,7 @@
 (eimap "\C-q" 'ignore) ;; C-q - don't use, it is the terminal flow control binding to restart flow.
 (eimap "\C-v" 'quoted-insert)
 ;; C-o -- in readline the default action for this is “operate-and-get-next”, which executes the command, finds the command in the history, and sets the buffer to the next command in history.  So it is useful for those times when you go back in history 5 commands, hit enter, then go up in history 5 commands, hit enter, etc, you can just go back 5 commands, then hit C-o 5 times.
+(eimap "\C-l" 'estate-normal-state-keymap)
 
 (eimap "\M-h" 'completer-map/body)
 (eimap (kbd "C-SPC TAB") 'completer-map/body)
@@ -628,6 +635,7 @@
             ("f" he-expand-file-name "file")
             ("l" he-expand-lisp-symbol "lisp")
             ("s" yas-expand "yas")
+            ("F" (progn (company-conf-init) (require 'company-files) (call-interactively 'company-files)) "file (company)")
             )
 
 

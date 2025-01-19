@@ -40,6 +40,9 @@
   ;; Setting it to nil means no auto idle completion.
                                         ;(setq company-idle-delay 0.4)
   (setq company-idle-delay nil)
+  (setq company-text-icons-add-background t) ;; add type icon before name in completion
+
+  (setq company-backends '((company-capf company-dabbrev-code)))
 
   (setq company-conf-init-done t))
 

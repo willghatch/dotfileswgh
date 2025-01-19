@@ -71,8 +71,7 @@ States can be switched with `estate-activate-state' using STATE-NAME.
         (enter-hook (estate--enter-hook-name state-name))
         (leave-hook (estate--leave-hook-name state-name)))
     `(progn
-       (defvar ,keymap (make-sparse-keymap)
-         ,(format "Keymap for estate %s state." state-name))
+       (define-prefix-command ',keymap)
        (defvar-local ,local-keymap nil
          ;; Set the default value as nil to force a buffer-local initialization.
          ;; If the default is a keymap, it is too easy to just access and mutate

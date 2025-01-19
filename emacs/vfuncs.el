@@ -393,6 +393,14 @@ I'm sick of doing this manually."
       (delete-char 1)
       (indent-region begin-point end-point))))
 
+(defun wgh/wgrep-start ()
+  (interactive)
+  (require 'wgrep)
+  ;; Functions to use:
+  ;; wgrep-finish-edit
+  ;; wgrep-save-all-buffers
+  (wgrep-change-to-wgrep-mode))
+
 (defun refresh-buffer-from-file ()
   "Alias for revert-buffer since I can never remember its name."
   (interactive)

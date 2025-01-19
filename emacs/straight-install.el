@@ -72,6 +72,15 @@
   (in 'which-key)
   ;;(in 'key-chord)
 
+  (in 'wgrep)
+
+  (in 'vertico)
+  (in 'marginalia)
+  (in 'consult)
+  (in 'embark)
+  (in 'orderless)
+  (in 'corfu)
+  (in 'cape)
 
 
   ;; TODO - try avy as an ace-jump-mode replacement
