@@ -19,6 +19,7 @@
 (require 'estate-vim-like-states)
 (estate-mode 1)
 (require 'command-sentence)
+(require 'estate-and-command-sentence-repeat)
 
 (defun cs/verb (name)
   `((word-type . verb)
@@ -220,6 +221,7 @@
 
 (emmap "m" nil) ;;;;;;;;;; m will be my prefix for mode-specific bindings
 
+(ecmap "." 'eacsr-repeat-latest-editing)
 
 ;; TODO - use command sentence
 (ecmap "x" 'delete-char)
@@ -257,7 +259,10 @@
 
 
 ;; Enter prefix maps for command-sentence
-(ecmap "c" 'command-select/body)
+(ecmap "c" (lambda ()
+             (interactive)
+             (funcall (cs/add `((word-type . ignore))))
+             (command-select/body)))
 
 (emmap "e" (lambda (n) (interactive "p")
              (funcall (cs/add (cs/mod 'direction 'forward)) n)
