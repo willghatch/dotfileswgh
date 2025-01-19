@@ -186,11 +186,10 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;; Now some helpers for operations that I want.  IE functions and infrastructure to have some things that are vim-like.
 
-(defvar estate--registers (make-hash-table :test #'equal)
-  "Hash table for “registers”, a la vim, where each register value must be a cons pair where the first element is a string and the second element has metadata for line mode.  For now, the metadata will either be null or the symbol 'line")
-(setq estate-current-register "default")
-(defun estate--get-register (reg)
-  (gethash reg estate--registers (cons "" nil)))
+
+(defvar estate-default-register ?\🄯)
+(defvar estate-copy-sync-with-kill-ring-register estate-default-register)
+(setq estate-current-register estate-default-register)
 
 ;; TODO - I probably want to just get rid of extra visual states like visual-line and visual-block for now.
 (defun estate-copy (&optional region)
@@ -202,14 +201,16 @@
        (lambda ()
          (let ((str (buffer-substring-no-properties (if region (car region) (region-beginning))
                                                     (if region (cdr region) (region-end)))))
-           (puthash estate-current-register (cons str copy-metadata) estate--registers)
-           (when (equal estate-current-register "default")
+           (set-register estate-default-register str)
+           (when (equal estate-current-register
+                        estate-copy-sync-with-kill-ring-register)
              (kill-new str))))))))
 
 (defun estate--paste-helper (copy-from-active-region)
   "TODO - paste but with extra handling"
   ;; TODO - currently this also copies if region is active.  Do I want to do that?
-  (let* ((to-paste (estate--get-register estate-current-register))
+  (let* ((to-paste (get-register estate-current-register))
+         ;; TODO - use emacs register instead of my register stuff that I wrote thinking that registers were an evil-mode thing instead of an emacs feature.
          (to-paste-text (if (stringp to-paste) to-paste (car to-paste)))
          (to-paste-metadata (if (stringp to-paste) nil (cdr to-paste))))
     (cond
@@ -349,61 +350,7 @@ TODO - maybe I should also save the recording to some data structure?
                (seq-drop last-val prefix-length)))))))
 
 
-(setq-local estate--kmacro-to-buffer-change-state nil)
 
-(defun estate-record-quick-keyboard-macro-to-buffer-change ()
-  "Start recording a nestable keyboard macro that will stop recording automatically once the buffer has been changed and estate is back in normal state.
-Uses `estate-nestable-keyboard-macro-start', and thus is incompatible with other keyboard macro tools that don't.
-"
-  ;; TODO - integrate this better with record-to-register, and make the register it records to be configurable.
-  (interactive)
-  (when estate--kmacro-to-buffer-change-state
-    (error "estate--kmacro-to-buffer-change-state error, alread: recording in %s state"
-           estate--kmacro-too-buffer-change-state))
-  ;;(kmacro-start-macro nil)
-  (estate-nestable-keyboard-macro-start 'estate--to-change-keyboard-macro)
-  (setq-local estate--kmacror-to-buffer-change-state 'recording)
-  (letrec ((kmacro-record-until-buffer-change-func
-            (lambda (changed-beg changed-end old-length)
-              (remove-hook 'after-change-functions
-                           kmacro-record-until-buffer-change-func
-                           t)
-              (if (equal estate-state 'normal)
-                  (progn
-                    (setq-local estate--kmacro-to-buffer-change-state nil)
-                    ;;(end-kbd-macro)
-                    (puthash "kmacro-to-buffer-change"
-                             (estate-nestable-keyboard-macro-end
-                              'estate--to-change-keyboard-macro)
-                             estate--registers)
-                    (setq estate--most-recent-register-macro-recorded "kmacro-to-buffer-change"))
-                (progn
-                  (setq-local estate--kmacro-to-buffer-change-state 'changed)
-                  (letrec ((normal-state-kmacro-hook
-                            (lambda ()
-                              (remove-hook 'estate-normal-state-enter-hook
-                                           normal-state-kmacro-hook
-                                           t)
-                              (setq-local estate--kmacro-to-buffer-change-state nil)
-                              ;;(end-kbd-macro)
-                              (puthash "kmacro-to-buffer-change"
-                                       ;; When using the
-                                       ;; estate-normal-state-enter-hook, the
-                                       ;; kmacro has not yet recorded the
-                                       ;; current keys.  I don't love this, but
-                                       ;; I'm not sure a better way right now.
-                                       ;; TODO - this doesn't work when nested under recording a macro to a particular register.
-                                       (vconcat (estate-nestable-keyboard-macro-end
-                                                 'estate--to-change-keyboard-macro)
-                                                (this-command-keys-vector))
-                                       estate--registers)
-                              (setq estate--most-recent-register-macro-recorded "kmacro-to-buffer-change"))))
-                    (add-hook 'estate-normal-state-enter-hook
-                              normal-state-kmacro-hook
-                              0 t)))))))
-    (add-hook 'after-change-functions
-              kmacro-record-until-buffer-change-func
-              0 t)))
 
 
 (setq estate--most-recent-register-macro-recorded nil)
@@ -418,7 +365,7 @@ Uses `estate-nestable-keyboard-macro-start', and thus is incompatible with other
   "Finish recording a keyboard macro to register CHAR."
   (let ((value (estate-nestable-keyboard-macro-end
                 (cons 'estate--keyboard-macro-to-register char))))
-    (puthash char value estate--registers)
+    (set-register char value)
     ;; TODO - I've been writing this macro stuff with setq-local and maybe defvar-local, but actually it should probably be global, not local.
     (setq estate--most-recent-register-macro-recorded char)
     value))
@@ -439,7 +386,9 @@ Uses `estate-nestable-keyboard-macro-start', and thus is incompatible with other
 
 (defun estate-keyboard-macro-execute-from-register (count char)
   (interactive "p\ncregister char:\n")
-  (execute-kbd-macro (gethash char estate--registers "") count))
+  (execute-kbd-macro
+   (get-register char)
+   count))
 
 (defun estate-keyboard-macro-execute-from-most-recently-macro-recorded-register
     (count)
@@ -449,19 +398,21 @@ Uses `estate-nestable-keyboard-macro-start', and thus is incompatible with other
    count
    estate--most-recent-register-macro-recorded))
 
+(defvar estate-default-keyboard-macro-register ?\⌨)
+
 (defun estate-keyboard-macro-to-register-end-most-recent-or-start-default ()
   "If currently recording from an estate-keyboard-macro-to-register-* function, end the most recently started one.
-Otherwise, start recording to the register \"default\".
+Otherwise, start recording to the register 'estate-default-keyboard-macro-register'.
 "
   (interactive)
   (let* ((found (assoc 'estate--keyboard-macro-to-register
                        estate--nested-keyboard-macro-states-alist
                        'estate--keyboard-macro-to-register-assoc-helper)))
     (if found
-        (puthash (cdar found)
-                 (estate--keyboard-macro-to-register-end (cdar found))
-                 estate--registers)
-      (estate-keyboard-macro-to-register-start "default"))))
+        (set-register (cdar found)
+                      (estate--keyboard-macro-to-register-end (cdar found)))
+      (estate-keyboard-macro-to-register-start
+       estate-default-keyboard-macro-register))))
 ;; TODO - probably use the character for default register a la vim, so it can still be selected by char.
 
 
