@@ -2,6 +2,8 @@
 
 ;; State for repeating isearch -- my key to start isearch sets this so that the repeat keys go the right direction.
 (setq wgh/isearch-repeat-forward-p t)
+;; There is an issue where the first repeat backward to beginning after going forward or the first repeat to end forward after going backward skips one.  Keep track of some state to hack around it.
+(setq wgh/isearch-last-direction-absolute nil)
 ;; State for isearch repetition -- values 'beginning or 'end.
 ;; TODO - I would like a system for writing an escape in the search for where the cursor should go.
 (setq wgh/isearch-go-part 'beginning)
@@ -9,10 +11,12 @@
 (defun wgh/isearch-start-forward ()
   (interactive)
   (setq wgh/isearch-repeat-forward-p t)
+  (setq wgh/isearch-last-direction-absolute 'forward)
   (funcall 'isearch-forward))
 (defun wgh/isearch-start-backward ()
   (interactive)
   (setq wgh/isearch-repeat-forward-p nil)
+  (setq wgh/isearch-last-direction-absolute 'backward)
   (funcall 'isearch-backward))
 
 ;; TODO - this has an issue when changing direction.  The first time it repeats backward after going forward, it skips one.
@@ -23,14 +27,31 @@
          (count-num (abs (or count 1)))
          (fwd (not (xor count-fwd wgh/isearch-repeat-forward-p)))
          (repeat-func (if fwd #'isearch-repeat-forward #'isearch-repeat-backward))
-         (moved (tree-walk--motion-moved (lambda () (funcall repeat-func count-num)))))
+         ;; count-adjusted to hack around skipping in these cases...
+         (count-adjusted (cond ((and (not fwd)
+                                     (equal wgh/isearch-go-part 'beginning)
+                                     (equal wgh/isearch-last-direction-absolute
+                                            'forward))
+                                (- count-num 1))
+                               ((and fwd
+                                     (equal wgh/isearch-go-part 'end)
+                                     (equal wgh/isearch-last-direction-absolute
+                                            'backward))
+                                (- count-num 1))
+                               (t count-num)))
+
+         (moved (tree-walk--motion-moved
+                 (lambda () (funcall repeat-func count-adjusted)))))
+    (setq wgh/isearch-last-direction-absolute (if fwd 'forward 'backward))
     (cond ((not moved) nil)
           ((and (equal wgh/isearch-go-part 'beginning)
                 (< isearch-other-end (point)))
-           (goto-char isearch-other-end))
+           (goto-char isearch-other-end)
+           )
           ((and (equal wgh/isearch-go-part 'end)
                 (>= isearch-other-end (point)))
-           (goto-char isearch-other-end)))))
+           (goto-char isearch-other-end)
+           ))))
 (defun wgh/isearch-repeat-backward (&optional count)
   (interactive "p")
   (wgh/isearch-repeat-forward (- (or count 1))))
