@@ -195,16 +195,15 @@
 (defun estate-copy (&optional region)
   "TODO - copy but with extra handling, REGION is nil or a cons pair (beg . end)."
   (interactive)
-  (let ((copy-metadata (and (eq estate-state 'visual-line) 'line)))
-    (save-mark-and-excursion
-      (estate-visual-execution-helper
-       (lambda ()
-         (let ((str (buffer-substring-no-properties (if region (car region) (region-beginning))
-                                                    (if region (cdr region) (region-end)))))
-           (set-register estate-default-register str)
-           (when (equal estate-current-register
-                        estate-copy-sync-with-kill-ring-register)
-             (kill-new str))))))))
+  (save-mark-and-excursion
+    (estate-visual-execution-helper
+     (lambda ()
+       (let ((str (buffer-substring-no-properties (if region (car region) (region-beginning))
+                                                  (if region (cdr region) (region-end)))))
+         (set-register estate-default-register str)
+         (when (equal estate-current-register
+                      estate-copy-sync-with-kill-ring-register)
+           (kill-new str)))))))
 
 (defun estate--paste-helper (copy-from-active-region)
   "TODO - paste but with extra handling"
