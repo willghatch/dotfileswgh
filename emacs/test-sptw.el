@@ -25,7 +25,6 @@
        (should/looking-at ,at-string))))
 
 (ert-deftest test-expand-region-to-any-delimiter-after-last-child ()
-  :expected-result :failed
   (with-temp-buffer
     (insert "
 (outer (inner foo

@@ -118,14 +118,17 @@ Return nil if not at any current smartparens delimiter.
         ;; the middle of symbols
         (t (sptw--at-end-of-last-symbol-sexp?))))
 
-(defun sptw--on-start-of-symbol-sexp? ()
-  ;; If backward-sexp then forward-sexp nets a backward movement, it means
-  ;; we were at the start of the symbol.
-  (sptw--advances? (lambda ()
-                     (sp-backward-sexp)
-                     (sp-forward-sexp))
-                   nil))
-(defun sptw--at-end-of-symbol-sexp? ()
+(defun sptw--at-start-of-symbol-sexp-if-not-at-other-start? ()
+  "Predicate for whether point is at the start of a symbol sexp, but it is hacky and was only ever meant as a fallback for testing after having tested for whether point is at the start of a delimited sexp."
+  (and (not (looking-at (rx space)))
+       ;; If backward-sexp then forward-sexp nets a backward movement, it means
+       ;; we were at the start of the symbol.
+       (sptw--advances? (lambda ()
+                          (sp-backward-sexp)
+                          (sp-forward-sexp))
+                        nil)))
+(defun sptw--at-end-of-symbol-sexp-if-not-at-other-end? ()
+  "Similar to `sptw--at-start-of-symbol-sexp-if-not-at-other-start?', hack."
   (sptw--movements-equal?
    'ignore (lambda () (sp-backward-sexp) (sp-forward-sexp))))
 (defun sptw--on-start-of-first-symbol-sexp? ()
@@ -147,14 +150,14 @@ Return nil if not at any current smartparens delimiter.
 (defun sptw-at-sexp-beginning-p ()
   "Return true if point is at the beginning of a smartparens sexp.  (IE delimited list or symbol-like object.)"
   (or (sptw-at-open-delimiter-p)
-      (sptw--on-start-of-symbol-sexp?)))
+      (sptw--at-start-of-symbol-sexp-if-not-at-other-start?)))
 
 (defun sptw-at-sexp-end-p ()
   "Return true if point is at the end of a smartparens sexp.  (IE delimited list or symbol-like object.)
 IE point is immediately after the end.
 Note that point can be both at the end and start of two different sexps, and commands prefer using the sexp that point is at the start of."
   (or (sptw-at-close-delimiter-p)
-      (sptw--at-end-of-symbol-sexp?)))
+      (sptw--at-end-of-symbol-sexp-if-not-at-other-end?)))
 
 (defun sptw-bounds-of-sexp-at-point (&optional point)
   "Return the bounds of the smartparens sexp at point as (beg . end), or nil if there is no sexp at point.
@@ -294,7 +297,7 @@ But if point is both after an end delimiter and before an open delimiter, it wil
     (sptw--backward-sexp-end-from-on-open)))
 (defun sptw--backward-sexp-end-else ()
   (unless (sptw--on-first-symbol-sexp?)
-    (unless (sptw--on-start-of-symbol-sexp?)
+    (unless (sptw--at-start-of-symbol-sexp-if-not-at-other-start?)
       (sptw--backward-sexp))
     (sptw--backward-sexp)
     (sptw--forward-sexp-end)))
