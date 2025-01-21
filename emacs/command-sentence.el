@@ -317,7 +317,7 @@ Otherwise, return a cons pair (PARAMS . EXECUTOR), containing the final paramete
           (paragraph (default-verb . move) (location-within . beginning))
           (line (default-verb . move) (location-within . beginning))
           (symbol (default-verb . move) (location-within . beginning))
-          (sptw (default-verb . move) (location-within . beginning) (delimiter . ,nil))
+          (sptw (default-verb . move) (location-within . beginning) (delimiter . ,nil) (respect-tree . ,t))
           (indent-tree (default-verb . move) (location-within . beginning))
           (outline (default-verb . move) (location-within . beginning))
           (tstw-qd (default-verb . move) (location-within . anchor))
@@ -424,6 +424,12 @@ Otherwise, return a cons pair (PARAMS . EXECUTOR), containing the final paramete
           (move word
                 ((direction backward) (location-within end))
                 (rmo/wgh/backward-word-end (num)))
+          (move word
+                ((direction forward) (location-within emacs-style))
+                (rmo/forward-word (num)))
+          (move word
+                ((direction backward) (location-within emacs-style))
+                (rmo/backward-word (num)))
 
           (move vi-like-word
                 ((direction ,nil) (expand-region ,t))
@@ -456,6 +462,12 @@ Otherwise, return a cons pair (PARAMS . EXECUTOR), containing the final paramete
           (move symbol
                 ((direction backward) (location-within end))
                 (rmo/wgh/backward-symbol-end (num)))
+          (move symbol
+                ((direction forward) (location-within emacs-style))
+                (rmo/forward-symbol (num)))
+          (move symbol
+                ((direction backward) (location-within emacs-style))
+                (rmo/backward-symbol (num)))
 
           (move sentence
                 ((direction ,nil) (expand-region ,t))
@@ -472,6 +484,12 @@ Otherwise, return a cons pair (PARAMS . EXECUTOR), containing the final paramete
           (move sentence
                 ((direction backward) (location-within end))
                 (rmo/wgh/backward-sentence-end (num)))
+          (move sentence
+                ((direction forward) (location-within emacs-style))
+                (rmo/forward-sentence (num)))
+          (move sentence
+                ((direction backward) (location-within emacs-style))
+                (rmo/backward-sentence (num)))
 
           (move paragraph
                 ((direction ,nil) (expand-region ,t))
@@ -488,6 +506,12 @@ Otherwise, return a cons pair (PARAMS . EXECUTOR), containing the final paramete
           (move paragraph
                 ((direction backward) (location-within end))
                 (rmo/wgh/backward-paragraph-end (num)))
+          (move paragraph
+                ((direction forward) (location-within emacs-style))
+                (rmo/forward-paragraph (num)))
+          (move paragraph
+                ((direction backward) (location-within emacs-style))
+                (rmo/backward-paragraph (num)))
 
           (move line
                 ((direction ,nil) (expand-region inner))
@@ -507,6 +531,7 @@ Otherwise, return a cons pair (PARAMS . EXECUTOR), containing the final paramete
           (move line
                 ((direction backward) (location-within end))
                 (rmo/wgh/backward-line-no-newline-end (num)))
+          ;; TODO - emacs-style, in keeping with the other things that are emacs-style but not in keeping with emacs next-line/previous-line,  should move forward to the end of the current line if not at the end of the line, then to the end of the next line, and going backwards should go to the start of the line first, then to the start of the previous line.
           (move line
                 ((direction forward) (location-within keep-if-possible))
                 (rmo-c/wgh/next-line (num)))
@@ -543,17 +568,23 @@ Otherwise, return a cons pair (PARAMS . EXECUTOR), containing the final paramete
                 ((direction backward) (tree-traversal inorder))
                 (rmo/sptw-backward-inorder-traversal (num)))
           (move sptw
-                ((direction forward) (location-within beginning) (tree-vertical ,nil) (tree-traversal ,nil))
+                ((direction forward) (location-within beginning) (tree-vertical ,nil) (tree-traversal ,nil) (respect-tree ,t))
                 (rmo/sptw-forward-sibling-beginning (num)))
           (move sptw
-                ((direction backward) (location-within beginning) (tree-vertical ,nil) (tree-traversal ,nil))
+                ((direction backward) (location-within beginning) (tree-vertical ,nil) (tree-traversal ,nil) (respect-tree ,t))
                 (rmo/sptw-backward-sibling-beginning (num)))
           (move sptw
-                ((direction forward) (location-within end) (tree-vertical ,nil) (tree-traversal ,nil))
+                ((direction forward) (location-within end) (tree-vertical ,nil) (tree-traversal ,nil) (respect-tree ,t))
                 (rmo/sptw-forward-sibling-end (num)))
           (move sptw
-                ((direction backward) (location-within end) (tree-vertical ,nil) (tree-traversal ,nil))
+                ((direction backward) (location-within end) (tree-vertical ,nil) (tree-traversal ,nil) (respect-tree ,t))
                 (rmo/sptw-backward-sibling-end (num)))
+          (move sptw
+                ((direction forward) (location-within emacs-style) (tree-vertical ,nil) (tree-traversal ,nil) (respect-tree ,nil))
+                (rmo/sp-forward-sexp (num)))
+          (move sptw
+                ((direction backward) (location-within emacs-style) (tree-vertical ,nil) (tree-traversal ,nil) (respect-tree ,nil))
+                (rmo/sp-backward-sexp (num)))
           (move sptw
                 ;; TODO - for my current key binding purposes, I want to use forward/backward to determine begin/end for parent...
                 ((direction forward) (tree-vertical up) (tree-inner ,nil))
