@@ -272,6 +272,25 @@ Otherwise, return a cons pair (PARAMS . EXECUTOR), containing the final paramete
   (let ((section (assq section-key config)))
     (setcdr section (cons spec (cdr section)))))
 
+
+(defun command-sentence--make-movement-delegated-command (f-on-region)
+  "F-ON-REGION must take two args, region start and region end."
+  (lambda (sentence-with-defaults)
+    (let ((orig-point (point))
+          (new-point (save-mark-and-excursion
+                       (command-sentence-execute
+                        ;; TODO - I should maybe delete the old verb, but I'll just use alist shadowing...
+                        (cons '((word-type . verb) (contents . move)) sentence-with-defaults)
+                        command-sentence-current-configuration)
+                       (if (region-active-p)
+                           (cons (region-beginning) (region-end))
+                         (point)))))
+      (if (consp new-point)
+          (funcall f-on-region (car new-point) (cdr new-point))
+        (funcall f-on-region
+                 (min orig-point new-point)
+                 (max orig-point new-point))))))
+
 (setq command-sentence--my-config
       `((verbs
          .
@@ -817,20 +836,7 @@ Otherwise, return a cons pair (PARAMS . EXECUTOR), containing the final paramete
                   (,(lambda () (delete-region (region-beginning) (region-end)))))
           (delete ,(lambda (x) (not (memq x '(region))))
                   ()
-                  (,(lambda (sentence-with-defaults)
-                      (let ((orig-point (point))
-                            (new-point (save-mark-and-excursion
-                                         (command-sentence-execute
-                                          ;; TODO - I should maybe delete the old verb, but I'll just use alist shadowing...
-                                          (cons '((word-type . verb) (contents . move)) sentence-with-defaults)
-                                          command-sentence-current-configuration)
-                                         (if (region-active-p)
-                                             (cons (region-beginning) (region-end))
-                                           (point)))))
-                        (if (consp new-point)
-                            (delete-region (car new-point) (cdr new-point))
-                          (delete-region (min orig-point new-point)
-                                         (max orig-point new-point)))))
+                  (,(command-sentence--make-movement-delegated-command 'delete-region)
                    sentence-with-defaults))
 
           (change region
@@ -840,21 +846,9 @@ Otherwise, return a cons pair (PARAMS . EXECUTOR), containing the final paramete
                        (lambda () (delete-region (region-beginning) (region-end)))))))
           (change ,(lambda (x) (not (memq x '(region))))
                   ()
-                  (,(lambda (sentence-with-defaults)
-                      (let ((orig-point (point))
-                            (new-point (save-mark-and-excursion
-                                         (command-sentence-execute
-                                          ;; TODO - I should maybe delete the old verb, but I'll just use alist shadowing...
-                                          (cons '((word-type . verb) (contents . move)) sentence-with-defaults)
-                                          command-sentence-current-configuration)
-                                         (if (region-active-p)
-                                             (cons (region-beginning) (region-end))
-                                           (point)))))
-                        (estate-insert-state-with-thunk
-                         (lambda () (if (consp new-point)
-                                        (delete-region (car new-point) (cdr new-point))
-                                      (delete-region (min orig-point new-point)
-                                                     (max orig-point new-point)))))))
+                  (,(command-sentence--make-movement-delegated-command
+                     (lambda (beg end) (estate-insert-state-with-thunk
+                                        (lambda () (delete-region beg end)))))
                    sentence-with-defaults))
 
           (copy region
@@ -862,21 +856,7 @@ Otherwise, return a cons pair (PARAMS . EXECUTOR), containing the final paramete
                 (estate-copy))
           (copy ,(lambda (x) (not (memq x '(region))))
                 ()
-                (,(lambda (sentence-with-defaults)
-                    (save-mark-and-excursion
-                      (let ((orig-point (point))
-                            (new-point (save-mark-and-excursion
-                                         (command-sentence-execute
-                                          ;; TODO - I should maybe delete the old verb, but I'll just use alist shadowing...
-                                          (cons '((word-type . verb) (contents . move)) sentence-with-defaults)
-                                          command-sentence-current-configuration)
-                                         (if (region-active-p)
-                                             (cons (region-beginning) (region-end))
-                                           (point)))))
-                        (estate-copy (if (consp new-point)
-                                         new-point
-                                       (cons (min orig-point new-point)
-                                             (max orig-point new-point)))))))
+                (,(command-sentence--make-movement-delegated-command (lambda (beg end) (estate-copy (cons beg end))))
                  sentence-with-defaults))
 
           (upcase region
@@ -884,60 +864,21 @@ Otherwise, return a cons pair (PARAMS . EXECUTOR), containing the final paramete
                   (,(lambda () (upcase-region (region-beginning) (region-end)))))
           (upcase ,(lambda (x) (not (memq x '(region))))
                   ()
-                  (,(lambda (sentence-with-defaults)
-                      (let ((orig-point (point))
-                            (new-point (save-mark-and-excursion
-                                         (command-sentence-execute
-                                          ;; TODO - I should maybe delete the old verb, but I'll just use alist shadowing...
-                                          (cons '((word-type . verb) (contents . move)) sentence-with-defaults)
-                                          command-sentence-current-configuration)
-                                         (if (region-active-p)
-                                             (cons (region-beginning) (region-end))
-                                           (point)))))
-                        (if (consp new-point)
-                            (upcase-region (car new-point) (cdr new-point))
-                          (upcase-region (min orig-point new-point)
-                                         (max orig-point new-point)))))
+                  (,(command-sentence--make-movement-delegated-command 'upcase-region)
                    sentence-with-defaults))
           (downcase region
                     ()
                     (,(lambda () (downcase-region (region-beginning) (region-end)))))
           (downcase ,(lambda (x) (not (memq x '(region))))
                     ()
-                    (,(lambda (sentence-with-defaults)
-                        (let ((orig-point (point))
-                              (new-point (save-mark-and-excursion
-                                           (command-sentence-execute
-                                            ;; TODO - I should maybe delete the old verb, but I'll just use alist shadowing...
-                                            (cons '((word-type . verb) (contents . move)) sentence-with-defaults)
-                                            command-sentence-current-configuration)
-                                           (if (region-active-p)
-                                               (cons (region-beginning) (region-end))
-                                             (point)))))
-                          (if (consp new-point)
-                              (downcase-region (car new-point) (cdr new-point))
-                            (downcase-region (min orig-point new-point)
-                                             (max orig-point new-point)))))
+                    (,(command-sentence--make-movement-delegated-command 'downcase-region)
                      sentence-with-defaults))
           (capitalize region
                       ()
                       (,(lambda () (capitalize-region (region-beginning) (region-end)))))
           (capitalize ,(lambda (x) (not (memq x '(region))))
                       ()
-                      (,(lambda (sentence-with-defaults)
-                          (let ((orig-point (point))
-                                (new-point (save-mark-and-excursion
-                                             (command-sentence-execute
-                                              ;; TODO - I should maybe delete the old verb, but I'll just use alist shadowing...
-                                              (cons '((word-type . verb) (contents . move)) sentence-with-defaults)
-                                              command-sentence-current-configuration)
-                                             (if (region-active-p)
-                                                 (cons (region-beginning) (region-end))
-                                               (point)))))
-                            (if (consp new-point)
-                                (capitalize-region (car new-point) (cdr new-point))
-                              (capitalize-region (min orig-point new-point)
-                                                 (max orig-point new-point)))))
+                      (,(command-sentence--make-movement-delegated-command 'capitalize-region)
                        sentence-with-defaults))
 
 
