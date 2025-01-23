@@ -63,15 +63,14 @@ Return nil if not at any current smartparens delimiter.
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;; Predicates!
 
-(defun sptw-at-open-delimiter-p ()
+(defun sptw--at-open-delimiter-p ()
   "Is point at an opening smartparens delimiter?"
   (sptw--at-delim-p t nil))
-(defun sptw-at-close-delimiter-p ()
+(defun sptw--at-close-delimiter-p ()
   "Is point at the end of a closing smartparens delimiter? IE immediately after the last character."
   (sptw--at-delim-p nil t))
-(defun sptw-at-delimiter-p ()
-  "Is point at the beginning of a smartparens open delimiter or the end of a smartparens close delimiter?"
-  (or (sptw-at-open-delimiter-p) (sptw-at-close-delimiter-p)))
+(defun sptw--before-close-delimiter-p ()
+  (sptw--at-delim-p nil nil))
 
 
 (defun sptw--advances? (move fwd?)
@@ -85,135 +84,94 @@ Return nil if not at any current smartparens delimiter.
           (and (> end-point cur-point) end-point)
         (and (< end-point cur-point) end-point)))))
 
+(defun sptw--move-if-advances (move fwd?)
+  (let ((end (sptw--advances? move fwd?)))
+    (when end
+      (goto-char end)
+      end)))
+
 (defun sptw--movements-equal? (a b)
   (let ((am (save-excursion (funcall a) (point)))
         (bm (save-excursion (funcall b) (point))))
     (and (eql am bm) am)))
 
-(defun sptw--from-close-on-last-sexp? ()
-  (sptw--movements-equal?
-   (lambda ()
-     (sp-forward-sexp))
-   (lambda ()
-     (sp-up-sexp))))
 
-(defun sptw--from-open-on-last-sexp? ()
-  (sptw--advances? 'sp-next-sexp nil))
-(defun sptw--on-last-sexp? ()
-  (cond ((sptw-at-open-delimiter-p) (sptw--from-open-on-last-sexp?))
-        ((sptw-at-close-delimiter-p) (sptw--from-close-on-last-sexp?))
-        (t (sptw--on-last-symbol-sexp?))))
+(defun sptw--at-end-of-symbol-sexp-probably ()
+  "If the character before point is not a space, and after point is an end delimiter or space, we are probably at the end of a sexp."
+  (and (not (bobp))
+       (save-mark-and-excursion (backward-char 1)
+                                (not (looking-at-p (rx space))))
+       (or (sptw--before-close-delimiter-p)
+           (looking-at-p (rx space))
+           (looking-at-p "\n"))))
 
-(defun sptw--from-open-on-first-sexp? ()
-  (sptw--advances? 'sp-previous-sexp t))
-(defun sptw--from-close-on-first-sexp? ()
-  (sptw--advances? (lambda ()
-                     (sp-previous-sexp)
-                     (sp-previous-sexp))
-                   t))
-(defun sptw--on-first-sexp? ()
-  (cond ((sptw-at-open-delimiter-p) (sptw--from-open-on-first-sexp?))
-        ((sptw-at-close-delimiter-p) (sptw--from-close-on-first-sexp?))
-        ;; they can't all be the same because sp functions act differently in
-        ;; the middle of symbols
-        (t (sptw--at-end-of-last-symbol-sexp?))))
+(defun sptw--at-sexp-end-probably ()
+  (or (sptw--at-close-delimiter-p)
+      (sptw--at-end-of-symbol-sexp-probably)))
 
-(defun sptw--at-start-of-symbol-sexp-if-not-at-other-start? ()
-  "Predicate for whether point is at the start of a symbol sexp, but it is hacky and was only ever meant as a fallback for testing after having tested for whether point is at the start of a delimited sexp."
-  (and (not (looking-at (rx space)))
-       ;; If backward-sexp then forward-sexp nets a backward movement, it means
-       ;; we were at the start of the symbol.
-       (sptw--advances? (lambda ()
-                          (sp-backward-sexp)
-                          (sp-forward-sexp))
-                        nil)))
-(defun sptw--at-end-of-symbol-sexp-if-not-at-other-end? ()
-  "Similar to `sptw--at-start-of-symbol-sexp-if-not-at-other-start?', hack."
-  (sptw--movements-equal?
-   'ignore (lambda () (sp-backward-sexp) (sp-forward-sexp))))
-(defun sptw--on-start-of-first-symbol-sexp? ()
-  (sptw--movements-equal?
-   'sp-backward-sexp 'sp-backward-up-sexp))
-(defun sptw--at-end-of-last-symbol-sexp? ()
-  (sptw--movements-equal?
-   'sp-up-sexp (lambda () (sp-forward-sexp))))
-(defun sptw--on-first-symbol-sexp? ()
-  (sptw--movements-equal?
-   'sp-forward-sexp (lambda () (sp-beginning-of-sexp) (sp-forward-sexp))))
-(defun sptw--on-last-symbol-sexp? ()
-  (or (sptw--movements-equal?
-       'sp-backward-sexp (lambda () (sp-end-of-sexp) (sp-backward-sexp)))
-      ;; IE on the first char of the last symbol-sexp
-      (sptw--movements-equal?
-       'ignore (lambda () (sp-end-of-sexp) (sp-backward-sexp)))))
-
-(defun sptw-at-sexp-beginning-p ()
-  "Return true if point is at the beginning of a smartparens sexp.  (IE delimited list or symbol-like object.)"
-  (or (sptw-at-open-delimiter-p)
-      (sptw--at-start-of-symbol-sexp-if-not-at-other-start?)))
-
-(defun sptw-at-sexp-end-p ()
-  "Return true if point is at the end of a smartparens sexp.  (IE delimited list or symbol-like object.)
-IE point is immediately after the end.
-Note that point can be both at the end and start of two different sexps, and commands prefer using the sexp that point is at the start of."
-  (or (sptw-at-close-delimiter-p)
-      (sptw--at-end-of-symbol-sexp-if-not-at-other-end?)))
-
-(defun sptw-bounds-of-sexp-at-point (&optional point)
+(defun sptw--bounds-of-sexp-at-point (&optional point prefix-flag direction)
   "Return the bounds of the smartparens sexp at point as (beg . end), or nil if there is no sexp at point.
 Note that if point is just before an opening delimiter or just after a closing delimiter, the sexp will be the one for those delimiters.
-But if point is both after an end delimiter and before an open delimiter, it will prefer the open delimiter."
+But if point is both after an end delimiter and before an open delimiter, it will prefer the open delimiter.
+
+PREFX-FLAG can be nil for choice based on point, 'always to include the prefix, 'never to not include the prefix.
+DIRECTION can be nil to detect, 'forward, or 'backward.
+"
   (let ((point (or point (point))))
     (save-mark-and-excursion
       (goto-char point)
-      (cond ((sptw-at-sexp-beginning-p)
-             (cons (point) (save-mark-and-excursion (sp-forward-sexp) (point))))
-            ;; TODO - sptw-at-sexp-end-p is causing a problem here for cases where the end delimiter matches the opening delimiter.
-            ((sptw-at-sexp-end-p)
-             (cons (save-mark-and-excursion (sp-backward-sexp) (point)) (point)))
-            (t
-             (let ((orig-point (point)))
-               (save-mark-and-excursion
-                 (sp-forward-sexp)
-                 (let ((end-point (point)))
-                   (sp-backward-sexp)
-                   (if (<= (point) orig-point end-point)
-                       (cons (point) end-point)
-                     nil)))))))))
+      (let* ((thing (sp-get-thing (cond ((equal direction 'forward) nil)
+                                        ((equal direction 'backward) t)
+                                        ((sptw--at-open-delimiter-p) nil)
+                                        ((sptw--at-close-delimiter-p) t)
+                                        ((sptw--at-end-of-symbol-sexp-probably) t)
+                                        (t nil))))
+             (beg (and thing (plist-get thing ':beg)))
+             (end (and thing (plist-get thing ':end)))
+             (prefix (and thing (plist-get thing ':prefix)))
+             (suffix (and thing (plist-get thing ':suffix)))
+             (beg-including-prefix (and beg (if prefix (- beg (length prefix)) beg)))
+             (end-including-suffix (and end (if suffix (+ end (length suffix)) end))))
+        ;; TODO - suffix
+        (cond ((or (not beg) (not end)) nil)
+              ((equal prefix-flag 'always) (cons beg-including-prefix end))
+              ((equal prefix-flag 'never) (cons beg end))
+              ((<= beg point) (cons beg end))
+              (t (cons beg-including-prefix end)))))))
 
-(defun sptw-bounds-of-delimited-sexp-at-point (&optional point)
-  "Like `sptw-bounds-of-sexp-at-point' except if the sexp-at-point is a symbol sexp, then use the parent instead."
-  (let ((bounds (sptw-bounds-of-sexp-at-point point)))
+(defun sptw--bounds-of-delimited-sexp-at-point (&optional point)
+  "Like `sptw--bounds-of-sexp-at-point' except if the sexp-at-point is a symbol sexp, then use the parent instead."
+  (let ((bounds (sptw--bounds-of-sexp-at-point point 'never)))
     (and bounds
          (if (save-mark-and-excursion (goto-char (car bounds))
-                                      (sptw-at-open-delimiter-p))
+                                      (sptw--at-open-delimiter-p))
              bounds
            (save-mark-and-excursion (goto-char (car bounds))
                                     (and (tree-walk--motion-moved 'sptw-up-parent-beginning)
-                                         (sptw-bounds-of-sexp-at-point)))))))
+                                         (sptw--bounds-of-sexp-at-point (point) 'never)))))))
 
 (defun sptw-move-to-current-sexp-beginning ()
   "Move to the beginning of the current sexp at point."
   (interactive)
-  (let ((bounds (sptw-bounds-of-sexp-at-point)))
+  (let ((bounds (sptw--bounds-of-sexp-at-point)))
     (when bounds
       (goto-char (car bounds)))))
 
-(defun sptw-bounds-of-sexp-children-at-point ()
-  "Like `sptw-bounds-of-sexp-at-point' but trimmed to only the area inside the delimiters."
+(defun sptw--bounds-of-sexp-children-at-point (&optional point)
+  "Like `sptw--bounds-of-sexp-at-point' but trimmed to only the area inside the delimiters."
   (save-mark-and-excursion
-    (sptw-move-to-current-sexp-beginning)
-    (if (sptw-at-open-delimiter-p)
-        (progn
-          (sptw-down-first-child-beginning 1)
-          (cons (progn (sp-beginning-of-sexp) (point))
-                (progn (sp-end-of-sexp) (point))))
-      nil)))
+    (when point (goto-char (point)))
+    (save-mark-and-excursion
+      (let ((bounds (sptw--bounds-of-sexp-at-point)))
+        (when bounds
+          (goto-char (car bounds))))
+      (if (sptw--at-open-delimiter-p)
+          (progn
+            (sptw-down-first-child-beginning 1)
+            (cons (progn (sp-beginning-of-sexp) (point))
+                  (progn (sp-end-of-sexp) (point))))
+        nil))))
 
-(defun sptw-bounds-of-sexp-children (point)
-  (save-mark-and-excursion
-    (goto-char point)
-    (sptw-bounds-of-sexp-children-at-point)))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;; Motion commands
@@ -229,90 +187,141 @@ But if point is both after an end delimiter and before an open delimiter, it wil
            (t (dotimes (_i arg)
                 (,command))))))
 
-(defun sptw--sptw-use-move-if-advances (move fwd)
-  (let ((new-point (sptw--advances? move fwd)))
-    (when new-point
-      (goto-char new-point))))
 
-(defun sptw--forward-sexp-from-on-open ()
-  (sptw--sptw-use-move-if-advances 'sp-next-sexp t))
-(defun sptw--forward-sexp-from-at-close ()
-  (let ((move (lambda () (sp-next-sexp))))
-    (sptw--sptw-use-move-if-advances move t)))
-;; if not on delimiters, use normal sp-next-sexp
-(defun sptw--forward-sexp ()
-  (cond ((sptw-at-open-delimiter-p) (sptw--forward-sexp-from-on-open))
-        ((sptw-at-close-delimiter-p) (sptw--forward-sexp-from-at-close))
-        (t (unless (sptw--on-last-symbol-sexp?)
-             (sp-forward-sexp)
-             (sp-next-sexp)))))
+(defun sptw--up-to-prefix ()
+  (let ((bounds (sptw--bounds-of-sexp-at-point (point) 'always nil)))
+    (and bounds
+         (goto-char (car bounds)))))
+
+(defun sptw--forward-sibling-beginning ()
+  (let ((new-point
+         (save-mark-and-excursion
+           (let* ((thing (sp-get-thing))
+                  (beg (and thing (plist-get thing ':beg)))
+                  (prefix-beg (and beg (- beg (length (plist-get thing ':prefix))))))
+             (and thing
+                  (cond
+                   ((<= prefix-beg (point) beg)
+                    (goto-char (plist-get thing ':end))
+                    (let* ((thing (sp-get-thing))
+                           (beg (and thing (plist-get thing ':beg))))
+                      (and beg (< (point) beg) (- beg (length (plist-get thing ':prefix))))))
+                   ((< beg (point))
+                    (let ((back-thing (sp-get-thing t)))
+                      (and back-thing
+                           (if (and (equal beg
+                                           (plist-get back-thing ':beg))
+                                    (not (sptw--before-close-delimiter-p))
+                                    (not (looking-at-p (rx space)))
+                                    (not (looking-at-p "\n")))
+                               (progn
+                                 ;; If thing and back-thing have the same beginning, then either point was in the middle of the thing, or point was in an empty list.
+                                 (goto-char (plist-get thing ':end))
+                                 (let* ((thing (sp-get-thing))
+                                        (beg (and thing (plist-get thing ':beg))))
+                                   (and beg (< (point) beg)
+                                        (- beg (length (plist-get thing ':prefix))))))
+                             nil))))
+                   (t prefix-beg)))))))
+    (when new-point (goto-char new-point) new-point)))
+
+(defun sptw--backward-sibling-beginning ()
+  (let ((new-point
+         (save-mark-and-excursion
+           (let* ((thing (sp-get-thing t))
+                  (beg (and thing (plist-get thing ':beg)))
+                  (prefix-beg (and beg (- beg (length (plist-get thing ':prefix)))))
+                  (end (and thing (plist-get thing ':end)))
+                  )
+             (and thing
+                  (if (< (point) end)
+                      (let* ((fwd-thing (sp-get-thing)))
+                        (and fwd-thing
+                             (and (equal end (plist-get fwd-thing ':end))
+                                  (not (sptw--before-close-delimiter-p))
+                                  (not (looking-at-p (rx space)))
+                                  (not (looking-at-p "\n"))
+                                  prefix-beg)))
+                    prefix-beg))))))
+    (when new-point (goto-char new-point) new-point)))
+
+(defun sptw--forward-sibling-end ()
+  (let ((new-point
+         (save-mark-and-excursion
+           (let* ((thing (sp-get-thing))
+                  (beg (and thing (plist-get thing ':beg)))
+                  (prefix-beg (and beg (- beg (length (plist-get thing ':prefix)))))
+                  (end (and thing (plist-get thing ':end)))
+                  )
+             (and thing
+                  (if (<= prefix-beg (point) end)
+                      (let* ((back-thing (sp-get-thing t)))
+                        (and back-thing
+                             (equal end (plist-get fwd-thing ':end))
+                             (not (sptw--before-close-delimiter-p))
+                             (not (looking-at-p (rx space)))
+                             (not (looking-at-p "\n"))
+                             end))
+                    end))))))
+    (when new-point (goto-char new-point) new-point)))
+
+(defun sptw--backward-sibling-end ()
+  (let ((new-point
+         (save-mark-and-excursion
+           (let* ((thing (sp-get-thing t))
+                  (beg (and thing (plist-get thing ':beg)))
+                  (end (and thing (plist-get thing ':end)))
+                  (prefix-beg (and beg (- beg (length (plist-get thing ':prefix))))))
+             (and thing
+                  (cond
+                   ((equal end (point))
+                    (goto-char prefix-beg)
+                    (let* ((thing (sp-get-thing t))
+                           (end (and thing (plist-get thing ':end))))
+                      (and end (< end (point)) end)))
+                   ((< end (point))
+                    end)
+                   (t
+                    (let* ((fwd-thing (sp-get-thing)))
+                      (if (and back-thing
+                               (equal end (plist-get back-thing ':end))
+                               (not (sptw--before-close-delimiter-p))
+                               (not (looking-at-p (rx space)))
+                               (not (looking-at-p "\n"))
+                               (progn
+                                 (goto-char prefix-beg)
+                                 (let* ((thing (sp-get-thing t))
+                                        (end (and thing (plist-get thing ':end))))
+                                   (and end (< end (point)) end)))))))))))))
+    (when new-point (goto-char new-point) new-point)))
+
 ;;;###autoload (autoload 'sptw-forward-sibling-beginning "tree-walk-smartparens-integration.el" "" t)
 (sptw--command-wrap sptw-forward-sibling-beginning
-                    sptw--forward-sexp
+                    sptw--forward-sibling-beginning
                     sptw-backward-sibling-beginning
                     "Move forward to the start of the next smartparens sexp sibling.")
 
-(defun sptw--backward-sexp-from-on-open ()
-  (unless (sptw--on-first-sexp?)
-    (sp-backward-sexp)))
-(defun sptw--backward-sexp-from-at-close ()
-  (sp-backward-sexp))
-(defun sptw--backward-sexp ()
-  (cond ((sptw-at-open-delimiter-p) (sptw--backward-sexp-from-on-open))
-        ((sptw-at-close-delimiter-p) (sptw--backward-sexp-from-at-close))
-        (t (unless (sptw--movements-equal? 'sp-backward-sexp
-                                           'sp-backward-up-sexp)
-             (sp-backward-sexp)))))
 ;;;###autoload (autoload 'sptw-backward-sibling-beginning "tree-walk-smartparens-integration.el" "" t)
 (sptw--command-wrap sptw-backward-sibling-beginning
-                    sptw--backward-sexp
+                    sptw--backward-sibling-beginning
                     sptw-forward-sibling-beginning
                     "Move backward to the start of the next smartparens sexp sibling.  Note that if not at the beginning of the current sexp, it will move to the beginning of the current, not actually to the next sibling.")
 
-(defun sptw--forward-sexp-end-from-on-open ()
-  (sp-forward-sexp))
-(defun sptw--forward-sexp-end-from-at-close ()
-  (unless (sptw--on-last-sexp?)
-    (sp-forward-sexp)))
-(defun sptw--forward-sexp-end-else ()
-  (unless (sptw--at-end-of-last-symbol-sexp?)
-    (sp-forward-sexp)))
-(defun sptw--forward-sexp-end ()
-  (cond ((sptw-at-open-delimiter-p) (sptw--forward-sexp-end-from-on-open))
-        ((sptw-at-close-delimiter-p) (sptw--forward-sexp-end-from-at-close))
-        (t (sptw--forward-sexp-end-else))))
 ;;;###autoload (autoload 'sptw-forward-sibling-end "tree-walk-smartparens-integration.el" "" t)
 (sptw--command-wrap sptw-forward-sibling-end
-                    sptw--forward-sexp-end
+                    sptw--forward-sibling-end
                     sptw-backward-sibling-end
                     "Move forward to the next end of a smartparens sexp sibling.  Note that if not at the end of the current sexp, it will move to the end of the current sexp, not actually to the next sibling.")
 
-(defun sptw--backward-sexp-end-from-on-open ()
-  (unless (sptw--on-first-sexp?)
-    (sptw--backward-sexp-from-on-open)
-    (sptw--forward-sexp-end)))
-(defun sptw--backward-sexp-end-from-at-close ()
-  (unless (sptw--on-first-sexp?)
-    (sp-backward-sexp)
-    (sptw--backward-sexp-end-from-on-open)))
-(defun sptw--backward-sexp-end-else ()
-  (unless (sptw--on-first-symbol-sexp?)
-    (unless (sptw--at-start-of-symbol-sexp-if-not-at-other-start?)
-      (sptw--backward-sexp))
-    (sptw--backward-sexp)
-    (sptw--forward-sexp-end)))
-(defun sptw--backward-sexp-end ()
-  (cond ((sptw-at-open-delimiter-p) (sptw--backward-sexp-end-from-on-open))
-        ((sptw-at-close-delimiter-p) (sptw--backward-sexp-end-from-at-close))
-        (t (sptw--backward-sexp-end-else))))
 ;;;###autoload (autoload 'sptw-backward-sibling-end "tree-walk-smartparens-integration.el" "" t)
 (sptw--command-wrap sptw-backward-sibling-end
-                    sptw--backward-sexp-end
+                    sptw--backward-sibling-end
                     sptw-forward-sibling-end
                     "Move backward to the next end of a smartparens sexp sibling.")
 
 (defun sptw--up-sexp ()
-  (sp-backward-up-sexp))
+  (or (sptw--move-if-advances 'sptw--up-to-prefix nil)
+      (sp-backward-up-sexp)))
 ;;;###autoload (autoload 'sptw-up-parent-beginning "tree-walk-smartparens-integration.el" "" t)
 (sptw--command-wrap sptw-up-parent-beginning
                     sptw--up-sexp
@@ -332,23 +341,40 @@ But if point is both after an end delimiter and before an open delimiter, it wil
 
 (defun sptw--move-if-within-bounds-of-current-delimited-sexp (movement)
   (let ((start-point (point))
-        (bounds (sptw-bounds-of-sexp-at-point)))
+        (bounds (sptw--bounds-of-sexp-at-point)))
     (when (not (and bounds
                     (and (save-mark-and-excursion (goto-char (car bounds))
-                                                  (sptw-at-open-delimiter-p)))
+                                                  (sptw--at-open-delimiter-p)))
                     (funcall movement)
                     (<= (car bounds) (point) (cdr bounds))))
       (goto-char start-point))))
 
-(defun sptw--down-sexp ()
-  (sptw--move-if-within-bounds-of-current-delimited-sexp
-   (lambda ()
-     (if (and (sptw-at-sexp-end-p)
-              (not (sptw-at-sexp-beginning-p)))
-         (progn
-           (backward-char)
-           (sp-down-sexp))
-       (sp-down-sexp)))))
+(defun sptw--down-from-prefix ()
+  (let ((thing (sp-get-thing)))
+    (when thing
+      (let* ((beg (plist-get thing ':beg))
+             (prefix (plist-get thing ':prefix))
+             (pre-len (length prefix)))
+        (when (and (not (equal 0 pre-len))
+                   (equal (point) (- beg pre-len)))
+          (goto-char beg)
+          beg)))))
+
+(defun sptw--down-sexp (&optional skip-prefix)
+  (or (and (not skip-prefix)
+           (sptw--down-from-prefix))
+      (sptw--move-if-within-bounds-of-current-delimited-sexp
+       (lambda ()
+         (let ((close-delim (sptw--at-close-delimiter-p))
+               (open-delim (sptw--at-open-delimiter-p)))
+           (cond (open-delim
+                  (sp-down-sexp))
+                 (close-delim
+                  (backward-char (length close-delim))
+                  (sp-down-sexp))
+                 (t (sp-down-sexp))))))))
+(defun sptw--down-sexp-skip-prefix ()
+  (sptw--down-sexp t))
 
 ;;;###autoload (autoload 'sptw-down-first-child-beginning "tree-walk-smartparens-integration.el" "" t)
 (sptw--command-wrap sptw-down-first-child-beginning
@@ -373,30 +399,12 @@ But if point is both after an end delimiter and before an open delimiter, it wil
                     sptw-up-parent-beginning
                     "Move down to the end of the contained smartparens sexp.")
 
-                                        ;(defun sptw--forward-sexp-in-supersexp ()
-                                        ;  (sptw--up-sexp)
-                                        ;  (sptw--forward-sexp)
-                                        ;  (sptw--down-sexp))
-                                        ;(defun sptw--backward-sexp-in-supersexp ()
-                                        ;  (sptw--up-sexp)
-                                        ;  (sptw--backward-sexp-end)
-                                        ;  (sptw--down-sexp))
-;;;;###autoload (autoload 'sptw-forward-sexp-in-supersexp "tree-walk-smartparens-integration.el" "" t)
-                                        ;(sptw--command-wrap sptw-forward-sexp-in-supersexp
-                                        ;                    sptw--forward-sexp-in-supersexp
-                                        ;                    sptw-backward-sexp-in-supersexp
-                                        ;                    "up, forward, down")
-;;;;###autoload (autoload 'sptw-backward-sexp-in-supersexp "tree-walk-smartparens-integration.el" "" t)
-                                        ;(sptw--command-wrap sptw-backward-sexp-in-supersexp
-                                        ;                    sptw--backward-sexp-in-supersexp
-                                        ;                    sptw-forward-sexp-in-supersexp
-                                        ;                    "up, backward, down")
 
 (defun sptw-move-to-other-end-of-sexp ()
   "If at the beginning of a smartparens sexp, move to the end of the same sexp, and vice versa."
   (interactive)
-  (cond ((sptw-at-open-delimiter-p) (sp-forward-sexp))
-        ((sptw-at-close-delimiter-p) (sp-backward-sexp))
+  (cond ((sptw--at-open-delimiter-p) (sp-forward-sexp))
+        ((sptw--at-close-delimiter-p) (sp-backward-sexp))
         ;; TODO - swap on symbols and stuff, too.
         (t nil)))
 
@@ -423,11 +431,11 @@ Specifically it moves inside the parens."
      (interactive "p")
      (sptw--action-move-wrap
       ,action
-      (list (list 'sptw-at-open-delimiter-p
-                  (lambda () (sptw-down-first-child-beginning 1))
+      (list (list 'sptw--at-open-delimiter-p
+                  (lambda () (sptw--down-sexp t))
                   (lambda () (sptw-up-parent-beginning 1)))
-            (list 'sptw-at-close-delimiter-p
-                  (lambda () (sptw-down-first-child-beginning 1))
+            (list 'sptw--at-close-delimiter-p
+                  (lambda () (sptw--down-sexp t))
                   (lambda () (sptw-up-parent-end 1))))
       interactive-arg)))
 
@@ -457,8 +465,8 @@ Specifically it moves inside the parens."
 (defun sptw-kill-sexp (&optional arg)
   "Like sp-kill-sexp, except if at the end of a smartparens sexp, kill the sexp that you're at the end of rather than its parent."
   (interactive "p")
-  (if (and (sptw-at-sexp-end-p)
-           (not (sptw-at-sexp-beginning-p)))
+  (if (and (sptw--at-sexp-end-probably)
+           (not (sptw--at-open-delimiter-p)))
       (progn
         (backward-char)
         (sp-kill-sexp arg))
@@ -472,7 +480,7 @@ Specifically it moves inside the parens."
   "Join the delimited sexp at point with the one before it, if they have the same delimiter type."
   (interactive "p")
   (let ((count (or count 1)))
-    (let ((bounds (sptw-bounds-of-delimited-sexp-at-point)))
+    (let ((bounds (sptw--bounds-of-delimited-sexp-at-point)))
       (when bounds
         (goto-char (if (<= 0 count) (cdr bounds) (car bounds)))
         (sp-join-sexp count)))))
@@ -499,15 +507,17 @@ Specifically it moves inside the parens."
  :def-transpose-sibling-backward sptw-transpose-sibling-backward
 
  :use-down-to-last-child (lambda () (and (tree-walk--motion-moved 'sptw-down-last-child-end)
-                                         (sptw-move-to-current-sexp-beginning)))
+                                         (let ((bounds (sptw--bounds-of-sexp-at-point (point) 'always)))
+                                           (when bounds
+                                             (goto-char (car bounds))))))
 
  :use-up-to-parent 'sptw-up-parent-beginning
  :use-down-to-first-child 'sptw-down-first-child-beginning
  :use-next-sibling 'sptw-forward-sibling-beginning
  :use-previous-sibling (lambda () (and (tree-walk--motion-moved 'sptw-backward-sibling-end)
                                        (sptw-backward-sibling-beginning)))
- :use-bounds 'sptw-bounds-of-sexp-at-point
- :use-children-bounds 'sptw-bounds-of-sexp-children
+ :use-bounds 'sptw--bounds-of-sexp-at-point
+ :use-children-bounds 'sptw--bounds-of-sexp-children-at-point
  )
 
 
@@ -542,7 +552,7 @@ If the predicate succeeds, leave the expanded region and return the new bounds."
    (lambda () (save-mark-and-excursion
                 (and (region-active-p)
                      (goto-char (if (region-active-p) (region-beginning) (point)))
-                     (sptw-at-open-delimiter-p))))))
+                     (sptw--at-open-delimiter-p))))))
 
 (defun sptw-expand-region-to-delimiter (delimiter)
   "DELIMITER must be an opening delimiter used by smartparens.
@@ -574,7 +584,7 @@ BOUNDS is the bounds of the current sexp."
   (or (let ((prev-sib-bounds (save-mark-and-excursion
                                (goto-char (car bounds))
                                (and (tree-walk--motion-moved 'sptw-backward-sibling-beginning)
-                                    (sptw-bounds-of-sexp-at-point)))))
+                                    (sptw--bounds-of-sexp-at-point)))))
         (if prev-sib-bounds
             (let* ((sib-end-line (line-number-at-pos (cdr prev-sib-bounds)))
                    (this-start-line (line-number-at-pos (car bounds)))
@@ -584,7 +594,7 @@ BOUNDS is the bounds of the current sexp."
           (let* ((next-sib-bounds (save-mark-and-excursion
                                     (goto-char (car bounds))
                                     (and (tree-walk--motion-moved 'sptw-forward-sibling-beginning)
-                                         (sptw-bounds-of-sexp-at-point))))
+                                         (sptw--bounds-of-sexp-at-point))))
                  (sib-start-line (and next-sib-bounds
                                       (line-number-at-pos (car next-sib-bounds))))
                  (this-end-line (line-number-at-pos (cdr bounds)))
@@ -598,7 +608,7 @@ BOUNDS is the bounds of the current sexp."
   (interactive)
   (let* ((same-line t)
          (extra-lines 0)
-         (bounds (sptw-bounds-of-sexp-at-point)))
+         (bounds (sptw--bounds-of-sexp-at-point)))
     (when (not bounds)
       (error "No smartparens object at point."))
     (when (not (equal (line-number-at-pos (car bounds))
@@ -614,7 +624,7 @@ BOUNDS is the bounds of the current sexp."
     (when same-line
       (let ((parent-bounds (save-mark-and-excursion
                              (and (tree-walk--motion-moved 'sptw-up-parent-beginning)
-                                  (sptw-bounds-of-delimited-sexp-at-point)))))
+                                  (sptw--bounds-of-delimited-sexp-at-point)))))
         (when (and parent-bounds (not (equal (line-number-at-pos (car parent-bounds))
                                              (line-number-at-pos (cdr parent-bounds)))))
           ;; When the parent is on a different line, the next sibling should
@@ -641,7 +651,7 @@ BOUNDS is the bounds of the current sexp."
   (interactive)
   (let* ((same-line t)
          (extra-lines 0)
-         (bounds (sptw-bounds-of-sexp-at-point)))
+         (bounds (sptw--bounds-of-sexp-at-point)))
     (when (not bounds)
       (error "No smartparens object at point."))
     (when (not (equal (line-number-at-pos (car bounds))
@@ -653,7 +663,7 @@ BOUNDS is the bounds of the current sexp."
     (when same-line
       (let ((parent-bounds (save-mark-and-excursion
                              (and (tree-walk--motion-moved 'sptw-up-parent-beginning)
-                                  (sptw-bounds-of-delimited-sexp-at-point)))))
+                                  (sptw--bounds-of-delimited-sexp-at-point)))))
         (when (and parent-bounds (not (equal (line-number-at-pos (car parent-bounds))
                                              (line-number-at-pos (cdr parent-bounds)))))
           (setq same-line nil))))
