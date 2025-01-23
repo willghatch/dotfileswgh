@@ -475,6 +475,7 @@
   ("o" (funcall (cs/ae (cs/obj 'NOOP-STOP-USING-THIS-BINDING-FOR-OLD-PURPOSE))) "break habit!" :exit t)
   ("O" (funcall (cs/ae (progn (require 'tree-walk-outline-integration) (cs/obj 'outline)))) "outline" :exit t)
   ("t" (funcall (cs/ae (progn (require 'tree-walk-treesitter-integration)
+                              (wgh/initialize-treesit-for-buffer)
                               ;; TODO - also need to initialize treesitter in the buffer before first use...
                               (cs/obj 'tstw-qd))))
    "treesitter-thumb" :exit t)

@@ -338,4 +338,19 @@
 (load-library "racket-mode-conf")
 (load-library "haskell-mode-conf")
 
+(setq-default wgh/treesit-initialized nil)
+(setq wgh/treesit-mode-parser-alist
+      `(
+        (emacs-lisp-mode . elisp)
+        (lisp-interaction-mode . elisp)
+        ))
+(defun wgh/initialize-treesit-for-buffer ()
+  (when (not wgh/treesit-initialized)
+    (require 'treesit)
+    (let ((treesit-parser-type
+           (cdr (assq major-mode wgh/treesit-mode-parser-alist))))
+      (when treesit-parser-type
+        (treesit-parser-create treesit-parser-type)
+        (setq-local wgh/treesit-initialized t)))))
+
 (provide 'mode-hooks-conf)

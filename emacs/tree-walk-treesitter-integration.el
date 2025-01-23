@@ -1,6 +1,7 @@
 ;; -*- lexical-binding: t; -*-
 
 (require 'tree-walk)
+(require 'treesit)
 
 ;; TODO - how to use treesitter
 ;; The built-in treesitter support in emacs 29 is in the treesit group.
