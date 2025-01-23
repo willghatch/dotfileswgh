@@ -383,8 +383,8 @@ It does not actually move the active region, it just takes and returns region da
 If REGION is null, then any region succeeds.
 "
               (let ((compare-func (if strictly-grow
-                                      #'tree-walk--region-strictly-less
-                                    #'tree-walk--region-less-or-equal)))
+                                      'tree-walk--region-strictly-less
+                                    'tree-walk--region-less-or-equal)))
                 (save-mark-and-excursion
                  (let* ((bounds (funcall get-bounds-func anchor-point))
                         (success (and bounds (or (and (not region) bounds)

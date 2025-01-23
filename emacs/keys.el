@@ -491,6 +491,7 @@
   ("I" (funcall (cs/add (cs/mod 'tree-inner t))) "tree-inner" :exit nil)
   ("u" (funcall (cs/add (cs/mod 'tree-vertical 'up))) "up" :exit nil)
   ("d" (funcall (cs/add (cs/mod 'tree-vertical 'down))) "down" :exit nil)
+  ("T" (funcall (cs/add (cs/mod 'tree-traversal 'inorder))) "inorder" :exit nil)
   ("r" TODO_register-select "register" :exit nil)
   (" " (funcall (cs/add (cs/mod 'surrounding-space 'surrounding-space))) "surrounding-space" :exit nil)
   ("g" (funcall (cs/add (cs/mod 'current-line-only 'current-line-only))) "current-line-only" :exit nil)
