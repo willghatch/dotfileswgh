@@ -565,6 +565,13 @@ TODO - add an optional fix-up function, eg. to fix indentation for indent tree, 
                 (undo-amalgamate-change-group change-group))
             (error "regions for thing, parent, and ancestor not strictly growing")))))))
 
+(defun tree-walk--up-to-root (up-func)
+  (while (tree-walk--motion-moved up-func)))
+(defun tree-walk--select-root (up-func expand-region-func)
+  ;; Alternatively I could repeat the expand-region-func, but this seems better as long as it works.
+  (tree-walk--up-to-root up-func)
+  (funcall expand-region-func))
+
 (cl-defmacro tree-walk-define-operations
     (&key
      def-inorder-forward
@@ -587,6 +594,9 @@ TODO - add an optional fix-up function, eg. to fix indentation for indent tree, 
      def-transpose-sibling-backward
 
      def-ancestor-reorder
+
+     def-up-to-root
+     def-select-root
 
      use-object-name
 
@@ -642,6 +652,16 @@ TODO - add an optional fix-up function, eg. to fix indentation for indent tree, 
              :bounds-func ,(or use-bounds `',def-bounds-for-tree-with-no-end-delimiter)
              :children-bounds-func ,(or use-children-bounds `',def-children-bounds-for-tree-with-no-end-delimiter)
              :up-func ,use-up-to-parent))
+         (when def-up-to-root
+           `(defun ,def-up-to-root ()
+              ,(format "Go up to the top tree ancestor for %s." use-object-name)
+              (interactive)
+              (tree-walk--up-to-root ,use-up-to-parent)))
+         (when def-select-root
+           `(defun ,def-select-root ()
+              ,(format "Select region (activate region with the bounds) of top tree ancestor for %s." use-object-name)
+              (interactive)
+              (tree-walk--select-root ,use-up-to-parent ',def-expand-region)))
          (when def-ancestor-reorder
            `(defun ,def-ancestor-reorder (count)
               ,(format "Reorder ancestors for %s.  Take the region of the thing at point, the region of the parent, and the region of the ancestor COUNT generations above parent, and swap the parent and the ancestor.  Essentially, take the ancestor out, leaving a hole in the overall buffer, take the parent out of the ancestor, leaving a hole in the ancestor, and take the child out of the parent, leaving a hole in the parent.  Reassemble putting the parent in the ancestor's old hole, the ancestor in the parent's hole, and the child in the ancestor's hole." (or use-object-name "thing"))

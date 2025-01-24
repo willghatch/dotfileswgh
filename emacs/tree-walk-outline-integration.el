@@ -106,10 +106,12 @@
  :def-expand-region-to-children/ancestor-generation twoi-expand-region/children-region
  :def-transpose-sibling-forward twoi-transpose-sibling-forward
  :def-transpose-sibling-backward twoi-transpose-sibling-backward
+ :def-up-to-root twoi-up-to-root
+ :def-select-root twoi-select-root
 
  :use-object-name "outline-mode header (eg. in org-mode or outline-minor-mode)"
 
- :use-up-to-parent (lambda () (outline-up-heading 1))
+ :use-up-to-parent (lambda () (ignore-errors (outline-up-heading 1)))
  :use-down-to-first-child #'twoi-down-to-first-child
  ;; TODO - handle half siblings like I did for indent-tree -- instead of using outline-forward-same-level here, I need to write a forward-sibling-or-half-sibling function.
  :use-next-sibling (lambda () (ignore-errors (outline-forward-same-level 1)))

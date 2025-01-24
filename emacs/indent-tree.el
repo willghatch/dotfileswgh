@@ -328,6 +328,9 @@ It always moves to the FIRST sibling in the full sibling region, regardless of m
  :def-transpose-sibling-forward indent-tree-transpose-sibling-forward
  :def-transpose-sibling-backward indent-tree-transpose-sibling-backward
 
+ :def-up-to-root indent-tree-up-to-root
+ :def-select-root indent-tree-select-root
+
  :use-object-name "indentation tree"
 
  :use-up-to-parent (lambda () (indent-tree-up-to-parent 1))

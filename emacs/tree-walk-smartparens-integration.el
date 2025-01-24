@@ -508,6 +508,8 @@ Specifically it moves inside the parens."
  :def-transpose-sibling-forward sptw-transpose-sibling-forward
  :def-transpose-sibling-backward sptw-transpose-sibling-backward
  :def-ancestor-reorder sptw-ancestor-reorder
+ :def-up-to-root sptw-up-to-root
+ :def-select-root sptw-select-root
 
  :use-object-name "smartparens tree"
 

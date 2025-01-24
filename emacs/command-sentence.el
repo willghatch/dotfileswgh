@@ -566,7 +566,14 @@ Otherwise, return a cons pair (PARAMS . EXECUTOR), containing the final paramete
                 ((direction backward) (location-within keep-if-possible))
                 (rmo-c/wgh/prev-line (num)))
 
-          ;; TODO -- for all tree objects, I want a convenient modifier to go all the way to the root.  I guess I could give a big number and rely on it stopping when hitting the root, but it would be nice to have something symbolic to go to the root, or maybe to depth N.
+          (move sptw
+                ;; TODO - the modifiers aren't correct, but I'm not sure where to shoehorn this in, so I'm going to roll with this for now.
+                ((tree-vertical up) (expand-region ,t) (tree-traversal inorder))
+                (sptw-select-root ()))
+          (move sptw
+                ;; TODO - the modifiers aren't correct, but I'm not sure where to shoehorn this in, so I'm going to roll with this for now.
+                ((tree-vertical up) (expand-region ,nil) (tree-traversal inorder))
+                (sptw-up-to-root ()))
           (move sptw
                 ((direction ,nil) (expand-region ,t) (delimiter any))
                 (sptw-expand-region-to-any-delimiter (num)))
@@ -589,10 +596,10 @@ Otherwise, return a cons pair (PARAMS . EXECUTOR), containing the final paramete
                 (sptw-expand-region/children-region (num)))
 
           (move sptw
-                ((direction forward) (tree-traversal inorder))
+                ((direction forward) (tree-vertical ,nil) (tree-traversal inorder))
                 (rmo/sptw-forward-inorder-traversal (num)))
           (move sptw
-                ((direction backward) (tree-traversal inorder))
+                ((direction backward) (tree-vertical ,nil) (tree-traversal inorder))
                 (rmo/sptw-backward-inorder-traversal (num)))
           (move sptw
                 ((direction forward) (location-within beginning) (tree-vertical ,nil) (tree-traversal ,nil) (respect-tree ,t))
@@ -653,7 +660,14 @@ Otherwise, return a cons pair (PARAMS . EXECUTOR), containing the final paramete
                  (sp-split-sexp (num)))
 
 
-
+          (move tstw-qd
+                ;; TODO - the modifiers aren't correct, but I'm not sure where to shoehorn this in, so I'm going to roll with this for now.
+                ((tree-vertical up) (expand-region ,t) (tree-traversal inorder))
+                (tstw-qd-select-root ()))
+          (move tstw-qd
+                ;; TODO - the modifiers aren't correct, but I'm not sure where to shoehorn this in, so I'm going to roll with this for now.
+                ((tree-vertical up) (expand-region ,nil) (tree-traversal inorder))
+                (tstw-qd-up-to-root ()))
           (move tstw-qd
                 ((direction ,nil) (expand-region ,t))
                 (tstw-qd-expand-region (num)))
@@ -703,6 +717,14 @@ Otherwise, return a cons pair (PARAMS . EXECUTOR), containing the final paramete
                 (nxml-up-element))
 
           (move outline
+                ;; TODO - the modifiers aren't correct, but I'm not sure where to shoehorn this in, so I'm going to roll with this for now.
+                ((tree-vertical up) (expand-region ,t) (tree-traversal inorder))
+                (twoi-select-root ()))
+          (move outline
+                ;; TODO - the modifiers aren't correct, but I'm not sure where to shoehorn this in, so I'm going to roll with this for now.
+                ((tree-vertical up) (expand-region ,nil) (tree-traversal inorder))
+                (twoi-up-to-root ()))
+          (move outline
                 ((direction ,nil) (expand-region ,t))
                 (twoi-expand-region (num)))
           (move outline
@@ -738,7 +760,14 @@ Otherwise, return a cons pair (PARAMS . EXECUTOR), containing the final paramete
           ;;       ((direction forward))
           ;;       (twoi-forward-barf-heading ()))
 
-
+          (move indent-tree
+                ;; TODO - the modifiers aren't correct, but I'm not sure where to shoehorn this in, so I'm going to roll with this for now.
+                ((tree-vertical up) (expand-region ,t) (tree-traversal inorder))
+                (indent-tree-select-root ()))
+          (move indent-tree
+                ;; TODO - the modifiers aren't correct, but I'm not sure where to shoehorn this in, so I'm going to roll with this for now.
+                ((tree-vertical up) (expand-region ,nil) (tree-traversal inorder))
+                (indent-tree-up-to-root ()))
           (move indent-tree
                 ((direction ,nil) (expand-region ,t))
                 (indent-tree-expand-region (num)))
