@@ -283,16 +283,16 @@ DIRECTION can be nil to detect, 'forward, or 'backward.
                     end)
                    (t
                     (let* ((fwd-thing (sp-get-thing)))
-                      (if (and back-thing
-                               (equal end (plist-get back-thing ':end))
-                               (not (sptw--before-close-delimiter-p))
-                               (not (looking-at-p (rx space)))
-                               (not (looking-at-p "\n"))
-                               (progn
-                                 (goto-char prefix-beg)
-                                 (let* ((thing (sp-get-thing t))
-                                        (end (and thing (plist-get thing ':end))))
-                                   (and end (< end (point)) end)))))))))))))
+                      (and fwd-thing
+                           (equal end (plist-get fwd-thing ':end))
+                           (not (sptw--before-close-delimiter-p))
+                           (not (looking-at-p (rx space)))
+                           (not (looking-at-p "\n"))
+                           (progn
+                             (goto-char prefix-beg)
+                             (let* ((thing (sp-get-thing t))
+                                    (end (and thing (plist-get thing ':end))))
+                               (and end (< end (point)) end))))))))))))
     (when new-point (goto-char new-point) new-point)))
 
 ;;;###autoload (autoload 'sptw-forward-sibling-beginning "tree-walk-smartparens-integration.el" "" t)
@@ -505,6 +505,8 @@ Specifically it moves inside the parens."
  ;;:def-down-to-last-child sptw-down-to-last-child-beginning
  :def-transpose-sibling-forward sptw-transpose-sibling-forward
  :def-transpose-sibling-backward sptw-transpose-sibling-backward
+
+ :use-object-name "smartparens tree"
 
  :use-down-to-last-child (lambda () (and (tree-walk--motion-moved 'sptw-down-last-child-end)
                                          (let ((bounds (sptw--bounds-of-sexp-at-point (point) 'always)))

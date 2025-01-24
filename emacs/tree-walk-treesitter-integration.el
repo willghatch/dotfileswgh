@@ -176,6 +176,8 @@ But this is a heuristic thing, so we'll see if it works well."
  :def-transpose-sibling-forward tstw-qd-transpose-sibling-forward
  :def-transpose-sibling-backward tstw-qd-transpose-sibling-backward
 
+ :use-object-name "treesitter tree (via 'treesit.el', using quick-and-dirty tstw-qd movement and selection)"
+
  :use-down-to-last-child 'tstw-qd-down-to-last-child-anchor-point
 
  :use-up-to-parent 'tstw-qd-up-to-parent-anchor-point

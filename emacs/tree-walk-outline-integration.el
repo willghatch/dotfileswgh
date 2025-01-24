@@ -82,6 +82,12 @@
   (and (tree-walk--motion-moved #'wgh/org-down-element)
        (wgh/org-forward-to-last-sibling)))
 
+(defun twoi--outline-at-anchor-point-p ()
+  (save-mark-and-excursion
+    (let ((start-point (point)))
+      (outline-previous-heading)
+      (outline-next-heading)
+      (equal (point) start-point))))
 
 (tree-walk-define-operations
  :def-inorder-forward twoi-inorder-traversal-forward
@@ -101,14 +107,21 @@
  :def-transpose-sibling-forward twoi-transpose-sibling-forward
  :def-transpose-sibling-backward twoi-transpose-sibling-backward
 
+ :use-object-name "outline-mode header (eg. in org-mode or outline-minor-mode)"
+
  :use-up-to-parent (lambda () (outline-up-heading 1))
  :use-down-to-first-child #'twoi-down-to-first-child
  ;; TODO - handle half siblings like I did for indent-tree -- instead of using outline-forward-same-level here, I need to write a forward-sibling-or-half-sibling function.
  :use-next-sibling (lambda () (ignore-errors (outline-forward-same-level 1)))
  :use-previous-sibling (lambda () (ignore-errors (outline-backward-same-level 1)))
- :use-left-finalizer-for-tree-with-no-end-delimiter #'line-beginning-position
- ;; TODO - this is wrong, it needs to get the contents of the heading potentially below the line.
- :use-right-finalizer-for-tree-with-no-end-delimiter #'line-end-position
+ :use-left-finalizer-for-tree-with-no-end-delimiter (lambda () (if (twoi--outline-at-anchor-point-p)
+                                                                   (line-beginning-position)
+                                                                 (outline-previous-heading)))
+ :use-right-finalizer-for-tree-with-no-end-delimiter (lambda ()
+                                                       (outline-next-heading)
+                                                       (unless (and (eobp) (not (bolp)))
+                                                         (beginning-of-line)
+                                                         (backward-char 1)))
  )
 
 (require 'repeatable-motion)

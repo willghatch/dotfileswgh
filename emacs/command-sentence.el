@@ -339,10 +339,10 @@ Otherwise, return a cons pair (PARAMS . EXECUTOR), containing the final paramete
           (paragraph (default-verb . move) (location-within . beginning))
           (line (default-verb . move) (location-within . beginning))
           (symbol (default-verb . move) (location-within . beginning))
-          (sptw (default-verb . move) (location-within . beginning) (delimiter . ,nil) (respect-tree . ,t))
-          (indent-tree (default-verb . move) (location-within . beginning))
-          (outline (default-verb . move) (location-within . beginning))
-          (tstw-qd (default-verb . move) (location-within . anchor))
+          (sptw (default-verb . move) (location-within . beginning) (respect-tree . ,t) (delimiter . ,nil))
+          (indent-tree (default-verb . move) (location-within . beginning) (respect-tree . ,t))
+          (outline (default-verb . move) (location-within . beginning) (respect-tree . ,t))
+          (tstw-qd (default-verb . move) (location-within . anchor) (respect-tree . ,t))
           (region)
           (buffer (default-verb . move) (location-within . ,nil))
 
@@ -699,16 +699,16 @@ Otherwise, return a cons pair (PARAMS . EXECUTOR), containing the final paramete
 
           (move outline
                 ((direction ,nil) (expand-region ,t))
-                (wgh/outline-expand-region ()))
+                (twoi-expand-region ()))
           (move outline
                 ((direction ,nil) (expand-region inner))
-                (wgh/outline-expand-region/children-region ()))
+                (twoi-expand-region/children-region ()))
           (move outline
                 ((direction forward) (tree-traversal inorder))
-                (rmo/wgh/outline-inorder-traversal-forward (num)))
+                (rmo/twoi-inorder-traversal-forward (num)))
           (move outline
                 ((direction backward) (tree-traversal inorder))
-                (rmo/wgh/outline-inorder-traversal-backward (num)))
+                (rmo/twoi-inorder-traversal-backward (num)))
           (move outline
                 ((direction forward) (location-within beginning) (tree-vertical ,nil))
                 (rmo/outline-forward-same-level (num)))
@@ -720,17 +720,18 @@ Otherwise, return a cons pair (PARAMS . EXECUTOR), containing the final paramete
                 (rmo/outline-up-heading (num)))
           (move outline
                 ((tree-vertical down) (direction backward))
-                (rmo/wgh/outline-down-to-first-child (num)))
+                (rmo/twoi-down-to-first-child (num)))
           (move outline
                 ((tree-vertical down) (direction forward))
-                (rmo/wgh/outline-down-to-last-child (num)))
+                (rmo/twoi-down-to-last-child (num)))
           ;; TODO - end of outline?
-          (slurp outline
-                 ((direction forward))
-                 (wgh/outline-forward-slurp-heading ()))
-          (barf outline
-                ((direction forward))
-                (wgh/outline-forward-barf-heading ()))
+          ;; TODO - commented out because they are broken
+          ;; (slurp outline
+          ;;        ((direction forward))
+          ;;        (twoi-forward-slurp-heading ()))
+          ;; (barf outline
+          ;;       ((direction forward))
+          ;;       (twoi-forward-barf-heading ()))
 
 
           (move indent-tree
@@ -746,10 +747,17 @@ Otherwise, return a cons pair (PARAMS . EXECUTOR), containing the final paramete
                 ((direction backward) (tree-traversal inorder))
                 (rmo/indent-tree-inorder-traversal-backward (num)))
           (move indent-tree
-                ((direction forward) (tree-vertical ,nil) (tree-traversal ,nil))
+                ((direction forward) (tree-vertical ,nil) (tree-traversal ,nil) (respect-tree ,t))
+                (rmo/indent-tree-forward-full-sibling (num)))
+          (move indent-tree
+                ((direction backward) (tree-vertical ,nil) (tree-traversal ,nil) (respect-tree ,t))
+                (rmo/indent-tree-backward-full-sibling (num)))
+          ;; It's not really fair to say that these half-sibling movements don't respect the tree, but I'm not sure what other modifier to use right now.  It is an alternate way of respecting the tree.
+          (move indent-tree
+                ((direction forward) (tree-vertical ,nil) (tree-traversal ,nil) (respect-tree ,nil))
                 (rmo/indent-tree-forward-full-or-half-sibling (num)))
           (move indent-tree
-                ((direction backward) (tree-vertical ,nil) (tree-traversal ,nil))
+                ((direction backward) (tree-vertical ,nil) (tree-traversal ,nil) (respect-tree ,nil))
                 (rmo/indent-tree-backward-full-or-half-sibling (num)))
           (move indent-tree
                 ((tree-vertical up))
@@ -800,16 +808,17 @@ Otherwise, return a cons pair (PARAMS . EXECUTOR), containing the final paramete
           (transpose sptw ((direction backward)) (sptw-transpose-sibling-backward (num)))
           (transpose tstw-qd ((direction forward)) (tstw-qd-transpose-sibling-forward (num)))
           (transpose tstw-qd ((direction backward)) (tstw-qd-transpose-sibling-backward (num)))
-          (transpose outline ((direction forward)) (wgh/outline-transpose-sibling-forward (num)))
-          (transpose outline ((direction backward)) (wgh/outline-transpose-sibling-backward (num)))
+          ;; TODO - comment these out until I fix them
+          (transpose outline ((direction forward)) (twoi-transpose-sibling-forward (num)))
+          (transpose outline ((direction backward)) (twoi-transpose-sibling-backward (num)))
           (transpose indent-tree ((direction forward)) (indent-tree-transpose-sibling-forward (num)))
           (transpose indent-tree ((direction backward)) (indent-tree-transpose-sibling-backward (num)))
 
           ;; TODO - rename and put this vilish-open-line stuff... somewhere reasonable
           (open line ((direction forward)) (vilish-open-line-below))
           (open line ((direction backward)) (vilish-open-line-above))
-          (open outline ((direction forward) (tree-vertical ,nil)) (,(lambda () (wgh/outline-add-heading-below) (estate-insert-state))))
-          (open outline ((direction backward) (tree-vertical ,nil)) (,(lambda () (wgh/outline-add-heading-above) (estate-insert-state))))
+          (open outline ((direction forward) (tree-vertical ,nil)) (,(lambda () (twoi-add-heading-below) (estate-insert-state))))
+          (open outline ((direction backward) (tree-vertical ,nil)) (,(lambda () (twoi-add-heading-above) (estate-insert-state))))
           (open outline ((tree-vertical down)) (,(lambda () (message "TODO - implement open outline child"))))
           (open indent-tree ((direction forward) (tree-vertical ,nil)) (,(lambda () (estate-insert-state-with-thunk 'indent-tree-open-sibling-forward))))
           (open indent-tree ((direction backward) (tree-vertical ,nil)) (,(lambda () (estate-insert-state-with-thunk 'indent-tree-open-sibling-backward))))

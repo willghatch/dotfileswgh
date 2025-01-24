@@ -147,32 +147,27 @@
                 (lambda () (while (tree-walk--motion-moved down-to-last-child))))))
       (funcall up))))
 
-(defun tree-walk--inorder-traversal-forward (forward1 backward1)
-  (lambda (num)
-    (interactive "p")
-    (cond ((not (integerp num)) (funcall forward1))
-          ((= num 0) t)
-          ((< num 0) (funcall backward1 (- num)))
-          (t
-           ;; TODO - a custom while loop could exit early if the number given is too high
-           (dotimes (i num) (funcall forward1))))))
-(defun tree-walk--inorder-traversal-backward (forward1 backward1)
-  (lambda (num)
-    (interactive "p")
-    (cond ((not (integerp num)) (funcall forward1))
-          ((= num 0) t)
-          ((< num 0) (funcall forward1 (- num)))
-          (t
-           ;; TODO - a custom while loop could exit early if the number given is too high
-           (dotimes (i num) (funcall backward1))))))
+(defmacro tree-walk--def-inorder-traversal (function-name object-name dir-name forward1 backward1)
+  `(defun ,function-name (count)
+       ,(format "Do COUNT steps %s of inorder tree traversal for %s." dir-name object-name)
+     (interactive "p")
+     (cond ((not (integerp count)) (funcall ,forward1))
+           ((= count 0) t)
+           ((< count 0) (funcall ,backward1 (- count)))
+           (t
+            ;; TODO - a custom while loop could exit early if the countber given is too high
+            (dotimes (i count) (funcall ,forward1))))))
+
 
 
 (defmacro tree-walk-define-inorder-traversal
-    (name-forward
+    (object-name
+     name-forward
      name-backward
      next prev
      up down down-to-last-child
      )
+  "OBJECT-NAME is for the doc string, NAME-FORWARD is the name of the forward traversal func, NEXT PREV etc are movement functions."
   (let ((forward1 (gensym (format "%s_single_" name-forward)))
         (backward1 (gensym (format "%s_single_" name-backward)))
         (leaf-forward (gensym (format "%s_leaf-helper_" name-forward)))
@@ -183,10 +178,8 @@
                         ,down ,next ,leaf-forward))
        (setq ,backward1 (tree-walk--inorder-traversal-backward-single
                          ,up ,prev ,down-to-last-child))
-       (fset ',name-forward
-             (tree-walk--inorder-traversal-forward ,forward1 ,backward1))
-       (fset ',name-backward
-             (tree-walk--inorder-traversal-backward ,forward1 ,backward1)))))
+       (tree-walk--def-inorder-traversal ,name-forward ,object-name "forward" ,forward1 ,backward1)
+       (tree-walk--def-inorder-traversal ,name-backward ,object-name "backward" ,backward1 ,forward1))))
 
 (defun tree-walk--down-to-last-child-default-impl (down-to-first-child next-sibling)
   "Default implementation of down-to-last-child."
@@ -266,7 +259,7 @@ Leave the cursor on the original thing, so you can keep dragging it forward or b
                               (car bounds-2)))
                  (undo-boundary))))))))
 (defun tree-walk--transpose-siblings (count bounds-func move-func goto-anchor-func move-backward-func)
-  "TODO"
+  "Transpose siblings COUNT times.  Use the other args to move and find the things."
   (setq count (or count 1))
   (let ((fwd (< 0 count))
         (count (abs count)))
@@ -339,13 +332,14 @@ Returns the region of the children, not the full tree."
   (lambda (start-point)
     (save-excursion
       (goto-char start-point)
-      (funcall final))))
+      ;; if the final function returns point, use it, otherwise assume it was a movement and get point.
+      (or (funcall final) (point)))))
 (defun tree-walk--outer-bounds-no-end-tree-for-point_right (up down-to-last-descendant final)
   (lambda (start-point)
     (save-excursion
       (goto-char start-point)
       (funcall down-to-last-descendant)
-      (funcall final))))
+      (or (funcall final) (point)))))
 
 (cl-defmacro tree-walk--define-bounds-functions-for-tree-with-no-end-delimiter
     (&key def-bounds-name
@@ -561,6 +555,8 @@ If no region is given, it uses the current region (or ((point) . (point))).
      def-transpose-sibling-forward
      def-transpose-sibling-backward
 
+     use-object-name
+
      use-up-to-parent
      use-down-to-first-child
      use-down-to-last-child
@@ -616,6 +612,7 @@ If no region is given, it uses the current region (or ((point) . (point))).
          (when (or def-transpose-sibling-forward def-transpose-sibling-backward)
            `(progn
               (fset ',def-transpose-sibling-forward (lambda (&optional count)
+                                                      ,(format "Transpose sibling %s forward COUNT times, moving point with the moved object so it can be dragged.  This movement respects tree boundaries." (or use-object-name "thing"))
                                                       (interactive "p")
                                                       (tree-walk--transpose-siblings (or count 1)
                                                                                      ,(or use-bounds `',def-bounds-for-tree-with-no-end-delimiter)
@@ -623,6 +620,7 @@ If no region is given, it uses the current region (or ((point) . (point))).
                                                                                      nil
                                                                                      ,use-previous-sibling)))
               (fset ',def-transpose-sibling-backward (lambda (&optional count)
+                                                       ,(format "Transpose sibling %s backward COUNT times, moving point with the moved object so it can be dragged.  This movement respects tree boundaries." (or use-object-name "thing"))
                                                       (interactive "p")
                                                       (tree-walk--transpose-siblings (or count 1)
                                                                                      ,(or use-bounds `',def-bounds-for-tree-with-no-end-delimiter)
@@ -631,6 +629,7 @@ If no region is given, it uses the current region (or ((point) . (point))).
                                                                                      ,use-next-sibling)))))
          (when (or def-inorder-forward def-inorder-backward)
            `(tree-walk-define-inorder-traversal
+             ,(or use-object-name "thing")
              ,def-inorder-forward
              ,def-inorder-backward
              ,use-next-sibling ,use-previous-sibling
