@@ -502,9 +502,6 @@ If no region is given, it uses the current region (or ((point) . (point))).
        )))
 
 
-(defun debug-message-and-ret (msg val)
-  (message "debug-message-and-ret: %s --- %s" msg val)
-  val)
 
 (cl-defmacro tree-walk--define-expand-region-funcs
     (&key def-expand-region
@@ -532,8 +529,41 @@ If no region is given, it uses the current region (or ((point) . (point))).
          `((fset ',def-expand-region-to-children/ancestor-generation
                  (tree-walk--expand-region (tree-walk--expanded-region ,children-bounds-func ,up-func) 'strictly-grow))))))
 
-;; TODO - I need to define text object functions for delimited trees, probably using smartparens as the base case.
-;; TODO - should I use thing-at-point to define `bounds-of-thing-at-point X`?
+(defun tree-walk--ancestor-reorder (parent-to-ancestor-distance expand-region-func)
+  "Given operations for regions, and a number for the distance between parent and the ancestor to swap it with, swap ancestors.
+This always swaps the parent of the tree object at point with its parent or some ancestor.
+TODO - add an optional fix-up function, eg. to fix indentation for indent tree, fix org-mode depth, etc.
+"
+  (when (region-active-p)
+    (error "starting with active region not yet supported"))
+  ;; Select the current object.
+  (let ((init-point (point)))
+    (funcall expand-region-func)
+    (let ((init-region (cons (region-beginning) (region-end)) ))
+      ;; Select the parent object.
+      (funcall expand-region-func)
+      (let ((parent-region (cons (region-beginning) (region-end))))
+        ;; Select grandparent/ancestor object.
+        (dotimes (i parent-to-ancestor-distance) (funcall expand-region-func))
+        (let ((ancestor-region (cons (region-beginning) (region-end))))
+          (if (and (tree-walk--region-strictly-less init-region parent-region)
+                   (tree-walk--region-strictly-less parent-region ancestor-region))
+              (let ((child-text (buffer-substring-no-properties (car init-region) (cdr init-region)))
+                    (parent-pre-text (buffer-substring-no-properties (car parent-region) (car init-region)))
+                    (parent-post-text (buffer-substring-no-properties (cdr init-region) (cdr parent-region)))
+                    (ancestor-pre-text (buffer-substring-no-properties (car ancestor-region) (car parent-region)))
+                    (ancestor-post-text (buffer-substring-no-properties (cdr parent-region) (cdr ancestor-region)))
+                    (change-group (prepare-change-group)))
+                (delete-region (car ancestor-region) (cdr ancestor-region))
+                ;; TODO - use fixup-function
+                (insert parent-pre-text)
+                (insert ancestor-pre-text)
+                (insert child-text)
+                (insert ancestor-post-text)
+                (insert parent-post-text)
+                (goto-char init-point)
+                (undo-amalgamate-change-group change-group))
+            (error "regions for thing, parent, and ancestor not strictly growing")))))))
 
 (cl-defmacro tree-walk-define-operations
     (&key
@@ -555,6 +585,8 @@ If no region is given, it uses the current region (or ((point) . (point))).
 
      def-transpose-sibling-forward
      def-transpose-sibling-backward
+
+     def-ancestor-reorder
 
      use-object-name
 
@@ -610,6 +642,11 @@ If no region is given, it uses the current region (or ((point) . (point))).
              :bounds-func ,(or use-bounds `',def-bounds-for-tree-with-no-end-delimiter)
              :children-bounds-func ,(or use-children-bounds `',def-children-bounds-for-tree-with-no-end-delimiter)
              :up-func ,use-up-to-parent))
+         (when def-ancestor-reorder
+           `(defun ,def-ancestor-reorder (count)
+              ,(format "Reorder ancestors for %s.  Take the region of the thing at point, the region of the parent, and the region of the ancestor COUNT generations above parent, and swap the parent and the ancestor.  Essentially, take the ancestor out, leaving a hole in the overall buffer, take the parent out of the ancestor, leaving a hole in the ancestor, and take the child out of the parent, leaving a hole in the parent.  Reassemble putting the parent in the ancestor's old hole, the ancestor in the parent's hole, and the child in the ancestor's hole." (or use-object-name "thing"))
+              (interactive "p")
+              (tree-walk--ancestor-reorder (or count 1) ',def-expand-region)))
          (when (or def-transpose-sibling-forward def-transpose-sibling-backward)
            `(progn
               (fset ',def-transpose-sibling-forward (lambda (&optional count)

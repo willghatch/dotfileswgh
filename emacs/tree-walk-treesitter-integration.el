@@ -175,6 +175,7 @@ But this is a heuristic thing, so we'll see if it works well."
  ;;:def-down-to-last-child tstw-qd-down-to-last-child-beginning
  :def-transpose-sibling-forward tstw-qd-transpose-sibling-forward
  :def-transpose-sibling-backward tstw-qd-transpose-sibling-backward
+ :def-ancestor-reorder tstw-qd-ancestor-reorder
 
  :use-object-name "treesitter tree (via 'treesit.el', using quick-and-dirty tstw-qd movement and selection)"
 

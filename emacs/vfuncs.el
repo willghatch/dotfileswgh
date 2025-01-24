@@ -455,4 +455,8 @@ I'm sick of doing this manually."
     ;;(isearch-forward)
     ))
 
+(defun debug-message-and-ret (msg val)
+  (message "debug-message-and-ret: %s --- %s" msg val)
+  val)
+
 (provide 'vfuncs)
