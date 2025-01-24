@@ -429,6 +429,12 @@
                              (cs/obj 'region)))
            (funcall (cs/add (cs/verb 'capitalize)) n)))
    "capitalize" :exit t)
+  ("i" (lambda (n) (interactive "p")
+         (if (region-active-p)
+             (funcall (cs/ae (cs/verb 'initiate-isearch)
+                             (cs/obj 'region))))
+         (funcall (cs/add (cs/verb 'initiate-isearch)) n))
+   "isearch-thing" :exit t)
 
   ;; TODO - handle the fact that some verbs take region, and other verbs don't work well in visual state.  Except that some should be able to take an object and behave differently with region active.  Eg. transpose with a region containing multiple tree siblings or lines should transpose a group.
   ("j" (lambda (n) (interactive "p")

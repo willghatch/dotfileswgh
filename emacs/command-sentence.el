@@ -315,6 +315,7 @@ Otherwise, return a cons pair (PARAMS . EXECUTOR), containing the final paramete
           (upcase)
           (downcase)
           (capitalize) ;; TODO - what is the difference between capitalize-region and upcase-initials-region?
+          (initiate-isearch) ;; TODO - I want to write something similar to vim's * command, to search the thing at point, except maybe with an argument to choose word or symbol or whatnot.  But my first attempt at actually implementing it was unsuccessful.  I'll probably come back to it later.
           (transpose (direction . forward) (num . 1))
           (join (direction . forward) (num . 1))
           (split)
@@ -866,35 +867,33 @@ Otherwise, return a cons pair (PARAMS . EXECUTOR), containing the final paramete
                                         (lambda () (delete-region beg end)))))
                    sentence-with-defaults))
 
-          (copy region
-                ()
+          (copy region ()
                 (estate-copy))
-          (copy ,(lambda (x) (not (memq x '(region))))
-                ()
+          (copy ,(lambda (x) (not (memq x '(region)))) ()
                 (,(command-sentence--make-movement-delegated-command (lambda (beg end) (estate-copy (cons beg end))))
                  sentence-with-defaults))
 
-          (upcase region
-                  ()
+          (upcase region ()
                   (,(lambda () (upcase-region (region-beginning) (region-end)))))
-          (upcase ,(lambda (x) (not (memq x '(region))))
-                  ()
+          (upcase ,(lambda (x) (not (memq x '(region)))) ()
                   (,(command-sentence--make-movement-delegated-command 'upcase-region)
                    sentence-with-defaults))
-          (downcase region
-                    ()
+          (downcase region ()
                     (,(lambda () (downcase-region (region-beginning) (region-end)))))
-          (downcase ,(lambda (x) (not (memq x '(region))))
-                    ()
+          (downcase ,(lambda (x) (not (memq x '(region)))) ()
                     (,(command-sentence--make-movement-delegated-command 'downcase-region)
                      sentence-with-defaults))
-          (capitalize region
-                      ()
+          (capitalize region ()
                       (,(lambda () (capitalize-region (region-beginning) (region-end)))))
-          (capitalize ,(lambda (x) (not (memq x '(region))))
-                      ()
+          (capitalize ,(lambda (x) (not (memq x '(region)))) ()
                       (,(command-sentence--make-movement-delegated-command 'capitalize-region)
                        sentence-with-defaults))
+
+          ;; (initiate-isearch region ((direction forward))
+          ;;                   (,(lambda () (wgh/isearch-forward-for-text-in-region (region-beginning) (region-end))) ()))
+          ;; (initiate-isearch ,(lambda (x) (not (memq x '(region)))) ((direction forward))
+          ;;                   (,(command-sentence--make-movement-delegated-command 'wgh/isearch-forward-for-text-in-region)
+          ;;                    sentence-with-defaults))
 
 
           ))))

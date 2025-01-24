@@ -436,4 +436,23 @@ I'm sick of doing this manually."
   (interactive)
   (setq warning-minimum-level :emergency))
 
+(defun wgh/isearch-forward-for-text-in-region (beg end)
+  ;; TODO - none of this is working, but I'll leave it here to look at the next time I try to do this.
+  (interactive "r")
+  (when (region-active-p)
+    (deactivate-mark))
+  (let* ((text (buffer-substring-no-properties beg end))
+         (set-string-func (lambda () (setq isearch-string text))))
+    (setq isearch-string text)
+    (isearch-repeat-forward)
+    ;;(isearch-resume text nil nil t text 'case-insensitive)
+    ;; (unwind-protect
+    ;;     (progn
+    ;;       (add-hook 'isearch-mode-hook set-string-func -100)
+    ;;       (isearch-forward))
+    ;;   (remove-hook 'isearch-mode-hook set-string-func))
+    ;;(setq isearch-string text)
+    ;;(isearch-forward)
+    ))
+
 (provide 'vfuncs)
