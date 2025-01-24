@@ -401,6 +401,27 @@ I'm sick of doing this manually."
   ;; wgrep-save-all-buffers
   (wgrep-change-to-wgrep-mode))
 
+(with-eval-after-load 'gptel
+  (require 'gptel-curl))
+(defun wgh/gptel-init ()
+  (require 'gptel))
+;;(autoload 'gptel "gptel" "gptel" t)
+;;(autoload 'gptel-send "gptel" "gptel-send -- send text to point or in region" t)
+
+(defun wgh/start-copilot ()
+    (interactive)
+  (require 'copilot)
+
+  (require 'request)
+  (require 'org)
+  (require 'markdown-mode)
+  (require 'shell-maker)
+  (require 'magit)
+  (require 'copilot-chat)
+
+  (copilot-mode))
+
+
 (defun refresh-buffer-from-file ()
   "Alias for revert-buffer since I can never remember its name."
   (interactive)

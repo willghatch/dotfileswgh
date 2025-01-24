@@ -624,6 +624,10 @@
 (ecmap "tara" (lambda () (interactive) (require 'alternate-region) (alternate-region-activate)))
 (ecmap "tars" (lambda () (interactive) (require 'alternate-region) (alternate-region-swap)))
 (ecmap "tarc" (lambda () (interactive) (require 'alternate-region) (alternate-region-cycle)))
+(ecmap "tav" 'sp-convolute-sexp)
+(ecmap "tag" 'gptel-send)
+
+
 
 
 ;; s map
@@ -658,6 +662,13 @@
             ("l" he-expand-lisp-symbol "lisp")
             ("s" yas-expand "yas")
             ("F" (progn (company-conf-init) (require 'company-files) (call-interactively 'company-files)) "file (company)")
+            )
+
+(myhydradef copilot-map
+            ("a" copilot-accept-completion "accept")
+            ("j" copilot-next-completion "next")
+            ("k" copilot-previous-completion "prev")
+            ("s" copilot-complete "start")
             )
 
 
