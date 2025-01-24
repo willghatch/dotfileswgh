@@ -353,20 +353,22 @@
 
 
 ;; Quick select any delimiter
-(emmap "(" (lambda ()
-             (interactive)
+(emmap "(" (lambda (n)
+             (interactive "p")
              (require 'tree-walk-smartparens-integration)
              (funcall (cs/ae (cs/mod 'direction nil)
                              (cs/mod 'expand-region t)
                              (cs/mod 'delimiter 'any)
-                             (cs/obj 'sptw)))))
-(emmap ")" (lambda ()
-             (interactive)
+                             (cs/obj 'sptw))
+                      n)))
+(emmap ")" (lambda (n)
+             (interactive "p")
              (require 'tree-walk-smartparens-integration)
              (funcall (cs/ae (cs/mod 'direction nil)
                              (cs/mod 'expand-region 'inner)
                              (cs/mod 'delimiter 'any)
-                             (cs/obj 'sptw)))))
+                             (cs/obj 'sptw))
+                      n)))
 
 
 ;; TODO - obviously I want to integrate these into command-sentence, but I need to add keys for going forward/back to objects, including delimiters, without regard for tree boundaries.

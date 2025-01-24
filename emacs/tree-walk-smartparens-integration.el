@@ -523,19 +523,23 @@ Specifically it moves inside the parens."
  )
 
 
-(defun sptw--expand-region-until-predicate (expansion-func predicate)
+(defun sptw--expand-region-until-predicate (expansion-func predicate &optional count)
   "Call EXPANSION-FUNC until PREDICATE is true.
 If the expansion func stops expanding the region before the predicate is ever true, return to the original region and return nil.
 If the predicate succeeds, leave the expanded region and return the new bounds."
   (let ((orig-bounds (if (region-active-p) (cons (region-beginning) (region-end)) (cons (point) (point))))
+        inner-result
         result)
     (save-mark-and-excursion
-      (while (and (not result)
-                  (tree-walk--motion-moved-region expansion-func))
-        (if (funcall predicate)
-            (setq result (cons (point) (mark)))
-          ;; Keep expanding until predicate is true or expansion stops
-          nil)))
+      (dotimes (i (or count 1))
+        (while (and (not inner-result)
+                    (tree-walk--motion-moved-region expansion-func))
+          (if (funcall predicate)
+              (setq inner-result (cons (point) (mark)))
+            ;; Keep expanding until predicate is true or expansion stops
+            nil))
+        (setq result inner-result)
+        (setq inner-result nil)))
     (if result
         (progn
           ;; Go to the new point/mark, but return the region canonicalized to (beg . end).
@@ -546,7 +550,7 @@ If the predicate succeeds, leave the expanded region and return the new bounds."
             (cons (cdr result) (car result))))
       nil)))
 
-(defun sptw-expand-region-to-any-delimiter ()
+(defun sptw-expand-region-to-any-delimiter (&optional count)
   "Like `sptw-expand-region' but specifically expanding to a delimited region, not just something like a symbol."
   (interactive)
   (sptw--expand-region-until-predicate
@@ -554,9 +558,10 @@ If the predicate succeeds, leave the expanded region and return the new bounds."
    (lambda () (save-mark-and-excursion
                 (and (region-active-p)
                      (goto-char (if (region-active-p) (region-beginning) (point)))
-                     (sptw--at-open-delimiter-p))))))
+                     (sptw--at-open-delimiter-p))))
+   (or count 1)))
 
-(defun sptw-expand-region-to-delimiter (delimiter)
+(defun sptw-expand-region-to-delimiter (delimiter &optional count)
   "DELIMITER must be an opening delimiter used by smartparens.
 Expand region until hitting that specific delimiter."
   (sptw--expand-region-until-predicate
@@ -564,9 +569,10 @@ Expand region until hitting that specific delimiter."
    (lambda () (save-mark-and-excursion
                 (and (region-active-p)
                      (goto-char (region-beginning))
-                     (looking-at (regexp-quote delimiter)))))))
+                     (looking-at (regexp-quote delimiter)))))
+   (or count 1)))
 
-(defun sptw-expand-region-to-delimiter/children-region (delimiter)
+(defun sptw-expand-region-to-delimiter/children-region (delimiter &optional count)
   "DELIMITER must be an opening delimiter used by smartparens.
 Expand region until hitting that specific delimiter.
 Except only expand to the inner area inside the parens."
@@ -577,7 +583,8 @@ Except only expand to the inner area inside the parens."
                      (goto-char (region-beginning))
                      (< (length delimiter) (point))
                      (progn (backward-char (length delimiter))
-                            (looking-at (regexp-quote delimiter))))))))
+                            (looking-at (regexp-quote delimiter))))))
+   (or count 1)))
 
 (defun sptw--open-sibling-extra-lines (bounds)
   "Get the number of extra lines to add.

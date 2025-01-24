@@ -140,10 +140,14 @@ Otherwise, return a cons pair (PARAMS . EXECUTOR), containing the final paramete
       (setq given-params-alist (cdr given-params-alist)))
     (not match-failed)))
 
+(setq command-sentence--debug-print-sentence nil)
+
 (defun command-sentence--execute-match (orig-sentence params executor)
   "PARAMS and EXECUTOR should match what is returned from command-sentence--match."
   (let ((spec (cadr executor))
         (func (car executor)))
+    (when command-sentence--debug-print-sentence
+      (message "executing sentence: %s\n\nargs: %s" orig-sentence spec))
     (cond ((eq spec 'alist) (funcall func params))
           ((eq spec 'original-sentence) (funcall func orig-sentence))
           ((eq spec 'sentence-with-defaults)
@@ -564,24 +568,24 @@ Otherwise, return a cons pair (PARAMS . EXECUTOR), containing the final paramete
           ;; TODO -- for all tree objects, I want a convenient modifier to go all the way to the root.  I guess I could give a big number and rely on it stopping when hitting the root, but it would be nice to have something symbolic to go to the root, or maybe to depth N.
           (move sptw
                 ((direction ,nil) (expand-region ,t) (delimiter any))
-                (sptw-expand-region-to-any-delimiter ()))
+                (sptw-expand-region-to-any-delimiter (num)))
           (move sptw
                 ((direction ,nil) (expand-region inner) (delimiter any))
-                (sptw-expand-region/children-region ()))
+                (sptw-expand-region/children-region (num)))
 
           (move sptw
                 ((direction ,nil) (expand-region ,t) (delimiter t ,(lambda (actual expected) (stringp actual))))
-                (sptw-expand-region-to-delimiter (delimiter)))
+                (sptw-expand-region-to-delimiter (delimiter num)))
           (move sptw
                 ((direction ,nil) (expand-region inner) (delimiter t ,(lambda (actual expected) (stringp actual))))
-                (sptw-expand-region-to-delimiter/children-region (delimiter)))
+                (sptw-expand-region-to-delimiter/children-region (delimiter num)))
 
           (move sptw
                 ((direction ,nil) (expand-region ,t) (delimiter ,nil))
-                (sptw-expand-region ()))
+                (sptw-expand-region (num)))
           (move sptw
                 ((direction ,nil) (expand-region inner) (delimiter ,nil))
-                (sptw-expand-region/children-region ()))
+                (sptw-expand-region/children-region (num)))
 
           (move sptw
                 ((direction forward) (tree-traversal inorder))
@@ -651,10 +655,10 @@ Otherwise, return a cons pair (PARAMS . EXECUTOR), containing the final paramete
 
           (move tstw-qd
                 ((direction ,nil) (expand-region ,t))
-                (tstw-qd-expand-region ()))
+                (tstw-qd-expand-region (num)))
           (move tstw-qd
                 ((direction ,nil) (expand-region inner))
-                (tstw-qd-expand-region/children-region ()))
+                (tstw-qd-expand-region/children-region (num)))
 
           (move tstw-qd
                 ((direction forward) (tree-traversal inorder))
@@ -699,10 +703,10 @@ Otherwise, return a cons pair (PARAMS . EXECUTOR), containing the final paramete
 
           (move outline
                 ((direction ,nil) (expand-region ,t))
-                (twoi-expand-region ()))
+                (twoi-expand-region (num)))
           (move outline
                 ((direction ,nil) (expand-region inner))
-                (twoi-expand-region/children-region ()))
+                (twoi-expand-region/children-region (num)))
           (move outline
                 ((direction forward) (tree-traversal inorder))
                 (rmo/twoi-inorder-traversal-forward (num)))
@@ -736,10 +740,10 @@ Otherwise, return a cons pair (PARAMS . EXECUTOR), containing the final paramete
 
           (move indent-tree
                 ((direction ,nil) (expand-region ,t))
-                (indent-tree-expand-region ()))
+                (indent-tree-expand-region (num)))
           (move indent-tree
                 ((direction ,nil) (expand-region inner))
-                (indent-tree-expand-region/children-region ()))
+                (indent-tree-expand-region/children-region (num)))
           (move indent-tree
                 ((direction forward) (tree-traversal inorder))
                 (rmo/indent-tree-inorder-traversal-forward (num)))
