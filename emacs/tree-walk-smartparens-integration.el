@@ -254,15 +254,17 @@ DIRECTION can be nil to detect, 'forward, or 'backward.
                   (end (and thing (plist-get thing ':end)))
                   )
              (and thing
-                  (if (<= prefix-beg (point) end)
-                      (let* ((back-thing (sp-get-thing t)))
-                        (and back-thing
-                             (equal end (plist-get fwd-thing ':end))
-                             (not (sptw--before-close-delimiter-p))
-                             (not (looking-at-p (rx space)))
-                             (not (looking-at-p "\n"))
-                             end))
-                    end))))))
+                  (cond ((<= prefix-beg (point) beg)
+                         end)
+                        ((<= beg (point) end)
+                         (let* ((back-thing (sp-get-thing t)))
+                           (and back-thing
+                                (equal end (plist-get back-thing ':end))
+                                (not (sptw--before-close-delimiter-p))
+                                (not (looking-at-p (rx space)))
+                                (not (looking-at-p "\n"))
+                                end)))
+                        (t end)))))))
     (when new-point (goto-char new-point) new-point)))
 
 (defun sptw--backward-sibling-end ()
