@@ -270,11 +270,13 @@ Leave the cursor on the original thing, so you can keep dragging it forward or b
   (setq count (or count 1))
   (let ((fwd (< 0 count))
         (count (abs count)))
-    (while (< 0 count)
-      (if fwd
-          (tree-walk--transpose-sibling-once bounds-func move-func goto-anchor-func)
-        (tree-walk--transpose-sibling-once bounds-func (or move-backward-func (lambda () (funcall move-func -1))) goto-anchor-func))
-      (setq count (- count 1)))))
+    (let ((cg (prepare-change-group)))
+      (while (< 0 count)
+        (if fwd
+            (tree-walk--transpose-sibling-once bounds-func move-func goto-anchor-func)
+          (tree-walk--transpose-sibling-once bounds-func (or move-backward-func (lambda () (funcall move-func -1))) goto-anchor-func))
+        (setq count (- count 1)))
+      (undo-amalgamate-change-group cg))))
 
 
 ;; TODO - all of this code about getting bounds is just a disaster.  I wanted to make the code I already had work, but I should have just started from scratch.  At any rate, it's mostly working.  I should come back and clean it up.  Eg. remove the stuff that's specific to evil-mode, and make things simpler and less super higher order due to whatever whims of the day I threw together the evil-mode version and then my desire to use that rather than starting over.
