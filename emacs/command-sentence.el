@@ -80,10 +80,14 @@ Otherwise, return a cons pair (PARAMS . EXECUTOR), containing the final paramete
            (object-spec (command-sentence--get-spec-from-symbol object-name nil config))
            ;; TODO - check for duplicate param names, and probably error.
            (full-default-params (append verb-spec object-spec))
-           (params (mapcar (lambda (param-spec)
-                             (or (assq (car param-spec) given-modifiers)
-                                 (assq (car param-spec) full-default-params)))
-                           full-default-params))
+           (full-param-keys (seq-uniq
+                             (mapcar 'car
+                                     (append full-default-params
+                                             given-modifiers))))
+           (params (mapcar (lambda (param-name)
+                             (or (assq param-name given-modifiers)
+                                 (assq param-name full-default-params)))
+                           full-param-keys))
            (match-table (cdr (assq 'match-table config)))
            (matched nil))
       (while (and (not matched)
@@ -121,11 +125,11 @@ Otherwise, return a cons pair (PARAMS . EXECUTOR), containing the final paramete
     (given-params-alist match-table-modifiers)
   "Check if the GIVEN-PARAMS-ALIST matches the MATCH-TABLE-MODIFIERS."
   (let ((match-failed nil))
-    (while (and given-params-alist
+    (while (and match-table-modifiers
                 (not match-failed))
-      (let* ((param-name (caar given-params-alist))
-             (param-value (cdar given-params-alist))
-             (matcher (assq param-name match-table-modifiers)))
+      (let* ((matcher (car match-table-modifiers))
+             (param-name (car matcher))
+             (given-param-value (cdr (assq param-name given-params-alist))))
         (when matcher
           (let* ((expected-value (cadr matcher))
                  (optional-comparator (caddr matcher))
@@ -134,10 +138,10 @@ Otherwise, return a cons pair (PARAMS . EXECUTOR), containing the final paramete
                                    (optional-comparator optional-comparator)
                                    (t #'equal))))
             (when (not (funcall comparator
-                                param-value
+                                given-param-value
                                 expected-value))
               (setq match-failed t)))))
-      (setq given-params-alist (cdr given-params-alist)))
+      (setq match-table-modifiers (cdr match-table-modifiers)))
     (not match-failed)))
 
 (setq command-sentence--debug-print-sentence nil)

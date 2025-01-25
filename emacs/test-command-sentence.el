@@ -8,6 +8,7 @@
          .
          ((move (default-object . word) (direction . forward) (count . 1))
           (delete (default-object . word) (direction . forward))
+          (arpeggiate (defaut-object . word))
           ))
         (objects
          .
@@ -22,9 +23,9 @@
           (move sentence
                 ((unlisted-mod foo))
                 (unlisted-sentence-move-func (count)))
-          (delete sentence
-                  ((unlisted-mod ,nil))
-                  (unlisted-sentence-delete))
+          (arpeggiate sentence
+                      ((unlisted-mod ,nil))
+                      (unlisted-nil-sentence-arpeggiate))
           (delete ,(lambda (x) t)
                   ()
                   (function-to-delete-after-moving sentence-with-defaults)))
@@ -109,7 +110,7 @@
                                          command-sentence--test-config)))
   (let ((sentence-with-unlisted-mod-no-default-nil-match
          '(((word-type . verb)
-            (contents . delete))
+            (contents . arpeggiate))
            ((word-type . object)
             (contents . sentence))
            ;; Note the lack of any explicit unlisted-mod value, and also it has no default value.
@@ -120,7 +121,7 @@
 
   (let ((sentence-with-unlisted-mod-doesnt-match-nil
          '(((word-type . verb)
-            (contents . delete))
+            (contents . arpeggiate))
            ((word-type . object)
             (contents . sentence))
            ((word-type . modifier)
