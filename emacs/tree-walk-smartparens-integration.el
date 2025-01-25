@@ -45,6 +45,10 @@
                              (sptw--get-specs def)))
                    sp-pairs))))
 
+(defun sptw--get-active-sp-pairs ()
+  (apply 'append (mapcar 'sptw--get-specs sp-pairs)))
+
+
 (defun sptw--at-delim-p (open? at-end?)
   "If at smartparens delimiter, return the delimiter string.
 If OPEN?, use the opening delimiter, else the closing delimiter.
@@ -694,5 +698,35 @@ BOUNDS is the bounds of the current sexp."
         (dotimes (i indent) (insert " "))
         (goto-char (car bounds))
         (dotimes (i extra-lines) (insert "\n") (backward-char 1))))))
+
+(defun sptw--wrap-region-with-delimiter (delimiter beg end)
+  (let* ((orig-point (point))
+         (pair-for-delim
+          (seq-find (lambda (x)
+                      (or (equal delimiter (plist-get x ':open))
+                          (equal delimiter (plist-get x ':close))))
+                    (sptw--get-active-sp-pairs)))
+         (open (plist-get pair-for-delim ':open))
+         (close (plist-get pair-for-delim ':close))
+         (change-group (prepare-change-group)))
+    (goto-char end)
+    (insert close)
+    (goto-char beg)
+    (insert open)
+    (cond ((<= end orig-point)
+           (goto-char (+ orig-point (length open) (length close))))
+          ((< beg orig-point)
+           (goto-char (+ orig-point (length open))))
+          (t (goto-char orig-point)))
+    (undo-amalgamate-change-group change-group)))
+
+(defun sptw-wrap-with-delimiter (delimiter)
+  (if (region-active-p)
+      (sptw--wrap-region-with-delimiter
+       delimiter (region-beginning) (region-end))
+    (let ((bounds (sptw--bounds-of-sexp-at-point)))
+      (and bounds
+           (sptw--wrap-region-with-delimiter
+            delimiter (car bounds) (cdr bounds))))))
 
 (provide 'tree-walk-smartparens-integration)
