@@ -63,6 +63,7 @@
   ;;(in 'evil)
   ;;(in 'nix-mode)
 
+  (in 'rg)
   (in 'systemd)
   (in 'yafolding)
   (in 'smooth-scrolling)
