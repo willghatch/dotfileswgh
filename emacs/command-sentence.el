@@ -239,32 +239,6 @@ Otherwise, return a cons pair (PARAMS . EXECUTOR), containing the final paramete
 ;; TODO - add macro for use as key bind RHS such that you write a list of words to add, an option to execute, and it implicitly takes a numeric argument.
 
 
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;;; tests
-
-;; TODO - move tests into some other file.
-
-(setq command-sentence--test-config
-      `((verbs
-         .
-         ((move (default-object . word) (direction . forward) (count . 1))
-          (delete (default-object . word) (direction . forward))
-          ))
-        (objects
-         .
-         ((word (default-verb . move) (location-within . beginning))
-          (sentence (default-verb . move) (location-within . beginning))
-          ))
-        (match-table
-         .
-         ((move word
-                ((direction forward) (location-within beginning eq))
-                (forward-word (count)))
-          (delete ,(lambda (x) t)
-                  ()
-                  (function-to-delete-after-moving sentence-with-defaults)))
-         )))
-
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;; a config, maybe to be default
