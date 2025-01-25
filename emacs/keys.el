@@ -456,6 +456,12 @@
   ("b" (lambda (n) (interactive "p")
          (funcall (cs/add (cs/verb 'barf)) n))
    "barf" :exit t)
+  ("P" (lambda (n) (interactive "p")
+         (funcall (cs/add (cs/verb 'promote)) n))
+   "promote" :exit t)
+  ("D" (lambda (n) (interactive "p")
+         (funcall (cs/add (cs/verb 'demote)) n))
+   "demote" :exit t)
   ;; TODO - need to make C-g clear the current-command-sentence, or something like that
 
   )

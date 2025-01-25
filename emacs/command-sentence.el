@@ -294,7 +294,7 @@ Otherwise, return a cons pair (PARAMS . EXECUTOR), containing the final paramete
           (downcase)
           (capitalize) ;; TODO - what is the difference between capitalize-region and upcase-initials-region?
           (initiate-isearch) ;; TODO - I want to write something similar to vim's * command, to search the thing at point, except maybe with an argument to choose word or symbol or whatnot.  But my first attempt at actually implementing it was unsuccessful.  I'll probably come back to it later.
-          (transpose (direction . forward) (num . 1))
+          (transpose (direction . forward) (tree-vertical . nil) (num . 1))
           (join (direction . forward) (num . 1))
           (split)
           (slurp (direction . forward) (num . 1))
@@ -645,6 +645,26 @@ Otherwise, return a cons pair (PARAMS . EXECUTOR), containing the final paramete
           (barf sptw
                 ((direction backward))
                 (sptw-backward-barf (num)))
+          (promote sptw
+                   ((delimiter ,nil))
+                   (sptw-splice ()))
+          (promote sptw
+                   ((delimiter t ,(lambda (actual expected) (stringp actual))))
+                   (TODO-sptw-splice-specific-delimiter))
+          (demote sptw
+                  ((delimiter ,nil))
+                  (sptw-TODO-wrap-with-delimiter-choice-prompt))
+          (demote sptw
+                  ((delimiter t ,(lambda (actual expected) (stringp actual))))
+                  (sptw-TODO-wrap-with-specific-delimiter (delimiter)))
+          (rewrap sptw
+                  ((delimiter ,nil))
+                  (sptw-TODO-rewrap-nearest-delimiter-with-interactive-choice
+                   (num)))
+          (rewrap sptw
+                  ((delimiter t ,(lambda (actual expected) (stringp actual))))
+                  (sptw-TODO-rewrap-nearest-specific-delimiter-with-interactive-choice
+                   (num)))
           (split sptw
                  ()
                  (sp-split-sexp (num)))
