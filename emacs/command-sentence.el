@@ -649,6 +649,9 @@ Otherwise, return a cons pair (PARAMS . EXECUTOR), containing the final paramete
                    ((delimiter ,nil))
                    (sptw-splice ()))
           (promote sptw
+                   ((delimiter any))
+                   (sptw-splice ()))
+          (promote sptw
                    ((delimiter t ,(lambda (actual expected) (stringp actual))))
                    (TODO-sptw-splice-specific-delimiter))
           (demote sptw
