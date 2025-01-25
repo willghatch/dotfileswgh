@@ -1,3 +1,4 @@
+;;; -*- lexical-binding: t; -*-
 ;; Environment setup
 
 (defun ensure-final-slash (str)

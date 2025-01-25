@@ -1,3 +1,4 @@
+;;; -*- lexical-binding: t; -*-
 ;; TODO - find homes for these
 
 ;; State for repeating isearch -- my key to start isearch sets this so that the repeat keys go the right direction.

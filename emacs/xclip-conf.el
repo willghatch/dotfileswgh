@@ -1,3 +1,4 @@
+;;; -*- lexical-binding: t; -*-
 (setq init-xclip-conf-done nil)
 (defun init-xclip-conf ()
   (unless init-xclip-conf-done

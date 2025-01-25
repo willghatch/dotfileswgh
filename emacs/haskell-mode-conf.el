@@ -1,3 +1,4 @@
+;;; -*- lexical-binding: t; -*-
 (autoload 'haskell-mode "haskell-mode")
 (add-to-list 'auto-mode-alist '("\\.hs" . haskell-mode))
 

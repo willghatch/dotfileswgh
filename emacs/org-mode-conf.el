@@ -1,3 +1,4 @@
+;;; -*- lexical-binding: t; -*-
 
 (defun wgh/org-update-cookies ()
   (interactive)

@@ -1,3 +1,4 @@
+;;; -*- lexical-binding: t; -*-
 (defun add-to-hooks (fun hooklist)
   (mapcar (lambda (hook) (add-hook hook fun)) hooklist))
 

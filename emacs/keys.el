@@ -1,3 +1,4 @@
+;;; -*- lexical-binding: t; -*-
 ;; TODO - things to think about re-mapping: folds (toggling, moving between visible ones), spell check (for individual words or for the buffer),
 ;; TODO - repeat a la vim dot, accessing old repetitions, register choice
 ;; TODO - search forward/backward for word or symbol or such at point, that's a nice single character function that vim has.

@@ -1,3 +1,4 @@
+;;; -*- lexical-binding: t; -*-
 (require 'sexp-rewrite)
 
 (defmacro define-sexprw-tactic/func (name &rest parts)

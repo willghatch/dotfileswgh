@@ -1,3 +1,4 @@
+;;; -*- lexical-binding: t; -*-
 ;; Install files with straight.el
 (let ((conf-dir (file-name-directory load-file-name)))
   (load-file (expand-file-name "./dotfileswgh-env-conf.el" conf-dir))

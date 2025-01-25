@@ -1,3 +1,4 @@
+;;; -*- lexical-binding: t; -*-
 ;; load a bunch of stuff so that whatever I actually load with a premacs daemon
 ;; loads FAST, which is the whole point!
 

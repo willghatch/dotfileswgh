@@ -1,3 +1,4 @@
+;;; -*- lexical-binding: t; -*-
 
 (load-file "~/dotfileswgh/emacs/package-conf.el")
 

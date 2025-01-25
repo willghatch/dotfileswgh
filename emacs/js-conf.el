@@ -1,3 +1,4 @@
+;;; -*- lexical-binding: t; -*-
 
 (add-to-list 'auto-mode-alist '("\\.mjs\\'" . js-mode))
 (add-to-list 'auto-mode-alist '("\\.rsh\\'" . js-mode))

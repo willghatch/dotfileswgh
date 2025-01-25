@@ -1,3 +1,4 @@
+;;; -*- lexical-binding: t; -*-
 (define-minor-mode sensitive-mode
   "For sensitive files like password lists.
 It disables backup creation and auto saving.

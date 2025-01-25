@@ -1,3 +1,4 @@
+;;; -*- lexical-binding: t; -*-
 ;;(require 'smartparens)
 ;;(require 'evil)
 ;;(require 'evil-textobj-anyblock)

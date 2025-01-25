@@ -1,3 +1,4 @@
+;;; -*- lexical-binding: t; -*-
 (defun window-swap (backwards-p)
   "Put the buffer from the selected window in next window, and vice versa"
   (let* ((this (selected-window))

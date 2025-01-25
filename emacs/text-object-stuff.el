@@ -1,3 +1,4 @@
+;;; -*- lexical-binding: t; -*-
 ;; Working on some infrastructure to define motions and selections by text objects, but without using evil-mode, and thus not dealing with the major error of vi: positioning the cursor ON characters in command mode instead of BETWEEN characters.  That's been a constant pain since switching to emacs, and it would be the same issue for integration with any editor that has most motions defined the normal way, with the cursor between characters.
 
 ;; One issue with thing-at-point is that point can be in multiple things if they nest, or between two things if one point can be at once the end of one and the beginning of another.  In those cases, it prefers the thing whose bounds extend ahead of the cursor.  So, eg. between two close parens it is at the end of a symex and just inside another, and it will choose to work on the symex that it is inside rather than the symex it is at but after.

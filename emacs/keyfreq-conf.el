@@ -1,3 +1,4 @@
+;;; -*- lexical-binding: t; -*-
 
 (setq keyfreq-file "~/emacs-keyfreq")
 (require 'keyfreq)

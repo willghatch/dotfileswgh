@@ -1,3 +1,4 @@
+;;; -*- lexical-binding: t; -*-
 (autoload 'racket-mode "racket-mode")
 (add-to-list 'auto-mode-alist '("\\.rkt" . racket-mode))
 

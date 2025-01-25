@@ -1,3 +1,4 @@
+;;; -*- lexical-binding: t; -*-
 
 ;; first define some faces for the mode line stuff, especially
 ;; for evil states

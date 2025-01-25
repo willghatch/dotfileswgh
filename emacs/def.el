@@ -1,3 +1,4 @@
+;;; -*- lexical-binding: t; -*-
 ;; Setting a higher gc threshold makes startup way faster
 (setq wgh/orig-gc-threshold gc-cons-threshold)
 (setq gc-cons-threshold 10000000)

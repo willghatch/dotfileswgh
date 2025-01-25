@@ -1,3 +1,4 @@
+;;; -*- lexical-binding: t; -*-
 ;; Load this AFTER env-conf.
 
 ;; load local settings first, in case of proxy or something

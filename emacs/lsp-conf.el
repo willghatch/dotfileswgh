@@ -1,3 +1,4 @@
+;;; -*- lexical-binding: t; -*-
 
 (defun lsp-common-setup ()
   (require 'lsp)

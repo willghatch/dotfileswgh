@@ -1,3 +1,4 @@
+;;; -*- lexical-binding: t; -*-
 (require 'vfuncs)
 
 (let* ((banner-dir (concat (getenv "DOTFILESWGH") "/emacs/banners/"))

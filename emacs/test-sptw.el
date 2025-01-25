@@ -1,3 +1,4 @@
+;;; -*- lexical-binding: t; -*-
 
 (require 'tree-walk-smartparens-integration)
 (require 'ert)

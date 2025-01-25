@@ -1,3 +1,4 @@
+;;; -*- lexical-binding: t; -*-
 
 (require 'helm-projectile)
 (helm-projectile-on)

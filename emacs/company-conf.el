@@ -1,3 +1,4 @@
+;;; -*- lexical-binding: t; -*-
 
 ;; settings and extensions to company mode
 

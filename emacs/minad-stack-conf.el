@@ -1,3 +1,4 @@
+;;; -*- lexical-binding: t; -*-
 ;; I'm going to give the Minad stack a try.  I haven't yet read through the docs on all of these, but I'll see how they go together for a bit.
 
 (setq wgh/init-minad-done nil)
