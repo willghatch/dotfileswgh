@@ -656,13 +656,18 @@ Otherwise, return a cons pair (PARAMS . EXECUTOR), containing the final paramete
                   (sptw-TODO-wrap-with-delimiter-choice-prompt))
           (demote sptw
                   ((delimiter t ,(lambda (actual expected) (stringp actual))))
-                  (sptw-TODO-wrap-with-specific-delimiter (delimiter)))
+                  (sptw-wrap-with-delimiter (delimiter)))
+          (demote sptw
+                  ((delimiter any))
+                  ;; Convenience for my keyboard layout.
+                  (,(lambda () (sptw-wrap-with-delimiter "(")) ()))
           (rewrap sptw
                   ((delimiter ,nil))
                   (sptw-TODO-rewrap-nearest-delimiter-with-interactive-choice
                    (num)))
           (rewrap sptw
                   ((delimiter t ,(lambda (actual expected) (stringp actual))))
+                  ;; TODO - I should maybe make this take the command sentence and look for multiple instances of delimiter.  Use the first one given as the target to change, and the second one given as the one to change to.  But then I need to detect when I should expect a second delimiter key... doing an interactive prompt for what to change to will be just as well.
                   (sptw-TODO-rewrap-nearest-specific-delimiter-with-interactive-choice
                    (num)))
           (split sptw
