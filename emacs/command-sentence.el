@@ -229,7 +229,7 @@ Otherwise, return a cons pair (PARAMS . EXECUTOR), containing the final paramete
     (command-sentence-clear-current)
     (command-sentence-execute sentence command-sentence-current-configuration)))
 
-(defun command-sentence-keyboard-macro-from-sentence (sentence)
+(defun command-sentence--keyboard-macro-from-sentence (sentence)
   "Get a vector or string of keys used to create SENTENCE."
   ;; TODO -- I need better handling to always get keys used.  I'm currently always missing keys used for numeric arguments, and I'm missing some keys used for prefix maps.  I would like at least my config to consistently work for this, even if I can't consistently get all keys in a general way that anyone could use with arbitrary configurations.
   (apply (lambda (&rest args)
