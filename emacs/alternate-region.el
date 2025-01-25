@@ -133,7 +133,7 @@ PREV-LENGTH is the length of the text that was in the modified region."
           ;; If regions are in different buffers
           (let ((current-text (buffer-substring-no-properties current-start current-end))
                 (alt-text (with-current-buffer alt-buffer
-                             (buffer-substring-no-properties alt-start alt-end))))
+                            (buffer-substring-no-properties alt-start alt-end))))
             ;; Swap text in the current buffer
             (delete-region current-start current-end)
             (goto-char current-start)

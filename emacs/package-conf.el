@@ -1,6 +1,6 @@
 ;; Load this AFTER env-conf.
 
-; load local settings first, in case of proxy or something
+;; load local settings first, in case of proxy or something
 (let ((local-f (concat dotfileswgh-dotlocal "/emacs/package-conf.el")))
   (when (file-exists-p local-f)
     (with-demoted-errors "Warning: %S" (load-file local-f))))
@@ -14,16 +14,16 @@
   (let ((default-directory (concat dotfileswgh-dotlocal "/emacs/")))
     (when (file-directory-p default-directory)
       (normal-top-level-add-subdirs-to-load-path)))
-  ;(let ((default-directory "~/.emacs.d/"))
-  ;  (normal-top-level-add-subdirs-to-load-path))
+  ;;(let ((default-directory "~/.emacs.d/"))
+  ;;  (normal-top-level-add-subdirs-to-load-path))
   )
 
 (setq package-archives '(
                          ("melpa" . "http://melpa.org/packages/")
                          ("gnu" . "http://elpa.gnu.org/packages/")
-                         ;("marmalade" . "http://marmalade-repo.org/packages/")
+                         ;;("marmalade" . "http://marmalade-repo.org/packages/")
                          ))
-;(package-initialize)
+;;(package-initialize)
 
 
 (defun package-upgrade ()

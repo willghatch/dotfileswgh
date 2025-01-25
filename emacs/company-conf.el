@@ -23,7 +23,7 @@
   (define-key company-active-map (kbd "C-d h") 'helm-company)
   (define-key company-active-map (kbd "RET") nil)
   (define-key company-active-map (kbd "<return>") nil)
-  ;(key-chord-define company-active-map (kbd "gc") 'company-complete-selection)
+  ;;(key-chord-define company-active-map (kbd "gc") 'company-complete-selection)
   (define-key company-active-map (kbd "C-s") 'company-complete-selection)
   (global-set-key [company-prefix] company-active-map)
   (define-key company-active-map (kbd "C-d b") (lambda () (interactive) (describe-bindings [company-prefix])))
@@ -38,7 +38,7 @@
   (setq company-minimum-prefix-length 2)
   ;; company-idle-delay is the delay before automatically showing a completion candidate.
   ;; Setting it to nil means no auto idle completion.
-                                        ;(setq company-idle-delay 0.4)
+  ;;(setq company-idle-delay 0.4)
   (setq company-idle-delay nil)
   (setq company-text-icons-add-background t) ;; add type icon before name in completion
 

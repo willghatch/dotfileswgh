@@ -1,7 +1,7 @@
-;(require 'smartparens)
-;(require 'evil)
-;(require 'evil-textobj-anyblock)
-;(require 'evil-surround)
+;;(require 'smartparens)
+;;(require 'evil)
+;;(require 'evil-textobj-anyblock)
+;;(require 'evil-surround)
 
 
 (with-eval-after-load 'smartparens

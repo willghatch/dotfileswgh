@@ -7,8 +7,8 @@
 ;; %aE adds author email
 ;; %cN adds committer name
 ;; %cE adds committer email
-;(setq magit-log-revision-headers-format "%+b%+N")
-;(setq magit-log-revision-headers-format "%+b%+N\nA: %aN, C: %cN")
+;;(setq magit-log-revision-headers-format "%+b%+N")
+;;(setq magit-log-revision-headers-format "%+b%+N\nA: %aN, C: %cN")
 
 
 (defun wgh/magit-checkout-at-point ()

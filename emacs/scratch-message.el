@@ -8,7 +8,7 @@
                                 (file->lines banner-file)))))
 
 (setq scratch-useful-message
-"
+      "
 
 ;;;; Useful notes for run-time definitions:
 

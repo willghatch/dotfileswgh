@@ -10,7 +10,7 @@
             (setq lsp-diagnostics-provider nil)
 
             ;; The default language server path should be generic, but I find it brittle.  So... Maybe I'll just update this each time I need to use a different GHC version...
-            ;(setq lsp-haskell-server-path "haskell-language-server-wrapper")
+            ;;(setq lsp-haskell-server-path "haskell-language-server-wrapper")
             (setq lsp-haskell-server-path "haskell-language-server-9.0.2")
             ;; If I get an error about GHC ABIs don't match, see this: https://github.com/haskell/vscode-haskell#ghc-abis-dont-match
 
@@ -23,9 +23,9 @@
             ;; This isn't working, though.  Something is turning it on AFTER this hook is run...
             ;; I'm leaving this here for future reference.  Disabling flymake-mode here did nothing because it was enabled later (probably `lsp` activation does something in the background and activates it later).  I found where it was enabled with `debug-on-entry`.
             ;; Also, the best way to detect if a mode is on or not is by checking it's variable value -- eg. (symbol-value 'flymake-mode) ;; returns t or nil
-            ;(flymake-mode -1)
-            ;(debug-on-entry #'flymake-mode)
+            ;;(flymake-mode -1)
+            ;;(debug-on-entry #'flymake-mode)
 
             ;; lsp-lens is the thing that shows eg. imports to the right of import statements, etc
-            ;(lsp-lens-mode -1)
+            ;;(lsp-lens-mode -1)
             ))

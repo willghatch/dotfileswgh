@@ -45,8 +45,8 @@
 
 ;; the following isn't working...
 ;; these have to be customized.  I'm leaving these comments here too, as an important note.
-;(setq-default evil-overriding-maps nil
-;              evil-intercept-maps nil)
+;;(setq-default evil-overriding-maps nil
+;;              evil-intercept-maps nil)
 
 ;;; First, blow up maps so they don't map things like t/T and
 ;;; insert mode stuff
@@ -57,12 +57,12 @@
 (setcdr evil-motion-state-map nil)
 
 (evil-define-state pager
-  "Pager State"
-  :tag "<P>"
-  :message "-- PAGER STATE --"
-  :enable (motion)
-  :suppress-keymap t
-  )
+                   "Pager State"
+                   :tag "<P>"
+                   :message "-- PAGER STATE --"
+                   :enable (motion)
+                   :suppress-keymap t
+                   )
 
 
 (defmacro myhydradef (hydra-name &rest hydra-keys)
@@ -120,7 +120,7 @@
 (nkmap "@" 'evil-execute-macro)
 (nkmap "\"" 'evil-use-register)
 (nkmap "~" 'evil-invert-char)
-;(nkmap "=" 'evil-indent)
+;;(nkmap "=" 'evil-indent)
 (nkmap "<" 'evil-shift-left)
 (nkmap ">" 'evil-shift-right)
 (nkmap "ZZ" 'evil-save-modified-and-close)
@@ -144,7 +144,7 @@
 ;;; Motion state
 
 ;; "0" is a special command when called first
-;(evil-redirect-digit-argument evil-motion-state-map "0" 'evil-beginning-of-line)
+;;(evil-redirect-digit-argument evil-motion-state-map "0" 'evil-beginning-of-line)
 (mkmap "0" 'evil-beginning-of-line)
 (mkmap "1" 'digit-argument)
 (mkmap "2" 'digit-argument)
@@ -161,7 +161,7 @@
 (mkmap "f" 'rmo/evil-find-char)
 (mkmap "F" 'rmo/evil-find-char-backward)
 (mkmap "G" 'evil-goto-line)
-;(mkmap "h" (lambda () (interactive) (message "use oc")))
+;;(mkmap "h" (lambda () (interactive) (message "use oc")))
 (mkmap "H" 'evil-window-top)
 (mkmap "j" 'rmo-c/evil-next-line)
 (mkmap "k" 'rmo-c/evil-previous-line)
@@ -258,18 +258,18 @@
 
 ;;; Minibuffer
 
-;(define-key minibuffer-local-map "\C-p" 'evil-complete-next)
-;(define-key minibuffer-local-map "\C-n" 'evil-complete-previous)
-;(define-key minibuffer-local-map "\C-x\C-p" 'evil-complete-next-line)
-;(define-key minibuffer-local-map "\C-x\C-n" 'evil-complete-previous-line)
+;;(define-key minibuffer-local-map "\C-p" 'evil-complete-next)
+;;(define-key minibuffer-local-map "\C-n" 'evil-complete-previous)
+;;(define-key minibuffer-local-map "\C-x\C-p" 'evil-complete-next-line)
+;;(define-key minibuffer-local-map "\C-x\C-n" 'evil-complete-previous-line)
 
 ;; Ex
 (mkmap ":" 'evil-ex)
 (mkmap "!" 'evil-shell-command)
-;
+;;
 ;;; search command line
-;(define-key evil-ex-search-keymap "\d" #'evil-ex-delete-backward-char)
-;
+;;(define-key evil-ex-search-keymap "\d" #'evil-ex-delete-backward-char)
+;;
 
 
 ;;; CUSTOM BINDINGS SECTION
@@ -282,35 +282,35 @@
   ("k" evil-window-prev nil)
   ("c" delete-window nil)
   ("h" (lambda () (interactive)
-     (let ((current-prefix-arg '(5)))
-       (call-interactively 'evil-window-decrease-width))) "skinny")
+         (let ((current-prefix-arg '(5)))
+           (call-interactively 'evil-window-decrease-width))) "skinny")
   ("l" (lambda () (interactive)
-     (let ((current-prefix-arg '(5)))
-       (call-interactively 'evil-window-increase-width))) "fat")
+         (let ((current-prefix-arg '(5)))
+           (call-interactively 'evil-window-increase-width))) "fat")
   ("H" (lambda () (interactive)
-     (let ((current-prefix-arg '(5)))
-       (call-interactively 'evil-window-increase-height))) "tall")
+         (let ((current-prefix-arg '(5)))
+           (call-interactively 'evil-window-increase-height))) "tall")
   ("L" (lambda () (interactive)
-     (let ((current-prefix-arg '(5)))
-       (call-interactively 'evil-window-decrease-height))) "short")
+         (let ((current-prefix-arg '(5)))
+           (call-interactively 'evil-window-decrease-height))) "short")
   ("f" delete-other-windows "full")
   ;; Space will be for layout concerns
-  ;(" f" delete-other-windows)
-  ;(" u" winner-undo)
-  ;(" r" winner-redo)
-  ;(" j" window-swap-next)
-  ;(" k" window-swap-prev)
-  ;("p" popwin-map)
+  ;;(" f" delete-other-windows)
+  ;;(" u" winner-undo)
+  ;;(" r" winner-redo)
+  ;;(" j" window-swap-next)
+  ;;(" k" window-swap-prev)
+  ;;("p" popwin-map)
   ("=" balance-windows "balance")
-  ;("g" elscreen-create)
-  ;("G" elscreen-kill)
-  ;("w" elscreen-next)
-  ;("b" elscreen-previous)
+  ;;("g" elscreen-create)
+  ;;("G" elscreen-kill)
+  ;;("w" elscreen-next)
+  ;;("b" elscreen-previous)
   ;; TODO - I want m to be "mode" -- IE I want a key to go into the map, but then
   ;;        have a key inside the map to make it sticky (switch modes).
   ("m" nil)
   ("e" nil)
-)
+  )
 
 
 
@@ -344,7 +344,7 @@
 ;;(key-chord-define evil-replace-state-map (kbd "kj") 'evil-normal-state)
 (ikmap (kbd "C-c") 'evil-normal-state)
 
-; Keys unbound and reserved for future use - bind to nop so they don't input
+;; Keys unbound and reserved for future use - bind to nop so they don't input
 (mkmap (kbd "RET") 'ignore)
 (mkmap "S" 'ignore)
 (mkmap "T" 'ignore)
@@ -361,7 +361,7 @@
 ;; I'm not sure a better place to put this...
 (nkmap (kbd "TAB") 'sp-indent-defun)
 
-; g map
+;; g map
 (mkmap "gr" 'evil-ace-jump-word-mode)
 (mkmap "gc" 'evil-ace-jump-char-mode)
 (mkmap "gf" 'evil-ace-jump-line-mode)
@@ -379,14 +379,14 @@
 (mkmap "gN" 'evil-previous-match)
 
 (nkmap "g&" 'evil-ex-repeat-global-substitute)
-(nkmap "gi" 'evil-insert-resume) ; insert mode at ins. mode cursor point
+(nkmap "gi" 'evil-insert-resume) ;; insert mode at ins. mode cursor point
 (nkmap "gu" 'evil-downcase)
 (nkmap "gU" 'evil-upcase)
 (nkmap "g~" 'evil-invert-case)
 (nkmap "g;" 'goto-last-change)
 (nkmap "g," 'goto-last-change-reverse)
 
-; o and e maps - o is left/back, e is right/forward
+;; o and e maps - o is left/back, e is right/forward
 (mkmap "ee" 'rmo/evil-forward-word-end)
 (mkmap "oe" 'rmo/evil-backward-word-end)
 (mkmap "eE" 'rmo/evil-forward-WORD-end)
@@ -398,10 +398,10 @@
 (nkmap "oo" 'evil-open-above)
 (mkmap "ec" 'rmo/evil-forward-char)
 (mkmap "oc" 'rmo/evil-backward-char)
-;(mkmap "ed" 'rmo/evil-next-close-paren)
-;(mkmap "od" 'rmo/evil-previous-open-paren)
-;(mkmap "ed" 'rmo/evil-next-close-brace)
-;(mkmap "od" 'rmo/evil-previous-open-brace)
+;;(mkmap "ed" 'rmo/evil-next-close-paren)
+;;(mkmap "od" 'rmo/evil-previous-open-paren)
+;;(mkmap "ed" 'rmo/evil-next-close-brace)
+;;(mkmap "od" 'rmo/evil-previous-open-brace)
 (mkmap "ed" 'rmo/on-parens-down-sexp-end)
 (mkmap "od" 'rmo/on-parens-down-sexp)
 (mkmap "eg" 'rmo/on-parens-up-sexp-end)
@@ -466,7 +466,7 @@
 ;; "ens_" forward slurp
 (mkmap "ensp" 'on-parens-forward-slurp)
 (mkmap "onsp" 'on-parens-backward-slurp)
-; TODO - indent tree slurp
+;; TODO - indent tree slurp
 (mkmap "ensi" 'ignore)
 (mkmap "onsi" 'ignore)
 (mkmap "enso" 'wgh/org-forward-slurp-heading)
@@ -476,7 +476,7 @@
 ;; "enb_" forward barf
 (mkmap "enbp" 'on-parens-forward-barf)
 (mkmap "onbp" 'on-parens-backward-barf)
-; TODO - indent tree barf
+;; TODO - indent tree barf
 (mkmap "enbi" 'ignore)
 (mkmap "onbi" 'ignore)
 (mkmap "enbo" 'wgh/org-forward-barf-heading)
@@ -496,7 +496,7 @@
 ;; "enm_" forward sibling end
 (mkmap "enmp" 'rmo/on-parens-forward-sexp-end)
 (mkmap "onmp" 'rmo/on-parens-backward-sexp-end)
-; TODO - indent tree moving by end of line
+;; TODO - indent tree moving by end of line
 (mkmap "enmi" 'ignore)
 (mkmap "onmi" 'ignore)
 (mkmap "enmo" 'ignore)
@@ -572,14 +572,14 @@
 ;; You can also do combos with special regions where the mouse is, eg. [mode-line mouse-1] to bind to something different when clicking in the mode-line.
 (mkmap [mouse-4] 'mwheel-scroll)
 (mkmap [mouse-5] 'mwheel-scroll)
-;(global-set-key [mouse-4] (lambda () (interactive) (scroll-down 4)))
-;(global-set-key [mouse-5] (lambda () (interactive) (scroll-up 4)))
+;;(global-set-key [mouse-4] (lambda () (interactive) (scroll-down 4)))
+;;(global-set-key [mouse-5] (lambda () (interactive) (scroll-up 4)))
 
 
 (mkmap "f" 'repeatable-motion-forward)
 (mkmap "F" 'repeatable-motion-backward)
 
-; t map
+;; t map
 (mkmap "tt" 'temp-key-map)
 
 (mkmap "tia" 'switch-to-buffer)
@@ -608,47 +608,47 @@
 (mkmap "tr" 'evil-use-register)
 ;; "ts" will stand for "toggle setting"
 (mkmap "ts"
-  (defhydra settings-toggle (:foreign-keys warn :exit t) "Toggle:"
-    ("p" smartparens-mode "smartparens")
-    ("b" (lambda () (interactive) (require 'blamer) (blamer-mode)) "git blame")
-    ("w" whitespace "whitespace")
-    ("C" (lambda () (interactive) (require 'rainbow-mode) (rainbow-mode)) "#aabbcc")
-    ("c" company-mode "company")
-    ("t" toggle-truncate-lines "trunc")
-    ("i" toggle-case-fold-search "/? case")
-    ("W" toggle-wrap-scan "search-wrap")
-    ("f" flycheck-mode "flycheck")
-    ("F" display-fill-column-indicator-mode "fill-col")
-    ("s" flyspell-mode "flyspell")
-    ("S" flyspell-prog-mode "flyspell-prog")
-    ;("e" electric-indent-mode "el.indent")
-    ("d" rainbow-delimiters-mode "rainbow{}")
-    ("r" linum-relative-toggle "linum-rel")
-    ("h" evil-search-highlight-persist-remove-all "search-highlight-now")
-    ("H" evil-search-highlight-persist "search-highlight-ever")
-    ("M" menu-bar-mode "menu-bar")
-    ("l" lsp-lens-mode "lsp-lens") ;; lsp-lens is the thing that shows eg. haskell imports in an overlay
-    ;("m" (lambda () (interactive) (menu-bar-mode 1) (menu-bar-open)) "menu-open")
-    ("n" display-line-numbers-mode "line-numbers")
-    ("I" indent-guide-mode "indent-guide")
-    ("x" wgh/racket-xp-pre-redisplay-toggle "racket-xp-hl")
-    ))
+       (defhydra settings-toggle (:foreign-keys warn :exit t) "Toggle:"
+         ("p" smartparens-mode "smartparens")
+         ("b" (lambda () (interactive) (require 'blamer) (blamer-mode)) "git blame")
+         ("w" whitespace "whitespace")
+         ("C" (lambda () (interactive) (require 'rainbow-mode) (rainbow-mode)) "#aabbcc")
+         ("c" company-mode "company")
+         ("t" toggle-truncate-lines "trunc")
+         ("i" toggle-case-fold-search "/? case")
+         ("W" toggle-wrap-scan "search-wrap")
+         ("f" flycheck-mode "flycheck")
+         ("F" display-fill-column-indicator-mode "fill-col")
+         ("s" flyspell-mode "flyspell")
+         ("S" flyspell-prog-mode "flyspell-prog")
+         ;;("e" electric-indent-mode "el.indent")
+         ("d" rainbow-delimiters-mode "rainbow{}")
+         ("r" linum-relative-toggle "linum-rel")
+         ("h" evil-search-highlight-persist-remove-all "search-highlight-now")
+         ("H" evil-search-highlight-persist "search-highlight-ever")
+         ("M" menu-bar-mode "menu-bar")
+         ("l" lsp-lens-mode "lsp-lens") ;; lsp-lens is the thing that shows eg. haskell imports in an overlay
+         ;;("m" (lambda () (interactive) (menu-bar-mode 1) (menu-bar-open)) "menu-open")
+         ("n" display-line-numbers-mode "line-numbers")
+         ("I" indent-guide-mode "indent-guide")
+         ("x" wgh/racket-xp-pre-redisplay-toggle "racket-xp-hl")
+         ))
 
 (mkmap "tl"
-  (defhydra list-stuff-map (:foreign-keys warn :exit t) "List:"
-    ("b" list-buffers "buffers")
-    ("m" evil-show-marks "marks")
-    ("M" bookmark-bmenu-list "bookmarks")
-                                        ;("tlk" 'list-keymaps) ; TODO - make this function
-    ("c" list-colors-display "colors")
-    ("f" list-faces-display "faces")
-    ("r" evil-show-registers "registers")
-    ))
-; TODO - list jumps, maybe
+       (defhydra list-stuff-map (:foreign-keys warn :exit t) "List:"
+         ("b" list-buffers "buffers")
+         ("m" evil-show-marks "marks")
+         ("M" bookmark-bmenu-list "bookmarks")
+         ;;("tlk" 'list-keymaps) ; TODO - make this function
+         ("c" list-colors-display "colors")
+         ("f" list-faces-display "faces")
+         ("r" evil-show-registers "registers")
+         ))
+;; TODO - list jumps, maybe
 
 ;; s map
-;(nkmap "ss" 'evil-substitute)
-;(nkmap "sS" 'evil-change-whole-line)
+;;(nkmap "ss" 'evil-substitute)
+;;(nkmap "sS" 'evil-change-whole-line)
 (evil-define-key 'visual evil-surround-mode-map "s" nil)
 (evil-define-key 'visual evil-surround-mode-map "S" 'ignore)
 (defun surround-region-with-parens (beg end)
@@ -679,13 +679,13 @@
 ;; command modes and macros
 (mkmap "-" (lambda (n)
              (interactive "p")
-             ;(message "use h")
+             ;;(message "use h")
              ;; I haven't liked using z, maybe I'll prefer h, but for now I just want to stop tripping over this.
              (call-interactively 'helm-M-x)
              ))
 (mkmap "z" 'helm-M-x)
 (mkmap "h" 'helm-M-x)
-;(mkmap "|" 'execute-extended-command)
+;;(mkmap "|" 'execute-extended-command)
 (mkmap "|" 'eval-expression)
 (mkmap "_" 'eval-expression)
 (mkmap "Q" 'call-last-kbd-macro)
@@ -716,18 +716,18 @@
 (mkmap "to" 'evil-pager-state)
 
 
-; space map
+;; space map
 (mkmap "sj" 'rmo/pscroll-down-half)
 (mkmap "sk" 'rmo/pscroll-up-half)
 (mkmap "sf" 'fold-toggle-wgh)
 (mkmap "sF" 'fold-toggle-wgh-all)
 (mkmap " /"
-  (myhydradef search-hydra
-              ("s" helm-swoop "swoop")
-              ("a" helm-multi-swoop-all "multi-swoop all")
-              ("m" helm-multi-swoop "multi-swoop")
-              ("r" wgh/fzf-repo "fzf-repo")
-  ))
+       (myhydradef search-hydra
+                   ("s" helm-swoop "swoop")
+                   ("a" helm-multi-swoop-all "multi-swoop all")
+                   ("m" helm-multi-swoop "multi-swoop")
+                   ("r" wgh/fzf-repo "fzf-repo")
+                   ))
 (mkmap " -h" 'helm-M-x)
 (mkmap " &g" 'evil-ex-repeat-global-substitute)
 (mkmap " va" 'mark-whole-buffer)
@@ -737,10 +737,10 @@
 ;;         for instance, g<key> is mostly navigation... t... mosty has window stuff in th... space is mostly one handed
 ;;         navigation aside from this one
 (mkmap " j"
-  (myhydradef j-hydra
-              ("l" evil-join "join lines")
-              ("w" evil-join-whitespace "join whitespace")
-              ))
+       (myhydradef j-hydra
+                   ("l" evil-join "join lines")
+                   ("w" evil-join-whitespace "join whitespace")
+                   ))
 
 
 ;; input mode
@@ -765,13 +765,13 @@
             ("f" he-expand-file-name "file")
             ("l" he-expand-lisp-symbol "lisp")
             ("s" yas-expand "yas")
-)
+            )
 (ikmap "\M-h" 'completer-map/body)
 (ikmap (kbd "C-SPC TAB") 'completer-map/body)
 (ikmap (kbd "C-@ TAB") 'completer-map/body)
 (ikmap (kbd "TAB") 'company-complete-common-wgh)
 ;; put indentation on something...
-;(define-key 'completer-map (kbd "TAB") 'indent-for-tab-command)
+;;(define-key 'completer-map (kbd "TAB") 'indent-for-tab-command)
 (ikmap (kbd "<backtab>") 'indent-for-tab-command)
 
 (global-set-key (kbd "C-\\") 'evil-execute-in-normal-state)

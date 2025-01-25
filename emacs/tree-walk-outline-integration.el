@@ -2,7 +2,7 @@
 (require 'outline)
 
 (defun twoi-forward-slurp-heading ()
-;; TODO - this is broken, outline-demote isn't working right, at least in org-mode
+  ;; TODO - this is broken, outline-demote isn't working right, at least in org-mode
   (interactive)
   (let ((start-line (line-number-at-pos))
         (line-at-next-heading (save-excursion
@@ -95,8 +95,8 @@
  :def-down-to-last-descendant twoi-down-to-last-descendant
  :def-down-to-last-child twoi-down-to-last-child
 
- ;:def-evil-inner-object-for-tree-with-no-end-delimiter twoi-tree-inner
- ;:def-evil-outer-object-for-tree-with-no-end-delimiter twoi-tree-outer
+ ;;:def-evil-inner-object-for-tree-with-no-end-delimiter twoi-tree-inner
+ ;;:def-evil-outer-object-for-tree-with-no-end-delimiter twoi-tree-outer
 
  :def-bounds-for-tree-with-no-end-delimiter twoi-tree-bounds
  :def-children-bounds-for-tree-with-no-end-delimiter twoi-tree-children-bounds

@@ -5,7 +5,7 @@
 (push '("^\*helm-.+\*$" :regexp t) popwin:special-display-config)
 
 (define-prefix-command 'popwin-map) ; because for some reason the one defined by
-                                    ; popwin itself won't play nice with evil
+                                        ; popwin itself won't play nice with evil
 (define-key popwin-map "b"    'popwin:popup-buffer)
 (define-key popwin-map "l"    'popwin:popup-last-buffer)
 (define-key popwin-map "o"    'popwin:display-buffer)

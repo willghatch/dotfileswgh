@@ -36,12 +36,12 @@
     (ui-hint . ,(or ui-hint contents))))
 (defun cs/ae (&rest words)
   (apply 'command-sentence-add-to-current-with-numeric-handling
-          'exec-after
-          words))
+         'exec-after
+         words))
 (defun cs/add (&rest words)
   (apply 'command-sentence-add-to-current-with-numeric-handling
-          nil
-          words))
+         nil
+         words))
 
 
 (require 'text-object-stuff)

@@ -315,8 +315,8 @@ It always moves to the FIRST sibling in the full sibling region, regardless of m
  :def-inorder-backward indent-tree-inorder-traversal-backward
  :def-down-to-last-descendant indent-tree-down-to-last-descendant
 
- ;:def-evil-inner-object-for-tree-with-no-end-delimiter indent-tree-inner
- ;:def-evil-outer-object-for-tree-with-no-end-delimiter indent-tree-outer
+ ;;:def-evil-inner-object-for-tree-with-no-end-delimiter indent-tree-inner
+ ;;:def-evil-outer-object-for-tree-with-no-end-delimiter indent-tree-outer
 
  :def-bounds-for-tree-with-no-end-delimiter indent-tree-bounds
  :def-children-bounds-for-tree-with-no-end-delimiter indent-tree-children-bounds

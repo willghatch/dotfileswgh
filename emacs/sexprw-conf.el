@@ -12,14 +12,14 @@
 ;;; These are not tactics I'll re-use, they are just tactics I used while testing the package.
 
 (define-sexprw-tactic/func parse-result-test-upgrade
-  (->results (parse* (open-input-string $str)
-                     $parser))
-  (p*/r $str !SL $parser))
+                           (->results (parse* (open-input-string $str)
+                                              $parser))
+                           (p*/r $str !SL $parser))
 
 (define-sexprw-tactic/func whole-parse-result-test-upgrade
-  (->results (whole-parse* (open-input-string $str)
-                           $parser))
-  (wp*/r $str !SL $parser))
+                           (->results (whole-parse* (open-input-string $str)
+                                                    $parser))
+                           (wp*/r $str !SL $parser))
 
 
 (require 'racket-rewrites)

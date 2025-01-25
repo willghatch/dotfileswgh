@@ -15,7 +15,7 @@
        (if (equal xclip-method 'wl-copy)
            (call-process-region (region-beginning) (region-end) "wl-copy")
          (xclip-set-selection 'clipboard
-                            (filter-buffer-substring beg end)))
+                              (filter-buffer-substring beg end)))
        (let ((eol (eolp))
              (point-at-region-end (equal end (point))))
          (call-interactively 'evil-normal-state)

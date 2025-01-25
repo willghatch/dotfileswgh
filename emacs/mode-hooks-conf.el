@@ -66,7 +66,7 @@
             (lnkmap "m" 'my-buffer-menu-mode-map)
             (set-keymap-parent 'my-buffer-menu-mode-map Buffer-menu-mode-map)))
 
-;(add-hook 'text-mode-hook #'flyspell-mode)
+;;(add-hook 'text-mode-hook #'flyspell-mode)
 (add-hook 'prog-mode-hook
           (lambda ()
             (nobreak
@@ -117,7 +117,7 @@
             (lsp-common-setup)
             (require 'lsp-java)
             ;; This lsp download url should work with openjdk11.
-            ;(setq lsp-java-jdt-download-url  "https://download.eclipse.org/jdtls/milestones/0.57.0/jdt-language-server-0.57.0-202006172108.tar.gz")
+            ;;(setq lsp-java-jdt-download-url  "https://download.eclipse.org/jdtls/milestones/0.57.0/jdt-language-server-0.57.0-202006172108.tar.gz")
             (lsp)
             (setq-local outline-regexp wgh/c-outline-regexp)
             ))
@@ -179,14 +179,14 @@
    ;; Don't override my evil-mode keymap with your default bindings.
    (setcdr magit-revision-mode-map nil)
    (wgh/magit-keys-setup)
-  ))
+   ))
 (add-hook
  'magit-diff-mode-hook
  (lambda ()
    ;; Don't override my evil-mode keymap with your default bindings.
    (setcdr magit-diff-mode-map nil)
    (wgh/magit-keys-setup)
-  ))
+   ))
 
 (add-hook
  'magit-log-mode-hook
@@ -237,7 +237,7 @@
    (define-key wgh/magit-log-m-keymap "brh" 'wgh/magit-current-branch-reset-hard-at-point)
    (define-key wgh/magit-log-m-keymap "brm" 'wgh/magit-current-branch-reset-mixed-at-point)
    ))
-;
+                                        ;
 ;; so it doesn't barf when it's not set!
 (setq start-on-pager-state nil)
 (add-hook 'server-switch-hook
@@ -256,21 +256,21 @@
             (setq c-basic-offset 2)))
 
 ;; TODO -- these are default values that I should deal with now
-;evil-overriding-maps
-;Value: ((Buffer-menu-mode-map)
- ;(color-theme-mode-map)
- ;(comint-mode-map)
- ;(compilation-mode-map)
- ;(grep-mode-map)
- ;(dictionary-mode-map)
- ;(ert-results-mode-map . motion)
- ;(Info-mode-map . motion)
- ;(speedbar-key-map)
- ;(speedbar-file-key-map)
- ;(speedbar-buffers-key-map))
-;
-;evil-intercept-maps
-;edebug-mode-map
+;;evil-overriding-maps
+;;Value: ((Buffer-menu-mode-map)
+;;(color-theme-mode-map)
+;;(comint-mode-map)
+;;(compilation-mode-map)
+;;(grep-mode-map)
+;;(dictionary-mode-map)
+;;(ert-results-mode-map . motion)
+;;(Info-mode-map . motion)
+;;(speedbar-key-map)
+;;(speedbar-file-key-map)
+;;(speedbar-buffers-key-map))
+;;
+;;evil-intercept-maps
+;;edebug-mode-map
 
 
 (define-derived-mode wgh-checklist-mode text-mode "wgh-checklist-mode"
@@ -302,13 +302,13 @@
   (lsp)
 
   ;; TODO - maybe try eglot instead of lsp-mode some time.
-  ;(require 'eglot)
+  ;;(require 'eglot)
 
   (require 'dap-mode)
   (require 'dap-mouse)
   (require 'dap-ui)
   (require 'dap-cpptools)
-  ;(require 'dap-lldb)
+  ;;(require 'dap-lldb)
   (require 'dap-hydra)
   ;; Something is trying to access this and crashing, so let's just define it.
   (defun treemacs--setup-mode-line () nil)
@@ -317,7 +317,7 @@
   ;; Remember to run dap-cpptools-setup to install, and put "type":"cppdbg" and "MIMode":"lldb" in dap config
   (require 'all-the-icons)
 
-  ;(require 'helm-lsp)
+  ;;(require 'helm-lsp)
   ;; TODO - try helm-lsp
   (lnkmap "m}" 'wgh/trivial-if-braces-remove)
   )

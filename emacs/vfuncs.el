@@ -96,7 +96,7 @@ buffer, it will call the next-buffer-func once more if advance-on-failure-p."
     (message (format "%s is not a directory!" dir))))
 
 (defun ish (cmd) (interactive (list (read-shell-command "$ ")))
-  (insert-string (shell-command-to-string cmd)))
+       (insert-string (shell-command-to-string cmd)))
 
 (require 'cl-lib)
 ;; List of buffers that will keep emacs from closing when I use kill-buffer-or-quit-emacs
@@ -111,7 +111,7 @@ buffer, it will call the next-buffer-func once more if advance-on-failure-p."
              (not (get-buffer "*scratch*")))
          (cl-notany 'buffer-file-name (buffer-list))
          (cl-notany 'buffer-live-p wgh/kill-block-buffer-list))
-    ;(evil-quit-all)
+    ;;(evil-quit-all)
     (save-buffers-kill-terminal)
     ))
 (defun kill-buffer-or-quit-emacs ()
@@ -233,14 +233,14 @@ quit emacs."
   (set-background-mode 'light)
   (setq current-theme-reapply-var 'light-theme)
   (load-theme 'wgh t)
-  ;(disable-theme 'wgh)
+  ;;(disable-theme 'wgh)
   )
 (defun dark-theme ()
   (interactive)
   (set-background-mode 'dark)
   (setq current-theme-reapply-var 'dark-theme)
   (load-theme 'wgh t)
-  ;(disable-theme 'wgh-light)
+  ;;(disable-theme 'wgh-light)
   )
 (defun current-theme-reapply ()
   (interactive
@@ -409,7 +409,7 @@ I'm sick of doing this manually."
 ;;(autoload 'gptel-send "gptel" "gptel-send -- send text to point or in region" t)
 
 (defun wgh/start-copilot ()
-    (interactive)
+  (interactive)
   (require 'copilot)
 
   (require 'request)
@@ -458,5 +458,10 @@ I'm sick of doing this manually."
 (defun debug-message-and-ret (msg val)
   (message "debug-message-and-ret: %s --- %s" msg val)
   val)
+
+(defun wgh/ripgrep ()
+  (interactive)
+  (require 'rg)
+  (call-interactively 'rg))
 
 (provide 'vfuncs)

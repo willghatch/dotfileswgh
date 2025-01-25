@@ -149,7 +149,7 @@
 
 (defmacro tree-walk--def-inorder-traversal (function-name object-name dir-name forward1 backward1)
   `(defun ,function-name (count)
-       ,(format "Do COUNT steps %s of inorder tree traversal for %s." dir-name object-name)
+     ,(format "Do COUNT steps %s of inorder tree traversal for %s." dir-name object-name)
      (interactive "p")
      (cond ((not (integerp count)) (funcall ,forward1))
            ((= count 0) t)
@@ -358,9 +358,9 @@ Returns the region of the children, not the full tree."
                    ,up-func ,down-func ,down-to-last-descendant-func ,left-finalize-func
                    ,left-inner-finalize-func ,right-finalize-func)))
        (fset ',def-bounds-name
-              (car funcs))
+             (car funcs))
        (fset ',def-children-bounds-name
-              (cadr funcs)))))
+             (cadr funcs)))))
 
 (defun tree-walk--expanded-region
     (get-bounds-func up-func)
@@ -382,15 +382,15 @@ If REGION is null, then any region succeeds.
                                       'tree-walk--region-strictly-less
                                     'tree-walk--region-less-or-equal)))
                 (save-mark-and-excursion
-                 (let* ((bounds (funcall get-bounds-func anchor-point))
-                        (success (and bounds (or (and (not region) bounds)
-                                                 (funcall compare-func region bounds)))))
+                  (let* ((bounds (funcall get-bounds-func anchor-point))
+                         (success (and bounds (or (and (not region) bounds)
+                                                  (funcall compare-func region bounds)))))
 
-                   (if success
-                       success
-                     (and
-                      (tree-walk--motion-moved up-func)
-                      (funcall grow-func strictly-grow (point) region)))))))))
+                    (if success
+                        success
+                      (and
+                       (tree-walk--motion-moved up-func)
+                       (funcall grow-func strictly-grow (point) region)))))))))
     grow-func))
 
 (defun tree-walk--expand-region (expansion-func strictly-grow)
@@ -446,8 +446,8 @@ Returns an interactive command to expand region.
 ;; The inner object is... probably worse semantically but it's the way I could think of making it work and be semi-correct.  It highlights all the children of the parent node, or if that's already covered then it expands to all children of the grandparent.
 (defmacro tree-walk-define-text-objects-no-end-tree
     (inner-name outer-name
-     up down down-to-last-child
-     left-finalize right-finalize)
+                up down down-to-last-child
+                left-finalize right-finalize)
   "Define text objects.
 Define INNER-NAME and OUTER-NAME as evil-mode text objects (using with-eval-after-load).
 
@@ -493,12 +493,12 @@ If no region is given, it uses the current region (or ((point) . (point))).
              (tree-walk--text-object-no-end-helper ,outer-left ,outer-right ,up))
        (with-eval-after-load 'evil-macros
          (evil-define-text-object ,inner-name (count &optional beg end type)
-           ;; TODO - handle count, type
-           (funcall ,inner-helper beg end)))
+                                  ;; TODO - handle count, type
+                                  (funcall ,inner-helper beg end)))
        (with-eval-after-load 'evil-macros
          (evil-define-text-object ,outer-name (count &optional beg end type)
-           ;; TODO - handle count, type
-           (funcall ,outer-helper beg end)))
+                                  ;; TODO - handle count, type
+                                  (funcall ,outer-helper beg end)))
        )))
 
 
@@ -514,9 +514,9 @@ If no region is given, it uses the current region (or ((point) . (point))).
   `(progn
      ,@(when def-expand-region
          `((fset ',def-expand-region
-                  (tree-walk--expand-region
-                   (tree-walk--expanded-region ,bounds-func ,up-func)
-                   'strictly-grow))))
+                 (tree-walk--expand-region
+                  (tree-walk--expanded-region ,bounds-func ,up-func)
+                  'strictly-grow))))
      ,@(when def-expand-region-idempotent
          `((fset ',def-expand-region-idempotent
                  (tree-walk--expand-region (tree-walk--expanded-region ,bounds-func ,up-func) nil))))
@@ -623,13 +623,20 @@ TODO - add an optional fix-up function, eg. to fix indentation for indent tree, 
          (when def-down-to-last-descendant
            `(defun ,def-down-to-last-descendant ()
               (interactive)
-              (tree-walk--down-to-last-descendant ,(or use-down-to-last-child `',def-down-to-last-child))))
-         (when (or def-evil-inner-object-for-tree-with-no-end-delimiter def-evil-outer-object-for-tree-with-no-end-delimiter)
+              (tree-walk--down-to-last-descendant
+               ,(or use-down-to-last-child `',def-down-to-last-child))))
+         (when (or def-evil-inner-object-for-tree-with-no-end-delimiter
+                   def-evil-outer-object-for-tree-with-no-end-delimiter)
            `(tree-walk-define-text-objects-no-end-tree
-             ,def-evil-inner-object-for-tree-with-no-end-delimiter ,def-evil-outer-object-for-tree-with-no-end-delimiter
-             ,use-up-to-parent ,use-down-to-first-child ,(or use-down-to-last-child `',def-down-to-last-child)
-             ,use-left-finalizer-for-tree-with-no-end-delimiter ,use-right-finalizer-for-tree-with-no-end-delimiter))
-         (when (or def-bounds-for-tree-with-no-end-delimiter def-children-bounds-for-tree-with-no-end-delimiter)
+             ,def-evil-inner-object-for-tree-with-no-end-delimiter
+             ,def-evil-outer-object-for-tree-with-no-end-delimiter
+             ,use-up-to-parent
+             ,use-down-to-first-child
+             ,(or use-down-to-last-child `',def-down-to-last-child)
+             ,use-left-finalizer-for-tree-with-no-end-delimiter
+             ,use-right-finalizer-for-tree-with-no-end-delimiter))
+         (when (or def-bounds-for-tree-with-no-end-delimiter
+                   def-children-bounds-for-tree-with-no-end-delimiter)
            `(tree-walk--define-bounds-functions-for-tree-with-no-end-delimiter
              :def-bounds-name ,def-bounds-for-tree-with-no-end-delimiter
              :def-children-bounds-name ,def-children-bounds-for-tree-with-no-end-delimiter
@@ -669,29 +676,34 @@ TODO - add an optional fix-up function, eg. to fix indentation for indent tree, 
               (tree-walk--ancestor-reorder (or count 1) ',def-expand-region)))
          (when (or def-transpose-sibling-forward def-transpose-sibling-backward)
            `(progn
-              (fset ',def-transpose-sibling-forward (lambda (&optional count)
-                                                      ,(format "Transpose sibling %s forward COUNT times, moving point with the moved object so it can be dragged.  This movement respects tree boundaries." (or use-object-name "thing"))
-                                                      (interactive "p")
-                                                      (tree-walk--transpose-siblings (or count 1)
-                                                                                     ,(or use-bounds `',def-bounds-for-tree-with-no-end-delimiter)
-                                                                                     ,use-next-sibling
-                                                                                     nil
-                                                                                     ,use-previous-sibling)))
-              (fset ',def-transpose-sibling-backward (lambda (&optional count)
-                                                       ,(format "Transpose sibling %s backward COUNT times, moving point with the moved object so it can be dragged.  This movement respects tree boundaries." (or use-object-name "thing"))
-                                                      (interactive "p")
-                                                      (tree-walk--transpose-siblings (or count 1)
-                                                                                     ,(or use-bounds `',def-bounds-for-tree-with-no-end-delimiter)
-                                                                                     ,use-previous-sibling
-                                                                                     nil
-                                                                                     ,use-next-sibling)))))
+              (fset ',def-transpose-sibling-forward
+                    (lambda (&optional count)
+                      ,(format "Transpose sibling %s forward COUNT times, moving point with the moved object so it can be dragged.  This movement respects tree boundaries." (or use-object-name "thing"))
+                      (interactive "p")
+                      (tree-walk--transpose-siblings
+                       (or count 1)
+                       ,(or use-bounds `',def-bounds-for-tree-with-no-end-delimiter)
+                       ,use-next-sibling
+                       nil
+                       ,use-previous-sibling)))
+              (fset ',def-transpose-sibling-backward
+                    (lambda (&optional count)
+                      ,(format "Transpose sibling %s backward COUNT times, moving point with the moved object so it can be dragged.  This movement respects tree boundaries." (or use-object-name "thing"))
+                      (interactive "p")
+                      (tree-walk--transpose-siblings
+                       (or count 1)
+                       ,(or use-bounds `',def-bounds-for-tree-with-no-end-delimiter)
+                       ,use-previous-sibling
+                       nil
+                       ,use-next-sibling)))))
          (when (or def-inorder-forward def-inorder-backward)
            `(tree-walk-define-inorder-traversal
              ,(or use-object-name "thing")
              ,def-inorder-forward
              ,def-inorder-backward
              ,use-next-sibling ,use-previous-sibling
-             ,use-up-to-parent ,use-down-to-first-child ,(or use-down-to-last-child `',def-down-to-last-child)
+             ,use-up-to-parent ,use-down-to-first-child
+             ,(or use-down-to-last-child `',def-down-to-last-child)
              ))
          ))))
 
