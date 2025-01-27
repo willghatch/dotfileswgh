@@ -63,8 +63,13 @@
   (nobreak-define-key estate-visual-state-rectangle-keymap keys func))
 (defun epmap (keys func)
   (nobreak-define-key estate-pager-state-keymap keys func))
-(defun eimap (keys func)
+;; insert state binding -- I'm used to using the function eimap, but for most bindings in “insert mode” I actually want to change the global map, to still allow other maps to override it depending on the mode.  But there are a few things that I DO need in the actual insert state keymap, at least if I don't want the hassle of unbinding things then rebinding, for prefix keys.
+(defun eImap (keys func)
   (nobreak-define-key estate-insert-state-keymap keys func))
+(defun eimap (keys func)
+  (nobreak-define-key global-map keys func))
+(defun egmap (keys func)
+  (nobreak-define-key global-map keys func))
 ;; TODO - pager mode/state
 
 
@@ -112,6 +117,7 @@
 (emmap (kbd "C-c") 'ignore)
 (evmap "\C-c" 'estate-normal-state)
 (eimap "\C-c" 'estate-normal-state)
+(eImap "\C-c" 'estate-normal-state)
 (eimap "\C-l" 'estate-normal-state)
 
 
@@ -151,11 +157,13 @@
 ;; C-o -- in readline the default action for this is “operate-and-get-next”, which executes the command, finds the command in the history, and sets the buffer to the next command in history.  So it is useful for those times when you go back in history 5 commands, hit enter, then go up in history 5 commands, hit enter, etc, you can just go back 5 commands, then hit C-o 5 times.
 (eimap "\C-l" 'estate-normal-state-keymap)
 
-(eimap "\M-h" 'completer-map/body)
-(eimap (kbd "C-SPC TAB") 'completer-map/body)
-(eimap (kbd "C-@ TAB") 'completer-map/body)
-(eimap (kbd "TAB") 'company-complete-common-wgh)
-
+;;(eimap "\M-h" 'completer-map/body)
+(eimap "\M-h" (lambda () (interactive) (require 'minad-stack-conf) (wgh/init-corfu) (completer-map/body)))
+;;(eimap (kbd "C-SPC TAB") 'completer-map/body)
+;;(eimap (kbd "C-@ TAB") 'completer-map/body)
+;;(eimap (kbd "TAB") 'company-complete-common-wgh)
+;;(eimap (kbd "TAB") (lambda () (interactive) (require 'minad-stack-conf) (wgh/init-corfu) (completion-at-point)))
+(eimap (kbd "TAB") (lambda () (interactive) (require 'minad-stack-conf) (wgh/completion-at-point-start)))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; vim-like keys to reconsider since I'm moving to command-sentence
@@ -670,11 +678,16 @@
 ;; Misc maps
 
 (myhydradef completer-map
-            ("h" hippie-expand "hippie")
-            ("f" he-expand-file-name "file")
-            ("l" he-expand-lisp-symbol "lisp")
+            ;;("h" hippie-expand "hippie")
+            ;;("f" he-expand-file-name "file")
+            ;;("F" (progn (company-conf-init) (require 'company-files) (call-interactively 'company-files)) "file (company)")
+            ;;("l" he-expand-lisp-symbol "lisp")
+            ("f" (cape-interactive 'cape-file) "file")
+            ("l" (cape-interactive 'elisp-completion-at-point) "elisp")
+            ("y" (cape-interactive 'cape-elisp-symbol) "cape-elisp")
+            ("d" (cape-interactive 'cape-dabbrev) "dabbrev -- text-in-buffer")
             ("s" yas-expand "yas")
-            ("F" (progn (company-conf-init) (require 'company-files) (call-interactively 'company-files)) "file (company)")
+            ("C-g" 'ignore "quit")
             )
 
 (myhydradef copilot-map
@@ -762,13 +775,13 @@
 
 
 ;; helm map to match what I've got going in zsh with zaw...
-(define-prefix-command 'meta-space-map)
-(global-set-key (kbd "M-SPC") 'meta-space-map)
-(define-key meta-space-map " " 'helm-helm-commands)
-(define-key meta-space-map (kbd "RET") 'helm-helm-commands)
-(define-key meta-space-map "c" 'helm-M-x)
-(define-key meta-space-map "p" 'helm-browse-project)
-(define-key meta-space-map "g" 'helm-do-grep)
+;;(define-prefix-command 'meta-space-map)
+;;(global-set-key (kbd "M-SPC") 'meta-space-map)
+;;(define-key meta-space-map " " 'helm-helm-commands)
+;;(define-key meta-space-map (kbd "RET") 'helm-helm-commands)
+;;(define-key meta-space-map "c" 'helm-M-x)
+;;(define-key meta-space-map "p" 'helm-browse-project)
+;;(define-key meta-space-map "g" 'helm-do-grep)
 
 
 

@@ -82,6 +82,7 @@
   (in 'embark)
   (in 'orderless)
   (in 'corfu)
+  (in 'corfu-terminal)
   (in 'cape)
 
 
