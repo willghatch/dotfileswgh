@@ -48,8 +48,8 @@
   (deactivate-mark)
   (estate-activate-state 'pager))
 
-;; Insert state inherits the global keymap.  It's basically emacs mode.
-(estate-define-state insert -estate-original-global-map)
+;; Insert state does not suppress the keymap, so it passes through to the global keymap.  It's basically emacs mode.  Except that you can define things that shadow the global keymap with it.
+(estate-define-state insert nil)
 
 (defvar-local estate--state-change-with-group-marker nil)
 
