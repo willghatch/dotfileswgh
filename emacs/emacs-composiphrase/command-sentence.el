@@ -339,8 +339,7 @@ Otherwise, return a cons pair (PARAMS . EXECUTOR), containing the final paramete
           (repeatable-motion-repeat (default-verb . move))
           (isearch-new (default-verb . move))
           (isearch-repeat (default-verb . move))
-          (goto-marker (default-verb . move))
-          (goto-marker-line (default-verb . move))
+          (jump-to-register (default-verb . move))
 
           ;;;;;
           ;; TODO - some objects that I don't really have anything implemented for, but that I want.
@@ -387,8 +386,7 @@ Otherwise, return a cons pair (PARAMS . EXECUTOR), containing the final paramete
           (move isearch-repeat
                 ((direction backward))
                 (wgh/isearch-repeat-backward (num)))
-          (move goto-marker () (wgh/evil-goto-marker ()))
-          (move goto-marker-line () (wgh/evil-goto-marker-line ()))
+          (move jump-to-register () ((lambda () (call-interactively 'jump-to-register)) ()))
 
 
           (move buffer
@@ -769,7 +767,8 @@ Otherwise, return a cons pair (PARAMS . EXECUTOR), containing the final paramete
           (move outline
                 ((tree-vertical down) (direction forward))
                 (rmo/twoi-down-to-last-child (num)))
-          ;; TODO - end of outline?
+          (promote outline () ((lambda () (outline-promote 'subtree)) ()))
+          (demote outline () ((lambda () (outline-demote 'subtree)) ()))
           ;; TODO - commented out because they are broken
           ;; (slurp outline
           ;;        ((direction forward))
@@ -820,6 +819,8 @@ Otherwise, return a cons pair (PARAMS . EXECUTOR), containing the final paramete
           (move indent-tree
                 ((tree-vertical down) (direction forward))
                 (rmo/indent-tree-down-to-last-child (num)))
+          (promote indent-tree () (indent-tree-promote ()))
+          (demote indent-tree () (indent-tree-demote ()))
 
 
           (move url ((direction ,nil) (expand-region ,t))
@@ -867,9 +868,8 @@ Otherwise, return a cons pair (PARAMS . EXECUTOR), containing the final paramete
           (transpose indent-tree ((direction forward)) (indent-tree-transpose-sibling-forward (num)))
           (transpose indent-tree ((direction backward)) (indent-tree-transpose-sibling-backward (num)))
 
-          ;; TODO - rename and put this vilish-open-line stuff... somewhere reasonable
-          (open line ((direction forward)) (vilish-open-line-below))
-          (open line ((direction backward)) (vilish-open-line-above))
+          (open line ((direction forward)) (cpo-open-line-below))
+          (open line ((direction backward)) (cpo-open-line-above))
           (open outline ((direction forward) (tree-vertical ,nil)) (,(lambda () (twoi-add-heading-below) (estate-insert-state))))
           (open outline ((direction backward) (tree-vertical ,nil)) (,(lambda () (twoi-add-heading-above) (estate-insert-state))))
           (open outline ((tree-vertical down)) (,(lambda () (message "TODO - implement open outline child"))))
@@ -886,8 +886,8 @@ Otherwise, return a cons pair (PARAMS . EXECUTOR), containing the final paramete
           ;; TODO - split for non-tree objects has reasonably defined meaning, I suppose, but isn't very interesting.
 
           ;; TODO - I need to fix my join-line implementation to take a numerical argument
-          (join line ((direction forward)) (,(lambda () (join-line/default-forward nil))))
-          (join line ((direction backward)) (,(lambda () (join-line/default-forward -1))))
+          (join line ((direction forward)) (,(lambda () (join-line t))))
+          (join line ((direction backward)) (,(lambda () (join-line))))
           (join sptw ((direction backward)) (sptw-join-sexp-backward (num)))
           (join sptw ((direction forward)) (sptw-join-sexp-forward (num)))
           ;; TODO - sptw - make a join-sexp function that takes a forward or backward argument

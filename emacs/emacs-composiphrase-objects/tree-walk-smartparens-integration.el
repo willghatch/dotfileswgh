@@ -729,4 +729,14 @@ BOUNDS is the bounds of the current sexp."
            (sptw--wrap-region-with-delimiter
             delimiter (car bounds) (cdr bounds))))))
 
+(with-eval-after-load 'repeatable-motion
+  (repeatable-motion-define-pair 'sptw-forward-inorder-traversal 'sptw-backward-inorder-traversal)
+  (repeatable-motion-define-pair 'sptw-forward-sibling-beginning 'sptw-backward-sibling-beginning)
+  (repeatable-motion-define-pair 'sptw-forward-sibling-end 'sptw-backward-sibling-end)
+  (repeatable-motion-define-pair 'sptw-up-parent-beginning 'sptw-down-first-child-beginning)
+  (repeatable-motion-define 'sptw-up-parent-end 'sptw-down-first-child-beginning)
+  (repeatable-motion-define 'sptw-down-last-child-end 'sptw-up-parent-beginning)
+  ;;(repeatable-motion-define-pair 'sptw-forward-sexp-in-supersexp 'sptw-backward-sexp-in-supersexp)
+  )
+
 (provide 'tree-walk-smartparens-integration)

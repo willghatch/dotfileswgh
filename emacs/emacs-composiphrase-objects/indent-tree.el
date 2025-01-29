@@ -20,7 +20,6 @@
 ;;      3 deep, full sibling to previous 3 deep
 ;;     2 deep, half sibling of both top 4 deep and both above 3 deep
 ;;
-;; TODO - So the system needs to account for half-siblings.  The inorder traversal needs to use them.
 
 
 (require 'tree-walk)

@@ -107,7 +107,7 @@
 
 
 (defun wgh/-expanded-region-to-bounds-of-thing-at-point
-    (strictly-grow sloppy-overlap thing &optional region)
+    (strictly-grow sloppy-grow thing &optional region)
   "Returns the new bounds or nil.
 If STRICTLY-GROW, only return the bounds if they are strictly greater than the original region.
 If SLOPPY-GROW is true, grows the region to include both the original region and the region of the thing at point.
@@ -351,6 +351,8 @@ If no region is active, it will use (point . point)."
 ;;;;;
 
 (defun forward-line-no-newline (&optional count)
+  "Movement function for `thing-at-point' for lines that treat the newline character as a separator and not part of the line.
+IE going forward go to the end of the line (character before newline), going backward go to the first character of the line (character after newline)."
   (interactive "p")
   (let* ((count (or count 1))
          (fwd (<= 0 count))
@@ -367,11 +369,58 @@ If no region is active, it will use (point . point)."
           (beginning-of-line)))
       (setq left (- left 1)))))
 (defun line-no-newline-bounds-at-point (&optional pt)
+  "Get the bounds of the line at point, but not including the newline character."
   (let ((pt (or pt (point))))
     (cons (save-mark-and-excursion (beginning-of-line) (point))
           (save-mark-and-excursion (end-of-line) (point)))))
 (put 'line-no-newline 'bounds-of-thing-at-point #'line-no-newline-bounds-at-point)
 (wgh/def-move-thing line-no-newline)
+
+
+
+(defun wgh/next-line (&optional arg)
+  "`next-line', but with line-move-visual always nil"
+  (interactive "p")
+  (let ((line-move-visual nil))
+    (next-line arg)))
+(defun wgh/prev-line (&optional arg)
+  "`previous-line', but with line-move-visual always nil"
+  (interactive "p")
+  (let ((line-move-visual nil))
+    (previous-line arg)))
+(repeatable-motion-define-pair 'wgh/next-line 'wgh/prev-line)
+
+
+(defun wgh/expand-region-to-fill-lines (&optional include-final-newline)
+  "Expand the current region to include the full first and last line.
+If INCLUDE-FINAL-NEWLINE, expands to include the newline as well, which makes the function non-idempotent."
+  (when (not (region-active-p))
+    (set-mark (point)))
+  (let ((point-first (< (point) (mark)))
+        (goto-end (if include-final-newline
+                      (lambda () (goto-char (line-end-position)) (when (not (eobp)) (forward-char 1)))
+                    (lambda () (goto-char (line-end-position))))))
+    (if point-first (goto-char (line-beginning-position)) (funcall goto-end))
+    (exchange-point-and-mark)
+    (if (not point-first) (goto-char (line-beginning-position)) (funcall goto-end))
+    (exchange-point-and-mark)))
+
+(defun cpo-open-line-below ()
+  ;; TODO - evil takes a numeric argument, and when you are done entering text it copies that line N times.  I never use that feature though, so... maybe I don't care.
+  (interactive)
+  (estate-insert-state-with-thunk (lambda ()
+                                    (end-of-line)
+                                    (newline-and-indent)
+                                    )))
+(defun cpo-open-line-above ()
+  (interactive)
+  (estate-insert-state-with-thunk (lambda ()
+                                    (beginning-of-line)
+                                    (if (bobp)
+                                        (open-line 1)
+                                      (progn (backward-char 1)
+                                             (newline-and-indent))))))
+
 
 ;;;;;
 

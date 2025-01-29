@@ -1,5 +1,7 @@
 ;; -*- lexical-binding: t -*-
 
+;;; Miscellaneous helpers and utilities that I use, or did at some point, or thought I would, or something.
+
 (defun file-visiting-buffer-list ()
   (cl-remove-if-not 'buffer-file-name (buffer-list)))
 
@@ -463,5 +465,64 @@ I'm sick of doing this manually."
   (interactive)
   (require 'rg)
   (call-interactively 'rg))
+
+
+
+
+
+(defun goto-column (&optional n)
+  (interactive "P")
+  (move-to-column (or n 0)))
+(defun goto-column/default-end (&optional n)
+  (interactive "P")
+  (if n (move-to-column n) (end-of-line)))
+
+
+
+
+;;;; TODO - stuff I don't use.  Do I want to use it, or delete it?
+
+(defun wgh/forward-char/no-line-wrap (&optional count)
+  (interactive "p")
+  (let ((fwd (< 0 count))
+        (count (abs count))
+        (keep-going t))
+    (while (and keep-going (< 0 count))
+      (if fwd
+          (if (eolp) (setq keep-going nil) (forward-char 1))
+        (if (bolp) (setq keep-going nil) (backward-char 1)))
+      (setq count (- count 1)))))
+(defun wgh/backward-char/no-line-wrap (&optional count)
+  (interactive "p")
+  (wgh/forward-char/no-line-wrap (- count)))
+(repeatable-motion-define-pair 'wgh/forward-char/no-line-wrap
+                               'wgh/backward-char/no-line-wrap)
+
+(cl-defun wgh/forward-line-keep-column/qd (&optional count)
+  ;; Well, not as good as evil mode... maybe I'll do this properly later?
+  ;; TODO - look at goal-column variable
+  (interactive "p")
+  (let ((col (current-column)))
+    (forward-line (or count 1))
+    (move-to-column col)))
+(cl-defun wgh/backward-line-keep-column/qd (&optional count)
+  (interactive "p")
+  (wgh/forward-line-keep-column/qd (- (or count 1))))
+
+;; call-keymap is from https://stackoverflow.com/questions/24914202/elisp-call-keymap-from-code
+(defun call-keymap (map &optional prompt)
+  "Read a key sequence and call the command it's bound to in MAP."
+  ;; Note: MAP must be a symbol so we can trick `describe-bindings' into giving
+  ;; us a nice help text.
+  (let* ((overriding-local-map `(keymap (,map . ,map)))
+         (help-form `(describe-bindings ,(vector map)))
+         (key (read-key-sequence prompt))
+         (cmd (lookup-key map key t)))
+    (if (functionp cmd)
+        (call-interactively cmd)
+      (user-error "%s is undefined" key))))
+
+;;;;;;;;;;;;;
+
 
 (provide 'vfuncs)

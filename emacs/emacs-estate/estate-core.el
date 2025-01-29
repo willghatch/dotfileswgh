@@ -41,6 +41,7 @@
 
 (defun -estate-mode-initialize ()
   ;; TODO - use a defvar for predicate
+  ;; TODO - also add initial state for major mode, or function for choosing initial state.
   (unless (minibufferp)
     ;; TODO - maybe I should make a minibuffer-specific map instead?
     (estate-local-mode 1)))

@@ -22,6 +22,10 @@
 (require 'command-sentence)
 (require 'estate-and-command-sentence-repeat)
 
+(require 'cpo-search-movements)
+(require 'cpo-helpers)
+
+
 (defun cs/verb (name)
   `((word-type . verb)
     (contents . ,name)
@@ -47,7 +51,8 @@
 
 (require 'text-object-stuff)
 
-(load-library "keys-funcs")
+(autoload 'rg "rg" "" t)
+
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
@@ -252,6 +257,12 @@
 (ecmap "u" 'undo)
 (ecmap "\C-r" 'undo-tree-redo)
 
+(defmacro with-evil (func)
+  `(lambda ()
+     (interactive)
+     (require 'evil)
+     (call-interactively ,func)))
+
 (ecmap "<" (with-evil 'evil-shift-left))
 (ecmap ">" (with-evil 'evil-shift-right))
 (emmap "%" 'sptw-move-to-other-end-of-sexp) ;; TODO - maybe just stop using this?  I can accomplish it with forward/backward beg/end.  Turn it into training wheels message binding.
@@ -315,8 +326,7 @@
 (emmap "b" (cs/ae (cs/mod 'direction 'backward)
                   (cs/obj 'vi-like-word)))
 
-(emmap "`" (with-evil (cs/ae (cs/obj 'goto-marker))))
-(emmap "'" (with-evil (cs/ae (cs/obj 'goto-marker-line))))
+(emmap "`" (cs/ae (cs/obj 'jump-to-register)))
 
 (emmap "/" (cs/ae (cs/mod 'direction 'forward)
                   (cs/obj 'isearch-new)))
@@ -550,9 +560,9 @@
 
 ;; g map
 ;; TODO - try to figure out a theme for this prefix map.  Maybe goto, which fits some of my bindings as well as what the helix editor does.  This map has grown by accretion over time and I would like to organize my accreted maps better.  That said, is it worth re-learning all of these miscellaneous key bindings, esp. those that are relatively low-use but that I have memorized?
-;; TODO - if I turn this into a goto-themed map, I should put goto-marker functions here.
-(emmap "gg" 'vilish/goto-line/beginning)
-(emmap "G" 'vilish/goto-line/end)
+;; TODO - if I turn this into a goto-themed map, I should put jump-to-register functions here.
+(emmap "gg" 'cpo-goto-line-default-first)
+(emmap "G" 'cpo-goto-line-default-last)
 (emmap "gdd" 'xref-find-definitions)
 (emmap "gdD" 'xref-find-definitions-other-window)
 (emmap "gdr" 'xref-find-references)
@@ -587,6 +597,8 @@
 (emmap "tfh" 'ff-find-other-file) ; IE switch between header and source file for C/C++
 (emmap "tfd" 'ido-find-file-from-pwd)
 (emmap "tfg" (lambda () (interactive) (require 'helm-projectile) (helm-projectile)))
+(autoload 'fzf-git-files "fzf" "" t)
+(emmap "tfz" 'fzf-git-files)
 
 (emmap "th" 'my-window-map/body)
 (autoload 'projectile-command-map "projectile-conf" "" t 'keymap)
@@ -658,9 +670,10 @@
 (ecmap "s)" 'eval-last-sexp)
 (evmap "s)" 'eval-region)
 (evmap "s/" (kbd ":s/ ")) ; TODO - fix this...
-(ecmap "sm" (with-evil 'evil-set-marker))
+;;(ecmap "sm" (with-evil 'evil-set-marker))
+(ecmap "sm" 'point-to-register)
 (ecmap "sM" 'bookmark-set)
-(ecmap "sg" (cs/ae (cs/obj 'goto-marker)))
+(ecmap "sg" (cs/ae (cs/obj 'jump-to-register)))
 (ecmap "sG" 'bookmark-jump)
 (emmap "sx" 'eval-expression)
 (emmap "sj" 'rmo/pscroll-down-half)
