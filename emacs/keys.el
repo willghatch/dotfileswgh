@@ -60,7 +60,7 @@
   (nobreak (define-key map keys func)))
 (defun emmap (keys func)
   (nobreak-define-key estate-motion-state-keymap keys func))
-(defun ecmap (keys func)
+(defun enmap (keys func)
   (nobreak-define-key estate-normal-state-keymap keys func))
 (defun evmap (keys func)
   (nobreak-define-key estate-visual-state-keymap keys func))
@@ -125,6 +125,10 @@
 (eImap "\C-c" 'estate-normal-state)
 (eimap "\C-l" 'estate-normal-state)
 
+(emmap "\C-g" 'keyboard-quit-and-clear-command-sentence)
+(evmap "\C-g" 'keyboard-quit-and-clear-command-sentence)
+(eimap "\C-g" 'keyboard-quit-and-clear-command-sentence)
+
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Misc things that cross states but that I want together for review...
@@ -144,9 +148,9 @@
 (global-set-key (kbd "M-c") (lambda () (interactive) (require 'minad-stack-conf) (wgh/init-minad) (call-interactively 'execute-extended-command)))
 
 
-(ecmap "=" 'indent-region)
-(ecmap "≠" 'wgh/racket-indent-region)
-(ecmap (kbd "TAB") 'sp-indent-defun)
+(enmap "=" 'indent-region)
+(enmap "≠" 'wgh/racket-indent-region)
+(enmap (kbd "TAB") 'sp-indent-defun)
 (eimap (kbd "<backtab>") 'indent-for-tab-command)
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -173,25 +177,25 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; vim-like keys to reconsider since I'm moving to command-sentence
 
-(ecmap "A" (lambda () (interactive)
+(enmap "A" (lambda () (interactive)
              (progn (move-end-of-line nil) (estate-insert-state))))
 (evmap "A" (lambda () (interactive) (progn (goto-char (region-end))
                                            (deactivate-mark)
                                            (estate-insert-state))))
 
-(ecmap "C" (lambda () (interactive) (progn (kill-line) (estate-insert-state))))
+(enmap "C" (lambda () (interactive) (progn (kill-line) (estate-insert-state))))
 (evmap "C" (lambda () (interactive (progn (kill-region (region-beginning)
                                                        (region-end))
                                           (estate-insert-state)))))
 
-(ecmap "D" (lambda () (interactive) (progn (kill-line))))
+(enmap "D" (lambda () (interactive) (progn (kill-line))))
 (evmap "D" (lambda () (interactive) (progn (kill-region nil nil t))))
-(ecmap "I" (lambda () (interactive)
+(enmap "I" (lambda () (interactive)
              (progn (back-to-indentation) (estate-insert-state))))
 (evmap "I" (lambda () (interactive) (progn (goto-char (region-beginning))
                                            (deactivate-mark)
                                            (estate-insert-state))))
-(ecmap "Y" (lambda () (interactive) (message "Y not yet implemented")))
+(enmap "Y" (lambda () (interactive) (message "Y not yet implemented")))
 
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -226,20 +230,20 @@
 (emmap "_" 'eval-expression)
 
 ;; TODO - figure out good keys to use, especially for the “quick” ones that record to change.
-(ecmap "q" 'estate-keyboard-macro-to-register-end-most-recent-or-start-default)
-(ecmap "Q" 'estate-keyboard-macro-to-register-start)
-(ecmap "r" 'estate-keyboard-macro-execute-from-most-recently-macro-recorded-register)
-(ecmap "R" 'estate-keyboard-macro-execute-from-register)
-;;(ecmap "h" 'estate-record-quick-keyboard-macro-to-buffer-change)
+(enmap "q" 'estate-keyboard-macro-to-register-end-most-recent-or-start-default)
+(enmap "Q" 'estate-keyboard-macro-to-register-start)
+(enmap "r" 'estate-keyboard-macro-execute-from-most-recently-macro-recorded-register)
+(enmap "R" 'estate-keyboard-macro-execute-from-register)
+;;(enmap "h" 'estate-record-quick-keyboard-macro-to-buffer-change)
 
 
 (emmap "m" nil) ;;;;;;;;;; m will be my prefix for mode-specific bindings
 
-(ecmap "." 'eacsr-repeat-latest-editing)
+(enmap "." 'eacsr-repeat-latest-editing)
 
 ;; TODO - use command sentence
-(ecmap "x" 'delete-char)
-(ecmap "X" 'delete-char-backward)
+(enmap "x" 'delete-char)
+(enmap "X" 'delete-char-backward)
 
 ;; TODO - I have this in the command map, but I find that I care more about having quick access to copy than I do about most commands.
 (emmap "y" (lambda (n) (interactive "p")
@@ -250,12 +254,12 @@
                (funcall (cs/add (cs/verb 'copy))
                         n))))
 (emmap " yc" 'xcopy)
-(ecmap "p" 'estate-paste)
-(ecmap "P" 'estate-paste/swap)
-(ecmap " pc" 'xpaste)
+(enmap "p" 'estate-paste)
+(enmap "P" 'estate-paste/swap)
+(enmap " pc" 'xpaste)
 
-(ecmap "u" 'undo)
-(ecmap "\C-r" 'undo-tree-redo)
+(enmap "u" 'undo)
+(enmap "\C-r" 'undo-tree-redo)
 
 (defmacro with-evil (func)
   `(lambda ()
@@ -263,12 +267,12 @@
      (require 'evil)
      (call-interactively ,func)))
 
-(ecmap "<" (with-evil 'evil-shift-left))
-(ecmap ">" (with-evil 'evil-shift-right))
+(enmap "<" (with-evil 'evil-shift-left))
+(enmap ">" (with-evil 'evil-shift-right))
 (emmap "%" 'sptw-move-to-other-end-of-sexp) ;; TODO - maybe just stop using this?  I can accomplish it with forward/backward beg/end.  Turn it into training wheels message binding.
 
-(ecmap (kbd "DEL") 'rmo/backward-char)
-(ecmap (kbd "<deletechar>") 'rmo/forward-char)
+(enmap (kbd "DEL") 'rmo/backward-char)
+(enmap (kbd "<deletechar>") 'rmo/forward-char)
 
 
 
@@ -279,7 +283,7 @@
 
 
 ;; Enter prefix maps for command-sentence
-(ecmap "c" (lambda ()
+(enmap "c" (lambda ()
              (interactive)
              (funcall (cs/add `((word-type . ignore))))
              (command-select/body)))
@@ -327,6 +331,7 @@
                   (cs/obj 'vi-like-word)))
 
 (emmap "`" (cs/ae (cs/obj 'jump-to-register)))
+(emmap "'" (cs/ae (cs/obj 'jump-to-register))) ;; in vim, this jumps to the LINE of the given marker, keeping the current column.  But... I dunno, I'll map both for now.
 
 (emmap "/" (cs/ae (cs/mod 'direction 'forward)
                   (cs/obj 'isearch-new)))
@@ -406,6 +411,7 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; command-sentence command-select map
 (defhydra command-select (:foreign-keys warn :exit nil) "Cmd:"
+  ("C-g" keyboard-quit-and-clear-command-sentence "quit" :exit t)
   ("c" (lambda (n) (interactive "p")
          (if (region-active-p)
              (funcall (cs/ae (cs/verb 'change)
@@ -494,6 +500,7 @@
   x)
 (defhydra object-select (:foreign-keys warn :exit nil) "Obj:"
   ;; TODO - I need these bodies to be evaluated, but hydra does some macro magic.  Maybe I should use something else instead of hydra... Or I can wrap them all in funcall...
+  ("C-g" keyboard-quit-and-clear-command-sentence "quit" :exit t)
   ("c" (funcall (cs/ae (cs/obj 'character))) "character" :exit t)
   ("f" (funcall (cs/ae (cs/mod 'specific t)
                        (cs/obj 'character)))
@@ -568,8 +575,8 @@
 (emmap "gdr" 'xref-find-references)
 (emmap "gdi" 'lsp-describe-thing-at-point)
 (emmap "gdp" 'pop-tag-mark)
-(ecmap "gq" (with-evil 'evil-fill-and-move))
-(ecmap "gw" (with-evil 'evil-fill))
+(enmap "gq" (with-evil 'evil-fill-and-move))
+(enmap "gw" (with-evil 'evil-fill))
 (emmap "gv" 'estate-restore-region)
 
 
@@ -649,16 +656,16 @@
 
 
 ;; "ta" will be an assortment of handy stuff...
-(ecmap "tac" 'comment-region)
-(ecmap "taC" 'uncomment-region)
-(ecmap "tam" (lambda () (interactive) (exchange-point-and-mark)))
-(ecmap "tad" 'insert-date)
-(ecmap "taD" 'insert-date-time)
-(ecmap "tara" (lambda () (interactive) (require 'alternate-region) (alternate-region-activate)))
-(ecmap "tars" (lambda () (interactive) (require 'alternate-region) (alternate-region-swap)))
-(ecmap "tarc" (lambda () (interactive) (require 'alternate-region) (alternate-region-cycle)))
-(ecmap "tav" 'sp-convolute-sexp)
-(ecmap "tag" 'gptel-send)
+(enmap "tac" 'comment-region)
+(enmap "taC" 'uncomment-region)
+(enmap "tam" (lambda () (interactive) (exchange-point-and-mark)))
+(enmap "tad" 'insert-date)
+(enmap "taD" 'insert-date-time)
+(enmap "tara" (lambda () (interactive) (require 'alternate-region) (alternate-region-activate)))
+(enmap "tars" (lambda () (interactive) (require 'alternate-region) (alternate-region-swap)))
+(enmap "tarc" (lambda () (interactive) (require 'alternate-region) (alternate-region-cycle)))
+(enmap "tav" 'sp-convolute-sexp)
+(enmap "tag" 'gptel-send)
 
 
 
@@ -666,15 +673,14 @@
 ;; s map
 ;; TODO - what is the theme of this map?  Does it need one?
 (evmap "sh" 'shell-command-on-region)
-(ecmap "sh" 'shell-command)
-(ecmap "s)" 'eval-last-sexp)
+(enmap "sh" 'shell-command)
+(enmap "s)" 'eval-last-sexp)
 (evmap "s)" 'eval-region)
 (evmap "s/" (kbd ":s/ ")) ; TODO - fix this...
-;;(ecmap "sm" (with-evil 'evil-set-marker))
-(ecmap "sm" 'point-to-register)
-(ecmap "sM" 'bookmark-set)
-(ecmap "sg" (cs/ae (cs/obj 'jump-to-register)))
-(ecmap "sG" 'bookmark-jump)
+(enmap "sm" 'point-to-register)
+(enmap "sM" 'bookmark-set)
+(enmap "sg" (cs/ae (cs/obj 'jump-to-register)))
+(enmap "sG" 'bookmark-jump)
 (emmap "sx" 'eval-expression)
 (emmap "sj" 'rmo/pscroll-down-half)
 (emmap "sk" 'rmo/pscroll-up-half)

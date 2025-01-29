@@ -19,6 +19,11 @@
         (t (error))))
 
 
+(defun keyboard-quit-and-clear-command-sentence ()
+  (interactive)
+  (setq command-sentence-current-sentence nil)
+  (keyboard-quit))
+
 
 (provide 'cpo-helpers)
 
