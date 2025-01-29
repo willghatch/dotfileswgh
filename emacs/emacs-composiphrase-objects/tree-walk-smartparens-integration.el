@@ -20,34 +20,8 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;; Section for getting needed info out of smartparens settings
 
-(defun sptw--get-specs (sp-def)
-  ;; return a list of smartparen specs that are global or for an active mode
-  (let ((mode (car sp-def)))
-    (if (or
-         (equal t mode)
-         (equal mode major-mode)
-         (memq mode minor-mode-list))
-        (cdr sp-def)
-      nil)))
-(defun sptw--get-delim-from-spec (sp-spec open?)
-  ;; get the delimiter from the spec
-  (let ((kw (if open? :open :close)))
-    (cond ((not sp-spec) nil)
-          ((equal (car sp-spec) kw) (cadr sp-spec))
-          (t (sptw--get-delim-from-spec (cdr sp-spec) open?)))))
-
 (defun sptw--delim-list (open?)
-  (let ((get-delim (lambda (x) (sptw--get-delim-from-spec x open?))))
-    (apply #'append
-           ;; The below returns a list of lists of specs.
-           (mapcar (lambda (def)
-                     (mapcar get-delim
-                             (sptw--get-specs def)))
-                   sp-pairs))))
-
-(defun sptw--get-active-sp-pairs ()
-  (apply 'append (mapcar 'sptw--get-specs sp-pairs)))
-
+  (mapcar (if open? 'car 'cdr) sp-pair-list))
 
 (defun sptw--at-delim-p (open? at-end?)
   "If at smartparens delimiter, return the delimiter string.
@@ -701,13 +675,12 @@ BOUNDS is the bounds of the current sexp."
 
 (defun sptw--wrap-region-with-delimiter (delimiter beg end)
   (let* ((orig-point (point))
-         (pair-for-delim
-          (seq-find (lambda (x)
-                      (or (equal delimiter (plist-get x ':open))
-                          (equal delimiter (plist-get x ':close))))
-                    (sptw--get-active-sp-pairs)))
-         (open (plist-get pair-for-delim ':open))
-         (close (plist-get pair-for-delim ':close))
+         (pair-for-delim (seq-find (lambda (x)
+                                     (or (equal delimiter (car x))
+                                         (equal delimiter (cdr x))))
+                                   sp-pair-list))
+         (open (car pair-for-delim))
+         (close (cdr pair-for-delim))
          (change-group (prepare-change-group)))
     (goto-char end)
     (insert close)
