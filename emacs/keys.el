@@ -545,8 +545,8 @@
   ("he" (funcall (cs/ae (cs/obj 'email))) "email" :exit t)
 
   ("\"" (funcall (cs/ae (cs/mod 'delimiter "\"") (with-sptw-req (cs/obj 'sptw)))) "\"" :exit t)
-  ("'" (funcall (cs/ae (cs/mod 'delimiter "\"") (with-sptw-req (cs/obj 'sptw)))) "'" :exit t)
-  ("`" (funcall (cs/ae (cs/mod 'delimiter "\"") (with-sptw-req (cs/obj 'sptw)))) "`" :exit t)
+  ("'" (funcall (cs/ae (cs/mod 'delimiter "'") (with-sptw-req (cs/obj 'sptw)))) "'" :exit t)
+  ("`" (funcall (cs/ae (cs/mod 'delimiter "`") (with-sptw-req (cs/obj 'sptw)))) "`" :exit t)
   ("(" (funcall (cs/ae (cs/mod 'delimiter "(") (with-sptw-req (cs/obj 'sptw)))) "()" :exit t)
   (")" (funcall (cs/ae (cs/mod 'delimiter "(") (with-sptw-req (cs/obj 'sptw)))) "()" :exit t)
   ("[" (funcall (cs/ae (cs/mod 'delimiter "[") (with-sptw-req (cs/obj 'sptw)))) "[]" :exit t)

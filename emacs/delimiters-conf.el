@@ -33,10 +33,6 @@
                          (mojo-mode syntax ":")
                          ))
 
-  ;; remove the pairs that won't be good for lisp
-  (sp-pair "'" nil :actions :rem)
-  (sp-pair "`" nil :actions :rem)
-
   ;; treat quotes correctly
 
   ;; TODO -- # by itself is a prefix, eg. #(1 2 3) vector literals, BUT
@@ -177,7 +173,7 @@
    ;;("'" . "'")
 
    ;; fancy delimiters!
-   ("#|" "|#" "racket-multiline-comments")
+   ;;("#|" "|#" "racket-multiline-comments")
    ("«" "»" "guillemets")
    ("‹" "›" "single-guillemets")
    ("｢" "｣" "cjk-angle-quotes")
@@ -245,6 +241,19 @@
   ;;                                    (= (car amem) 123)))
   ;;                              evil-surround-pairs-alist)))
 
+
+  (sp-local-pair '(racket-mode) "#|" "|#")
+
+  (setq lispy-modes-list
+        '(lisp-mode
+          lisp-interaction-mode
+          emacs-lisp-mode
+          racket-mode
+          scheme-mode
+          ))
+  ;; Remove bad default pairs for lisp
+  (sp-local-pair lispy-modes-list "'" "'" :actions nil)
+  (sp-local-pair lispy-modes-list "`" "`" :actions nil)
 
   )
 
