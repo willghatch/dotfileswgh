@@ -177,25 +177,29 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; vim-like keys to reconsider since I'm moving to command-sentence
 
+;; TODO - consider A/I to open object selection, so that they are longer commands in terms of keys but dot repetition captures the movement and the insertion for arbitrary movements instead of just end of line / back-to-indentation...
 (enmap "A" (lambda () (interactive)
              (progn (move-end-of-line nil) (estate-insert-state))))
 (evmap "A" (lambda () (interactive) (progn (goto-char (region-end))
                                            (deactivate-mark)
                                            (estate-insert-state))))
-
-(enmap "C" (lambda () (interactive) (progn (kill-line) (estate-insert-state))))
-(evmap "C" (lambda () (interactive (progn (kill-region (region-beginning)
-                                                       (region-end))
-                                          (estate-insert-state)))))
-
-(enmap "D" (lambda () (interactive) (progn (kill-line))))
-(evmap "D" (lambda () (interactive) (progn (kill-region nil nil t))))
 (enmap "I" (lambda () (interactive)
              (progn (back-to-indentation) (estate-insert-state))))
 (evmap "I" (lambda () (interactive) (progn (goto-char (region-beginning))
                                            (deactivate-mark)
                                            (estate-insert-state))))
-(enmap "Y" (lambda () (interactive) (message "Y not yet implemented")))
+
+;; (enmap "C" (lambda () (interactive) (progn (kill-line) (estate-insert-state))))
+;; (evmap "C" (lambda () (interactive (progn (kill-region (region-beginning)
+;;                                                        (region-end))
+;;                                           (estate-insert-state)))))
+
+;; (enmap "D" (lambda () (interactive) (progn (kill-line))))
+;; (evmap "D" (lambda () (interactive) (progn (kill-region nil nil t))))
+(enmap "C" (lambda () (interactive) (message "Training wheels: use cceel")))
+(enmap "D" (lambda () (interactive) (message "Training wheels: use cdeel")))
+
+(enmap "Y" (lambda () (interactive) (message "Y not mapped...")))
 
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -325,10 +329,12 @@
                   (cs/obj 'line)))
 
 ;; TODO - w/b is a lazy duplicate with no difference from what exists compositionally.  I've kept w/b as the “quick mash for movement” keys to just move for a while.  I would replace that with using ew/eb then mashing f.  I should turn these into training wheels message binds to unlearn their use.
-(emmap "w" (cs/ae (cs/mod 'direction 'forward)
-                  (cs/obj 'vi-like-word)))
-(emmap "b" (cs/ae (cs/mod 'direction 'backward)
-                  (cs/obj 'vi-like-word)))
+;; (emmap "w" (cs/ae (cs/mod 'direction 'forward)
+;;                   (cs/obj 'vi-like-word)))
+;; (emmap "b" (cs/ae (cs/mod 'direction 'backward)
+;;                   (cs/obj 'vi-like-word)))
+(emmap "w" (lambda () (interactive) (message "training wheels: use ew")))
+(emmap "b" (lambda () (interactive) (message "training wheels: use eb")))
 
 (emmap "`" (cs/ae (cs/obj 'jump-to-register)))
 (emmap "'" (cs/ae (cs/obj 'jump-to-register))) ;; in vim, this jumps to the LINE of the given marker, keeping the current column.  But... I dunno, I'll map both for now.
@@ -486,8 +492,6 @@
   ("D" (lambda (n) (interactive "p")
          (funcall (cs/add (cs/verb 'demote)) n))
    "demote" :exit t)
-  ;; TODO - need to make C-g clear the current-command-sentence, or something like that
-
   )
 
 
@@ -541,6 +545,8 @@
   ("he" (funcall (cs/ae (cs/obj 'email))) "email" :exit t)
 
   ("\"" (funcall (cs/ae (cs/mod 'delimiter "\"") (with-sptw-req (cs/obj 'sptw)))) "\"" :exit t)
+  ("'" (funcall (cs/ae (cs/mod 'delimiter "\"") (with-sptw-req (cs/obj 'sptw)))) "'" :exit t)
+  ("`" (funcall (cs/ae (cs/mod 'delimiter "\"") (with-sptw-req (cs/obj 'sptw)))) "`" :exit t)
   ("(" (funcall (cs/ae (cs/mod 'delimiter "(") (with-sptw-req (cs/obj 'sptw)))) "()" :exit t)
   (")" (funcall (cs/ae (cs/mod 'delimiter "(") (with-sptw-req (cs/obj 'sptw)))) "()" :exit t)
   ("[" (funcall (cs/ae (cs/mod 'delimiter "[") (with-sptw-req (cs/obj 'sptw)))) "[]" :exit t)
@@ -554,10 +560,6 @@
   ("⟅" (funcall (cs/ae (cs/mod 'delimiter "⟅") (with-sptw-req (cs/obj 'sptw)))) "⟅⟆" :exit t)
   ("⟆" (funcall (cs/ae (cs/mod 'delimiter "⟅") (with-sptw-req (cs/obj 'sptw)))) "⟅⟆" :exit t)
   ("#" (funcall (cs/ae (cs/mod 'delimiter "#|") (with-sptw-req (cs/obj 'sptw)))) "#||#" :exit t)
-
-  ("q" (funcall (cs/ae (cs/obj 'non-matching-bad-object-just-to-clear-things-out)))
-   "quit-cancel-sentence" :exit t)
-
   )
 
 
