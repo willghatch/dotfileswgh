@@ -56,6 +56,9 @@
 [submodule "external/emacs/straight.el"]
 	path = external/emacs/straight.el
 	url = https://github.com/radian-software/straight.el
+[submodule "external/emacs/alternate-region"]
+	path = external/emacs/alternate-region
+	url = https://github.com/willghatch/emacs-alternate-region.git
 
 ## These ones aren't (or weren't when I added them) packaged eg. in melpa.
 [submodule "external/emacs/sexp-rewrite"]
