@@ -41,6 +41,7 @@
 
   (straight-use-package (submod 'sexp-rewrite))
   (straight-use-package (submod 'whitespace-final-newline))
+  (straight-use-package (submod 'alternate-region))
 
   (straight-use-package (submod 'dash))
   (straight-use-package (submod 'smartparens))
