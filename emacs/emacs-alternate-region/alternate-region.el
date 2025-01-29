@@ -1,14 +1,52 @@
-;; alternate-region.el  -*- lexical-binding: t -*-
-;;
-;;
-;; Implements an alternate region.
-;;
-;; Core functionality:
-;; `alternate-region-set' takes a (cons beginning end) region or nil, and optional buffer (which defaults to the current buffer).  It accordingly activates or deactivates the alternate-region overlay.  Non-interactive.
-;; `alternate-region-activate' is interactive.  If `region-active-p', it sets the current region as the alternate region, and deactivates the region.  If not `region-active-p', deactivate the alternate region (setting it to nil).
-;; `alternate-region-cycle' is interactive.  If `region-active-p' and there is an alternate region, it sets the current region as the alternate region and sets the previous alternate region as the new region.  Otherwise error.
-;; `alternate-region-swap' is interactive.  If `region-active-p' and there is an alterante region, it swaps the contents of the region and the alternate region.  It updates the ranges of the region and alternate region, so they are both still active.  If the region and alternate region are not both active, error.
+;;; -*- lexical-binding: t -*-
+;;; alternate-region.el --- Make a second region, swap regions.
 
+;;; Author: William Hatch <william@hatch.uno>
+;;; Maintainer: William Hatch <william@hatch.uno>
+;;; Version: 0.0
+;;; Homepage: https://github.com/willghatch/emacs-alternate-region
+;;; Git-Repository: git://github.com/willghatch/emacs-alternate-region.git
+;;; Keywords: region
+;;; Package-Requires: ((emacs "28"))
+
+;;; License:
+;;; This is free software: you can redistribute it and/or modify
+;;; it under the terms of the GNU General Public License as published by
+;;; the Free Software Foundation, either version 3 of the License, or
+;;; (at your option) any later version.
+;;;
+;;; This is distributed in the hope that it will be useful,
+;;; but WITHOUT ANY WARRANTY; without even the implied warranty of
+;;; MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+;;; GNU General Public License for more details.
+;;; <http://www.gnu.org/licenses/>
+
+;;; Commentary:
+;;; I wrote this package to support a workflow that I wanted: Often there is
+;;; some piece of code that I want to lift out into a definition.  But then I
+;;; need to decide where to put it.  I can cut the text first, put in the
+;;; identifier I use, find a place to put it, start writing a definition and
+;;; hope I use the same identifier, then paste it.  But maybe I'll get
+;;; distracted along the way to finding the appropriate place.  And probably I
+;;; won't remember the exact name I used.  So instead, with this package, I can
+;;; set the region that I want to lift out as the alternate region with
+;;; `alternate-region-activate', which gives it highlighting, then move on to
+;;; find the right place to put the definition, write the name, copy the name,
+;;; and paste the name on the right hand side, then select the name and use
+;;; `alternate-region-swap' to move the regions.  Then fix indentation,
+;;; probably.
+;;;
+;;; The API:
+;;; • `alternate-region-activate' is interactive.  If `region-active-p', it sets the current region as the alternate region, and deactivates the region.  If not `region-active-p', deactivate the alternate region (setting it to nil).
+;;; • `alternate-region-cycle' is interactive.  If `region-active-p' and there is an alternate region, it sets the current region as the alternate region and sets the previous alternate region as the new region.  Otherwise error.
+;;; • `alternate-region-swap' is interactive.  If `region-active-p' and there is an alterante region, it swaps the contents of the region and the alternate region.  It updates the ranges of the region and alternate region, so they are both still active.  If the region and alternate region are not both active, error.
+;;; • `alternate-region-set' takes a (cons beginning end) region or nil, and optional buffer (which defaults to the current buffer).  It accordingly activates or deactivates the alternate-region overlay.  Non-interactive.  Probably just use `alternate-region-activate' instead, but this is the function to use programatically.
+;;; • 'alternate-region-face' is a face for the highlighted alternate region.
+
+;;; Code:
+
+
+;; TODO - I have no idea what the minimum emacs version required here is.  It can probably work with much earlier versions.
 ;; TODO - I would like to have multiple alternate regions in theory, but my main use case is just highlighting and swapping things.
 
 (defvar alternate-region--current nil
@@ -74,7 +112,7 @@ PREV-LENGTH is the length of the text that was in the modified region."
           (alternate-region-set nil)))))))
 
 (defun alternate-region-activate ()
-  "Activate the alternate region by setting it to the current active region."
+  "Activate the alternate region by setting it to the current active region.  If not `region-active-p', deactivate the alternate region."
   (interactive)
   (if (region-active-p)
       (let ((current-region (cons (region-beginning) (region-end))))
@@ -83,7 +121,7 @@ PREV-LENGTH is the length of the text that was in the modified region."
     (alternate-region-set nil)))
 
 (defun alternate-region-cycle ()
-  "Cycle the current region and the alternate region."
+  "Don't move the text between the regions, but changen which region is the current region and the alternate region."
   (interactive)
   (if (and (region-active-p) alternate-region--current)
       (let ((current-region (cons (region-beginning) (region-end)))
@@ -100,7 +138,7 @@ PREV-LENGTH is the length of the text that was in the modified region."
 
 
 (defun alternate-region-swap ()
-  "Swap the contents of the current region and the alternate region."
+  "Swap the contents of the current region and the alternate region.  IE move the text between the two regions."
   (interactive)
   (if (and (region-active-p) alternate-region--current)
       (let* ((current-region (cons (region-beginning) (region-end)))
