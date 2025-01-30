@@ -9,7 +9,6 @@
 ;; * It won't come with bindings out-of-the-box.  Estate can be used as a DIY modal editing package, or can be used in combination with other packages that may provide key bindings.
 ;; * I want it to be lighter-weight than evil-mode.  But I may expand features as I find I need more.  The evil-core.el file already feels too big and complicated to me.
 
-;; TODO - clean up and document to be “publishable”, add current state variable and indicator, how to deal with repeating commands (should it be integrated or separate), ...
 
 ;; Notes: each state buffer-local-keymap must be initialized to an actual keymap (instead of nil) before use.
 
@@ -25,7 +24,7 @@
   "Function called when activating estate-mode to set the initial state for the buffer.
 Should probably check things like 'major-mode' variable or `minibufferp', etc.
 By default this is unset with just estate-core, so you had better set it if you want to do a DIY modal editing setup.
-The estate-vim-like-states file will set it if it has not been set yet, to something that puts every buffer into normal state unless it is a minibuffer.
+The estate-default-states file will set it if it has not been set yet, to something that puts every buffer into normal state unless it is a minibuffer.
 You probably want more fine grained control over this, so you should write such a function yourself, probably.")
 
 (define-minor-mode estate-local-mode

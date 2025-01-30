@@ -17,7 +17,7 @@
 (message "started loading keys.el")
 
 (require 'estate-core)
-(require 'estate-vim-like-states)
+(require 'estate-default-states)
 (setq estate-set-initial-state-function
       (lambda ()
         (cond
