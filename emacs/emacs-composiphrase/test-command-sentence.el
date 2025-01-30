@@ -1,9 +1,9 @@
 ;;; -*- lexical-binding: t; -*-
 (require 'ert)
-(require 'command-sentence)
+(require 'composiphrase)
 
 
-(setq command-sentence--test-config
+(setq composiphrase--test-config
       `((verbs
          .
          ((move (default-object . word) (direction . forward) (count . 1))
@@ -33,8 +33,8 @@
 
 
 
-(ert-deftest command-sentence--match-test ()
-  "Test matching functionality of `command-sentence--match`."
+(ert-deftest composiphrase--match-test ()
+  "Test matching functionality of `composiphrase--match`."
   (let ((mv '((word-type . verb)
               (contents . move)))
         (del '((word-type . verb)
@@ -48,7 +48,7 @@
                (parameter-name . location-within)
                (contents . beginning))))
 
-    (let ((result1 (command-sentence--match (list mv fwd beg wd) command-sentence--test-config)))
+    (let ((result1 (composiphrase--match (list mv fwd beg wd) composiphrase--test-config)))
       (should result1)
       (let ((params (car result1))
             (executor (cdr result1)))
@@ -58,7 +58,7 @@
         ))
 
     ;; Same as above, but with default values
-    (let ((result2 (command-sentence--match (list mv wd) command-sentence--test-config)))
+    (let ((result2 (composiphrase--match (list mv wd) composiphrase--test-config)))
       (should result2)
       (let ((params (car result2))
             (executor (cdr result2)))
@@ -68,7 +68,7 @@
         ))
 
     ;; Predicate matcher
-    (let ((result3 (command-sentence--match (list del wd) command-sentence--test-config)))
+    (let ((result3 (composiphrase--match (list del wd) composiphrase--test-config)))
       (should result3)
       (let ((params (car result3))
             (executor (cdr result3)))
@@ -86,7 +86,7 @@
                                  ((word-type . modifier)
                                   (parameter-name . direction)
                                   (contents . backward)))))
-    (should-not (command-sentence--match non-matching-sentence command-sentence--test-config)))
+    (should-not (composiphrase--match non-matching-sentence composiphrase--test-config)))
 
   (let ((sentence-with-unlisted-mod-match
          '(((word-type . verb)
@@ -96,8 +96,8 @@
            ((word-type . modifier)
             (parameter-name . unlisted-mod)
             (contents . foo)))))
-    (should (command-sentence--match sentence-with-unlisted-mod-match
-                                     command-sentence--test-config)))
+    (should (composiphrase--match sentence-with-unlisted-mod-match
+                                     composiphrase--test-config)))
 
   (let ((sentence-with-unlisted-mod-no-default
          '(((word-type . verb)
@@ -106,8 +106,8 @@
             (contents . sentence))
            ;; Note the lack of any explicit unlisted-mod value, and also it has no default value.
            )))
-    (should-not (command-sentence--match sentence-with-unlisted-mod-no-default
-                                         command-sentence--test-config)))
+    (should-not (composiphrase--match sentence-with-unlisted-mod-no-default
+                                         composiphrase--test-config)))
   (let ((sentence-with-unlisted-mod-no-default-nil-match
          '(((word-type . verb)
             (contents . arpeggiate))
@@ -116,8 +116,8 @@
            ;; Note the lack of any explicit unlisted-mod value, and also it has no default value.
            ;; But this one should match because the matcher looks for nil.
            )))
-    (should (command-sentence--match sentence-with-unlisted-mod-no-default-nil-match
-                                     command-sentence--test-config)))
+    (should (composiphrase--match sentence-with-unlisted-mod-no-default-nil-match
+                                     composiphrase--test-config)))
 
   (let ((sentence-with-unlisted-mod-doesnt-match-nil
          '(((word-type . verb)
@@ -128,7 +128,7 @@
             (parameter-name . unlisted-mod)
             (contents . foo))
            )))
-    (should-not (command-sentence--match sentence-with-unlisted-mod-doesnt-match-nil
-                                         command-sentence--test-config)))
+    (should-not (composiphrase--match sentence-with-unlisted-mod-doesnt-match-nil
+                                         composiphrase--test-config)))
   )
 

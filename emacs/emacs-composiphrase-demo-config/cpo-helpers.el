@@ -19,9 +19,9 @@
         (t (error))))
 
 
-(defun keyboard-quit-and-clear-command-sentence ()
+(defun keyboard-quit-and-clear-composiphrase ()
   (interactive)
-  (setq command-sentence-current-sentence nil)
+  (setq composiphrase-current-sentence nil)
   (keyboard-quit))
 
 

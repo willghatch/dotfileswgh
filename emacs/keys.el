@@ -25,8 +25,8 @@
          ((equal major-mode 'term-mode) (estate-insert-state))
          (t (estate-normal-state)))))
 (estate-mode 1)
-(require 'command-sentence)
-(require 'estate-and-command-sentence-repeat)
+(require 'composiphrase)
+(require 'estate-and-composiphrase-repeat)
 
 (require 'cpo-search-movements)
 (require 'cpo-helpers)
@@ -46,11 +46,11 @@
     (contents . ,contents)
     (ui-hint . ,(or ui-hint contents))))
 (defun cs/ae (&rest words)
-  (apply 'command-sentence-add-to-current-with-numeric-handling
+  (apply 'composiphrase-add-to-current-with-numeric-handling
          'exec-after
          words))
 (defun cs/add (&rest words)
-  (apply 'command-sentence-add-to-current-with-numeric-handling
+  (apply 'composiphrase-add-to-current-with-numeric-handling
          nil
          words))
 
@@ -131,9 +131,9 @@
 (eImap "\C-c" 'estate-normal-state)
 (eimap "\C-l" 'estate-normal-state)
 
-(emmap "\C-g" 'keyboard-quit-and-clear-command-sentence)
-(evmap "\C-g" 'keyboard-quit-and-clear-command-sentence)
-(eimap "\C-g" 'keyboard-quit-and-clear-command-sentence)
+(emmap "\C-g" 'keyboard-quit-and-clear-composiphrase)
+(evmap "\C-g" 'keyboard-quit-and-clear-composiphrase)
+(eimap "\C-g" 'keyboard-quit-and-clear-composiphrase)
 
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -181,7 +181,7 @@
 (eimap (kbd "TAB") (lambda () (interactive) (require 'minad-stack-conf) (wgh/completion-at-point-start)))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;; vim-like keys to reconsider since I'm moving to command-sentence
+;; vim-like keys to reconsider since I'm moving to composiphrase
 
 ;; TODO - consider A/I to open object selection, so that they are longer commands in terms of keys but dot repetition captures the movement and the insertion for arbitrary movements instead of just end of line / back-to-indentation...
 (enmap "A" (lambda () (interactive)
@@ -292,7 +292,7 @@
                   (cs/obj 'repeatable-motion-repeat)))
 
 
-;; Enter prefix maps for command-sentence
+;; Enter prefix maps for composiphrase
 (enmap "c" (lambda ()
              (interactive)
              (funcall (cs/add `((word-type . ignore))))
@@ -307,7 +307,7 @@
 
 
 (emmap "i" (lambda (n) (interactive "p")
-             (if (null command-sentence-current-sentence)
+             (if (null composiphrase-current-sentence)
                  (estate-insert-state) ;; TODO - handle number
                (progn
                  (funcall (cs/add (cs/mod 'direction nil)
@@ -407,7 +407,7 @@
                       n)))
 
 
-;; TODO - obviously I want to integrate these into command-sentence, but I need to add keys for going forward/back to objects, including delimiters, without regard for tree boundaries.
+;; TODO - obviously I want to integrate these into composiphrase, but I need to add keys for going forward/back to objects, including delimiters, without regard for tree boundaries.
 (emmap "{" 'backward-sexp)
 (emmap "}" 'forward-sexp)
 (emmap "[" 'backward-list)
@@ -421,9 +421,9 @@
 
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;; command-sentence command-select map
+;; composiphrase command-select map
 (defhydra command-select (:foreign-keys warn :exit nil) "Cmd:"
-  ("C-g" keyboard-quit-and-clear-command-sentence "quit" :exit t)
+  ("C-g" keyboard-quit-and-clear-composiphrase "quit" :exit t)
   ("c" (lambda (n) (interactive "p")
          (if (region-active-p)
              (funcall (cs/ae (cs/verb 'change)
@@ -503,14 +503,14 @@
 
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;; command-sentence object-select map
+;; composiphrase object-select map
 
 (defun with-sptw-req (x)
   (require 'tree-walk-smartparens-integration)
   x)
 (defhydra object-select (:foreign-keys warn :exit nil) "Obj:"
   ;; TODO - Hydra handles lambda specially.  I would love to just use higher order functions, but to work with Hydra I seem to need to use lambdas...  Maybe I should do this without hydra.
-  ("C-g" keyboard-quit-and-clear-command-sentence "quit" :exit t)
+  ("C-g" keyboard-quit-and-clear-composiphrase "quit" :exit t)
   ("c" (lambda (n) (interactive "p") (funcall (cs/ae (cs/obj 'character)) n)) "character" :exit t)
   ("f" (lambda (n) (interactive "p") (funcall (cs/ae (cs/mod 'specific t)
                                                      (cs/obj 'character))

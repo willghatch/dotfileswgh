@@ -51,10 +51,10 @@
   "read only tag face")
 
 
-(defface command-sentence-ui-hints-face
+(defface composiphrase-ui-hints-face
   '((((background dark)) (:foreground "magenta"))
     (((background light)) (:foreground "purple")))
-  "face for UI hints for command-sentence-current-sentence")
+  "face for UI hints for composiphrase-current-sentence")
 
 ;; You can set both header-line-format and mode-line-format
 
@@ -141,13 +141,13 @@
                                      (equal coding 'prefer-utf-8-unix))
                            (propertize (symbol-name coding) 'face 'font-lock-warning-face))))
                "%]%["
-               '(:eval (or (and (boundp 'command-sentence-current-sentence)
-                                (let ((ui-hints (command-sentence-current-ui-hints)))
+               '(:eval (or (and (boundp 'composiphrase-current-sentence)
+                                (let ((ui-hints (composiphrase-current-ui-hints)))
                                   (and ui-hints
                                        ;;(format " %s" ui-hints)
                                        (propertize
                                         (format " %s" ui-hints)
-                                        'face 'command-sentence-ui-hints-face)
+                                        'face 'composiphrase-ui-hints-face)
                                        )))
                            ""))
                ;; TODO - I read that in a future emacs version that this symbol will split the mode line for right alignment.

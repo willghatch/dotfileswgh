@@ -1,18 +1,18 @@
-;; command-sentence.el  -*- lexical-binding: t -*-
+;; composiphrase.el  -*- lexical-binding: t -*-
 ;;
 ;;
-;; The command-sentence library provides a way of interpreting sentence objects based on a configuration.
-;; A command-sentence is a list of command-sentence-words.
-;; The `command-sentence-execute' function takes a command-sentence SENTENCE and a command-sentence-configuration CONFIG, and maps the sentence, using the config, to a specific function to call.
+;; The composiphrase library provides a way of interpreting sentence objects based on a configuration.
+;; A composiphrase-sentence is a list of composiphrase-words.
+;; The `composiphrase-execute' function takes a composiphrase-sentence SENTENCE and a composiphrase-configuration CONFIG, and maps the sentence, using the config, to a specific function to call.
 ;;
-;; A command-sentence-word is a dictionary imlemented as an alist, following a schema that maps a known set of keys to values.
+;; A composiphrase-word is a dictionary imlemented as an alist, following a schema that maps a known set of keys to values.
 ;; * word-type: can be 'verb, 'object, 'modifier
 ;; * parameter-name: (only on 'modifier words) a symbol, name of appropriate parameter of object or verb
 ;; * contents: for modifier it can be anything, for verb or object it should be a symbol
 ;; * ui-hint: a string that can be displayed on the modeline or in some other way to show the current state (optional)
 ;; * keys: a string or vector of the keys used when entering the word (optional)
 ;;
-;; A command-sentence-configuration is an alist with the following top-level fields:
+;; A composiphrase-configuration is an alist with the following top-level fields:
 ;; * verbs - has a list of verb specifications
 ;; * objects - has a list of object specifications
 ;; * match-table - has a list of match-table specifications
@@ -34,22 +34,22 @@
 ;; * the symbol 'original-sentence to pass the original command sentence.
 ;;
 
-(defun command-sentence--get-spec-from-symbol (given-v-or-o given-verb-p config)
+(defun composiphrase--get-spec-from-symbol (given-v-or-o given-verb-p config)
   "Takes a symbol name for a verb or an object, returns the spec from the config."
   (cdr (assq given-v-or-o
              (cdr (assq (if given-verb-p 'verbs 'objects) config)))))
-(defun command-sentence--get-verb-or-obj-name (given-v-or-o)
-  "Takes a command-sentence-word or a symbol."
+(defun composiphrase--get-verb-or-obj-name (given-v-or-o)
+  "Takes a composiphrase-word or a symbol."
   (if (symbolp given-v-or-o)
       given-v-or-o
     (cdr (assq 'contents given-v-or-o))))
-(defun command-sentence--get-default-verb-or-obj (given-v-or-o given-verb-p config)
-  "Given a verb or object (as a command-sentence-word), get the symbol for the default of the other one."
-  (let* ((given-name (command-sentence--get-verb-or-obj-name given-v-or-o))
-         (given-spec (command-sentence--get-spec-from-symbol given-name given-verb-p config)))
+(defun composiphrase--get-default-verb-or-obj (given-v-or-o given-verb-p config)
+  "Given a verb or object (as a composiphrase-word), get the symbol for the default of the other one."
+  (let* ((given-name (composiphrase--get-verb-or-obj-name given-v-or-o))
+         (given-spec (composiphrase--get-spec-from-symbol given-name given-verb-p config)))
     (cdr (assq (if given-verb-p 'default-object 'default-verb) given-spec))))
 
-(defun command-sentence--match (sentence config)
+(defun composiphrase--match (sentence config)
   "Find a match for SENTENCE using the CONFIG.
 Return nil if no match is found.
 Otherwise, return a cons pair (PARAMS . EXECUTOR), containing the final parameters and executor from the match.
@@ -66,18 +66,18 @@ Otherwise, return a cons pair (PARAMS . EXECUTOR), containing the final paramete
                                                (cdr (assq 'word-type word))))
                             sentence))))
     (when (and (not verb) (not object))
-      (error "command-sentence: sentence lacks both verb and object: %s" sentence))
+      (error "composiphrase: sentence lacks both verb and object: %s" sentence))
     ;; TODO - deeper validation of the structure of command sentence words, to be sure all parts are there.
     (let* ((verb (or verb
-                     (command-sentence--get-default-verb-or-obj object nil config)
-                     (error "command-sentence: can't resolve a verb for sentence: %s" sentence)))
+                     (composiphrase--get-default-verb-or-obj object nil config)
+                     (error "composiphrase: can't resolve a verb for sentence: %s" sentence)))
            (object (or object
-                       (command-sentence--get-default-verb-or-obj verb t config)
-                       (error "command-sentence: can't resolve an object for sentence: %s" sentence)))
-           (verb-name (command-sentence--get-verb-or-obj-name verb))
-           (object-name (command-sentence--get-verb-or-obj-name object))
-           (verb-spec (command-sentence--get-spec-from-symbol verb-name t config))
-           (object-spec (command-sentence--get-spec-from-symbol object-name nil config))
+                       (composiphrase--get-default-verb-or-obj verb t config)
+                       (error "composiphrase: can't resolve an object for sentence: %s" sentence)))
+           (verb-name (composiphrase--get-verb-or-obj-name verb))
+           (object-name (composiphrase--get-verb-or-obj-name object))
+           (verb-spec (composiphrase--get-spec-from-symbol verb-name t config))
+           (object-spec (composiphrase--get-spec-from-symbol object-name nil config))
            ;; TODO - check for duplicate param names, and probably error.
            (full-default-params (append verb-spec object-spec))
            (full-param-keys (seq-uniq
@@ -111,7 +111,7 @@ Otherwise, return a cons pair (PARAMS . EXECUTOR), containing the final paramete
                (entry-mods (and vo-match
                                 (caddr entry)))
                (full-match (and vo-match
-                                (command-sentence--match-table-modifiers-match-p
+                                (composiphrase--match-table-modifiers-match-p
                                  params
                                  entry-mods))))
           (when full-match
@@ -121,7 +121,7 @@ Otherwise, return a cons pair (PARAMS . EXECUTOR), containing the final paramete
            (cons params (seq-elt matched 3))))))
 
 
-(defun command-sentence--match-table-modifiers-match-p
+(defun composiphrase--match-table-modifiers-match-p
     (given-params-alist match-table-modifiers)
   "Check if the GIVEN-PARAMS-ALIST matches the MATCH-TABLE-MODIFIERS."
   (let ((match-failed nil))
@@ -144,18 +144,18 @@ Otherwise, return a cons pair (PARAMS . EXECUTOR), containing the final paramete
       (setq match-table-modifiers (cdr match-table-modifiers)))
     (not match-failed)))
 
-(setq command-sentence--debug-print-sentence nil)
+(setq composiphrase--debug-print-sentence nil)
 
-(defun command-sentence--execute-match (orig-sentence params executor)
-  "PARAMS and EXECUTOR should match what is returned from command-sentence--match."
+(defun composiphrase--execute-match (orig-sentence params executor)
+  "PARAMS and EXECUTOR should match what is returned from composiphrase--match."
   (let ((spec (cadr executor))
         (func (car executor)))
-    (when command-sentence--debug-print-sentence
+    (when composiphrase--debug-print-sentence
       (message "executing sentence: %s\n\nargs: %s" orig-sentence spec))
     (cond ((eq spec 'alist) (funcall func params))
           ((eq spec 'original-sentence) (funcall func orig-sentence))
           ((eq spec 'sentence-with-defaults)
-           (let ((new-sentence (command-sentence--apply-params-to-sentence
+           (let ((new-sentence (composiphrase--apply-params-to-sentence
                                 orig-sentence params)))
              (funcall func new-sentence)))
           ((listp spec) (apply func (mapcar (lambda (name)
@@ -163,13 +163,13 @@ Otherwise, return a cons pair (PARAMS . EXECUTOR), containing the final paramete
                                             spec)))
           (t (error "bad executor spec: %s" spec)))))
 
-(defun command-sentence-execute (sentence config)
-  (let ((match (command-sentence--match sentence config)))
+(defun composiphrase-execute (sentence config)
+  (let ((match (composiphrase--match sentence config)))
     (if match
-        (command-sentence--execute-match sentence (car match) (cdr match))
+        (composiphrase--execute-match sentence (car match) (cdr match))
       (error "No executor found for command sentence: %s" sentence))))
 
-(defun command-sentence--apply-params-to-sentence (old-sentence params)
+(defun composiphrase--apply-params-to-sentence (old-sentence params)
   "For each param in PARAMS that is not in OLD-SENTENCE, add the param to a new sentence (whose tail is the old sentence)."
   (let ((new-sentence old-sentence))
     (dolist (param params)
@@ -186,31 +186,31 @@ Otherwise, return a cons pair (PARAMS . EXECUTOR), containing the final paramete
                 new-sentence))))
     new-sentence))
 
-(defvar-local command-sentence-current-sentence nil)
-(defvar command-sentence-current-configuration nil)
+(defvar-local composiphrase-current-sentence nil)
+(defvar composiphrase-current-configuration nil)
 
 ;; TODO - should I have just one previous sentence, or have a history that keeps up to N elements?  For now I'll do the simplest thing for my immediate wants.
-(defvar-local command-sentence-previous-sentence nil)
+(defvar-local composiphrase-previous-sentence nil)
 
-(defun command-sentence-clear-current ()
+(defun composiphrase-clear-current ()
   (interactive)
-  (setq command-sentence-current-sentence nil))
+  (setq composiphrase-current-sentence nil))
 
-(defun command-sentence-add-to-current (&rest words)
-  "add words to current-command-sentence (and also add the keys used to add the command (WIP))"
+(defun composiphrase-add-to-current (&rest words)
+  "add words to composisphrase-current-sentence (and also add the keys used to add the command (WIP))"
   (let ((word1 (car words))
         (words-rest (cdr words)))
     (unless nil ;;no-keys
       ;; TODO - how can I get the keys for numeric arguments and uses of M-x, etc?
       (setq word1 (cons (cons 'keys (this-command-keys))
                         word1)))
-    (setq command-sentence-current-sentence (append (list word1) words-rest command-sentence-current-sentence))))
+    (setq composiphrase-current-sentence (append (list word1) words-rest composiphrase-current-sentence))))
 
-(defun command-sentence-add-to-current-with-numeric-handling (exec-after-p &rest words)
-  "Takes a list of command-sentence words, but returns an interactive function that takes a numeric argument, and adds the numeric argument to the modifier parameter 'num'."
+(defun composiphrase-add-to-current-with-numeric-handling (exec-after-p &rest words)
+  "Takes a list of composiphrase words, but returns an interactive function that takes a numeric argument, and adds the numeric argument to the modifier parameter 'num'."
   (lambda (&optional num)
     (interactive "p")
-    (apply 'command-sentence-add-to-current
+    (apply 'composiphrase-add-to-current
            (if (and num (not (equal num 1)))
                (cons `((word-type . modifier)
                        (parameter-name . num)
@@ -219,17 +219,17 @@ Otherwise, return a cons pair (PARAMS . EXECUTOR), containing the final paramete
                      words)
              words))
     (when exec-after-p
-      (command-sentence-execute-current))))
+      (composiphrase-execute-current))))
 
-(defun command-sentence-execute-current ()
-  "Executes command-sentence-current-sentence and clears it."
+(defun composiphrase-execute-current ()
+  "Executes composiphrase-current-sentence and clears it."
   (interactive)
-  (let ((sentence command-sentence-current-sentence))
-    (setq command-sentence-previous-sentence sentence)
-    (command-sentence-clear-current)
-    (command-sentence-execute sentence command-sentence-current-configuration)))
+  (let ((sentence composiphrase-current-sentence))
+    (setq composiphrase-previous-sentence sentence)
+    (composiphrase-clear-current)
+    (composiphrase-execute sentence composiphrase-current-configuration)))
 
-(defun command-sentence--keyboard-macro-from-sentence (sentence)
+(defun composiphrase--keyboard-macro-from-sentence (sentence)
   "Get a vector or string of keys used to create SENTENCE."
   ;; TODO -- I need better handling to always get keys used.  I'm currently always missing keys used for numeric arguments, and I'm missing some keys used for prefix maps.  I would like at least my config to consistently work for this, even if I can't consistently get all keys in a general way that anyone could use with arbitrary configurations.
   (apply (lambda (&rest args)
@@ -239,16 +239,16 @@ Otherwise, return a cons pair (PARAMS . EXECUTOR), containing the final paramete
                              (mapcar (lambda (word) (cdr (assq 'keys word)))
                                      (reverse sentence))))))
 
-;; TODO - add command-sentence-configuration-compose that can merge configs
+;; TODO - add composiphrase-configuration-compose that can merge configs
 ;; TODO - add macro for use as key bind RHS such that you write a list of words to add, an option to execute, and it implicitly takes a numeric argument.
 
 
-(defun command-sentence-current-ui-hints ()
+(defun composiphrase-current-ui-hints ()
   "Get a list of ui hints for the current command sentence."
   (let ((ui-hints (seq-filter
                    #'identity
                    (mapcar (lambda (x) (cdr (assq 'ui-hint x)))
-                           command-sentence-current-sentence))))
+                           composiphrase-current-sentence))))
     (reverse ui-hints)))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -262,15 +262,15 @@ Otherwise, return a cons pair (PARAMS . EXECUTOR), containing the final paramete
     (setcdr section (cons spec (cdr section)))))
 
 
-(defun command-sentence--make-movement-delegated-command (f-on-region)
+(defun composiphrase--make-movement-delegated-command (f-on-region)
   "F-ON-REGION must take two args, region start and region end."
   (lambda (sentence-with-defaults)
     (let ((orig-point (point))
           (new-point (save-mark-and-excursion
-                       (command-sentence-execute
+                       (composiphrase-execute
                         ;; TODO - I should maybe delete the old verb, but I'll just use alist shadowing...
                         (cons '((word-type . verb) (contents . move)) sentence-with-defaults)
-                        command-sentence-current-configuration)
+                        composiphrase-current-configuration)
                        (if (region-active-p)
                            (cons (region-beginning) (region-end))
                          (point)))))
@@ -280,7 +280,7 @@ Otherwise, return a cons pair (PARAMS . EXECUTOR), containing the final paramete
                  (min orig-point new-point)
                  (max orig-point new-point))))))
 
-(setq command-sentence--my-config
+(setq composiphrase--my-config
       `((verbs
          .
          ((move (direction . forward)
@@ -907,7 +907,7 @@ Otherwise, return a cons pair (PARAMS . EXECUTOR), containing the final paramete
                   (,(lambda () (delete-region (region-beginning) (region-end)))))
           (delete ,(lambda (x) (not (memq x '(region))))
                   ()
-                  (,(command-sentence--make-movement-delegated-command 'delete-region)
+                  (,(composiphrase--make-movement-delegated-command 'delete-region)
                    sentence-with-defaults))
 
           (change region
@@ -917,7 +917,7 @@ Otherwise, return a cons pair (PARAMS . EXECUTOR), containing the final paramete
                        (lambda () (delete-region (region-beginning) (region-end)))))))
           (change ,(lambda (x) (not (memq x '(region))))
                   ()
-                  (,(command-sentence--make-movement-delegated-command
+                  (,(composiphrase--make-movement-delegated-command
                      (lambda (beg end) (estate-insert-state-with-thunk
                                         (lambda () (delete-region beg end)))))
                    sentence-with-defaults))
@@ -925,35 +925,35 @@ Otherwise, return a cons pair (PARAMS . EXECUTOR), containing the final paramete
           (copy region ()
                 (estate-copy))
           (copy ,(lambda (x) (not (memq x '(region)))) ()
-                (,(command-sentence--make-movement-delegated-command (lambda (beg end) (estate-copy (cons beg end))))
+                (,(composiphrase--make-movement-delegated-command (lambda (beg end) (estate-copy (cons beg end))))
                  sentence-with-defaults))
 
           (upcase region ()
                   (,(lambda () (upcase-region (region-beginning) (region-end)))))
           (upcase ,(lambda (x) (not (memq x '(region)))) ()
-                  (,(command-sentence--make-movement-delegated-command 'upcase-region)
+                  (,(composiphrase--make-movement-delegated-command 'upcase-region)
                    sentence-with-defaults))
           (downcase region ()
                     (,(lambda () (downcase-region (region-beginning) (region-end)))))
           (downcase ,(lambda (x) (not (memq x '(region)))) ()
-                    (,(command-sentence--make-movement-delegated-command 'downcase-region)
+                    (,(composiphrase--make-movement-delegated-command 'downcase-region)
                      sentence-with-defaults))
           (capitalize region ()
                       (,(lambda () (capitalize-region (region-beginning) (region-end)))))
           (capitalize ,(lambda (x) (not (memq x '(region)))) ()
-                      (,(command-sentence--make-movement-delegated-command 'capitalize-region)
+                      (,(composiphrase--make-movement-delegated-command 'capitalize-region)
                        sentence-with-defaults))
 
           ;; (initiate-isearch region ((direction forward))
           ;;                   (,(lambda () (wgh/isearch-forward-for-text-in-region (region-beginning) (region-end))) ()))
           ;; (initiate-isearch ,(lambda (x) (not (memq x '(region)))) ((direction forward))
-          ;;                   (,(command-sentence--make-movement-delegated-command 'wgh/isearch-forward-for-text-in-region)
+          ;;                   (,(composiphrase--make-movement-delegated-command 'wgh/isearch-forward-for-text-in-region)
           ;;                    sentence-with-defaults))
 
 
           ))))
 
 ;; temporary convenience...
-(setq command-sentence-current-configuration command-sentence--my-config)
+(setq composiphrase-current-configuration composiphrase--my-config)
 
-(provide 'command-sentence)
+(provide 'composiphrase)
