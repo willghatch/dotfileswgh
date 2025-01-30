@@ -9,7 +9,6 @@
 (require 'estate-core)
 
 (defun estate--activate-initialize-core-states ()
-  (estate-normal-state)
   (add-hook 'activate-mark-hook #'estate--mark-activate-hook 0 t)
   (add-hook 'deactivate-mark-hook #'estate--mark-deactivate-hook 0 t)
   (add-hook 'estate-visual-line-state-enter-hook #'estate--visual-line-on 0 t)
@@ -24,10 +23,17 @@
 (add-hook 'estate-activate-hook #'estate--activate-initialize-core-states)
 (add-hook 'estate-deactivate-hook #'estate--deactivate-initialize-core-states)
 
+(when (not estate-set-initial-state-function)
+  (setq estate-set-initial-state-function 'estate--default-set-initial-state-function-for-vim-like-states))
+
+(defun estate--default-set-initial-state-function-for-vim-like-states ()
+  (if (minibufferp)
+      (estate-insert-state)
+    (estate-normal-state)))
+
 ;; Motion map is a core map that suppresses everything not bound, and is the basis for most non-insert modes.
 (estate-define-state motion nil)
 (suppress-keymap estate-motion-state-keymap)
-
 
 
 (estate-define-state normal estate-motion-state-keymap)
@@ -433,6 +439,7 @@ Otherwise, start recording to the register 'estate-default-keyboard-macro-regist
 ;; * delete doesn't copy (there is a copy/swap and a delete without copy).  Together with delete not copying, you can do copy-then-delete to get the same effect.
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
 
 
 (provide 'estate-vim-like-states)

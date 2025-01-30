@@ -18,6 +18,12 @@
 
 (require 'estate-core)
 (require 'estate-vim-like-states)
+(setq estate-set-initial-state-function
+      (lambda ()
+        (cond
+         ((minibufferp) (estate-insert-state))
+         ((equal major-mode 'term-mode) (estate-insert-state))
+         (t (estate-normal-state)))))
 (estate-mode 1)
 (require 'command-sentence)
 (require 'estate-and-command-sentence-repeat)

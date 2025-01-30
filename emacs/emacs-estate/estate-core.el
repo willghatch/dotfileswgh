@@ -19,6 +19,13 @@
 (defvar estate-activate-hook '())
 (defvar estate-deactivate-hook '())
 
+(defvar estate-set-initial-state-function nil
+  "Function called when activating estate-mode to set the initial state for the buffer.
+Should probably check things like 'major-mode' variable or `minibufferp', etc.
+By default this is unset with just estate-core, so you had better set it if you want to do a DIY modal editing setup.
+The estate-vim-like-states file will set it if it has not been set yet, to something that puts every buffer into normal state unless it is a minibuffer.
+You probably want more fine grained control over this, so you should write such a function yourself, probably.")
+
 (define-minor-mode estate-local-mode
   "TODO docstring here..."
   :init-value nil
@@ -30,6 +37,8 @@
         (add-to-list 'emulation-mode-map-alists 'estate--estate-mode-map-alist)
         ;; Add local alist after so that the buffer-local keys are earlier in the list.
         (add-to-list 'emulation-mode-map-alists 'estate--estate-mode-map-local-alist)
+        (when estate-set-initial-state-function
+          (funcall estate-set-initial-state-function))
         (run-hooks 'estate-activate-hook)
         )
     (progn
@@ -40,11 +49,14 @@
       (run-hooks 'estate-deactivate-hook)
       )))
 
+(defvar estate-mode-activate-predicate nil
+  "Predicate for whether to turn on estate-mode in a buffer.
+Can be nil to always enable, or a function that returns non-nil when the mode should be enabled.
+The function takes no arguments, and probably should inspect the 'major-mode' variable or `minibufferp' or such.")
+
 (defun -estate-mode-initialize ()
-  ;; TODO - use a defvar for predicate
-  ;; TODO - also add initial state for major mode, or function for choosing initial state.
-  (unless (minibufferp)
-    ;; TODO - maybe I should make a minibuffer-specific map instead?
+  (when (or (not estate-mode-activate-predicate)
+            (funcall estate-mode-activate-predicate))
     (estate-local-mode 1)))
 (define-globalized-minor-mode estate-mode
   estate-local-mode -estate-mode-initialize)
