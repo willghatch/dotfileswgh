@@ -16,8 +16,10 @@
 (defvar-local estate--estate-mode-map-alist `())
 (defvar-local estate--estate-mode-map-local-alist `())
 
-(defvar estate-activate-hook '())
-(defvar estate-deactivate-hook '())
+(defvar estate-activate-hook '()
+  "Hook used when estate-mode is first activated in a buffer.")
+(defvar estate-deactivate-hook '()
+  "Hook used when estate-mode is deactivated in a buffer.")
 
 (defvar estate-set-initial-state-function nil
   "Function called when activating estate-mode to set the initial state for the buffer.
@@ -27,11 +29,12 @@ The estate-vim-like-states file will set it if it has not been set yet, to somet
 You probably want more fine grained control over this, so you should write such a function yourself, probably.")
 
 (define-minor-mode estate-local-mode
-  "TODO docstring here..."
+  "Buffer-local mode for estate-mode."
   :init-value nil
   :lighter " estate "
-  ;; If this has a keymap value, the keymap is stored in a non-buffer-local variable.
+  ;; If a minor mode has a keymap value, the keymap is stored in a non-buffer-local variable.
   ;; The solution is to use emulation-mod-map-alist, which can consult a buffer-local variable, and is read before minor-mode maps.
+  ;; This allows estate-mode to have a buffer-local state, as well as have a buffer-local keymap for each state in each buffer.
   (if estate-local-mode
       (progn
         (add-to-list 'emulation-mode-map-alists 'estate--estate-mode-map-alist)
@@ -54,14 +57,18 @@ You probably want more fine grained control over this, so you should write such 
 Can be nil to always enable, or a function that returns non-nil when the mode should be enabled.
 The function takes no arguments, and probably should inspect the 'major-mode' variable or `minibufferp' or such.")
 
-(defun -estate-mode-initialize ()
+(defun estate-mode--initialize ()
   (when (or (not estate-mode-activate-predicate)
             (funcall estate-mode-activate-predicate))
     (estate-local-mode 1)))
-(define-globalized-minor-mode estate-mode
-  estate-local-mode -estate-mode-initialize)
 
-(defvar estate-state-change-hook '())
+(define-globalized-minor-mode estate-mode
+  estate-local-mode estate-mode--initialize)
+
+(defvar estate-state-change-hook '()
+  "Hook called for every estate state change.
+Called after the exit-hook of the previous state, but before the enter-hook of the new state.
+The previous state is already set in 'estate-previous-state', and the new state is already set in 'estate-state'.")
 
 (defun estate--keymap-name (state)
   (intern (format "estate-%s-state-keymap" state)))
@@ -69,13 +76,13 @@ The function takes no arguments, and probably should inspect the 'major-mode' va
   (intern (format "estate-%s-state-buffer-local-keymap" state)))
 (defun estate--enter-hook-name (state)
   (intern (format "estate-%s-state-enter-hook" state)))
-(defun estate--leave-hook-name (state)
-  (intern (format "estate-%s-state-leave-hook" state)))
+(defun estate--exit-hook-name (state)
+  (intern (format "estate-%s-state-exit-hook" state)))
 
 (defmacro estate-define-state (state-name parent-keymap)
   "Define a new state with STATE-NAME.
 STATE-NAME should be a symbol.
-Defines estate-X-keymap, estate-X-buffer-local-keymap, estate-X-state-enter-hook, estate-X-state-leave-hook.
+Defines estate-X-keymap, estate-X-buffer-local-keymap, estate-X-state-enter-hook, estate-X-state-exit-hook.
 The keymap gets the specified parent.
 The buffer-local-keymap has default value of nil, and so must be initialized to a keymap (eg. with `make-sparse-keymap') before first use in each buffer.
 States can be switched with `estate-activate-state' using STATE-NAME.
@@ -83,7 +90,7 @@ States can be switched with `estate-activate-state' using STATE-NAME.
   (let ((keymap (estate--keymap-name state-name))
         (local-keymap (estate--local-keymap-name state-name))
         (enter-hook (estate--enter-hook-name state-name))
-        (leave-hook (estate--leave-hook-name state-name)))
+        (exit-hook (estate--exit-hook-name state-name)))
     `(progn
        (define-prefix-command ',keymap)
        (defvar-local ,local-keymap nil
@@ -94,14 +101,22 @@ States can be switched with `estate-activate-state' using STATE-NAME.
          ,(format "Buffer-local keymap for estate %s state.  Starts nil, must be initialized (eg. with `make-sparse-keymap') before binding anything." state-name))
        (set-keymap-parent ,keymap ,parent-keymap)
        (defvar ,enter-hook '()
-         ,(format "Hook for entering estate %s state." state-name))
-       (defvar ,leave-hook '()
-         ,(format "Hook for leaving estate %s state." state-name)))))
+         ,(format "Hook for entering estate %s state.
+Called after the exit-hook for the previous state and after the generic 'estate-state-change-hook'.
+The variables 'estate-previous-state' and 'estate-state' are already set, so 'estate-state' is the new state."
+                  state-name))
+       (defvar ,exit-hook '()
+         ,(format "Hook for exiting estate %s state.
+Called before the enter-hook for the new state and before the generic 'estate-state-change-hook'.
+The variables 'estate-previous-state' and 'estate-state' are already set, so 'estate-previous-state' is the state that the hook is running for."
+                  state-name)))))
 
 (defvar-local estate-state nil
   "The current estate-mode state.
 Don't manually set this variable, use `estate-activate-state' instead if you want to change states.")
-(defvar-local estate--previous-state nil)
+(defvar-local estate-previous-state nil
+  "The previous estate-mode state.
+Do not manually set this variable.")
 
 
 (defun estate-activate-state (state)
@@ -110,16 +125,16 @@ Don't manually set this variable, use `estate-activate-state' instead if you wan
     (let ((keymap-sym (estate--keymap-name state))
           (local-keymap-sym (estate--local-keymap-name state))
           (enter-hook (estate--enter-hook-name state))
-          (leave-hook (and estate-state
-                           (estate--leave-hook-name estate-state))))
+          (exit-hook (and estate-state
+                           (estate--exit-hook-name estate-state))))
       (if (boundp keymap-sym)
           (progn
-            (setq-local estate--previous-state estate-state)
+            (setq-local estate-previous-state estate-state)
             (setq-local estate-state state)
             (setq-local estate--estate-mode-map-alist `((estate-local-mode . ,(symbol-value keymap-sym))))
             (setq-local estate--estate-mode-map-local-alist `((estate-local-mode . ,(symbol-value local-keymap-sym))))
-            (when (symbol-value leave-hook)
-              (run-hooks leave-hook))
+            (when (symbol-value exit-hook)
+              (run-hooks exit-hook))
             (run-hooks 'estate-state-change-hook)
             (when (symbol-value enter-hook)
               (run-hooks enter-hook)))

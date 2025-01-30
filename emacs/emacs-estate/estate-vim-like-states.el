@@ -12,13 +12,13 @@
   (add-hook 'activate-mark-hook #'estate--mark-activate-hook 0 t)
   (add-hook 'deactivate-mark-hook #'estate--mark-deactivate-hook 0 t)
   (add-hook 'estate-visual-line-state-enter-hook #'estate--visual-line-on 0 t)
-  (add-hook 'estate-visual-line-state-leave-hook #'estate--visual-line-off 0 t)
+  (add-hook 'estate-visual-line-state-exit-hook #'estate--visual-line-off 0 t)
   )
 (defun estate--deactivate-initialize-core-states ()
   (remove-hook 'activate-mark-hook #'estate--mark-activate-hook t)
   (remove-hook 'deactivate-mark-hook #'estate--mark-deactivate-hook t)
   (remove-hook 'estate-visual-line-state-enter-hook #'estate--visual-line-on t)
-  (remove-hook 'estate-visual-line-state-leave-hook #'estate--visual-line-off t)
+  (remove-hook 'estate-visual-line-state-exit-hook #'estate--visual-line-off t)
   )
 (add-hook 'estate-activate-hook #'estate--activate-initialize-core-states)
 (add-hook 'estate-deactivate-hook #'estate--deactivate-initialize-core-states)
@@ -72,7 +72,7 @@
     (funcall pre-change-thunk)
     (estate-activate-state new-state)))
 
-(add-hook 'estate-insert-state-leave-hook 'estate--state-with-change-group-handler)
+(add-hook 'estate-insert-state-exit-hook 'estate--state-with-change-group-handler)
 
 (defun estate-insert-state ()
   (interactive)
@@ -254,7 +254,7 @@
 
 (defun estate-restore-region ()
   (interactive)
-  (let ((last-state estate--previous-state))
+  (let ((last-state estate-previous-state))
     (activate-mark)
     (when (member last-state '(visual-line visual-rectangle))
       (estate-activate-state last-state))))
