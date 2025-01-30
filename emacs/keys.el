@@ -26,6 +26,8 @@
          (t (estate-normal-state)))))
 (estate-mode 1)
 (require 'composiphrase)
+(require 'composiphrase-demo-config)
+(setq composiphrase-current-configuration composiphrase-demo-config)
 (require 'estate-and-composiphrase-repeat)
 
 (require 'cpo-search-movements)
@@ -46,11 +48,11 @@
     (contents . ,contents)
     (ui-hint . ,(or ui-hint contents))))
 (defun cs/ae (&rest words)
-  (apply 'composiphrase-add-to-current-with-numeric-handling
+  (apply 'composiphrase-add-to-current-sentence-with-numeric-handling
          'exec-after
          words))
 (defun cs/add (&rest words)
-  (apply 'composiphrase-add-to-current-with-numeric-handling
+  (apply 'composiphrase-add-to-current-sentence-with-numeric-handling
          nil
          words))
 
