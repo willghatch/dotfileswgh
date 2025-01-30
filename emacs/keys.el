@@ -535,7 +535,7 @@
 
   ;; Modifiers -- maybe these should have a separate map, but that adds verbosity, and I'm not yet certain there are enough objects and modifiers to warrant splitting -- I can have a prefix within this map for infrequent things, and I can always add another separateprefix map.
   ("e" (lambda (n) (interactive "p") (funcall (cs/add (cs/mod 'location-within 'end)) n)) "end" :exit nil)
-  ("I" (lambda (n) (interactive "p") (funcall (cs/add (cs/mod 'tree-inner t "inner")) n)) "tree-inner" :exit nil)
+  ("n" (lambda (n) (interactive "p") (funcall (cs/add (cs/mod 'tree-inner t "inner")) n)) "tree-inner" :exit nil)
   ("u" (lambda (n) (interactive "p") (funcall (cs/add (cs/mod 'tree-vertical 'up)) n)) "up" :exit nil)
   ("d" (lambda (n) (interactive "p") (funcall (cs/add (cs/mod 'tree-vertical 'down)) n)) "down" :exit nil)
   ("T" (lambda (n) (interactive "p") (funcall (cs/add (cs/mod 'tree-traversal 'inorder)) n)) "inorder" :exit nil)
