@@ -77,6 +77,8 @@ The previous state is already set in 'estate-previous-state', and the new state 
   (intern (format "estate-%s-state-enter-hook" state)))
 (defun estate--exit-hook-name (state)
   (intern (format "estate-%s-state-exit-hook" state)))
+(defun estate--enter-func-name (state)
+  (intern (format "estate-%s-state" state)))
 
 (defmacro estate-define-state (state-name parent-keymap)
   "Define a new state with STATE-NAME.
@@ -85,11 +87,13 @@ Defines estate-X-keymap, estate-X-buffer-local-keymap, estate-X-state-enter-hook
 The keymap gets the specified parent.
 The buffer-local-keymap has default value of nil, and so must be initialized to a keymap (eg. with `make-sparse-keymap') before first use in each buffer.
 States can be switched with `estate-activate-state' using STATE-NAME.
+Also defines estate-X-state function, which is equivalent to using `estate-activate-state' using STATE-NAME.
 "
   (let ((keymap (estate--keymap-name state-name))
         (local-keymap (estate--local-keymap-name state-name))
         (enter-hook (estate--enter-hook-name state-name))
-        (exit-hook (estate--exit-hook-name state-name)))
+        (exit-hook (estate--exit-hook-name state-name))
+        (activate-func (estate--enter-func-name state-name)))
     `(progn
        (define-prefix-command ',keymap)
        (defvar-local ,local-keymap nil
@@ -108,7 +112,11 @@ The variables 'estate-previous-state' and 'estate-state' are already set, so 'es
          ,(format "Hook for exiting estate %s state.
 Called before the enter-hook for the new state and before the generic 'estate-state-change-hook'.
 The variables 'estate-previous-state' and 'estate-state' are already set, so 'estate-previous-state' is the state that the hook is running for."
-                  state-name)))))
+                  state-name))
+       (defun ,activate-func ()
+         ,(format "Enter %s state.  Equivalent to (estate-activate-state '%s)" state-name state-name)
+         (interactive)
+         (estate-activate-state ',state-name)))))
 
 (defvar-local estate-state nil
   "The current estate-mode state.
