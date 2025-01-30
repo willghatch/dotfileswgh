@@ -2,53 +2,59 @@
 
 ;; first define some faces for the mode line stuff, especially
 ;; for evil states
-(defface wevil-normal-face
+(defface estate-mode-line-normal-face
   '((t (:foreground "black" :background "cyan")))
   "normal state marker face")
 
-(defface wevil-motion-face
+(defface estate-mode-line-motion-face
   '((t (:foreground "black" :background "blue")))
   "motion state marker face")
 
-(defface wevil-insert-face
+(defface estate-mode-line-insert-face
   '((t (:foreground "black" :background "magenta")))
   "insert state marker face")
 
-(defface wevil-replace-face
+(defface estate-mode-line-replace-face
   '((t (:foreground "black" :background "red")))
   "replace state marker face")
 
-(defface wevil-visual-face
+(defface estate-mode-line-visual-face
   '((t (:foreground "black" :background "green")))
   "visual state marker face")
 
-(defface wevil-emacs-face
+(defface estate-mode-line-emacs-face
   '((t (:foreground "black" :background "white")))
   "emacs state marker face")
 
-(defface wevil-operator-face
+(defface estate-mode-line-operator-face
   '((t (:foreground "black" :background "yellow")))
   "operator state marker face")
 
-(defface wevil-bufname-face
+(defface estate-mode-line-pager-face
+  '((t (:foreground "black" :background "purple")))
+  "pager state marker face")
+
+(defface wgh-mode-line-bufname-face
   '((t (:foreground "magenta" :bold t)))
   "face for buffer name")
 
-(defface wevil-unsaved-face
+(defface wgh-mode-line-unsaved-face
   '((t (:foreground "#5f0000" :background "red" :bold t)))
   "buffer unsaved (unsaved) face")
 
-(defface wevil-unsaved-global-face
+(defface wgh-mode-line-unsaved-global-face
   '((t (:foreground "#5f0000" :background "magenta" :bold t)))
   "face for marker for when any file-visiting buffer is unsaved")
 
-(defface wevil-ro-face
+(defface wgh-mode-line-ro-face
   '((t (:foreground "black" :background "yellow" :bold t)))
   "read only tag face")
 
-(defface wevil-pager-face
-  '((t (:foreground "black" :background "purple")))
-  "pager state marker face")
+
+(defface command-sentence-ui-hints-face
+  '((((background dark)) (:foreground "magenta"))
+    (((background light)) (:foreground "purple")))
+  "face for UI hints for command-sentence-current-sentence")
 
 ;; You can set both header-line-format and mode-line-format
 
@@ -59,40 +65,42 @@
                '(:eval (cond ((and (boundp 'estate-state) estate-local-mode)
                               (cond
                                ((eq estate-state 'normal)
-                                (propertize "<NORM>" 'face 'wevil-normal-face))
+                                (propertize "<NORM>" 'face 'estate-mode-line-normal-face))
+                               ((eq estate-state 'motion)
+                                (propertize "<MOTN>" 'face 'estate-mode-line-normal-face))
                                ((eq estate-state 'visual)
-                                (propertize "< VI >" 'face 'wevil-visual-face))
+                                (propertize "< VI >" 'face 'estate-mode-line-visual-face))
                                ((eq estate-state 'visual-rectangle)
-                                (propertize "<RECT>" 'face 'wevil-visual-face))
+                                (propertize "<RECT>" 'face 'estate-mode-line-visual-face))
                                ((eq estate-state 'visual-line)
-                                (propertize "<LINE>" 'face 'wevil-visual-face))
+                                (propertize "<LINE>" 'face 'estate-mode-line-visual-face))
                                ((eq estate-state 'insert)
-                                (propertize "<INST>" 'face 'wevil-insert-face))
+                                (propertize "<INST>" 'face 'estate-mode-line-insert-face))
                                ((eq estate-state 'pager)
-                                (propertize "<PAGE>" 'face 'wevil-pager-face))
-                               (t (propertize "WHAT ESTATE??" 'face 'wevil-emacs-face))))
+                                (propertize "<PAGE>" 'face 'estate-mode-line-pager-face))
+                               (t (propertize "WHAT ESTATE??" 'face 'estate-mode-line-emacs-face))))
                              ((boundp 'evil-state)
                               (cond
                                ((eq evil-state 'visual)
-                                (propertize "< VI >" 'face 'wevil-visual-face))
+                                (propertize "< VI >" 'face 'estate-mode-line-visual-face))
                                ((eq evil-state 'normal)
-                                (propertize "<NORM>" 'face 'wevil-normal-face))
+                                (propertize "<NORM>" 'face 'estate-mode-line-normal-face))
                                ((eq evil-state 'motion)
-                                (propertize "<MOTN>" 'face 'wevil-motion-face))
+                                (propertize "<MOTN>" 'face 'estate-mode-line-motion-face))
                                ((eq evil-state 'insert)
-                                (propertize "<INST>" 'face 'wevil-insert-face))
+                                (propertize "<INST>" 'face 'estate-mode-line-insert-face))
                                ((eq evil-state 'replace)
-                                (propertize "<REPL>" 'face 'wevil-replace-face))
+                                (propertize "<REPL>" 'face 'estate-mode-line-replace-face))
                                ((eq evil-state 'emacs)
-                                (propertize "<EMCS>" 'face 'wevil-emacs-face))
+                                (propertize "<EMCS>" 'face 'estate-mode-line-emacs-face))
                                ((eq evil-state 'operator)
-                                (propertize "<OPER>" 'face 'wevil-operator-face))
+                                (propertize "<OPER>" 'face 'estate-mode-line-operator-face))
                                ((eq evil-state 'pager)
-                                (propertize "<PAGE>" 'face 'wevil-pager-face))
-                               (t (propertize "WHAT STATE??" 'face 'wevil-emacs-face))))
-                             (t (propertize "<NO STATE INFO>" 'face 'wevil-emacs-face))))
+                                (propertize "<PAGE>" 'face 'estate-mode-line-pager-face))
+                               (t (propertize "WHAT STATE??" 'face 'estate-mode-line-emacs-face))))
+                             (t (propertize "<NO STATE INFO>" 'face 'estate-mode-line-emacs-face))))
 
-               '(:eval (propertize " %b " 'face 'wevil-bufname-face))
+               '(:eval (propertize " %b " 'face 'wgh-mode-line-bufname-face))
 
                ;; line and column
                '(:eval
@@ -139,16 +147,26 @@
                                                  (mapcar (lambda (x) (cdr (assq 'ui-hint x)))
                                                          command-sentence-current-sentence))))
                                   (and ui-hints
-                                       (format " %s" ui-hints))))
+                                       ;;(format " %s" ui-hints)
+                                       (propertize
+                                        (format " %s" ui-hints)
+                                        'face 'command-sentence-ui-hints-face)
+                                       )))
                            ""))
-               " {"
-               '(:eval (mapconcat (lambda (buffer)
-                                    (buffer-name buffer))
-                                  (cl-remove-if (lambda (buffer)
-                                                  (equal (buffer-name buffer) (buffer-name)))
-                                                (file-visiting-buffer-list))
-                                  " "))
-               "}"
+               ;; TODO - I read that in a future emacs version that this symbol will split the mode line for right alignment.
+               ;;'mode-line-format-right-align
+
+               ;;;; files list
+               ;; " {"
+               ;; '(:eval (mapconcat (lambda (buffer)
+               ;;                      (buffer-name buffer))
+               ;;                    (cl-remove-if (lambda (buffer)
+               ;;                                    (equal (buffer-name buffer) (buffer-name)))
+               ;;                                  (file-visiting-buffer-list))
+               ;;                    " "))
+               ;; "}"
+
+
                "%-" ; dashes to end
                ))
 
@@ -157,7 +175,7 @@
                "["
                ;; was this buffer modified since the last save?
                '(:eval (when (buffer-modified-p)
-                         (propertize "EDITED" 'face 'wevil-unsaved-face)))
+                         (propertize "EDITED" 'face 'wgh-mode-line-unsaved-face)))
 
                ;; was any buffer modified since the last save?
                '(:eval (when
@@ -169,11 +187,11 @@
                                          (and (buffer-file-name)
                                               (buffer-modified-p)))))
                              (buffer-list) :initial-value nil))
-                         (propertize "EB" 'face 'wevil-unsaved-global-face)))
+                         (propertize "EB" 'face 'wgh-mode-line-unsaved-global-face)))
 
                ;; is this buffer read-only?
                '(:eval (when buffer-read-only
-                         (propertize "RO" 'face 'wevil-ro-face)))
+                         (propertize "RO" 'face 'wgh-mode-line-ro-face)))
                "%e"
                "] "
                ;; the full file name

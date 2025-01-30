@@ -1,17 +1,18 @@
 ;; -*- lexical-binding: t -*-
 
-;; This is basically intended as a modal editing package, like evil-mode, vaguely vim-inspired, except:
-;; * All cursor positions are between characters, always.  No cursor-on-character nonsense like vi and its descendants.
-;; * I want it to be lighter-weight than evil-mode.
-;; * It won't come with bindings out-of-the-box, or at least won't provide them without calling some function.
-;; * estate-mode is mostly about having states, and only provides a few helpers for a few concerns that interact with states, eg. visual mode concerns.
+;; This is basically intended as a modal editing package, like evil-mode, vaguely vim-inspired.
+;; Some notes:
+;; * estate-mode just provides modal editing (or stateful editing since emacs uses the word mode for something else).
+;; * estate-core just provides the infrastructure for defining states.  You can define as many states as you want, but if a state should represent anything more than a set of key bindings, you must write the code to support that.
+;; * Each estate state comes with hooks, so you can run code on entering or leaving any particular state.
+;; * No part of estate provides support for vim-style on-character cursor positioning, which I consider to be a bad feature.  All cursor positions are between characters, always.
+;; * It won't come with bindings out-of-the-box.  Estate can be used as a DIY modal editing package, or can be used in combination with other packages that may provide key bindings.
+;; * I want it to be lighter-weight than evil-mode.  But I may expand features as I find I need more.  The evil-core.el file already feels too big and complicated to me.
 
 ;; TODO - clean up and document to be “publishable”, add current state variable and indicator, how to deal with repeating commands (should it be integrated or separate), ...
-;; TODO - what vim/evil functionality do I want to replicate?  Marks?  Registers?  I want something that (1) doesn't have the on-character location issue of vim, and (2) is lighter-weight than evil-mode.  What features belong in estate vs in other files?
-;; TODO - split into estate-core.el that has the minor mode definition and the infrastructure to define modes, but with no modes defined, and estate-vim-like-states.el that defines the core states that I want and their hooks and such, but with no bindings.  Add maybe another file with function definitions.  Add one more with vim-like bindings as a demo.
+
 ;; Notes: each state buffer-local-keymap must be initialized to an actual keymap (instead of nil) before use.
 
-(setq -estate-original-global-map (current-global-map))
 (defvar-local estate--estate-mode-map-alist `())
 (defvar-local estate--estate-mode-map-local-alist `())
 
