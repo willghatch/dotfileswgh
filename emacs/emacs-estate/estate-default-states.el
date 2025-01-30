@@ -1,10 +1,6 @@
 ;; -*- lexical-binding: t -*-
 
-;; Definitions for states that are similar to vim and evil-mode in spirit, though of course with some different details.
-
-;; TODO - decide what I want to be here vs elsewhere.  Anything that lives here should have the estate- prefix, no wgh/ prefix.
-;; TODO - clean up and document.  Especially document the wonky limitations of the different visual modes -- I am implementing just enough so that I get what I want out of visual-line, etc.
-;; TODO - estate-default-states, or at least a demo of bindings, needs a text object library.  So if I actually publish estate outside of my dotfiles, I need to also publish a text object library for it to use.
+;; Definitions for states that are similar to vim and evil-mode in spirit, though simpler and with no bindings.
 
 (require 'estate-core)
 
@@ -31,12 +27,9 @@
 (estate-define-state motion nil)
 (suppress-keymap estate-motion-state-keymap)
 
-
 (estate-define-state normal estate-motion-state-keymap)
 
-
-
-;; A pager state is nice to have -- it's basically motion state but maybe with some extra keys.  The idea is that it's like normal mode but you won't accidentally hit editing keys or such.
+;; A pager state is nice to have -- it's basically motion state but maybe with some extra keys.  The idea is that it's like normal mode but you won't accidentally hit editing keys or such, and maybe you bind things a bit differently, eg to scroll a page instead of moving by a line.
 (estate-define-state pager estate-motion-state-keymap)
 (add-hook 'estate-pager-state-enter-hook 'estate--pager-state-init)
 (add-hook 'estate-pager-state-exit-hook 'estate--pager-state-exit)
@@ -64,7 +57,7 @@
 (add-hook 'estate-insert-state-enter-hook 'estate--change-group-marker-init)
 (add-hook 'estate-insert-state-exit-hook 'estate--state-with-change-group-handler)
 
-(defun estate-state-with-change-group (new-state pre-change-thunk)
+(defun estate--activate-state-with-change-group (new-state pre-change-thunk)
   "Do all operations in pre-change-thunk and new-state as one change group (undo group)."
   (estate--state-with-change-group-handler)
   (let ((estate-change-group-marker (prepare-change-group)))
@@ -75,8 +68,9 @@
 
 
 (defun estate-insert-state-with-thunk (thunk)
-  "enter insert state, but execute thunk as part of the change group"
-  (estate-state-with-change-group 'insert thunk))
+  "Enter insert state, but execute thunk as part of the change group.
+This allows you to create bindings like Vim's change operator that do some edit then leave you in insert mode, but treat both as one change group."
+  (estate--activate-state-with-change-group 'insert thunk))
 
 
 
@@ -101,11 +95,9 @@
       (estate-activate-state 'visual)
     (estate-activate-state estate--pre-visual-state)))
 
-
 (defun estate--visual-mark-initialize ()
   (unless (region-active-p)
     (set-mark (point))))
-
 
 (add-hook 'estate-visual-state-enter-hook 'estate--visual-mark-initialize)
 (add-hook 'estate-visual-state-exit-hook 'deactivate-mark)
