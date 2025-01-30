@@ -37,8 +37,15 @@
 
 
 ;; A pager state is nice to have -- it's basically motion state but maybe with some extra keys.  The idea is that it's like normal mode but you won't accidentally hit editing keys or such.
-;; TODO - ensure that when in pager state, the buffer is read-only, but when exiting go back to the previous read status.
 (estate-define-state pager estate-motion-state-keymap)
+(add-hook 'estate-pager-state-enter-hook 'estate--pager-state-init)
+(add-hook 'estate-pager-state-exit-hook 'estate--pager-state-exit)
+(defvar-local estate--pre-pager-state-read-only-status nil)
+(defun estate--pager-state-init ()
+  (setq estate--pre-pager-state-read-only-status buffer-read-only)
+  (setq buffer-read-only t))
+(defun estate--pager-state-exit ()
+  (setq buffer-read-only estate--pre-pager-state-read-only-status))
 
 ;; Insert state does not suppress the keymap, so it passes through to the global keymap.  It's basically emacs mode.  Except that you can define things that shadow the global keymap with it.
 (estate-define-state insert nil)
