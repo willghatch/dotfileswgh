@@ -243,6 +243,13 @@ Otherwise, return a cons pair (PARAMS . EXECUTOR), containing the final paramete
 ;; TODO - add macro for use as key bind RHS such that you write a list of words to add, an option to execute, and it implicitly takes a numeric argument.
 
 
+(defun command-sentence-current-ui-hints ()
+  "Get a list of ui hints for the current command sentence."
+  (let ((ui-hints (seq-filter
+                   #'identity
+                   (mapcar (lambda (x) (cdr (assq 'ui-hint x)))
+                           command-sentence-current-sentence))))
+    (reverse ui-hints)))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;; a config, maybe to be default
