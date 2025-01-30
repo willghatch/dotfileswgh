@@ -7,6 +7,9 @@
 ### emacs
 
 ### These top few are the most important to have my core functionality.
+[submodule "external/emacs/estate"]
+	path = external/emacs/estate
+	url = https://github.com/willghatch/emacs-estate
 [submodule "external/emacs/repeatable-motion"]
 	path = external/emacs/repeatable-motion
 	url = https://github.com/willghatch/emacs-repeatable-motion
