@@ -25,12 +25,11 @@
 (setq composiphrase-demo-match-config
       `((verbs
          .
-         ((move (direction . forward)
-                (tree-vertical . ,nil) ;; options, nil, 'up, 'down
+         ((move (direction . forward) ;; options: forward, backward, expand-region
+                (tree-vertical . ,nil) ;; options: nil, 'up, 'down
                 ;; TODO - tree-inner is very specific to smartparens object so I can go up to inner parent...
                 (tree-inner . ,nil)     ;; boolean
                 (tree-traversal . ,nil) ;; nil or 'inorder
-                (expand-region . ,nil) ;; t for object selection, 'inner where that makes sense (eg. selecting tree children), may add more if more make sense, eg. 'space for adding surrounding white space.
                 (num . 1))
           ;; TODO - add registers for delete, change, copy.  They should all copy, but delete and change can have a different default register if I don't want them to copy by default.  Also paste should have a register to paste from, but also have a register for replaced contents when replacing.
           ;; TODO - what arguments do most of these mean?  Eg. tree movement also needs arguments about up/down, when going down you can have a child index, etc.  I generally want an idempotence argument for movements, though maybe it's really only useful for things like “go to the end of the line” without going to the next line, but it's likely a useful option in principle especially for keyboard macros.  Also want movement to sibling vs strict full/half sibling (indent/org trees) vs unbound by tree (eg. move to next s-expression beginning whether or not it moves out of the current tree).
@@ -50,8 +49,7 @@
           (barf (direction . forward) (num . 1))
           (open (direction . forward)) ;; IE new sibling
           ;; TODO - none of the below are really implemented yet.
-          (splice) ;; TODO - splice makes sense for delimited trees (s-expressions, xml), meaning delete the parentheses or enclosing tags, but less so for eg. org or indent trees, but could maybe mean promote.
-          (promote) ;; TODO - promote makes sense for org/outline trees, as well as indent-tree, and could maybe mean splice for lift-out-of-parent for symex...
+          (promote)
           (demote) ;; For symex you should be prompted to choose a tag to wrap with, and for xml you should be prompted for a tag.
           (change-delimiter) ;; This really only makes sense for a few things... how many operators do I want to have that aren't really composable?  That said, it's a common operation, so I want it to be convenient in the layout even if it doesn't apply to most objects.
           ;; TODO - something like insert-move, eg. vi's I and A move to a useful place before inserting, which is useful for command repetition.  I can encapsulate a move then an edit with macros, which I want to use more frequently and have easily accessible.  But the command repetition of evil-mode is just so convenient, and if I implement something similar it would be nice to have a “move to relevant location then insert” as a single command to be captured for repetition.
@@ -139,7 +137,7 @@
 
 
           (move buffer
-                ((direction ,nil) (expand-region ,t))
+                ((direction expand-region))
                 (,(lambda ()
                     (activate-mark)
                     (set-mark (point-min))
@@ -174,7 +172,7 @@
 
           ;; TODO - I really want more kinds of word objects, eg. to select camelCase word parts, to transpose them keeping the overall casing correct, etc.  Is there a useful way that I can specify ad-hoc word types and what delimiters should be allowed?  Eg. people use each of camelCase, snake_case, kebab-case, and more.  Sometimes they are mixed together or with extra separators like / or sigils, and can have ad-hoc meaning for the hierarchy of the different groupings.  Some people balk at mixing, but using more than one kind of case can be useful and meaningful, and sometimes mixing is out of your hands.  But I want tools to easily use all of these and select sub-parts at different levels of granularity.
           (move word
-                ((direction ,nil) (expand-region ,t))
+                ((direction expand-region))
                 (wgh/expand-region-to-word ()))
           (move word
                 ((direction forward) (location-within beginning))
@@ -196,7 +194,7 @@
                 (rmo/backward-word (num)))
 
           (move vi-like-word
-                ((direction ,nil) (expand-region ,t))
+                ((direction expand-region))
                 (wgh/expand-region-to-vi-like-word ()))
           (move vi-like-word
                 ((direction forward) (location-within beginning))
@@ -212,7 +210,7 @@
                 (rmo/wgh/backward-vi-like-word-end (num)))
 
           (move symbol
-                ((direction ,nil) (expand-region ,t))
+                ((direction expand-region))
                 (wgh/expand-region-to-symbol ()))
           (move symbol
                 ((direction forward) (location-within beginning))
@@ -234,7 +232,7 @@
                 (rmo/backward-symbol (num)))
 
           (move sentence
-                ((direction ,nil) (expand-region ,t))
+                ((direction expand-region))
                 (wgh/expand-region-to-sentence ()))
           (move sentence
                 ((direction forward) (location-within beginning))
@@ -256,7 +254,7 @@
                 (rmo/backward-sentence (num)))
 
           (move paragraph
-                ((direction ,nil) (expand-region ,t))
+                ((direction expand-region))
                 (wgh/expand-region-to-paragraph ()))
           (move paragraph
                 ((direction forward) (location-within beginning))
@@ -278,10 +276,10 @@
                 (rmo/backward-paragraph (num)))
 
           (move line
-                ((direction ,nil) (expand-region inner))
+                ((direction expand-region) (tree-inner ,t))
                 (,(lambda () (wgh/expand-region-to-fill-lines nil)) ()))
           (move line
-                ((direction ,nil) (expand-region ,t))
+                ((direction expand-region) (tree-inner ,nil))
                 (,(lambda () (wgh/expand-region-to-fill-lines t)) ()))
           (move line
                 ((direction forward) (location-within beginning))
@@ -304,32 +302,31 @@
                 (rmo-c/wgh/prev-line (num)))
 
           (move sptw
-                ;; TODO - the modifiers aren't correct, but I'm not sure where to shoehorn this in, so I'm going to roll with this for now.
-                ((tree-vertical up) (expand-region ,t) (tree-traversal inorder))
+                ((tree-vertical up) (direction expand-region) (tree-inner ,nil))
                 (sptw-select-root ()))
           (move sptw
-                ;; TODO - the modifiers aren't correct, but I'm not sure where to shoehorn this in, so I'm going to roll with this for now.
-                ((tree-vertical up) (expand-region ,nil) (tree-traversal inorder))
+                ((tree-vertical up) (direction expand-region) (tree-inner ,nil))
                 (sptw-up-to-root ()))
           (move sptw
-                ((direction ,nil) (expand-region ,t) (delimiter any))
+                ((direction expand-region) (tree-inner ,nil) (delimiter any) (tree-vertical ,nil))
                 (sptw-expand-region-to-any-delimiter (num)))
           (move sptw
-                ((direction ,nil) (expand-region inner) (delimiter any))
+                ((direction expand-region) (tree-inner ,t) (delimiter any) (tree-vertical ,nil))
                 (sptw-expand-region/children-region (num)))
 
           (move sptw
-                ((direction ,nil) (expand-region ,t) (delimiter t ,(lambda (actual expected) (stringp actual))))
+                ((direction expand-region) (tree-vertical ,nil) (tree-inner ,nil)
+                 (delimiter t ,(lambda (actual expected) (stringp actual))))
                 (sptw-expand-region-to-delimiter (delimiter num)))
           (move sptw
-                ((direction ,nil) (expand-region inner) (delimiter t ,(lambda (actual expected) (stringp actual))))
+                ((direction expand-region) (tree-vertical ,nil) (tree-inner ,t) (delimiter t ,(lambda (actual expected) (stringp actual))))
                 (sptw-expand-region-to-delimiter/children-region (delimiter num)))
 
           (move sptw
-                ((direction ,nil) (expand-region ,t) (delimiter ,nil))
+                ((direction expand-region) (tree-vertical ,nil) (tree-inner ,nil) (delimiter ,nil))
                 (sptw-expand-region (num)))
           (move sptw
-                ((direction ,nil) (expand-region inner) (delimiter ,nil))
+                ((direction expand-region) (tree-vertical ,nil) (tree-inner ,t) (delimiter ,nil))
                 (sptw-expand-region/children-region (num)))
 
           (move sptw
@@ -426,18 +423,16 @@
 
 
           (move tstw-qd
-                ;; TODO - the modifiers aren't correct, but I'm not sure where to shoehorn this in, so I'm going to roll with this for now.
-                ((tree-vertical up) (expand-region ,t) (tree-traversal inorder))
+                ((tree-vertical up) (direction expand-region) (tree-inner ,nil))
                 (tstw-qd-select-root ()))
           (move tstw-qd
-                ;; TODO - the modifiers aren't correct, but I'm not sure where to shoehorn this in, so I'm going to roll with this for now.
-                ((tree-vertical up) (expand-region ,nil) (tree-traversal inorder))
+                ((tree-vertical up) (direction expand-region) (tree-inner ,nil))
                 (tstw-qd-up-to-root ()))
           (move tstw-qd
-                ((direction ,nil) (expand-region ,t))
+                ((direction expand-region) (tree-vertical ,nil) (tree-inner ,nil))
                 (tstw-qd-expand-region (num)))
           (move tstw-qd
-                ((direction ,nil) (expand-region inner))
+                ((direction expand-region) (tree-vertical ,nil) (tree-inner ,t))
                 (tstw-qd-expand-region/children-region (num)))
 
           (move tstw-qd
@@ -482,18 +477,16 @@
                 (nxml-up-element))
 
           (move outline
-                ;; TODO - the modifiers aren't correct, but I'm not sure where to shoehorn this in, so I'm going to roll with this for now.
-                ((tree-vertical up) (expand-region ,t) (tree-traversal inorder))
+                ((tree-vertical up) (direction expand-region) (tree-inner ,nil))
                 (twoi-select-root ()))
           (move outline
-                ;; TODO - the modifiers aren't correct, but I'm not sure where to shoehorn this in, so I'm going to roll with this for now.
-                ((tree-vertical up) (expand-region ,nil) (tree-traversal inorder))
+                ((tree-vertical up) (direction expand-region) (tree-inner ,nil))
                 (twoi-up-to-root ()))
           (move outline
-                ((direction ,nil) (expand-region ,t))
+                ((direction expand-region) (tree-vertical ,nil) (tree-inner ,nil))
                 (twoi-expand-region (num)))
           (move outline
-                ((direction ,nil) (expand-region inner))
+                ((direction expand-region) (tree-vertical ,nil) (tree-inner ,t))
                 (twoi-expand-region/children-region (num)))
           (move outline
                 ((direction forward) (tree-traversal inorder))
@@ -528,17 +521,17 @@
 
           (move indent-tree
                 ;; TODO - the modifiers aren't correct, but I'm not sure where to shoehorn this in, so I'm going to roll with this for now.
-                ((tree-vertical up) (expand-region ,t) (tree-traversal inorder))
+                ((tree-vertical up) (direction expand-region) (tree-inner ,nil))
                 (indent-tree-select-root ()))
           (move indent-tree
                 ;; TODO - the modifiers aren't correct, but I'm not sure where to shoehorn this in, so I'm going to roll with this for now.
-                ((tree-vertical up) (expand-region ,nil) (tree-traversal inorder))
+                ((tree-vertical up) (direction expand-region) (tree-inner ,nil))
                 (indent-tree-up-to-root ()))
           (move indent-tree
-                ((direction ,nil) (expand-region ,t))
+                ((direction expand-region) (tree-vertical ,nil) (tree-inner ,nil))
                 (indent-tree-expand-region (num)))
           (move indent-tree
-                ((direction ,nil) (expand-region inner))
+                ((direction expand-region) (tree-vertical ,nil) (tree-inner ,t))
                 (indent-tree-expand-region/children-region (num)))
           (move indent-tree
                 ((direction forward) (tree-traversal inorder))
@@ -572,7 +565,7 @@
           (demote indent-tree () (indent-tree-demote ()))
 
 
-          (move url ((direction ,nil) (expand-region ,t))
+          (move url ((direction expand-region))
                 (wgh/expand-region-to-url))
           (move url ((direction forward) (location-within beginning))
                 (rmo/wgh/forward-url-beginning (num)))
@@ -582,7 +575,7 @@
                 (rmo/wgh/forward-url-end (num)))
           (move url ((direction backward) (location-within end))
                 (rmo/wgh/backward-url-end (num)))
-          (move email ((direction ,nil) (expand-region ,t))
+          (move email ((direction expand-region))
                 (wgh/expand-region-to-email))
           (move email ((direction forward) (location-within beginning))
                 (rmo/wgh/forward-email-beginning (num)))
