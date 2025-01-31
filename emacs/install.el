@@ -35,6 +35,8 @@
     (straight-use-package (submod 'estate))
     (straight-use-package (submod 'repeatable-motion))
     (straight-use-package (submod 'this-command-all-keys))
+    (straight-use-package (submod 'aggreact))
+
     (straight-use-package (submod 'hydra))
     (straight-use-package (submod 'queue))
     (straight-use-package (submod 'undo-tree))
