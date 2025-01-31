@@ -19,6 +19,12 @@
 [submodule "external/emacs/aggreact"]
 	path = external/emacs/aggreact
 	url = https://github.com/willghatch/emacs-aggreact
+[submodule "external/emacs/composiphrase"]
+	path = external/emacs/composiphrase
+	url = https://github.com/willghatch/emacs-composiphrase
+[submodule "external/emacs/composiphrase-objects"]
+	path = external/emacs/composiphrase-objects
+	url = https://github.com/willghatch/emacs-composiphrase-objects
   
 [submodule "external/emacs/hydra"]
 	path = external/emacs/hydra
