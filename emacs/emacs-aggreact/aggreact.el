@@ -1,55 +1,6 @@
 ;;; -*- lexical-binding: t; -*-
 
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;; Record all keys for each command.
-
-(setq aggreact--current-command-key-groups nil)
-(setq aggreact--current-single-command-key-groups nil)
-(setq aggreact--current-single-command-raw-key-groups nil)
-
-(defun aggreact--read-key-sequence-advice (&rest args)
-  (setq aggreact--current-single-command-raw-key-groups
-        (cons (this-single-command-raw-keys)
-              aggreact--current-single-command-raw-key-groups))
-  (setq aggreact--current-single-command-key-groups
-        (cons (this-single-command-keys)
-              aggreact--current-single-command-key-groups))
-  (setq aggreact--current-command-key-groups
-        (cons (this-command-keys)
-              aggreact--current-command-key-groups)))
-
-(defun aggreact-this-command-all-keys (cook-style as-groups)
-  "Return a vector of keys used for this command, including any uses of `read-key-sequence', at least up to the point where this function is used.
-Returns a vector, or if AS-GROUPS is non-nil, return a list of vectors where each vector represents a different call to `read-key-sequence' or a command loop read.
-COOK-STYLE can be 'raw, 'single, or 'tck to receive keys as in `this-single-command-raw-keys', `this-single-command-keys', or `this-command-keys', respectively.
-
-Requires aggreact-mode to be enabled, since it depends on `read-key-sequence' advice to not lose key sequences.
-"
-  (when (not aggreact-mode)
-    (error "aggreact-this-command-all-keys requires aggreact-mode be enabled"))
-  (let ((data (reverse
-               (cons (cond ((eq cook-style 'raw) (this-single-command-raw-keys))
-                           ((eq cook-style 'single) (this-single-command-keys))
-                           ((eq cook-style 'tck) (this-command-keys))
-                           (t (error "bad value for cook-style: %s" cook-style)))
-                     (cond ((eq cook-style 'raw) aggreact--current-single-command-raw-key-groups)
-                           ((eq cook-style 'single) aggreact--current-single-command-key-groups)
-                           ((eq cook-style 'tck) aggreact--current-command-key-groups)
-                           (t (error "bad value for cook-style: %s" cook-style)))))))
-    (if as-groups
-        data
-      (apply 'seq-concatenate 'vector data))))
-
-
-;; (defun aggreact--post-command--single-command-record ()
-;;   (let ((data (reverse
-;;                (cons (this-single-command-keys)
-;;                      aggreact--current-single-command-key-groups))))
-;;     (setq aggreact--current-single-command-key-groups nil)
-;;     (ring-insert aggreact--ring
-;;                  (reverse data))))
-;; ;; TODO - allow depth configuration.  The post-command hook clears the current value such that aggreact-this-command-all-keys no longer works, and the value goes into the history ring.
-;; (add-hook 'post-command-hook 'aggreact--post-command--single-command-record 99 nil)
+(require 'this-command-all-keys)
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Record metadata about each command, and group commands.
@@ -80,9 +31,9 @@ This is useful to eg. keep histories of commands with interesting properties.
   (let* ((new-command-details
           `((command . ,this-command)
             ;; TODO - command arguments
-            (keys-vectors . ,(aggreact-this-command-all-keys 'tck t))
-            (single-keys-vectors . ,(aggreact-this-command-all-keys 'single t))
-            (raw-keys-vectors . ,(aggreact-this-command-all-keys 'raw t)))))
+            (keys-vectors . ,(this-command-all-keys 'tck t))
+            (single-keys-vectors . ,(this-command-all-keys 'single t))
+            (raw-keys-vectors . ,(this-command-all-keys 'raw t)))))
     (setq new-command-details
           (seq-reduce (lambda (accum enrich-func)
                         (let ((enrich-result
@@ -118,13 +69,10 @@ This may cause issues if not run in a state where the keys will do the same thin
 "
   (execute-kbd-macro (aggreact--get-keys-for-command-group command-group)))
 
-
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;; minor-mode that adds advice and hooks
+(setq aggreact--this-command-all-keys-mode-state-before-aggreact nil)
 
 (define-minor-mode aggreact-mode
   "A minor-mode for recording commands.
-It adds advice to `read-key-sequence' so that all keys for a given command can be recorded.
 For each command, it records an alist that includes the the keys:
 * command - the command executed
 * keys-vectors - list of vectors of keys, as from `this-single-command-keys'
@@ -137,6 +85,8 @@ The variable 'aggreact-command-group-split-predicate' determines when command gr
 When a group is split, the 'aggreact-command-gorup-split-functions' list is run.
 You can add a function to the list to eg. keep a list of interesting command groups.
 
+This mode also requires this-command-all-keys mode.
+
 The original motivation behind this mode was to provide command recording and replay that can work for my other packages, estate-mode and composiphrase.
 That requires replaying groups of commands, and filtering to decide which groups are interesting for replaying.
 See the composiphrase demo config at TODO to see an example setup using aggreact-mode.
@@ -144,21 +94,13 @@ See the composiphrase demo config at TODO to see an example setup using aggreact
   :global t
   (if aggreact-mode
       (progn
-        (advice-add 'read-key-sequence
-                    :before
-                    'aggreact--read-key-sequence-advice)
-        (advice-add 'read-key-sequence-vector
-                    :before
-                    'aggreact--read-key-sequence-advice)
-        (add-hook 'post-command-hook 'aggreact--post-command)
-        )
+        (setq aggreact--this-command-all-keys-mode-state-before-aggreact
+              this-command-all-keys-mode)
+        (this-command-all-keys-mode 1)
+        (add-hook 'post-command-hook 'aggreact--post-command))
     (progn
-      (advice-remove 'read-key-sequence
-                     'aggreact--read-key-sequence-advice)
-      (advice-remove 'read-key-sequence-vector
-                     'aggreact--read-key-sequence-advice)
       (remove-hook 'post-command-hook 'aggreact--post-command)
-      )))
-
+      (when (not aggreact--this-command-all-keys-mode-state-before-aggreact)
+        (this-command-all-keys-mode -1)))))
 
 (provide 'aggreact)
