@@ -1,29 +1,48 @@
 ;; -*- lexical-binding: t; -*-
 
-(setq this-command-all-keys--current-key-groups nil)
+(setq this-command-all-keys--current-single-command-key-groups nil)
+(setq this-command-all-keys--current-single-command-raw-key-groups nil)
 ;; TODO - make configurable size
 (setq this-command-all-keys--ring (make-ring 1000))
 
 (defun this-command-all-keys--read-key-sequence-advice (&rest args)
   ;; TODO - should this use this-single-command-keys, this-single-command-raw-keys, this-command-keys, or what?
-  (setq this-command-all-keys--current-key-groups
+  (setq this-command-all-keys--current-single-command-key-groups
         (cons (this-single-command-keys)
-              this-command-all-keys--current-key-groups)))
+              this-command-all-keys--current-single-command-key-groups))
+  (setq this-command-all-keys--current-single-command-raw-key-groups
+        (cons (this-single-command-raw-keys)
+              this-command-all-keys--current-single-command-raw-key-groups)))
 
 
 (defun this-command-all-keys--post-command ()
   (let ((data (reverse
                (cons (this-single-command-keys)
-                     this-command-all-keys--current-key-groups))))
-    (setq this-command-all-keys--current-key-groups nil)
+                     this-command-all-keys--current-single-command-key-groups))))
+    (setq this-command-all-keys--current-single-command-key-groups nil)
     (ring-insert this-command-all-keys--ring
                  (reverse data))))
 
-(defun this-command-all-keys (&optional as-groups)
+(defun this-command-all-keys (&optional raw as-groups)
+  "Return a vector of keys used for this command, including any uses of `read-key-sequence', at least up to the point where this function is used.
+Returns a vector, or if AS-GROUPS is 't', return a list of vectors where each vector represents a different call to `read-key-sequence' or a command loop read.
+If RAW, return keys as in `this-single-command-raw-keys' instead of `this-single-command-keys'.
+"
+  (let ((data (reverse
+               (cons (if raw (this-single-command-raw-keys)
+                       (this-single-command-keys))
+                     (if raw
+                         this-command-all-keys--current-single-command-raw-key-groups
+                       this-command-all-keys--current-single-command-key-groups)))))
+    (if as-groups
+        data
+      (apply 'seq-concatenate 'vector data))))
+
+(defun this-command-all-keys-raw (&optional as-groups)
   "Return a vector of keys used for this command, including any uses of `read-key-sequence', at least up to the point where this function is used.  Returns a vector, or if AS-GROUPS is 't', return a list of vectors where each vector represents a different call to `read-key-sequence' or a command loop read."
   (let ((data (reverse
-               (cons (this-single-command-keys)
-                     this-command-all-keys--current-key-groups))))
+               (cons (this-single-command-raw-keys)
+                     this-command-all-keys--current-single-command-raw-key-groups))))
     (if as-groups
         data
       (apply 'seq-concatenate 'vector data))))
