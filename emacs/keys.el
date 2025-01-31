@@ -133,9 +133,9 @@
 (eImap "\C-c" 'estate-normal-state)
 (eimap "\C-l" 'estate-normal-state)
 
-(emmap "\C-g" 'keyboard-quit-and-clear-composiphrase)
-(evmap "\C-g" 'keyboard-quit-and-clear-composiphrase)
-(eimap "\C-g" 'keyboard-quit-and-clear-composiphrase)
+(emmap "\C-g" 'keyboard-quit-and-clear-composiphrase-and-maybe-leave-visual-state)
+(eimap "\C-g" 'keyboard-quit-and-clear-composiphrase-and-maybe-leave-visual-state)
+(evmap "\C-g" 'keyboard-quit-and-clear-composiphrase-and-maybe-leave-visual-state)
 
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -425,7 +425,7 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; composiphrase command-select map
 (defhydra command-select (:foreign-keys warn :exit nil) "Cmd:"
-  ("C-g" keyboard-quit-and-clear-composiphrase "quit" :exit t)
+  ("C-g" keyboard-quit-and-clear-composiphrase-and-maybe-leave-visual-state "quit" :exit t)
   ("c" (lambda (n) (interactive "p")
          (if (region-active-p)
              (funcall (cs/ae (cs/verb 'change)
@@ -512,7 +512,7 @@
   x)
 (defhydra object-select (:foreign-keys warn :exit nil) "Obj:"
   ;; TODO - Hydra handles lambda specially.  I would love to just use higher order functions, but to work with Hydra I seem to need to use lambdas...  Maybe I should do this without hydra.
-  ("C-g" keyboard-quit-and-clear-composiphrase "quit" :exit t)
+  ("C-g" keyboard-quit-and-clear-composiphrase-and-maybe-leave-visual-state "quit" :exit t)
   ("c" (lambda (n) (interactive "p") (funcall (cs/ae (cs/obj 'character)) n)) "character" :exit t)
   ("f" (lambda (n) (interactive "p") (funcall (cs/ae (cs/mod 'specific t)
                                                      (cs/obj 'character))

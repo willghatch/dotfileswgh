@@ -19,9 +19,12 @@
         (t (error))))
 
 
-(defun keyboard-quit-and-clear-composiphrase ()
+
+(defun keyboard-quit-and-clear-composiphrase-and-maybe-leave-visual-state ()
   (interactive)
   (setq composiphrase-current-sentence nil)
+  (when (equal estate-state 'visual)
+    (estate-normal-state))
   (keyboard-quit))
 
 
