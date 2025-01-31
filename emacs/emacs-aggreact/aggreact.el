@@ -1,4 +1,4 @@
-;; -*- lexical-binding: t; -*-
+;;; -*- lexical-binding: t; -*-
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Record all keys for each command.
@@ -55,10 +55,6 @@ Requires aggreact-mode to be enabled, since it depends on `read-key-sequence' ad
 ;; Record metadata about each command, and group commands.
 
 (setq aggreact--current-groups nil)
-(setq aggreact--pre-command-prefix-arg-state nil)
-
-(defun aggreact--pre-command ()
-  (setq aggreact--pre-command-prefix-arg-state prefix-arg))
 
 (defvar aggreact-command-group-split-predicate nil
   "Predicate for when to split a command group.
@@ -86,9 +82,7 @@ This is useful to eg. keep histories of commands with interesting properties.
             ;; TODO - command arguments
             (keys-vectors . ,(aggreact-this-command-all-keys 'tck t))
             (single-keys-vectors . ,(aggreact-this-command-all-keys 'single t))
-            (raw-keys-vectors . ,(aggreact-this-command-all-keys 'raw t))
-            (modified-prefix-arg-p . ,(equal aggreact--pre-command-prefix-arg-state
-                                             prefix-arg)))))
+            (raw-keys-vectors . ,(aggreact-this-command-all-keys 'raw t)))))
     (setq new-command-details
           (seq-reduce (lambda (accum enrich-func)
                         (let ((enrich-result
@@ -135,7 +129,6 @@ For each command, it records an alist that includes the the keys:
 * command - the command executed
 * keys-vectors - list of vectors of keys, as from `this-single-command-keys'
 * raw-keys-vectors - list of vectors of keys, as from `this-single-command-raw-keys'
-* modified-prefix-arg-p - non-nil if the command modified the prefix argument.
 
 Additionally, it uses 'aggreact-command-history-enrichment-functions' to add more keys to the alist.
 
@@ -157,68 +150,15 @@ See the composiphrase demo config at TODO to see an example setup using aggreact
         (advice-add 'read-key-sequence-vector
                     :before
                     'aggreact--read-key-sequence-advice)
-        (add-hook 'pre-command-hook 'aggreact--pre-command)
         (add-hook 'post-command-hook 'aggreact--post-command)
-        (add-hook 'after-change-functions 'aggreact--after-change)
         )
     (progn
       (advice-remove 'read-key-sequence
                      'aggreact--read-key-sequence-advice)
       (advice-remove 'read-key-sequence-vector
                      'aggreact--read-key-sequence-advice)
-      (remove-hook 'pre-command-hook 'aggreact--pre-command)
       (remove-hook 'post-command-hook 'aggreact--post-command)
-      (remove-hook 'after-change-functions 'aggreact--after-change)
       )))
-
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;; TODO - move out -- the below is config for composiphrase + estate demo to have a good repeat key
-(setq aggreact--editing-groups-ring (make-ring 100))
-
-(setq aggreact--current-command-modified-buffers nil)
-(defun aggreact--after-change (&rest args)
-  (when (not (member (current-buffer) aggreact--current-command-modified-buffers))
-    (setq aggreact--current-command-modified-buffers
-          (cons (current-buffer) aggreact--current-command-modified-buffers))))
-
-(setq aggreact-command-group-split-predicate
-      (lambda (reversed-command-group)
-        (and (equal estate-state 'normal)
-             (equal composiphrase-current-sentence nil)
-             (equal aggreact--pre-command-prefix-arg-state prefix-arg)
-             )))
-
-(setq aggreact-command-history-enrichment-functions
-      (list
-       (lambda (x)
-         `(
-           ;;(estate-state-after-command . ,estate-state)
-           ;;(composiphrase-current-sentence-after-command . ,composiphrase-current-sentence)
-           (edited-buffer-that-command-ended-in
-            .
-            ,(let ((result (member (current-buffer)
-                                   aggreact--current-command-modified-buffers)))
-               (setq aggreact--current-command-modified-buffers nil)
-               result))))))
-(setq aggreact-command-group-split-functions
-      (list
-       (lambda (group)
-         (let* ((edited-p (seq-find (lambda (cmd) (cdr (assq 'edited-buffer-that-command-ended-in cmd))) group))
-                (length-1-command (and (equal (length group) 1)
-                                       (cdr (assq 'command (car group)))))
-                (single-undo-p (and length-1-command
-                                    (member length-1-command
-                                            '(undo undo-tree-undo undo-tree-redo)))))
-           (when (and edited-p
-                      (not single-undo-p))
-             (ring-insert aggreact--editing-groups-ring group))))))
-
-(defun aggreact-repeat-latest-editing (&optional count)
-  (interactive "p")
-  (let ((last-command (ring-ref aggreact--editing-groups-ring 0)))
-    (dotimes (i (or count 1))
-      (aggreact-execute-command-group-as-keyboard-macro last-command))))
-
 
 
 (provide 'aggreact)
