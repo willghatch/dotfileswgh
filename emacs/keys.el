@@ -283,7 +283,7 @@
 
 (enmap "<" (with-evil 'evil-shift-left))
 (enmap ">" (with-evil 'evil-shift-right))
-(emmap "%" 'sptw-move-to-other-end-of-sexp) ;; TODO - maybe just stop using this?  I can accomplish it with forward/backward beg/end.  Turn it into training wheels message binding.
+(emmap "%" 'cpo-smartparens-move-to-other-end-of-sexp) ;; TODO - maybe just stop using this?  I can accomplish it with forward/backward beg/end.  Turn it into training wheels message binding.
 
 (enmap (kbd "DEL") 'rmo/backward-char)
 (enmap (kbd "<deletechar>") 'rmo/forward-char)
@@ -397,7 +397,7 @@
              (require 'cpo-smartparens)
              (funcall (cs/ae (cs/mod 'direction 'expand-region)
                              (cs/mod 'delimiter 'any)
-                             (cs/obj 'sptw))
+                             (cs/obj 'cpo-smartparens))
                       n)))
 (emmap ")" (lambda (n)
              (interactive "p")
@@ -405,7 +405,7 @@
              (funcall (cs/ae (cs/mod 'direction 'expand-region)
                              (cs/mod 'tree-inner t "inner")
                              (cs/mod 'delimiter 'any)
-                             (cs/obj 'sptw))
+                             (cs/obj 'cpo-smartparens))
                       n)))
 
 
@@ -507,7 +507,7 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; composiphrase object-select map
 
-(defun with-sptw-req (x)
+(defun with-cpo-smartparens-req (x)
   (require 'cpo-smartparens)
   x)
 (defhydra object-select (:foreign-keys warn :exit nil) "Obj:"
@@ -521,8 +521,8 @@
   ("l" (lambda (n) (interactive "p") (funcall (cs/ae (cs/obj 'line)) n)) "line" :exit t)
   ("w" (lambda (n) (interactive "p") (funcall (cs/ae (cs/obj 'cpo-vi-like-word)) n)) "vi-like-word" :exit t)
   ("W" (lambda (n) (interactive "p") (funcall (cs/ae (cs/obj 'word)) n)) "word" :exit t)
-  ("s" (lambda (n) (interactive "p") (funcall (cs/ae (with-sptw-req (cs/obj 'sptw))) n)) "smartparens" :exit t)
-  ("i" (lambda (n) (interactive "p") (funcall (cs/ae (progn (require 'cpo-indent-tree) (cs/obj 'indent-tree))) n)) "indent-tree" :exit t)
+  ("s" (lambda (n) (interactive "p") (funcall (cs/ae (with-cpo-smartparens-req (cs/obj 'cpo-smartparens))) n)) "smartparens" :exit t)
+  ("i" (lambda (n) (interactive "p") (funcall (cs/ae (progn (require 'cpo-indent-tree) (cs/obj 'cpo-indent-tree))) n)) "indent-tree" :exit t)
   ;; TODO - I want this one, but I keep using this accidentally due to my old key bindings, and it is so frustrating.  So I'll leave it as a no-op for now.
   ;;("o" (funcall (cs/ae (cs/obj 'outline))) "outline" :exit t)
   ("o" (lambda (n) (interactive "p") (funcall (cs/ae (cs/obj 'NOOP-STOP-USING-THIS-BINDING-FOR-OLD-PURPOSE)) n)) "break habit!" :exit t)
@@ -530,7 +530,7 @@
   ("t" (lambda (n) (interactive "p") (funcall (cs/ae (progn (require 'cpo-treesitter-qd)
                                                             (wgh/initialize-treesit-for-buffer)
                                                             ;; TODO - also need to initialize treesitter in the buffer before first use...
-                                                            (cs/obj 'tstw-qd)))
+                                                            (cs/obj 'cpo-treesitter-qd)))
                                               n))
    "treesitter-thumb" :exit t)
   ("x" (lambda (n) (interactive "p") (funcall (cs/ae (cs/obj 'xml)) n)) "xml" :exit t)
@@ -554,22 +554,22 @@
   ("hu" (lambda (n) (interactive "p") (funcall (cs/ae (cs/obj 'url)) n)) "url" :exit t)
   ("he" (lambda (n) (interactive "p") (funcall (cs/ae (cs/obj 'email)) n)) "email" :exit t)
 
-  ("\"" (lambda (n) (interactive "p") (funcall (cs/ae (cs/mod 'delimiter "\"") (with-sptw-req (cs/obj 'sptw))) n)) "\"" :exit t)
-  ("'" (lambda (n) (interactive "p") (funcall (cs/ae (cs/mod 'delimiter "'") (with-sptw-req (cs/obj 'sptw))) n)) "'" :exit t)
-  ("`" (lambda (n) (interactive "p") (funcall (cs/ae (cs/mod 'delimiter "`") (with-sptw-req (cs/obj 'sptw))) n)) "`" :exit t)
-  ("(" (lambda (n) (interactive "p") (funcall (cs/ae (cs/mod 'delimiter "(") (with-sptw-req (cs/obj 'sptw))) n)) "()" :exit t)
-  (")" (lambda (n) (interactive "p") (funcall (cs/ae (cs/mod 'delimiter "(") (with-sptw-req (cs/obj 'sptw))) n)) "()" :exit t)
-  ("[" (lambda (n) (interactive "p") (funcall (cs/ae (cs/mod 'delimiter "[") (with-sptw-req (cs/obj 'sptw))) n)) "[]" :exit t)
-  ("]" (lambda (n) (interactive "p") (funcall (cs/ae (cs/mod 'delimiter "[") (with-sptw-req (cs/obj 'sptw))) n)) "[]" :exit t)
-  ("{" (lambda (n) (interactive "p") (funcall (cs/ae (cs/mod 'delimiter "{") (with-sptw-req (cs/obj 'sptw))) n)) "{}" :exit t)
-  ("}" (lambda (n) (interactive "p") (funcall (cs/ae (cs/mod 'delimiter "{") (with-sptw-req (cs/obj 'sptw))) n)) "{}" :exit t)
-  ("«" (lambda (n) (interactive "p") (funcall (cs/ae (cs/mod 'delimiter "«") (with-sptw-req (cs/obj 'sptw))) n)) "«»" :exit t)
-  ("»" (lambda (n) (interactive "p") (funcall (cs/ae (cs/mod 'delimiter "«") (with-sptw-req (cs/obj 'sptw))) n)) "«»" :exit t)
-  ("“" (lambda (n) (interactive "p") (funcall (cs/ae (cs/mod 'delimiter "“") (with-sptw-req (cs/obj 'sptw))) n)) "“”" :exit t)
-  ("”" (lambda (n) (interactive "p") (funcall (cs/ae (cs/mod 'delimiter "“") (with-sptw-req (cs/obj 'sptw))) n)) "“”" :exit t)
-  ("⟅" (lambda (n) (interactive "p") (funcall (cs/ae (cs/mod 'delimiter "⟅") (with-sptw-req (cs/obj 'sptw))) n)) "⟅⟆" :exit t)
-  ("⟆" (lambda (n) (interactive "p") (funcall (cs/ae (cs/mod 'delimiter "⟅") (with-sptw-req (cs/obj 'sptw))) n)) "⟅⟆" :exit t)
-  ("#" (lambda (n) (interactive "p") (funcall (cs/ae (cs/mod 'delimiter "#|") (with-sptw-req (cs/obj 'sptw))) n)) "#||#" :exit t)
+  ("\"" (lambda (n) (interactive "p") (funcall (cs/ae (cs/mod 'delimiter "\"") (with-cpo-smartparens-req (cs/obj 'cpo-smartparens))) n)) "\"" :exit t)
+  ("'" (lambda (n) (interactive "p") (funcall (cs/ae (cs/mod 'delimiter "'") (with-cpo-smartparens-req (cs/obj 'cpo-smartparens))) n)) "'" :exit t)
+  ("`" (lambda (n) (interactive "p") (funcall (cs/ae (cs/mod 'delimiter "`") (with-cpo-smartparens-req (cs/obj 'cpo-smartparens))) n)) "`" :exit t)
+  ("(" (lambda (n) (interactive "p") (funcall (cs/ae (cs/mod 'delimiter "(") (with-cpo-smartparens-req (cs/obj 'cpo-smartparens))) n)) "()" :exit t)
+  (")" (lambda (n) (interactive "p") (funcall (cs/ae (cs/mod 'delimiter "(") (with-cpo-smartparens-req (cs/obj 'cpo-smartparens))) n)) "()" :exit t)
+  ("[" (lambda (n) (interactive "p") (funcall (cs/ae (cs/mod 'delimiter "[") (with-cpo-smartparens-req (cs/obj 'cpo-smartparens))) n)) "[]" :exit t)
+  ("]" (lambda (n) (interactive "p") (funcall (cs/ae (cs/mod 'delimiter "[") (with-cpo-smartparens-req (cs/obj 'cpo-smartparens))) n)) "[]" :exit t)
+  ("{" (lambda (n) (interactive "p") (funcall (cs/ae (cs/mod 'delimiter "{") (with-cpo-smartparens-req (cs/obj 'cpo-smartparens))) n)) "{}" :exit t)
+  ("}" (lambda (n) (interactive "p") (funcall (cs/ae (cs/mod 'delimiter "{") (with-cpo-smartparens-req (cs/obj 'cpo-smartparens))) n)) "{}" :exit t)
+  ("«" (lambda (n) (interactive "p") (funcall (cs/ae (cs/mod 'delimiter "«") (with-cpo-smartparens-req (cs/obj 'cpo-smartparens))) n)) "«»" :exit t)
+  ("»" (lambda (n) (interactive "p") (funcall (cs/ae (cs/mod 'delimiter "«") (with-cpo-smartparens-req (cs/obj 'cpo-smartparens))) n)) "«»" :exit t)
+  ("“" (lambda (n) (interactive "p") (funcall (cs/ae (cs/mod 'delimiter "“") (with-cpo-smartparens-req (cs/obj 'cpo-smartparens))) n)) "“”" :exit t)
+  ("”" (lambda (n) (interactive "p") (funcall (cs/ae (cs/mod 'delimiter "“") (with-cpo-smartparens-req (cs/obj 'cpo-smartparens))) n)) "“”" :exit t)
+  ("⟅" (lambda (n) (interactive "p") (funcall (cs/ae (cs/mod 'delimiter "⟅") (with-cpo-smartparens-req (cs/obj 'cpo-smartparens))) n)) "⟅⟆" :exit t)
+  ("⟆" (lambda (n) (interactive "p") (funcall (cs/ae (cs/mod 'delimiter "⟅") (with-cpo-smartparens-req (cs/obj 'cpo-smartparens))) n)) "⟅⟆" :exit t)
+  ("#" (lambda (n) (interactive "p") (funcall (cs/ae (cs/mod 'delimiter "#|") (with-cpo-smartparens-req (cs/obj 'cpo-smartparens))) n)) "#||#" :exit t)
   )
 
 

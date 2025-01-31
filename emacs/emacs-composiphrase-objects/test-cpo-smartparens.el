@@ -39,7 +39,7 @@
     (search-forward "))")
     (backward-char 5)
     (message "point pre: %s, mark %s, active: %s" (point) (mark) (region-active-p))
-    (sptw-expand-region-to-any-delimiter)
+    (cpo-smartparens-expand-region-to-any-delimiter)
     (message "point post: %s, mark: %s, active: %s" (point) (mark) (region-active-p))
     (message "point at: %s" (buffer-substring (region-beginning) (point-max)))
     (should/mark-looking-at "(inner")
@@ -48,7 +48,7 @@
 
   )
 
-(ert-deftest misc-sptw-tests ()
+(ert-deftest misc-cpo-smartparens-tests ()
   (with-temp-buffer
     (insert "
 (outer (inner foo
@@ -61,23 +61,23 @@
     (emacs-lisp-mode)
 
     (search-forward "foo")
-    (sptw-expand-region)
+    (cpo-smartparens-expand-region)
     (should/mark-looking-at "foo")
-    (sptw-expand-region-to-any-delimiter)
+    (cpo-smartparens-expand-region-to-any-delimiter)
     (should/mark-looking-at "(inner")
 
     (set-mark nil)
     (goto-char 1)
     (search-forward "foo")
     (backward-char 1)
-    (sptw-expand-region-to-any-delimiter)
+    (cpo-smartparens-expand-region-to-any-delimiter)
     (should/mark-looking-at "(inner")
 
     ;; TODO - enable this, I didn't think this was failing, too, but it is.
     ;; (set-mark nil)
     ;; (goto-char 1)
     ;; (search-forward "foo")
-    ;; (sptw-expand-region-to-any-delimiter)
+    ;; (cpo-smartparens-expand-region-to-any-delimiter)
     ;; (should/mark-looking-at "(inner")
     )
 

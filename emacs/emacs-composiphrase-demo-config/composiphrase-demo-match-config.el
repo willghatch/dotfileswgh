@@ -69,11 +69,11 @@
           (paragraph (default-verb . move) (location-within . beginning))
           (line (default-verb . move) (location-within . beginning))
           (symbol (default-verb . move) (location-within . beginning))
-          (sptw (default-verb . move) (location-within . beginning) (respect-tree . ,t) (delimiter . ,nil))
-          (indent-tree (default-verb . move) (location-within . beginning) (respect-tree . ,t))
+          (cpo-smartparens (default-verb . move) (location-within . beginning) (respect-tree . ,t) (delimiter . ,nil))
+          (cpo-indent-tree (default-verb . move) (location-within . beginning) (respect-tree . ,t))
           (outline (default-verb . move) (location-within . beginning) (respect-tree . ,t))
-          (tstw-qd (default-verb . move) (location-within . anchor) (respect-tree . ,t)) ;; IE treesitter generic handler
-          ;; TODO - other tree-sitter things that are more tuned to the language.  Well, maybe it would be good to have the generic tstw-qd and a more specific one on the same map, where the specific one pulls in some language config.  I think it's likely worthwhile to still keep a generic one in the map, though.
+          (cpo-treesitter-qd (default-verb . move) (location-within . anchor) (respect-tree . ,t)) ;; IE treesitter generic handler
+          ;; TODO - other tree-sitter things that are more tuned to the language.  Well, maybe it would be good to have the generic cpo-treesitter-qd and a more specific one on the same map, where the specific one pulls in some language config.  I think it's likely worthwhile to still keep a generic one in the map, though.
           (region)
           (buffer (default-verb . move) (location-within . ,nil))
 
@@ -108,7 +108,7 @@
           (tracking-number)
           (file-name)
           ;; TODO - I want modifiers for respecting or not respecting tree bounds.  Eg. I typically want go-to-sibling for tree things that don't go out to cousin nodes.  But sometimes it is convenient to just go to the start of the next thing not caring about tree siblings.  But maybe most of the places where I want to disrespect trees are for specific kinds of nodes.  Eg. I want a convenient “go to next/prev function definition”, but I rarely want “go to next expression disregarding tree shape”, or “go to next argument” that goes out to some other function call.
-          ;; TODO - I want some modifier to go to a tree node with a given tag.  Eg. this could be a lisp form that starts with a particular symbol, or a specific xml tag, or a treesitter node of particular type.  For org-mode or indent-tree it could be a particular indentation depth or something that I can match about the header or line.
+          ;; TODO - I want some modifier to go to a tree node with a given tag.  Eg. this could be a lisp form that starts with a particular symbol, or a specific xml tag, or a treesitter node of particular type.  For org-mode or cpo-indent-tree it could be a particular indentation depth or something that I can match about the header or line.
           ))
         (match-table
          .
@@ -301,164 +301,164 @@
                 ((direction backward) (location-within keep-if-possible))
                 (rmo-c/cpo-prev-line (num)))
 
-          (move sptw
+          (move cpo-smartparens
                 ((tree-vertical up) (direction expand-region) (tree-inner ,nil))
-                (sptw-select-root ()))
-          (move sptw
+                (cpo-smartparens-select-root ()))
+          (move cpo-smartparens
                 ((tree-vertical up) (direction expand-region) (tree-inner ,nil))
-                (sptw-up-to-root ()))
-          (move sptw
+                (cpo-smartparens-up-to-root ()))
+          (move cpo-smartparens
                 ((direction expand-region) (tree-inner ,nil) (delimiter any) (tree-vertical ,nil))
-                (sptw-expand-region-to-any-delimiter (num)))
-          (move sptw
+                (cpo-smartparens-expand-region-to-any-delimiter (num)))
+          (move cpo-smartparens
                 ((direction expand-region) (tree-inner ,t) (delimiter any) (tree-vertical ,nil))
-                (sptw-expand-region/children-region (num)))
+                (cpo-smartparens-expand-region/children-region (num)))
 
-          (move sptw
+          (move cpo-smartparens
                 ((direction expand-region) (tree-vertical ,nil) (tree-inner ,nil)
                  (delimiter t ,(lambda (actual expected) (stringp actual))))
-                (sptw-expand-region-to-delimiter (delimiter num)))
-          (move sptw
+                (cpo-smartparens-expand-region-to-delimiter (delimiter num)))
+          (move cpo-smartparens
                 ((direction expand-region) (tree-vertical ,nil) (tree-inner ,t) (delimiter t ,(lambda (actual expected) (stringp actual))))
-                (sptw-expand-region-to-delimiter/children-region (delimiter num)))
+                (cpo-smartparens-expand-region-to-delimiter/children-region (delimiter num)))
 
-          (move sptw
+          (move cpo-smartparens
                 ((direction expand-region) (tree-vertical ,nil) (tree-inner ,nil) (delimiter ,nil))
-                (sptw-expand-region (num)))
-          (move sptw
+                (cpo-smartparens-expand-region (num)))
+          (move cpo-smartparens
                 ((direction expand-region) (tree-vertical ,nil) (tree-inner ,t) (delimiter ,nil))
-                (sptw-expand-region/children-region (num)))
+                (cpo-smartparens-expand-region/children-region (num)))
 
-          (move sptw
+          (move cpo-smartparens
                 ((direction forward) (tree-vertical ,nil) (tree-traversal inorder))
-                (rmo/sptw-forward-inorder-traversal (num)))
-          (move sptw
+                (rmo/cpo-smartparens-forward-inorder-traversal (num)))
+          (move cpo-smartparens
                 ((direction backward) (tree-vertical ,nil) (tree-traversal inorder))
-                (rmo/sptw-backward-inorder-traversal (num)))
-          (move sptw
+                (rmo/cpo-smartparens-backward-inorder-traversal (num)))
+          (move cpo-smartparens
                 ((direction forward) (location-within beginning) (tree-vertical ,nil) (tree-traversal ,nil) (respect-tree ,t))
-                (rmo/sptw-forward-sibling-beginning (num)))
-          (move sptw
+                (rmo/cpo-smartparens-forward-sibling-beginning (num)))
+          (move cpo-smartparens
                 ((direction backward) (location-within beginning) (tree-vertical ,nil) (tree-traversal ,nil) (respect-tree ,t))
-                (rmo/sptw-backward-sibling-beginning (num)))
-          (move sptw
+                (rmo/cpo-smartparens-backward-sibling-beginning (num)))
+          (move cpo-smartparens
                 ((direction forward) (location-within end) (tree-vertical ,nil) (tree-traversal ,nil) (respect-tree ,t))
-                (rmo/sptw-forward-sibling-end (num)))
-          (move sptw
+                (rmo/cpo-smartparens-forward-sibling-end (num)))
+          (move cpo-smartparens
                 ((direction backward) (location-within end) (tree-vertical ,nil) (tree-traversal ,nil) (respect-tree ,t))
-                (rmo/sptw-backward-sibling-end (num)))
-          (move sptw
+                (rmo/cpo-smartparens-backward-sibling-end (num)))
+          (move cpo-smartparens
                 ((direction forward) (location-within emacs-style) (tree-vertical ,nil) (tree-traversal ,nil) (respect-tree ,nil))
                 (rmo/sp-forward-sexp (num)))
-          (move sptw
+          (move cpo-smartparens
                 ((direction backward) (location-within emacs-style) (tree-vertical ,nil) (tree-traversal ,nil) (respect-tree ,nil))
                 (rmo/sp-backward-sexp (num)))
-          (move sptw
+          (move cpo-smartparens
                 ;; TODO - for my current key binding purposes, I want to use forward/backward to determine begin/end for parent...
                 ((direction forward) (tree-vertical up) (tree-inner ,nil))
-                (rmo/sptw-up-parent-end (num)))
-          (move sptw
+                (rmo/cpo-smartparens-up-parent-end (num)))
+          (move cpo-smartparens
                 ;; TODO - for my current key binding purposes, I want to use forward/backward to determine begin/end for parent...
                 ((direction backward) (tree-vertical up) (tree-inner ,nil))
-                (rmo/sptw-up-parent-beginning (num)))
-          (move sptw
+                (rmo/cpo-smartparens-up-parent-beginning (num)))
+          (move cpo-smartparens
                 ;; TODO - for my current key binding purposes, I want to use forward/backward to determine begin/end for parent...
                 ((direction backward) (tree-vertical down))
-                (rmo/sptw-down-first-child-beginning (num)))
-          (move sptw
+                (rmo/cpo-smartparens-down-first-child-beginning (num)))
+          (move cpo-smartparens
                 ;; TODO - for my current key binding purposes, I want to use forward/backward to determine begin/end for parent...
                 ((direction forward) (tree-vertical down))
-                (rmo/sptw-down-last-child-end (num)))
-          (move sptw
+                (rmo/cpo-smartparens-down-last-child-end (num)))
+          (move cpo-smartparens
                 ;; TODO - for my current key binding purposes, I want to use forward/backward to determine begin/end for parent...
                 ((direction forward) (tree-vertical up) (tree-inner ,t))
                 (rmo/sp-end-of-sexp (num)))
-          (move sptw
+          (move cpo-smartparens
                 ;; TODO - for my current key binding purposes, I want to use forward/backward to determine begin/end for parent...
                 ((direction backward) (tree-vertical up) (tree-inner ,t))
                 (rmo/sp-beginning-of-sexp (num)))
-          (slurp sptw
+          (slurp cpo-smartparens
                  ((direction forward))
-                 (sptw-forward-slurp (num)))
-          (slurp sptw
+                 (cpo-smartparens-forward-slurp (num)))
+          (slurp cpo-smartparens
                  ((direction backward))
-                 (sptw-backward-slurp (num)))
-          (barf sptw
+                 (cpo-smartparens-backward-slurp (num)))
+          (barf cpo-smartparens
                 ((direction forward))
-                (sptw-forward-barf (num)))
-          (barf sptw
+                (cpo-smartparens-forward-barf (num)))
+          (barf cpo-smartparens
                 ((direction backward))
-                (sptw-backward-barf (num)))
-          (promote sptw
+                (cpo-smartparens-backward-barf (num)))
+          (promote cpo-smartparens
                    ((delimiter ,nil))
-                   (sptw-splice ()))
-          (promote sptw
+                   (cpo-smartparens-splice ()))
+          (promote cpo-smartparens
                    ((delimiter any))
-                   (sptw-splice ()))
-          (promote sptw
+                   (cpo-smartparens-splice ()))
+          (promote cpo-smartparens
                    ((delimiter t ,(lambda (actual expected) (stringp actual))))
-                   (TODO-sptw-splice-specific-delimiter))
-          (demote sptw
+                   (TODO-cpo-smartparens-splice-specific-delimiter))
+          (demote cpo-smartparens
                   ((delimiter ,nil))
-                  (sptw-TODO-wrap-with-delimiter-choice-prompt))
-          (demote sptw
+                  (cpo-smartparens-TODO-wrap-with-delimiter-choice-prompt))
+          (demote cpo-smartparens
                   ((delimiter t ,(lambda (actual expected) (stringp actual))))
-                  (sptw-wrap-with-delimiter (delimiter)))
-          (demote sptw
+                  (cpo-smartparens-wrap-with-delimiter (delimiter)))
+          (demote cpo-smartparens
                   ((delimiter any))
                   ;; Convenience for my keyboard layout.
-                  (,(lambda () (sptw-wrap-with-delimiter "(")) ()))
-          (rewrap sptw
+                  (,(lambda () (cpo-smartparens-wrap-with-delimiter "(")) ()))
+          (rewrap cpo-smartparens
                   ((delimiter ,nil))
-                  (sptw-TODO-rewrap-nearest-delimiter-with-interactive-choice
+                  (cpo-smartparens-TODO-rewrap-nearest-delimiter-with-interactive-choice
                    (num)))
-          (rewrap sptw
+          (rewrap cpo-smartparens
                   ((delimiter t ,(lambda (actual expected) (stringp actual))))
                   ;; TODO - I should maybe make this take the command sentence and look for multiple instances of delimiter.  Use the first one given as the target to change, and the second one given as the one to change to.  But then I need to detect when I should expect a second delimiter key... doing an interactive prompt for what to change to will be just as well.
-                  (sptw-TODO-rewrap-nearest-specific-delimiter-with-interactive-choice
+                  (cpo-smartparens-TODO-rewrap-nearest-specific-delimiter-with-interactive-choice
                    (num)))
-          (split sptw
+          (split cpo-smartparens
                  ()
                  (sp-split-sexp (num)))
 
 
-          (move tstw-qd
+          (move cpo-treesitter-qd
                 ((tree-vertical up) (direction expand-region) (tree-inner ,nil))
-                (tstw-qd-select-root ()))
-          (move tstw-qd
+                (cpo-treesitter-qd-select-root ()))
+          (move cpo-treesitter-qd
                 ((tree-vertical up) (direction expand-region) (tree-inner ,nil))
-                (tstw-qd-up-to-root ()))
-          (move tstw-qd
+                (cpo-treesitter-qd-up-to-root ()))
+          (move cpo-treesitter-qd
                 ((direction expand-region) (tree-vertical ,nil) (tree-inner ,nil))
-                (tstw-qd-expand-region (num)))
-          (move tstw-qd
+                (cpo-treesitter-qd-expand-region (num)))
+          (move cpo-treesitter-qd
                 ((direction expand-region) (tree-vertical ,nil) (tree-inner ,t))
-                (tstw-qd-expand-region/children-region (num)))
+                (cpo-treesitter-qd-expand-region/children-region (num)))
 
-          (move tstw-qd
+          (move cpo-treesitter-qd
                 ((direction forward) (tree-traversal inorder))
-                (rmo/tstw-qd-forward-inorder-traversal (num)))
-          (move tstw-qd
+                (rmo/cpo-treesitter-qd-forward-inorder-traversal (num)))
+          (move cpo-treesitter-qd
                 ((direction backward) (tree-traversal inorder))
-                (rmo/tstw-qd-backward-inorder-traversal (num)))
-          (move tstw-qd
+                (rmo/cpo-treesitter-qd-backward-inorder-traversal (num)))
+          (move cpo-treesitter-qd
                 ((direction forward) (location-within anchor) (tree-vertical ,nil) (tree-traversal ,nil))
-                (rmo/tstw-qd-forward-sibling-anchor-point (num)))
-          (move tstw-qd
+                (rmo/cpo-treesitter-qd-forward-sibling-anchor-point (num)))
+          (move cpo-treesitter-qd
                 ((direction backward) (location-within anchor) (tree-vertical ,nil) (tree-traversal ,nil))
-                (rmo/tstw-qd-backward-sibling-anchor-point (num)))
-          (move tstw-qd
+                (rmo/cpo-treesitter-qd-backward-sibling-anchor-point (num)))
+          (move cpo-treesitter-qd
                 ((direction forward) (tree-vertical up) (tree-inner ,nil))
-                (rmo/tstw-qd-up-to-parent-anchor-point (num)))
-          (move tstw-qd
+                (rmo/cpo-treesitter-qd-up-to-parent-anchor-point (num)))
+          (move cpo-treesitter-qd
                 ((direction backward) (tree-vertical up) (tree-inner ,nil))
-                (rmo/tstw-qd-up-to-parent-anchor-point (num)))
-          (move tstw-qd
+                (rmo/cpo-treesitter-qd-up-to-parent-anchor-point (num)))
+          (move cpo-treesitter-qd
                 ((direction backward) (tree-vertical down))
-                (rmo/tstw-qd-down-to-first-child-anchor-point (num)))
-          (move tstw-qd
+                (rmo/cpo-treesitter-qd-down-to-first-child-anchor-point (num)))
+          (move cpo-treesitter-qd
                 ((direction forward) (tree-vertical down))
-                (rmo/tstw-qd-down-to-last-child-anchor-point (num)))
+                (rmo/cpo-treesitter-qd-down-to-last-child-anchor-point (num)))
 
 
 
@@ -478,22 +478,22 @@
 
           (move outline
                 ((tree-vertical up) (direction expand-region) (tree-inner ,nil))
-                (twoi-select-root ()))
+                (cpo-outline-select-root ()))
           (move outline
                 ((tree-vertical up) (direction expand-region) (tree-inner ,nil))
-                (twoi-up-to-root ()))
+                (cpo-outline-up-to-root ()))
           (move outline
                 ((direction expand-region) (tree-vertical ,nil) (tree-inner ,nil))
-                (twoi-expand-region (num)))
+                (cpo-outline-expand-region (num)))
           (move outline
                 ((direction expand-region) (tree-vertical ,nil) (tree-inner ,t))
-                (twoi-expand-region/children-region (num)))
+                (cpo-outline-expand-region/children-region (num)))
           (move outline
                 ((direction forward) (tree-traversal inorder))
-                (rmo/twoi-inorder-traversal-forward (num)))
+                (rmo/cpo-outline-inorder-traversal-forward (num)))
           (move outline
                 ((direction backward) (tree-traversal inorder))
-                (rmo/twoi-inorder-traversal-backward (num)))
+                (rmo/cpo-outline-inorder-traversal-backward (num)))
           (move outline
                 ((direction forward) (location-within beginning) (tree-vertical ,nil))
                 (rmo/outline-forward-same-level (num)))
@@ -505,64 +505,64 @@
                 (rmo/outline-up-heading (num)))
           (move outline
                 ((tree-vertical down) (direction backward))
-                (rmo/twoi-down-to-first-child (num)))
+                (rmo/cpo-outline-down-to-first-child (num)))
           (move outline
                 ((tree-vertical down) (direction forward))
-                (rmo/twoi-down-to-last-child (num)))
+                (rmo/cpo-outline-down-to-last-child (num)))
           (promote outline () ((lambda () (outline-promote 'subtree)) ()))
           (demote outline () ((lambda () (outline-demote 'subtree)) ()))
           ;; TODO - commented out because they are broken
           ;; (slurp outline
           ;;        ((direction forward))
-          ;;        (twoi-forward-slurp-heading ()))
+          ;;        (cpo-outline-forward-slurp-heading ()))
           ;; (barf outline
           ;;       ((direction forward))
-          ;;       (twoi-forward-barf-heading ()))
+          ;;       (cpo-outline-forward-barf-heading ()))
 
-          (move indent-tree
+          (move cpo-indent-tree
                 ;; TODO - the modifiers aren't correct, but I'm not sure where to shoehorn this in, so I'm going to roll with this for now.
                 ((tree-vertical up) (direction expand-region) (tree-inner ,nil))
-                (indent-tree-select-root ()))
-          (move indent-tree
+                (cpo-indent-tree-select-root ()))
+          (move cpo-indent-tree
                 ;; TODO - the modifiers aren't correct, but I'm not sure where to shoehorn this in, so I'm going to roll with this for now.
                 ((tree-vertical up) (direction expand-region) (tree-inner ,nil))
-                (indent-tree-up-to-root ()))
-          (move indent-tree
+                (cpo-indent-tree-up-to-root ()))
+          (move cpo-indent-tree
                 ((direction expand-region) (tree-vertical ,nil) (tree-inner ,nil))
-                (indent-tree-expand-region (num)))
-          (move indent-tree
+                (cpo-indent-tree-expand-region (num)))
+          (move cpo-indent-tree
                 ((direction expand-region) (tree-vertical ,nil) (tree-inner ,t))
-                (indent-tree-expand-region/children-region (num)))
-          (move indent-tree
+                (cpo-indent-tree-expand-region/children-region (num)))
+          (move cpo-indent-tree
                 ((direction forward) (tree-traversal inorder))
-                (rmo/indent-tree-inorder-traversal-forward (num)))
-          (move indent-tree
+                (rmo/cpo-indent-tree-inorder-traversal-forward (num)))
+          (move cpo-indent-tree
                 ((direction backward) (tree-traversal inorder))
-                (rmo/indent-tree-inorder-traversal-backward (num)))
-          (move indent-tree
+                (rmo/cpo-indent-tree-inorder-traversal-backward (num)))
+          (move cpo-indent-tree
                 ((direction forward) (tree-vertical ,nil) (tree-traversal ,nil) (respect-tree ,t))
-                (rmo/indent-tree-forward-full-sibling (num)))
-          (move indent-tree
+                (rmo/cpo-indent-tree-forward-full-sibling (num)))
+          (move cpo-indent-tree
                 ((direction backward) (tree-vertical ,nil) (tree-traversal ,nil) (respect-tree ,t))
-                (rmo/indent-tree-backward-full-sibling (num)))
+                (rmo/cpo-indent-tree-backward-full-sibling (num)))
           ;; It's not really fair to say that these half-sibling movements don't respect the tree, but I'm not sure what other modifier to use right now.  It is an alternate way of respecting the tree.
-          (move indent-tree
+          (move cpo-indent-tree
                 ((direction forward) (tree-vertical ,nil) (tree-traversal ,nil) (respect-tree ,nil))
-                (rmo/indent-tree-forward-full-or-half-sibling (num)))
-          (move indent-tree
+                (rmo/cpo-indent-tree-forward-full-or-half-sibling (num)))
+          (move cpo-indent-tree
                 ((direction backward) (tree-vertical ,nil) (tree-traversal ,nil) (respect-tree ,nil))
-                (rmo/indent-tree-backward-full-or-half-sibling (num)))
-          (move indent-tree
+                (rmo/cpo-indent-tree-backward-full-or-half-sibling (num)))
+          (move cpo-indent-tree
                 ((tree-vertical up))
-                (rmo/indent-tree-up-to-parent (num)))
-          (move indent-tree
+                (rmo/cpo-indent-tree-up-to-parent (num)))
+          (move cpo-indent-tree
                 ((tree-vertical down) (direction backward))
-                (rmo/indent-tree-down-to-first-child (num)))
-          (move indent-tree
+                (rmo/cpo-indent-tree-down-to-first-child (num)))
+          (move cpo-indent-tree
                 ((tree-vertical down) (direction forward))
-                (rmo/indent-tree-down-to-last-child (num)))
-          (promote indent-tree () (indent-tree-promote ()))
-          (demote indent-tree () (indent-tree-demote ()))
+                (rmo/cpo-indent-tree-down-to-last-child (num)))
+          (promote cpo-indent-tree () (cpo-indent-tree-promote ()))
+          (demote cpo-indent-tree () (cpo-indent-tree-demote ()))
 
 
           (move url ((direction expand-region))
@@ -603,40 +603,40 @@
           ;;(transpose url ((direction backward)) (cpo-transpose-url-backward (num)))
           ;;(transpose email ((direction forward)) (cpo-transpose-email-forward (num)))
           ;;(transpose email ((direction backward)) (cpo-transpose-email-backward (num)))
-          (transpose sptw ((tree-vertical up)) (sptw-ancestor-reorder (num)))
-          (transpose sptw ((tree-vertical ,nil) (direction forward)) (sptw-transpose-sibling-forward (num)))
-          (transpose sptw ((tree-vertical ,nil) (direction backward)) (sptw-transpose-sibling-backward (num)))
-          (transpose tstw-qd ((tree-vertical up)) (tstw-qd-ancestor-reorder (num)))
-          (transpose tstw-qd ((tree-vertical ,nil) (direction forward)) (tstw-qd-transpose-sibling-forward (num)))
-          (transpose tstw-qd ((tree-vertical ,nil) (direction backward)) (tstw-qd-transpose-sibling-backward (num)))
-          (transpose outline ((direction forward)) (twoi-transpose-sibling-forward (num)))
-          (transpose outline ((direction backward)) (twoi-transpose-sibling-backward (num)))
-          (transpose indent-tree ((direction forward)) (indent-tree-transpose-sibling-forward (num)))
-          (transpose indent-tree ((direction backward)) (indent-tree-transpose-sibling-backward (num)))
+          (transpose cpo-smartparens ((tree-vertical up)) (cpo-smartparens-ancestor-reorder (num)))
+          (transpose cpo-smartparens ((tree-vertical ,nil) (direction forward)) (cpo-smartparens-transpose-sibling-forward (num)))
+          (transpose cpo-smartparens ((tree-vertical ,nil) (direction backward)) (cpo-smartparens-transpose-sibling-backward (num)))
+          (transpose cpo-treesitter-qd ((tree-vertical up)) (cpo-treesitter-qd-ancestor-reorder (num)))
+          (transpose cpo-treesitter-qd ((tree-vertical ,nil) (direction forward)) (cpo-treesitter-qd-transpose-sibling-forward (num)))
+          (transpose cpo-treesitter-qd ((tree-vertical ,nil) (direction backward)) (cpo-treesitter-qd-transpose-sibling-backward (num)))
+          (transpose outline ((direction forward)) (cpo-outline-transpose-sibling-forward (num)))
+          (transpose outline ((direction backward)) (cpo-outline-transpose-sibling-backward (num)))
+          (transpose cpo-indent-tree ((direction forward)) (cpo-indent-tree-transpose-sibling-forward (num)))
+          (transpose cpo-indent-tree ((direction backward)) (cpo-indent-tree-transpose-sibling-backward (num)))
 
           (open line ((direction forward)) (,(lambda () (estate-insert-state-with-thunk 'cpo-open-line-below))))
           (open line ((direction backward)) (,(lambda () (estate-insert-state-with-thunk 'cpo-open-line-above))))
-          (open outline ((direction forward) (tree-vertical ,nil)) (,(lambda () (estate-insert-state-with-thunk 'twoi-add-heading-below))))
-          (open outline ((direction backward) (tree-vertical ,nil)) (,(lambda () (estate-insert-state-with-thunk 'twoi-add-heading-above))))
+          (open outline ((direction forward) (tree-vertical ,nil)) (,(lambda () (estate-insert-state-with-thunk 'cpo-outline-add-heading-below))))
+          (open outline ((direction backward) (tree-vertical ,nil)) (,(lambda () (estate-insert-state-with-thunk 'cpo-outline-add-heading-above))))
           (open outline ((tree-vertical down)) (,(lambda () (message "TODO - implement open outline child"))))
-          (open indent-tree ((direction forward) (tree-vertical ,nil)) (,(lambda () (estate-insert-state-with-thunk 'indent-tree-open-sibling-forward))))
-          (open indent-tree ((direction backward) (tree-vertical ,nil)) (,(lambda () (estate-insert-state-with-thunk 'indent-tree-open-sibling-backward))))
-          (open indent-tree ((tree-vertical down)) (,(lambda () (message "TODO - implement open indent-tree child"))))
-          (open sptw ((direction forward) (tree-vertical ,nil)) (,(lambda () (estate-insert-state-with-thunk 'sptw-open-sibling-forward)) ()))
-          (open sptw ((direction backward) (tree-vertical ,nil)) (,(lambda () (estate-insert-state-with-thunk 'sptw-open-sibling-backward)) ()))
+          (open cpo-indent-tree ((direction forward) (tree-vertical ,nil)) (,(lambda () (estate-insert-state-with-thunk 'cpo-indent-tree-open-sibling-forward))))
+          (open cpo-indent-tree ((direction backward) (tree-vertical ,nil)) (,(lambda () (estate-insert-state-with-thunk 'cpo-indent-tree-open-sibling-backward))))
+          (open cpo-indent-tree ((tree-vertical down)) (,(lambda () (message "TODO - implement open cpo-indent-tree child"))))
+          (open cpo-smartparens ((direction forward) (tree-vertical ,nil)) (,(lambda () (estate-insert-state-with-thunk 'cpo-smartparens-open-sibling-forward)) ()))
+          (open cpo-smartparens ((direction backward) (tree-vertical ,nil)) (,(lambda () (estate-insert-state-with-thunk 'cpo-smartparens-open-sibling-backward)) ()))
           ;; TODO - symex open - ignore unwrapped forms and open a sibling form with the same paren type, hopefully matching indentation...
 
           (split line () (,(lambda () (open-line 1))))
-          (split sptw () (sp-split-sexp))
+          (split cpo-smartparens () (sp-split-sexp))
           ;; TODO - is there something useful to do for split for outline or indent tree?  For symex or XML it has obvious meaning, but is used in the middle of a thing.  Maybe for outline it means to split the parent on the current header, inserting a new header above at the parent level.  And similar for indent tree.  Need to implement this...
           ;; TODO - split for non-tree objects has reasonably defined meaning, I suppose, but isn't very interesting.
 
           ;; TODO - I need to fix my join-line implementation to take a numerical argument
           (join line ((direction forward)) (,(lambda () (join-line t))))
           (join line ((direction backward)) (,(lambda () (join-line))))
-          (join sptw ((direction backward)) (sptw-join-sexp-backward (num)))
-          (join sptw ((direction forward)) (sptw-join-sexp-forward (num)))
-          ;; TODO - sptw - make a join-sexp function that takes a forward or backward argument
+          (join cpo-smartparens ((direction backward)) (cpo-smartparens-join-sexp-backward (num)))
+          (join cpo-smartparens ((direction forward)) (cpo-smartparens-join-sexp-forward (num)))
+          ;; TODO - cpo-smartparens - make a join-sexp function that takes a forward or backward argument
 
 
           ;; TODO - optional register for delete to be delete-copy

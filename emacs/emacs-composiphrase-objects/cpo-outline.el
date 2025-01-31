@@ -2,7 +2,7 @@
 (require 'cpo-tree-walk)
 (require 'outline)
 
-(defun twoi-forward-slurp-heading ()
+(defun cpo-outline-forward-slurp-heading ()
   ;; TODO - this is broken, outline-demote isn't working right, at least in org-mode
   (interactive)
   (let ((start-line (line-number-at-pos))
@@ -15,7 +15,7 @@
         (outline-forward-same-level 1)
         (outline-demote 'subtree)))))
 
-(defun twoi-forward-barf-heading ()
+(defun cpo-outline-forward-barf-heading ()
   (interactive)
   (let ((next-heading-loc (save-excursion
                             (outline-forward-same-level 1)
@@ -37,20 +37,20 @@
           (funcall loop (point))
           (outline-promote 'subtree))))))
 
-(defun twoi-add-heading-above ()
+(defun cpo-outline-add-heading-above ()
   (interactive)
   (outline-back-to-heading)
   (outline-insert-heading)
   (insert " "))
 
-(defun twoi-add-heading-below ()
+(defun cpo-outline-add-heading-below ()
   (interactive)
-  (twoi-add-heading-above)
+  (cpo-outline-add-heading-above)
   (outline-move-subtree-down 1)
   (end-of-line))
 
 
-(defun twoi-down-to-first-child ()
+(defun cpo-outline-down-to-first-child ()
   (interactive)
   (let ((end-point nil))
     (save-mark-and-excursion
@@ -83,7 +83,7 @@
   (and (cpo-tree-walk--motion-moved #'wgh/org-down-element)
        (wgh/org-forward-to-last-sibling)))
 
-(defun twoi--outline-at-anchor-point-p ()
+(defun cpo-outline--outline-at-anchor-point-p ()
   (save-mark-and-excursion
     (let ((start-point (point)))
       (outline-previous-heading)
@@ -91,33 +91,33 @@
       (equal (point) start-point))))
 
 (cpo-tree-walk-define-operations
- :def-inorder-forward twoi-inorder-traversal-forward
- :def-inorder-backward twoi-inorder-traversal-backward
- :def-down-to-last-descendant twoi-down-to-last-descendant
- :def-down-to-last-child twoi-down-to-last-child
+ :def-inorder-forward cpo-outline-inorder-traversal-forward
+ :def-inorder-backward cpo-outline-inorder-traversal-backward
+ :def-down-to-last-descendant cpo-outline-down-to-last-descendant
+ :def-down-to-last-child cpo-outline-down-to-last-child
 
- ;;:def-evil-inner-object-for-tree-with-no-end-delimiter twoi-tree-inner
- ;;:def-evil-outer-object-for-tree-with-no-end-delimiter twoi-tree-outer
+ ;;:def-evil-inner-object-for-tree-with-no-end-delimiter cpo-outline-tree-inner
+ ;;:def-evil-outer-object-for-tree-with-no-end-delimiter cpo-outline-tree-outer
 
- :def-bounds-for-tree-with-no-end-delimiter twoi-tree-bounds
- :def-children-bounds-for-tree-with-no-end-delimiter twoi-tree-children-bounds
- :def-expand-region twoi-expand-region
- :def-expand-region-idempotent twoi-expand-region-idempotent
- :def-select-children-once twoi-region-to-children
- :def-expand-region-to-children/ancestor-generation twoi-expand-region/children-region
- :def-transpose-sibling-forward twoi-transpose-sibling-forward
- :def-transpose-sibling-backward twoi-transpose-sibling-backward
- :def-up-to-root twoi-up-to-root
- :def-select-root twoi-select-root
+ :def-bounds-for-tree-with-no-end-delimiter cpo-outline-tree-bounds
+ :def-children-bounds-for-tree-with-no-end-delimiter cpo-outline-tree-children-bounds
+ :def-expand-region cpo-outline-expand-region
+ :def-expand-region-idempotent cpo-outline-expand-region-idempotent
+ :def-select-children-once cpo-outline-region-to-children
+ :def-expand-region-to-children/ancestor-generation cpo-outline-expand-region/children-region
+ :def-transpose-sibling-forward cpo-outline-transpose-sibling-forward
+ :def-transpose-sibling-backward cpo-outline-transpose-sibling-backward
+ :def-up-to-root cpo-outline-up-to-root
+ :def-select-root cpo-outline-select-root
 
  :use-object-name "outline-mode header (eg. in org-mode or outline-minor-mode)"
 
  :use-up-to-parent (lambda () (ignore-errors (outline-up-heading 1)))
- :use-down-to-first-child #'twoi-down-to-first-child
+ :use-down-to-first-child #'cpo-outline-down-to-first-child
  ;; TODO - handle half siblings like I did for indent-tree -- instead of using outline-forward-same-level here, I need to write a forward-sibling-or-half-sibling function.
  :use-next-sibling (lambda () (ignore-errors (outline-forward-same-level 1)))
  :use-previous-sibling (lambda () (ignore-errors (outline-backward-same-level 1)))
- :use-left-finalizer-for-tree-with-no-end-delimiter (lambda () (if (twoi--outline-at-anchor-point-p)
+ :use-left-finalizer-for-tree-with-no-end-delimiter (lambda () (if (cpo-outline--outline-at-anchor-point-p)
                                                                    (line-beginning-position)
                                                                  (outline-previous-heading)))
  :use-right-finalizer-for-tree-with-no-end-delimiter (lambda ()
@@ -129,10 +129,10 @@
 
 (require 'repeatable-motion)
 (repeatable-motion-define-pair 'outline-forward-same-level 'outline-backward-same-level)
-(repeatable-motion-define-pair 'twoi-down-to-first-child 'outline-up-heading)
-(repeatable-motion-define 'twoi-down-to-last-child 'outline-up-heading)
-(repeatable-motion-define 'twoi-down-to-last-descendant nil)
-(repeatable-motion-define-pair 'twoi-inorder-traversal-forward 'twoi-inorder-traversal-backward)
+(repeatable-motion-define-pair 'cpo-outline-down-to-first-child 'outline-up-heading)
+(repeatable-motion-define 'cpo-outline-down-to-last-child 'outline-up-heading)
+(repeatable-motion-define 'cpo-outline-down-to-last-descendant nil)
+(repeatable-motion-define-pair 'cpo-outline-inorder-traversal-forward 'cpo-outline-inorder-traversal-backward)
 
 
 
