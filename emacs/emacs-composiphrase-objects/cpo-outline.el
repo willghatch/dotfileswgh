@@ -127,12 +127,13 @@
                                                          (backward-char 1)))
  )
 
-(require 'repeatable-motion)
-(repeatable-motion-define-pair 'outline-forward-same-level 'outline-backward-same-level)
-(repeatable-motion-define-pair 'cpo-outline-down-to-first-child 'outline-up-heading)
-(repeatable-motion-define 'cpo-outline-down-to-last-child 'outline-up-heading)
-(repeatable-motion-define 'cpo-outline-down-to-last-descendant nil)
-(repeatable-motion-define-pair 'cpo-outline-inorder-traversal-forward 'cpo-outline-inorder-traversal-backward)
+(with-eval-after-load 'repeatable-motion
+  (repeatable-motion-define-pair 'outline-forward-same-level 'outline-backward-same-level)
+  (repeatable-motion-define-pair 'cpo-outline-down-to-first-child 'outline-up-heading)
+  (repeatable-motion-define 'cpo-outline-down-to-last-child 'outline-up-heading)
+  (repeatable-motion-define 'cpo-outline-down-to-last-descendant nil)
+  (repeatable-motion-define-pair 'cpo-outline-inorder-traversal-forward 'cpo-outline-inorder-traversal-backward)
+  )
 
 
 

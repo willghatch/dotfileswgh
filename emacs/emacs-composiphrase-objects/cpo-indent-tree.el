@@ -23,7 +23,6 @@
 
 
 (require 'cpo-tree-walk)
-(require 'repeatable-motion)
 
 (defun cpo-indent-tree--current-line-whitespace-only-p ()
   (string-match-p "^\\s-*$"
@@ -69,8 +68,6 @@ Notably this will stop if it hits a half-sibling boundary."
   (interactive "p")
   (cpo-indent-tree-forward-full-sibling (* -1 (or direction 1))))
 
-(repeatable-motion-define-pair 'cpo-indent-tree-backward-full-sibling
-                               'cpo-indent-tree-forward-full-sibling)
 
 (defun cpo-indent-tree--forward-half-sibling ()
   "Go forward to next half sibling iff the current node is the last one before a half-sibling region boundary.
@@ -153,8 +150,6 @@ Return the (positive) number of iterations that could NOT be done (IE returns 0 
   (interactive "p")
   (cpo-indent-tree-forward-full-or-half-sibling (* -1 (or direction 1))))
 
-(repeatable-motion-define-pair 'cpo-indent-tree-backward-full-or-half-sibling
-                               'cpo-indent-tree-forward-full-or-half-sibling)
 
 (defun cpo-indent-tree--forward-full-sibling-region--only-to-boundary (num)
   (let ((times (abs num))
@@ -226,10 +221,6 @@ It always moves to the FIRST sibling in the full sibling region, regardless of m
   (interactive "p")
   (cpo-indent-tree-forward-full-sibling-region-last (- num)))
 
-(repeatable-motion-define-pair 'cpo-indent-tree-forward-full-sibling-region-first
-                               'cpo-indent-tree-backward-full-sibling-region-first)
-(repeatable-motion-define-pair 'cpo-indent-tree-forward-full-sibling-region-last
-                               'cpo-indent-tree-backward-full-sibling-region-last)
 
 (defun cpo-indent-tree-forward-to-last-full-sibling ()
   (interactive)
@@ -289,8 +280,6 @@ It always moves to the FIRST sibling in the full sibling region, regardless of m
           (setq backtrack-pos (point))
           (setq start-indent (current-indentation)))))
     ret-val))
-(repeatable-motion-define-pair 'cpo-indent-tree-up-to-parent
-                               'cpo-indent-tree-down-to-first-child)
 
 (defun cpo-indent-tree-down-to-last-child (num)
   ;; TODO - this should probably error if num is negative
@@ -305,9 +294,6 @@ It always moves to the FIRST sibling in the full sibling region, regardless of m
                 (setq index (+ 1 index)))
       (and (cpo-tree-walk--motion-moved (lambda () (cpo-indent-tree-down-to-first-child 1)))
            (cpo-indent-tree--cpo-indent-tree-forward-to-last-full-or-half-sibling)))))
-(repeatable-motion-define 'cpo-indent-tree-down-to-last-child
-                          ;; down to last child has the same inverse as down to first child, but up to parent inverses as down to first child
-                          'cpo-indent-tree-up-to-parent)
 
 (cpo-tree-walk-define-operations
  :def-inorder-forward cpo-indent-tree-inorder-traversal-forward
@@ -340,9 +326,6 @@ It always moves to the FIRST sibling in the full sibling region, regardless of m
  :use-left-finalizer-for-tree-with-no-end-delimiter #'line-beginning-position
  :use-right-finalizer-for-tree-with-no-end-delimiter #'line-end-position
  )
-(repeatable-motion-define-pair 'cpo-indent-tree-inorder-traversal-forward
-                               'cpo-indent-tree-inorder-traversal-backward)
-(repeatable-motion-define 'cpo-indent-tree-down-to-last-descendant nil)
 
 ;; TODO - for things like python, there is already a variable that this should match, and it should generally be customizable.
 ;; TODO - also, it might be nice to just check for an existing indentation amount, especially for promoting to promote specifically to parent level.
@@ -396,5 +379,24 @@ It always moves to the FIRST sibling in the full sibling region, regardless of m
     (insert "\n")
     (backward-char 1)
     (dotimes (i indentation) (insert " "))))
+
+(with-eval-after-load 'repeatable-motion
+  (repeatable-motion-define-pair 'cpo-indent-tree-backward-full-sibling
+                                 'cpo-indent-tree-forward-full-sibling)
+  (repeatable-motion-define-pair 'cpo-indent-tree-backward-full-or-half-sibling
+                                 'cpo-indent-tree-forward-full-or-half-sibling)
+  (repeatable-motion-define-pair 'cpo-indent-tree-forward-full-sibling-region-first
+                                 'cpo-indent-tree-backward-full-sibling-region-first)
+  (repeatable-motion-define-pair 'cpo-indent-tree-forward-full-sibling-region-last
+                                 'cpo-indent-tree-backward-full-sibling-region-last)
+  (repeatable-motion-define-pair 'cpo-indent-tree-up-to-parent
+                                 'cpo-indent-tree-down-to-first-child)
+  (repeatable-motion-define 'cpo-indent-tree-down-to-last-child
+                            ;; down to last child has the same inverse as down to first child, but up to parent inverses as down to first child
+                            'cpo-indent-tree-up-to-parent)
+  (repeatable-motion-define-pair 'cpo-indent-tree-inorder-traversal-forward
+                                 'cpo-indent-tree-inorder-traversal-backward)
+  (repeatable-motion-define 'cpo-indent-tree-down-to-last-descendant nil)
+  )
 
 (provide 'cpo-indent-tree)

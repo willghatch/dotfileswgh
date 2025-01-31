@@ -15,12 +15,6 @@
 ;; I'm going to write a trial generic handler as cpo-treesitter-qd-*
 
 
-(defun tstw-core-bounds-of-thing-at-point (&optional pt)
-  (let* ((pt (or pt (point)))
-         (n (treesit-node-at pt)))
-    (and n
-         (cons (treesit-node-start n)
-               (treesit-node-end n)))))
 
 (defun cpo-treesitter-qd-node-interesting-p (node)
   (and node
@@ -64,10 +58,10 @@
     (and n (cons (treesit-node-start n)
                  (treesit-node-end n)))))
 
-(defun tstw--qd-bounds-of-children-area (node)
-  (let* ((first-interesting (tstw--qd-first-interesting-child node))
+(defun cpo-treesitter-qd--qd-bounds-of-children-area (node)
+  (let* ((first-interesting (cpo-treesitter-qd--qd-first-interesting-child node))
          (left-out-of-bounds (treesit-node-prev-sibling first-interesting))
-         (last-interesting (tstw--qd-last-interesting-child node))
+         (last-interesting (cpo-treesitter-qd--qd-last-interesting-child node))
          (right-out-of-bounds (treesit-node-next-sibling last-interesting)))
     (cons (if left-out-of-bounds (treesit-node-end left-out-of-bounds) (treesit-node-start node))
           (if right-out-of-bounds (treesit-node-start right-out-of-bounds) (treesit-node-end node)))))
@@ -75,7 +69,7 @@
 (defun cpo-treesitter-qd-bounds-of-thing-at-point/children-region (&optional pt)
   (let* ((pt (or pt (point)))
          (n (cpo-treesitter-qd-node-at-point pt)))
-    (and n (tstw--qd-bounds-of-children-area n))))
+    (and n (cpo-treesitter-qd--qd-bounds-of-children-area n))))
 
 (defun cpo-treesitter-qd-node-anchor-point (node)
   "Return an anchor point for the node, where hopefully running `cpo-treesitter-qd-bounds-of-thing-at-point' at the anchor point will return the same node.
@@ -104,7 +98,7 @@ But this is a heuristic thing, so we'll see if it works well."
          (parent-anchor (and parent (cpo-treesitter-qd-node-anchor-point parent))))
     (and parent-anchor (goto-char parent-anchor))))
 
-(defun tstw--qd-next-interesting-sibling (node fwd)
+(defun cpo-treesitter-qd--qd-next-interesting-sibling (node fwd)
   (let* ((sib node)
          (_sib-set (and sib (setq sib
                                   (if fwd
@@ -126,7 +120,7 @@ But this is a heuristic thing, so we'll see if it works well."
          (n (cpo-treesitter-qd-node-at-point))
          (sib n)
          (_sib-set (dotimes (i count)
-                     (setq sib (tstw--qd-next-interesting-sibling sib fwd)))))
+                     (setq sib (cpo-treesitter-qd--qd-next-interesting-sibling sib fwd)))))
     (let ((anchor (and sib (cpo-treesitter-qd-node-anchor-point sib))))
       (and anchor (goto-char anchor)))))
 ;;;###autoload (autoload 'cpo-treesitter-qd-backward-sibling-anchor-point "cpo-treesitter-qd.el" "" t)
@@ -134,13 +128,13 @@ But this is a heuristic thing, so we'll see if it works well."
   (interactive "p")
   (cpo-treesitter-qd-forward-sibling-anchor-point (- (or count 1))))
 
-(defun tstw--qd-first-interesting-child (node)
+(defun cpo-treesitter-qd--qd-first-interesting-child (node)
   (let ((sib (treesit-node-child node 0)))
     (while (and sib
                 (not (cpo-treesitter-qd-node-interesting-p sib)))
       (setq sib (treesit-node-next-sibling sib)))
     sib))
-(defun tstw--qd-last-interesting-child (node)
+(defun cpo-treesitter-qd--qd-last-interesting-child (node)
   (let ((sib (treesit-node-child node -1)))
     (while (and sib
                 (not (cpo-treesitter-qd-node-interesting-p sib)))
@@ -151,14 +145,14 @@ But this is a heuristic thing, so we'll see if it works well."
 (defun cpo-treesitter-qd-down-to-first-child-anchor-point ()
   (interactive)
   (let* ((n (cpo-treesitter-qd-node-at-point))
-         (sib (and n (tstw--qd-first-interesting-child n)))
+         (sib (and n (cpo-treesitter-qd--qd-first-interesting-child n)))
          (anchor (and sib (cpo-treesitter-qd-node-anchor-point sib))))
     (and anchor (goto-char anchor))))
 ;;;###autoload (autoload 'cpo-treesitter-qd-down-to-last-child-anchor-point "cpo-treesitter-qd.el" "" t)
 (defun cpo-treesitter-qd-down-to-last-child-anchor-point ()
   (interactive)
   (let* ((n (cpo-treesitter-qd-node-at-point))
-         (sib (and n (tstw--qd-last-interesting-child n)))
+         (sib (and n (cpo-treesitter-qd--qd-last-interesting-child n)))
          (anchor (and sib (cpo-treesitter-qd-node-anchor-point sib))))
     (and anchor (goto-char anchor))))
 
@@ -191,15 +185,16 @@ But this is a heuristic thing, so we'll see if it works well."
  :use-children-bounds 'cpo-treesitter-qd-bounds-of-thing-at-point/children-region
  )
 
-(require 'repeatable-motion)
 ;;;###autoload (autoload 'rmo/cpo-treesitter-qd-forward-inorder-traversal "cpo-treesitter-qd.el" "" t)
 ;;;###autoload (autoload 'rmo/cpo-treesitter-qd-backward-inorder-traversal "cpo-treesitter-qd.el" "" t)
-(repeatable-motion-define-pair 'cpo-treesitter-qd-forward-inorder-traversal 'cpo-treesitter-qd-backward-inorder-traversal)
 ;;;###autoload (autoload 'rmo/cpo-treesitter-qd-forward-sibling-anchor-point "cpo-treesitter-qd.el" "" t)
 ;;;###autoload (autoload 'rmo/cpo-treesitter-qd-backward-sibling-anchor-point "cpo-treesitter-qd.el" "" t)
-(repeatable-motion-define-pair 'cpo-treesitter-qd-forward-sibling-anchor-point 'cpo-treesitter-qd-backward-sibling-anchor-point)
-(repeatable-motion-define-pair 'cpo-treesitter-qd-up-to-parent-anchor-point 'cpo-treesitter-qd-down-to-first-child-anchor-point)
 ;;;###autoload (autoload 'rmo/cpo-treesitter-qd-down-to-last-child-anchor-point "cpo-treesitter-qd.el" "" t)
-(repeatable-motion-define 'cpo-treesitter-qd-down-to-last-child-anchor-point 'cpo-treesitter-qd-up-to-parent-anchor-point)
+(with-eval-after-load 'repeatable-motion
+  (repeatable-motion-define-pair 'cpo-treesitter-qd-forward-inorder-traversal 'cpo-treesitter-qd-backward-inorder-traversal)
+  (repeatable-motion-define-pair 'cpo-treesitter-qd-forward-sibling-anchor-point 'cpo-treesitter-qd-backward-sibling-anchor-point)
+  (repeatable-motion-define-pair 'cpo-treesitter-qd-up-to-parent-anchor-point 'cpo-treesitter-qd-down-to-first-child-anchor-point)
+  (repeatable-motion-define 'cpo-treesitter-qd-down-to-last-child-anchor-point 'cpo-treesitter-qd-up-to-parent-anchor-point)
+  )
 
 (provide 'cpo-treesitter-qd)
