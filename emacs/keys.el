@@ -371,7 +371,7 @@
 
 ;; Ex
 (emmap ":" (lambda () (interactive)
-             (require 'evil)
+             (require 'evil) ;; Note that if I just require evil-ex here, it doesn't have any commands and I just get stuck in the ex buffer.
              (if (region-active-p)
                  (evil-ex (format "%s,%s "
                                   (line-number-at-pos (region-beginning))
