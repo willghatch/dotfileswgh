@@ -22,7 +22,7 @@
                  (min orig-point new-point)
                  (max orig-point new-point))))))
 
-(setq composiphrase-demo-config
+(setq composiphrase-demo-match-config
       `((verbs
          .
          ((move (direction . forward)
@@ -696,4 +696,4 @@
           ))))
 
 
-(provide 'composiphrase-demo-config)
+(provide 'composiphrase-demo-match-config)
