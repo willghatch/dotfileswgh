@@ -59,7 +59,7 @@
          words))
 
 
-(require 'text-object-stuff)
+(require 'cpo-text-object-stuff)
 
 (autoload 'rg "rg" "" t)
 
@@ -339,9 +339,9 @@
 
 ;; TODO - w/b is a lazy duplicate with no difference from what exists compositionally.  I've kept w/b as the “quick mash for movement” keys to just move for a while.  I would replace that with using ew/eb then mashing f.  I should turn these into training wheels message binds to unlearn their use.
 ;; (emmap "w" (cs/ae (cs/mod 'direction 'forward)
-;;                   (cs/obj 'vi-like-word)))
+;;                   (cs/obj 'cpo-vi-like-word)))
 ;; (emmap "b" (cs/ae (cs/mod 'direction 'backward)
-;;                   (cs/obj 'vi-like-word)))
+;;                   (cs/obj 'cpo-vi-like-word)))
 (emmap "w" (lambda () (interactive) (message "training wheels: use ew")))
 (emmap "b" (lambda () (interactive) (message "training wheels: use eb")))
 
@@ -519,7 +519,7 @@
                                               n))
    "character-specific" :exit t)
   ("l" (lambda (n) (interactive "p") (funcall (cs/ae (cs/obj 'line)) n)) "line" :exit t)
-  ("w" (lambda (n) (interactive "p") (funcall (cs/ae (cs/obj 'vi-like-word)) n)) "vi-like-word" :exit t)
+  ("w" (lambda (n) (interactive "p") (funcall (cs/ae (cs/obj 'cpo-vi-like-word)) n)) "vi-like-word" :exit t)
   ("W" (lambda (n) (interactive "p") (funcall (cs/ae (cs/obj 'word)) n)) "word" :exit t)
   ("s" (lambda (n) (interactive "p") (funcall (cs/ae (with-sptw-req (cs/obj 'sptw))) n)) "smartparens" :exit t)
   ("i" (lambda (n) (interactive "p") (funcall (cs/ae (progn (require 'indent-tree) (cs/obj 'indent-tree))) n)) "indent-tree" :exit t)

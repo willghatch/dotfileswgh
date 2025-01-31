@@ -64,7 +64,7 @@
                      (specific . ,nil) ;; This is specific to character, to implement something like vi's find character in line, but more consistent with this system.
                      )
           (word (default-verb . move) (location-within . beginning))
-          (vi-like-word (default-verb . move) (location-within . beginning))
+          (cpo-vi-like-word (default-verb . move) (location-within . beginning))
           (sentence (default-verb . move) (location-within . beginning))
           (paragraph (default-verb . move) (location-within . beginning))
           (line (default-verb . move) (location-within . beginning))
@@ -173,19 +173,19 @@
           ;; TODO - I really want more kinds of word objects, eg. to select camelCase word parts, to transpose them keeping the overall casing correct, etc.  Is there a useful way that I can specify ad-hoc word types and what delimiters should be allowed?  Eg. people use each of camelCase, snake_case, kebab-case, and more.  Sometimes they are mixed together or with extra separators like / or sigils, and can have ad-hoc meaning for the hierarchy of the different groupings.  Some people balk at mixing, but using more than one kind of case can be useful and meaningful, and sometimes mixing is out of your hands.  But I want tools to easily use all of these and select sub-parts at different levels of granularity.
           (move word
                 ((direction expand-region))
-                (wgh/expand-region-to-word ()))
+                (cpo-expand-region-to-word ()))
           (move word
                 ((direction forward) (location-within beginning))
-                (rmo/wgh/forward-word-beginning (num)))
+                (rmo/cpo-forward-word-beginning (num)))
           (move word
                 ((direction backward) (location-within beginning))
-                (rmo/wgh/backward-word-beginning (num)))
+                (rmo/cpo-backward-word-beginning (num)))
           (move word
                 ((direction forward) (location-within end))
-                (rmo/wgh/forward-word-end (num)))
+                (rmo/cpo-forward-word-end (num)))
           (move word
                 ((direction backward) (location-within end))
-                (rmo/wgh/backward-word-end (num)))
+                (rmo/cpo-backward-word-end (num)))
           (move word
                 ((direction forward) (location-within emacs-style))
                 (rmo/forward-word (num)))
@@ -193,37 +193,37 @@
                 ((direction backward) (location-within emacs-style))
                 (rmo/backward-word (num)))
 
-          (move vi-like-word
+          (move cpo-vi-like-word
                 ((direction expand-region))
-                (wgh/expand-region-to-vi-like-word ()))
-          (move vi-like-word
+                (cpo-expand-region-to-cpo-vi-like-word ()))
+          (move cpo-vi-like-word
                 ((direction forward) (location-within beginning))
-                (rmo/wgh/forward-vi-like-word-beginning (num)))
-          (move vi-like-word
+                (rmo/cpo-forward-cpo-vi-like-word-beginning (num)))
+          (move cpo-vi-like-word
                 ((direction backward) (location-within beginning))
-                (rmo/wgh/backward-vi-like-word-beginning (num)))
-          (move vi-like-word
+                (rmo/cpo-backward-cpo-vi-like-word-beginning (num)))
+          (move cpo-vi-like-word
                 ((direction forward) (location-within end))
-                (rmo/wgh/forward-vi-like-word-end (num)))
-          (move vi-like-word
+                (rmo/cpo-forward-cpo-vi-like-word-end (num)))
+          (move cpo-vi-like-word
                 ((direction backward) (location-within end))
-                (rmo/wgh/backward-vi-like-word-end (num)))
+                (rmo/cpo-backward-cpo-vi-like-word-end (num)))
 
           (move symbol
                 ((direction expand-region))
-                (wgh/expand-region-to-symbol ()))
+                (cpo-expand-region-to-symbol ()))
           (move symbol
                 ((direction forward) (location-within beginning))
-                (rmo/wgh/forward-symbol-beginning (num)))
+                (rmo/cpo-forward-symbol-beginning (num)))
           (move symbol
                 ((direction backward) (location-within beginning))
-                (rmo/wgh/backward-symbol-beginning (num)))
+                (rmo/cpo-backward-symbol-beginning (num)))
           (move symbol
                 ((direction forward) (location-within end))
-                (rmo/wgh/forward-symbol-end (num)))
+                (rmo/cpo-forward-symbol-end (num)))
           (move symbol
                 ((direction backward) (location-within end))
-                (rmo/wgh/backward-symbol-end (num)))
+                (rmo/cpo-backward-symbol-end (num)))
           (move symbol
                 ((direction forward) (location-within emacs-style))
                 (rmo/forward-symbol (num)))
@@ -233,19 +233,19 @@
 
           (move sentence
                 ((direction expand-region))
-                (wgh/expand-region-to-sentence ()))
+                (cpo-expand-region-to-sentence ()))
           (move sentence
                 ((direction forward) (location-within beginning))
-                (rmo/wgh/forward-sentence-beginning (num)))
+                (rmo/cpo-forward-sentence-beginning (num)))
           (move sentence
                 ((direction backward) (location-within beginning))
-                (rmo/wgh/backward-sentence-beginning (num)))
+                (rmo/cpo-backward-sentence-beginning (num)))
           (move sentence
                 ((direction forward) (location-within end))
-                (rmo/wgh/forward-sentence-end (num)))
+                (rmo/cpo-forward-sentence-end (num)))
           (move sentence
                 ((direction backward) (location-within end))
-                (rmo/wgh/backward-sentence-end (num)))
+                (rmo/cpo-backward-sentence-end (num)))
           (move sentence
                 ((direction forward) (location-within emacs-style))
                 (rmo/forward-sentence (num)))
@@ -255,19 +255,19 @@
 
           (move paragraph
                 ((direction expand-region))
-                (wgh/expand-region-to-paragraph ()))
+                (cpo-expand-region-to-paragraph ()))
           (move paragraph
                 ((direction forward) (location-within beginning))
-                (rmo/wgh/forward-paragraph-beginning (num)))
+                (rmo/cpo-forward-paragraph-beginning (num)))
           (move paragraph
                 ((direction backward) (location-within beginning))
-                (rmo/wgh/backward-paragraph-beginning (num)))
+                (rmo/cpo-backward-paragraph-beginning (num)))
           (move paragraph
                 ((direction forward) (location-within end))
-                (rmo/wgh/forward-paragraph-end (num)))
+                (rmo/cpo-forward-paragraph-end (num)))
           (move paragraph
                 ((direction backward) (location-within end))
-                (rmo/wgh/backward-paragraph-end (num)))
+                (rmo/cpo-backward-paragraph-end (num)))
           (move paragraph
                 ((direction forward) (location-within emacs-style))
                 (rmo/forward-paragraph (num)))
@@ -277,29 +277,29 @@
 
           (move line
                 ((direction expand-region) (tree-inner ,t))
-                (,(lambda () (wgh/expand-region-to-fill-lines nil)) ()))
+                (,(lambda () (cpo-expand-region-to-fill-lines nil)) ()))
           (move line
                 ((direction expand-region) (tree-inner ,nil))
-                (,(lambda () (wgh/expand-region-to-fill-lines t)) ()))
+                (,(lambda () (cpo-expand-region-to-fill-lines t)) ()))
           (move line
                 ((direction forward) (location-within beginning))
-                (rmo/wgh/forward-line-no-newline-beginning (num)))
+                (rmo/cpo-forward-cpo-line-no-newline-beginning (num)))
           (move line
                 ((direction backward) (location-within beginning))
-                (rmo/wgh/backward-line-no-newline-beginning (num)))
+                (rmo/cpo-backward-cpo-line-no-newline-beginning (num)))
           (move line
                 ((direction forward) (location-within end))
-                (rmo/wgh/forward-line-no-newline-end (num)))
+                (rmo/cpo-forward-cpo-line-no-newline-end (num)))
           (move line
                 ((direction backward) (location-within end))
-                (rmo/wgh/backward-line-no-newline-end (num)))
+                (rmo/cpo-backward-cpo-line-no-newline-end (num)))
           ;; TODO - emacs-style, in keeping with the other things that are emacs-style but not in keeping with emacs next-line/previous-line,  should move forward to the end of the current line if not at the end of the line, then to the end of the next line, and going backwards should go to the start of the line first, then to the start of the previous line.
           (move line
                 ((direction forward) (location-within keep-if-possible))
-                (rmo-c/wgh/next-line (num)))
+                (rmo-c/cpo-next-line (num)))
           (move line
                 ((direction backward) (location-within keep-if-possible))
-                (rmo-c/wgh/prev-line (num)))
+                (rmo-c/cpo-prev-line (num)))
 
           (move sptw
                 ((tree-vertical up) (direction expand-region) (tree-inner ,nil))
@@ -566,39 +566,43 @@
 
 
           (move url ((direction expand-region))
-                (wgh/expand-region-to-url))
+                (cpo-expand-region-to-url))
           (move url ((direction forward) (location-within beginning))
-                (rmo/wgh/forward-url-beginning (num)))
+                (rmo/cpo-forward-url-beginning (num)))
           (move url ((direction backward) (location-within beginning))
-                (rmo/wgh/backward-url-beginning (num)))
+                (rmo/cpo-backward-url-beginning (num)))
           (move url ((direction forward) (location-within end))
-                (rmo/wgh/forward-url-end (num)))
+                (rmo/cpo-forward-url-end (num)))
           (move url ((direction backward) (location-within end))
-                (rmo/wgh/backward-url-end (num)))
+                (rmo/cpo-backward-url-end (num)))
           (move email ((direction expand-region))
-                (wgh/expand-region-to-email))
+                (cpo-expand-region-to-email))
           (move email ((direction forward) (location-within beginning))
-                (rmo/wgh/forward-email-beginning (num)))
+                (rmo/cpo-forward-email-beginning (num)))
           (move email ((direction backward) (location-within beginning))
-                (rmo/wgh/backward-email-beginning (num)))
+                (rmo/cpo-backward-email-beginning (num)))
           (move email ((direction forward) (location-within end))
-                (rmo/wgh/forward-email-end (num)))
+                (rmo/cpo-forward-email-end (num)))
           (move email ((direction backward) (location-within end))
-                (rmo/wgh/backward-email-end (num)))
+                (rmo/cpo-backward-email-end (num)))
 
           ;; TODO - for transpose character, implement something that follows the character explicitly forward/backward.
-          (transpose word ((direction forward)) (wgh/transpose-word-forward (num)))
-          (transpose word ((direction backward)) (wgh/transpose-word-backward (num)))
-          (transpose vi-like-word ((direction forward)) (wgh/transpose-vi-like-word-forward (num)))
-          (transpose vi-like-word ((direction backward)) (wgh/transpose-vi-like-word-backward (num)))
-          (transpose symbol ((direction forward)) (wgh/transpose-symbol-forward (num)))
-          (transpose symbol ((direction backward)) (wgh/transpose-symbol-backward (num)))
-          (transpose sentence ((direction forward)) (wgh/transpose-sentence-forward (num)))
-          (transpose sentence ((direction backward)) (wgh/transpose-sentence-backward (num)))
-          (transpose paragraph ((direction forward)) (wgh/transpose-paragraph-forward (num)))
-          (transpose paragraph ((direction backward)) (wgh/transpose-paragraph-backward (num)))
-          (transpose line ((direction forward)) (wgh/transpose-line-forward (num)))
-          (transpose line ((direction backward)) (wgh/transpose-line-backward (num)))
+          (transpose word ((direction forward)) (cpo-transpose-word-forward (num)))
+          (transpose word ((direction backward)) (cpo-transpose-word-backward (num)))
+          (transpose cpo-vi-like-word ((direction forward)) (cpo-transpose-cpo-vi-like-word-forward (num)))
+          (transpose cpo-vi-like-word ((direction backward)) (cpo-transpose-cpo-vi-like-word-backward (num)))
+          (transpose symbol ((direction forward)) (cpo-transpose-symbol-forward (num)))
+          (transpose symbol ((direction backward)) (cpo-transpose-symbol-backward (num)))
+          (transpose sentence ((direction forward)) (cpo-transpose-sentence-forward (num)))
+          (transpose sentence ((direction backward)) (cpo-transpose-sentence-backward (num)))
+          (transpose paragraph ((direction forward)) (cpo-transpose-paragraph-forward (num)))
+          (transpose paragraph ((direction backward)) (cpo-transpose-paragraph-backward (num)))
+          (transpose line ((direction forward)) (cpo-transpose-line-forward (num)))
+          (transpose line ((direction backward)) (cpo-transpose-line-backward (num)))
+          ;;(transpose url ((direction forward)) (cpo-transpose-url-forward (num)))
+          ;;(transpose url ((direction backward)) (cpo-transpose-url-backward (num)))
+          ;;(transpose email ((direction forward)) (cpo-transpose-email-forward (num)))
+          ;;(transpose email ((direction backward)) (cpo-transpose-email-backward (num)))
           (transpose sptw ((tree-vertical up)) (sptw-ancestor-reorder (num)))
           (transpose sptw ((tree-vertical ,nil) (direction forward)) (sptw-transpose-sibling-forward (num)))
           (transpose sptw ((tree-vertical ,nil) (direction backward)) (sptw-transpose-sibling-backward (num)))
@@ -610,10 +614,10 @@
           (transpose indent-tree ((direction forward)) (indent-tree-transpose-sibling-forward (num)))
           (transpose indent-tree ((direction backward)) (indent-tree-transpose-sibling-backward (num)))
 
-          (open line ((direction forward)) (cpo-open-line-below))
-          (open line ((direction backward)) (cpo-open-line-above))
-          (open outline ((direction forward) (tree-vertical ,nil)) (,(lambda () (twoi-add-heading-below) (estate-insert-state))))
-          (open outline ((direction backward) (tree-vertical ,nil)) (,(lambda () (twoi-add-heading-above) (estate-insert-state))))
+          (open line ((direction forward)) (,(lambda () (estate-insert-state-with-thunk 'cpo-open-line-below))))
+          (open line ((direction backward)) (,(lambda () (estate-insert-state-with-thunk 'cpo-open-line-above))))
+          (open outline ((direction forward) (tree-vertical ,nil)) (,(lambda () (estate-insert-state-with-thunk 'twoi-add-heading-below))))
+          (open outline ((direction backward) (tree-vertical ,nil)) (,(lambda () (estate-insert-state-with-thunk 'twoi-add-heading-above))))
           (open outline ((tree-vertical down)) (,(lambda () (message "TODO - implement open outline child"))))
           (open indent-tree ((direction forward) (tree-vertical ,nil)) (,(lambda () (estate-insert-state-with-thunk 'indent-tree-open-sibling-forward))))
           (open indent-tree ((direction backward) (tree-vertical ,nil)) (,(lambda () (estate-insert-state-with-thunk 'indent-tree-open-sibling-backward))))
@@ -680,9 +684,9 @@
                        sentence-with-defaults))
 
           ;; (initiate-isearch region ((direction forward))
-          ;;                   (,(lambda () (wgh/isearch-forward-for-text-in-region (region-beginning) (region-end))) ()))
+          ;;                   (,(lambda () (cpo-isearch-forward-for-text-in-region (region-beginning) (region-end))) ()))
           ;; (initiate-isearch ,(lambda (x) (not (memq x '(region)))) ((direction forward))
-          ;;                   (,(composiphrase--make-movement-delegated-command 'wgh/isearch-forward-for-text-in-region)
+          ;;                   (,(composiphrase--make-movement-delegated-command 'cpo-isearch-forward-for-text-in-region)
           ;;                    sentence-with-defaults))
 
 
