@@ -3,34 +3,39 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Record all keys for each command.
 
+(setq aggreact--current-command-key-groups nil)
 (setq aggreact--current-single-command-key-groups nil)
 (setq aggreact--current-single-command-raw-key-groups nil)
 
 (defun aggreact--read-key-sequence-advice (&rest args)
-  ;; TODO - should this use this-single-command-keys, this-single-command-raw-keys, this-command-keys, or what?
+  (setq aggreact--current-single-command-raw-key-groups
+        (cons (this-single-command-raw-keys)
+              aggreact--current-single-command-raw-key-groups))
   (setq aggreact--current-single-command-key-groups
         (cons (this-single-command-keys)
               aggreact--current-single-command-key-groups))
-  (setq aggreact--current-single-command-raw-key-groups
-        (cons (this-single-command-raw-keys)
-              aggreact--current-single-command-raw-key-groups)))
+  (setq aggreact--current-command-key-groups
+        (cons (this-command-keys)
+              aggreact--current-command-key-groups)))
 
-(defun aggreact-this-command-all-keys (&optional raw as-groups)
+(defun aggreact-this-command-all-keys (cook-style as-groups)
   "Return a vector of keys used for this command, including any uses of `read-key-sequence', at least up to the point where this function is used.
-Returns a vector, or if AS-GROUPS is 't', return a list of vectors where each vector represents a different call to `read-key-sequence' or a command loop read.
-If RAW, return keys as in `this-single-command-raw-keys' instead of `this-single-command-keys'.
+Returns a vector, or if AS-GROUPS is non-nil, return a list of vectors where each vector represents a different call to `read-key-sequence' or a command loop read.
+COOK-STYLE can be 'raw, 'single, or 'tck to receive keys as in `this-single-command-raw-keys', `this-single-command-keys', or `this-command-keys', respectively.
 
 Requires aggreact-mode to be enabled, since it depends on `read-key-sequence' advice to not lose key sequences.
 "
   (when (not aggreact-mode)
     (error "aggreact-this-command-all-keys requires aggreact-mode be enabled"))
-  ;; TODO - error when aggreact mode not enabled
   (let ((data (reverse
-               (cons (if raw (this-single-command-raw-keys)
-                       (this-single-command-keys))
-                     (if raw
-                         aggreact--current-single-command-raw-key-groups
-                       aggreact--current-single-command-key-groups)))))
+               (cons (cond ((eq cook-style 'raw) (this-single-command-raw-keys))
+                           ((eq cook-style 'single) (this-single-command-keys))
+                           ((eq cook-style 'tck) (this-command-keys))
+                           (t (error "bad value for cook-style: %s" cook-style)))
+                     (cond ((eq cook-style 'raw) aggreact--current-single-command-raw-key-groups)
+                           ((eq cook-style 'single) aggreact--current-single-command-key-groups)
+                           ((eq cook-style 'tck) aggreact--current-command-key-groups)
+                           (t (error "bad value for cook-style: %s" cook-style)))))))
     (if as-groups
         data
       (apply 'seq-concatenate 'vector data))))
@@ -79,8 +84,9 @@ This is useful to eg. keep histories of commands with interesting properties.
   (let* ((new-command-details
           `((command . ,this-command)
             ;; TODO - command arguments
-            (keys-vectors . ,(aggreact-this-command-all-keys nil t))
-            (raw-keys-vectors . ,(aggreact-this-command-all-keys t t))
+            (keys-vectors . ,(aggreact-this-command-all-keys 'tck t))
+            (single-keys-vectors . ,(aggreact-this-command-all-keys 'single t))
+            (raw-keys-vectors . ,(aggreact-this-command-all-keys 'raw t))
             (modified-prefix-arg-p . ,(equal aggreact--pre-command-prefix-arg-state
                                              prefix-arg)))))
     (setq new-command-details
@@ -105,12 +111,8 @@ This is useful to eg. keep histories of commands with interesting properties.
           (mapcar (lambda (func) (funcall func finalized-group))
                   aggreact-command-group-split-functions))))))
 
-(defun aggreact--get-keys-for-command-group (command-group &optional keys-type)
-  "Return the keys used for the entire COMMAND-GROUP as a flat vector.
-KEYS-TYPE can be 'raw, 'single, or nil.
-TODO - explanation of difference...
-"
-  ;; TODO - use keys-type
+(defun aggreact--get-keys-for-command-group (command-group)
+  "Return the raw keys used for the entire COMMAND-GROUP as a flat vector."
   (apply 'seq-concatenate 'vector
          (mapcar (lambda (x) (apply 'seq-concatenate 'vector
                                     (cdr (assq 'raw-keys-vectors x))))
