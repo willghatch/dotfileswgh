@@ -1,5 +1,5 @@
 ;;; -*- lexical-binding: t; -*-
-(require 'tree-walk)
+(require 'cpo-tree-walk)
 (require 'outline)
 
 (defun twoi-forward-slurp-heading ()
@@ -57,7 +57,7 @@
       (outline-back-to-heading)
       (let* ((orig-level (outline-level))
              (orig-heading-point (point))
-             (moved (tree-walk--motion-moved 'outline-next-heading))
+             (moved (cpo-tree-walk--motion-moved 'outline-next-heading))
              (next-level (outline-level))
              (next-heading-point (point)))
         (when (< orig-level next-level)
@@ -76,11 +76,11 @@
   (ignore-errors (org-up-element)))
 
 (defun wgh/org-forward-to-last-sibling ()
-  (while (tree-walk--motion-moved (lambda () (org-forward-heading-same-level 1)))))
+  (while (cpo-tree-walk--motion-moved (lambda () (org-forward-heading-same-level 1)))))
 (defun wgh/org-down-to-last-child ()
   ;; TODO - this and others should probably take a number argument
   (interactive)
-  (and (tree-walk--motion-moved #'wgh/org-down-element)
+  (and (cpo-tree-walk--motion-moved #'wgh/org-down-element)
        (wgh/org-forward-to-last-sibling)))
 
 (defun twoi--outline-at-anchor-point-p ()
@@ -90,7 +90,7 @@
       (outline-next-heading)
       (equal (point) start-point))))
 
-(tree-walk-define-operations
+(cpo-tree-walk-define-operations
  :def-inorder-forward twoi-inorder-traversal-forward
  :def-inorder-backward twoi-inorder-traversal-backward
  :def-down-to-last-descendant twoi-down-to-last-descendant
@@ -136,4 +136,4 @@
 
 
 
-(provide 'tree-walk-outline-integration)
+(provide 'cpo-outline)

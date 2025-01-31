@@ -1,6 +1,6 @@
 ;;; -*- lexical-binding: t; -*-
 
-(require 'tree-walk-smartparens-integration)
+(require 'cpo-smartparens)
 (require 'ert)
 
 ;; TODO - actually write a bunch of tests

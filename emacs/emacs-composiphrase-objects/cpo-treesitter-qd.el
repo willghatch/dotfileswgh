@@ -1,6 +1,6 @@
 ;; -*- lexical-binding: t; -*-
 
-(require 'tree-walk)
+(require 'cpo-tree-walk)
 (require 'treesit)
 
 ;; TODO - how to use treesitter
@@ -93,7 +93,7 @@ But this is a heuristic thing, so we'll see if it works well."
 ;; TODO - This is working well for elisp, but I would like an end anchor point as well as a start anchor point.
 ;; TODO - autoloads
 
-;;;###autoload (autoload 'tstw-qd-up-to-parent-anchor-point "tree-walk-treesitter-integration.el" "" t)
+;;;###autoload (autoload 'tstw-qd-up-to-parent-anchor-point "cpo-tree-walk-treesitter-integration.el" "" t)
 (defun tstw-qd-up-to-parent-anchor-point (&optional count)
   (interactive "p")
   (let* ((count (or count 1))
@@ -117,7 +117,7 @@ But this is a heuristic thing, so we'll see if it works well."
                   (treesit-node-prev-sibling sib))))
     sib))
 
-;;;###autoload (autoload 'tstw-qd-forward-sibling-anchor-point "tree-walk-treesitter-integration.el" "" t)
+;;;###autoload (autoload 'tstw-qd-forward-sibling-anchor-point "cpo-tree-walk-treesitter-integration.el" "" t)
 (defun tstw-qd-forward-sibling-anchor-point (&optional count)
   (interactive "p")
   (let* ((count (or count 1))
@@ -129,7 +129,7 @@ But this is a heuristic thing, so we'll see if it works well."
                      (setq sib (tstw--qd-next-interesting-sibling sib fwd)))))
     (let ((anchor (and sib (tstw-qd-node-anchor-point sib))))
       (and anchor (goto-char anchor)))))
-;;;###autoload (autoload 'tstw-qd-backward-sibling-anchor-point "tree-walk-treesitter-integration.el" "" t)
+;;;###autoload (autoload 'tstw-qd-backward-sibling-anchor-point "cpo-tree-walk-treesitter-integration.el" "" t)
 (defun tstw-qd-backward-sibling-anchor-point (&optional count)
   (interactive "p")
   (tstw-qd-forward-sibling-anchor-point (- (or count 1))))
@@ -147,14 +147,14 @@ But this is a heuristic thing, so we'll see if it works well."
       (setq sib (treesit-node-prev-sibling sib)))
     sib))
 
-;;;###autoload (autoload 'tstw-qd-down-to-first-child-anchor-point "tree-walk-treesitter-integration.el" "" t)
+;;;###autoload (autoload 'tstw-qd-down-to-first-child-anchor-point "cpo-tree-walk-treesitter-integration.el" "" t)
 (defun tstw-qd-down-to-first-child-anchor-point ()
   (interactive)
   (let* ((n (tstw-qd-node-at-point))
          (sib (and n (tstw--qd-first-interesting-child n)))
          (anchor (and sib (tstw-qd-node-anchor-point sib))))
     (and anchor (goto-char anchor))))
-;;;###autoload (autoload 'tstw-qd-down-to-last-child-anchor-point "tree-walk-treesitter-integration.el" "" t)
+;;;###autoload (autoload 'tstw-qd-down-to-last-child-anchor-point "cpo-tree-walk-treesitter-integration.el" "" t)
 (defun tstw-qd-down-to-last-child-anchor-point ()
   (interactive)
   (let* ((n (tstw-qd-node-at-point))
@@ -164,7 +164,7 @@ But this is a heuristic thing, so we'll see if it works well."
 
 
 
-(tree-walk-define-operations
+(cpo-tree-walk-define-operations
  :def-inorder-forward tstw-qd-forward-inorder-traversal
  :def-inorder-backward tstw-qd-backward-inorder-traversal
 
@@ -192,14 +192,14 @@ But this is a heuristic thing, so we'll see if it works well."
  )
 
 (require 'repeatable-motion)
-;;;###autoload (autoload 'rmo/tstw-qd-forward-inorder-traversal "tree-walk-treesitter-integration.el" "" t)
-;;;###autoload (autoload 'rmo/tstw-qd-backward-inorder-traversal "tree-walk-treesitter-integration.el" "" t)
+;;;###autoload (autoload 'rmo/tstw-qd-forward-inorder-traversal "cpo-tree-walk-treesitter-integration.el" "" t)
+;;;###autoload (autoload 'rmo/tstw-qd-backward-inorder-traversal "cpo-tree-walk-treesitter-integration.el" "" t)
 (repeatable-motion-define-pair 'tstw-qd-forward-inorder-traversal 'tstw-qd-backward-inorder-traversal)
-;;;###autoload (autoload 'rmo/tstw-qd-forward-sibling-anchor-point "tree-walk-treesitter-integration.el" "" t)
-;;;###autoload (autoload 'rmo/tstw-qd-backward-sibling-anchor-point "tree-walk-treesitter-integration.el" "" t)
+;;;###autoload (autoload 'rmo/tstw-qd-forward-sibling-anchor-point "cpo-tree-walk-treesitter-integration.el" "" t)
+;;;###autoload (autoload 'rmo/tstw-qd-backward-sibling-anchor-point "cpo-tree-walk-treesitter-integration.el" "" t)
 (repeatable-motion-define-pair 'tstw-qd-forward-sibling-anchor-point 'tstw-qd-backward-sibling-anchor-point)
 (repeatable-motion-define-pair 'tstw-qd-up-to-parent-anchor-point 'tstw-qd-down-to-first-child-anchor-point)
-;;;###autoload (autoload 'rmo/tstw-qd-down-to-last-child-anchor-point "tree-walk-treesitter-integration.el" "" t)
+;;;###autoload (autoload 'rmo/tstw-qd-down-to-last-child-anchor-point "cpo-tree-walk-treesitter-integration.el" "" t)
 (repeatable-motion-define 'tstw-qd-down-to-last-child-anchor-point 'tstw-qd-up-to-parent-anchor-point)
 
-(provide 'tree-walk-treesitter-integration)
+(provide 'cpo-treesitter-qd)

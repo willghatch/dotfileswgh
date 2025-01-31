@@ -34,7 +34,7 @@
     (on-xml--forward-from-on-close)))
 
 (defun on-xml--forward-end-from-on-open ()
-  (when (tree-walk--motion-moved #'nxml-forward-element)
+  (when (cpo-tree-walk--motion-moved #'nxml-forward-element)
     (backward-char)))
 
 (defun on-xml--forward ()
@@ -58,7 +58,7 @@
 (defun on-xml--backward-from-on-open ()
   (nxml-backward-element))
 (defun on-xml--backward-end-from-on-open ()
-  (when (tree-walk--motion-moved #'nxml-backward-element)
+  (when (cpo-tree-walk--motion-moved #'nxml-backward-element)
     (nxml-forward-element)
     (backward-char)))
 (defun on-xml--backward-from-on-close ()
@@ -98,18 +98,18 @@
 (defun on-xml--up-from-on-open ()
   (nxml-backward-up-element))
 (defun on-xml--up-end-from-on-open ()
-  (when (tree-walk--motion-moved #'nxml-up-element)
+  (when (cpo-tree-walk--motion-moved #'nxml-up-element)
     (backward-char)))
 
 (defun on-xml--up-from-on-close ()
   (let ((start (point)))
     (on-xml-backward 1)
-    (unless (tree-walk--motion-moved #'on-xml--up-from-on-open)
+    (unless (cpo-tree-walk--motion-moved #'on-xml--up-from-on-open)
       (goto-char start))))
 (defun on-xml--up-end-from-on-close ()
   (let ((start (point)))
     (on-xml-backward 1)
-    (unless (tree-walk--motion-moved #'on-xml--up-end-from-on-open)
+    (unless (cpo-tree-walk--motion-moved #'on-xml--up-end-from-on-open)
       (goto-char start))))
 
 (defun on-xml--up ()
@@ -119,7 +119,7 @@
 (defun on-xml--up-end ()
   (cond ((on-xml-on-open-p) (on-xml--up-end-from-on-open))
         ((on-xml-on-close-p) (on-xml--up-end-from-on-close))
-        (t (when (tree-walk--motion-moved #'nxml-up-element)
+        (t (when (cpo-tree-walk--motion-moved #'nxml-up-element)
              (backward-char)))))
 
 (on-parens--command-wrap on-xml-up

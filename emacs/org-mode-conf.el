@@ -8,7 +8,7 @@
 (add-hook 'org-mode-hook
           (lambda ()
             (message "doing org-mode-hook")
-            (require 'tree-walk-outline-integration)
+            (require 'cpo-tree-walk-outline-integration)
             ;; (lnkmap "eh" 'rmo/org-forward-heading-same-level)
             ;; (lnkmap "oh" 'rmo/org-backward-heading-same-level)
             ;; ;; outline-up-heading skips the immediate parent heading if called

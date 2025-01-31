@@ -1,4 +1,4 @@
-;;; tree-walk.el --- TODO - description here -*- lexical-binding: t; -*-
+;;; cpo-tree-walk.el --- TODO - description here -*- lexical-binding: t; -*-
 ;; Related work:
 ;; * https://github.com/volrath/treepy.el -- a library for navigating elisp data structures.  Cool!  But I want motions navigating a text buffer according to various kinds of trees encoded within the text.
 ;; * https://github.com/yangwen0228/jump-tree/ -- a library like undo-tree but for jump positions.  Awesome!
@@ -26,7 +26,7 @@
 ;; This is also a problem for mixed trees, where if any of the trees mixed in lack explicit end delimiters, the mixed tree then doesn't universally have them.
 ;;
 ;; Another weird tree issue is the idea of “half-siblings” for indent trees and org/outline-mode trees.  These can both have a first child that is indented more than later children, and in fact can have an arbitrary number of early children that are indented deeper than later children.  Eg: * h1 **** h4 *** h3 ** h2.  Each of these may have valid sub-trees, but they are not full siblings despite sharing a parent.  So there should be a next/prev full-sibling function and a next/prev full-or-half-sibling function, and maybe a next/prev half-sibling region function, and the full inorder traversal function needs to use the full-or-half-sibling functions.  Also XML could have a definition where the attributes count as a set of half siblings -- not the main XML definition, but it could be an alternate mode.
-;; But... does this tree-walk library need to care about full/half siblings?  The inorder traversal can just be given the next-full-or-half-sibling functions, and any specific trees with this quality can define their own helpers for dealing with full/half siblings.
+;; But... does this cpo-tree-walk library need to care about full/half siblings?  The inorder traversal can just be given the next-full-or-half-sibling functions, and any specific trees with this quality can define their own helpers for dealing with full/half siblings.
 ;;
 ;; What are the common USEFUL operations that may be built on top of the basics, that I can bind to keys in a generic way so that once I learn the keys for operations and for trees I can compose them?
 ;; * Move to sibling is really useful for navigation and reading, eg. to get an overview of definitions at a certain level
@@ -78,7 +78,7 @@
 ;; TODO list
 ;; * Document things
 ;; * Make macro keywords consistent, and use names like def-X for symbols that the macro will define.
-;; * Make it clear what APIs are necessary to define new tree-walk trees, and what APIs you get from it.
+;; * Make it clear what APIs are necessary to define new cpo-tree-walk trees, and what APIs you get from it.
 ;; * Implement helper to get bounds for indent tree and similar trees -- convert it from being focused on evil-mode to focused on getting bounds more generally.
 ;; * Define a shared API for all trees to access bounds.  IE explicitly write some bounds helpers for smartparens, and decide if anything more is necessary.
 ;; * Define easy generic ops: transpose-sibling, transpose-sibling-region (IE transpose a group of siblings together, all of the siblings in the region (either strictly with the sibling regions exactly fitting the region or sloppily using all siblings that are partially in the region)), raise/replace-parent, etc.  Do I want things like delete forward/back, delete to parent, etc?  I think just having movements is enough for that -- IE move to start of first sibling, move to end of last sibling, etc paired with regions and deletion do it.
@@ -93,13 +93,13 @@
 
 (require 'cl-lib)
 
-(defun tree-walk--motion-moved (motion)
+(defun cpo-tree-walk--motion-moved (motion)
   "Take MOTION, some movement function of no args.  Call it, and return true if the motion moved, leaving point where the motion moved it."
   (let ((start-pos (point)))
     (funcall motion)
     (not (= (point) start-pos))))
 
-(defun tree-walk--motion-moved-region (motion)
+(defun cpo-tree-walk--motion-moved-region (motion)
   (let ((start-pos (point))
         (start-mark (mark))
         (start-region-active (region-active-p)))
@@ -108,7 +108,7 @@
         (not (= (mark) start-mark))
         (not (equal start-region-active (region-active-p))))))
 
-(defun tree-walk--last-leaf-forward-in-order (up next)
+(defun cpo-tree-walk--last-leaf-forward-in-order (up next)
   (lambda ()
     ;; IE if you're at a leaf with no next sibling,
     ;; the next motion is to find the nearest
@@ -118,36 +118,36 @@
           (keep-going-p t)
           (success-p nil))
       (while (and keep-going-p (not success-p))
-        (when (not (tree-walk--motion-moved up))
+        (when (not (cpo-tree-walk--motion-moved up))
           (setq keep-going-p nil))
-        (when (tree-walk--motion-moved next)
+        (when (cpo-tree-walk--motion-moved next)
           (setq success-p t)))
       (when (not success-p)
         (goto-char backtrack-pos))
       success-p)))
 
-(defun tree-walk--down-to-last-descendant (down-to-last-child)
+(defun cpo-tree-walk--down-to-last-descendant (down-to-last-child)
   (interactive)
-  (while (tree-walk--motion-moved down-to-last-child)))
+  (while (cpo-tree-walk--motion-moved down-to-last-child)))
 
-(defun tree-walk--previous-sibling-last-descendant (prev last-descendant)
-  (and (tree-walk--motion-moved prev) (funcall last-descendant)))
+(defun cpo-tree-walk--previous-sibling-last-descendant (prev last-descendant)
+  (and (cpo-tree-walk--motion-moved prev) (funcall last-descendant)))
 
-(defun tree-walk--inorder-traversal-forward-single (down next last-leaf-forward)
+(defun cpo-tree-walk--inorder-traversal-forward-single (down next last-leaf-forward)
   (lambda ()
-    (unless (tree-walk--motion-moved down)
-      (unless (tree-walk--motion-moved next)
-        (tree-walk--motion-moved last-leaf-forward)))))
-(defun tree-walk--inorder-traversal-backward-single (up prev down-to-last-child)
+    (unless (cpo-tree-walk--motion-moved down)
+      (unless (cpo-tree-walk--motion-moved next)
+        (cpo-tree-walk--motion-moved last-leaf-forward)))))
+(defun cpo-tree-walk--inorder-traversal-backward-single (up prev down-to-last-child)
   (lambda ()
-    (unless (tree-walk--motion-moved
+    (unless (cpo-tree-walk--motion-moved
              (lambda ()
-               (tree-walk--previous-sibling-last-descendant
+               (cpo-tree-walk--previous-sibling-last-descendant
                 prev
-                (lambda () (while (tree-walk--motion-moved down-to-last-child))))))
+                (lambda () (while (cpo-tree-walk--motion-moved down-to-last-child))))))
       (funcall up))))
 
-(defmacro tree-walk--def-inorder-traversal (function-name object-name dir-name forward1 backward1)
+(defmacro cpo-tree-walk--def-inorder-traversal (function-name object-name dir-name forward1 backward1)
   `(defun ,function-name (count)
      ,(format "Do COUNT steps %s of inorder tree traversal for %s." dir-name object-name)
      (interactive "p")
@@ -160,7 +160,7 @@
 
 
 
-(defmacro tree-walk-define-inorder-traversal
+(defmacro cpo-tree-walk-define-inorder-traversal
     (object-name
      name-forward
      name-backward
@@ -173,21 +173,21 @@
         (leaf-forward (gensym (format "%s_leaf-helper_" name-forward)))
         )
     `(progn
-       (setq ,leaf-forward (tree-walk--last-leaf-forward-in-order ,up ,next))
-       (setq ,forward1 (tree-walk--inorder-traversal-forward-single
+       (setq ,leaf-forward (cpo-tree-walk--last-leaf-forward-in-order ,up ,next))
+       (setq ,forward1 (cpo-tree-walk--inorder-traversal-forward-single
                         ,down ,next ,leaf-forward))
-       (setq ,backward1 (tree-walk--inorder-traversal-backward-single
+       (setq ,backward1 (cpo-tree-walk--inorder-traversal-backward-single
                          ,up ,prev ,down-to-last-child))
-       (tree-walk--def-inorder-traversal ,name-forward ,object-name "forward" ,forward1 ,backward1)
-       (tree-walk--def-inorder-traversal ,name-backward ,object-name "backward" ,backward1 ,forward1))))
+       (cpo-tree-walk--def-inorder-traversal ,name-forward ,object-name "forward" ,forward1 ,backward1)
+       (cpo-tree-walk--def-inorder-traversal ,name-backward ,object-name "backward" ,backward1 ,forward1))))
 
-(defun tree-walk--down-to-last-child-default-impl (down-to-first-child next-sibling)
+(defun cpo-tree-walk--down-to-last-child-default-impl (down-to-first-child next-sibling)
   "Default implementation of down-to-last-child."
   (and
-   (tree-walk--motion-moved down-to-first-child)
-   (while (tree-walk--motion-moved next-sibling))))
+   (cpo-tree-walk--motion-moved down-to-first-child)
+   (while (cpo-tree-walk--motion-moved next-sibling))))
 
-(defun tree-walk--region-less-or-equal (r1 r2)
+(defun cpo-tree-walk--region-less-or-equal (r1 r2)
   "Returns canon form of r2 if it includes all of r1, otherwise nil.
 r1 and r2 should both be cons pairs of points eg. (beg . end), but also return nil if one of them is not.
 r1 and r2 do not have to be in proper order.
@@ -207,21 +207,21 @@ If r2 is not in order, a successful return has in ordered."
        (cons (min (car r2) (cdr r2))
              (max (car r2) (cdr r2)))))
 
-(defun tree-walk--region-strictly-less (r1 r2)
+(defun cpo-tree-walk--region-strictly-less (r1 r2)
   "Returns canon form of r2 if it is strictly greater than r1, IE it covers but also goes beyond on at least one side."
-  (let ((cover (tree-walk--region-less-or-equal r1 r2)))
+  (let ((cover (cpo-tree-walk--region-less-or-equal r1 r2)))
     (and cover
          (or (< (car r2) (min (car r1) (cdr r1)))
              (<  (max (cdr r1) (car r1)) (cdr r2)))
          cover)))
 
-(defun tree-walk--regions-not-overlapping (r1 r2)
+(defun cpo-tree-walk--regions-not-overlapping (r1 r2)
   "Return t if regions do not overlap, nil otherwise."
   (if (< (car r1) (car r2))
       (<= (cdr r1) (car r2))
     (<= (cdr r2) (car r1))))
 
-(defun tree-walk--transpose-sibling-once (bounds-func move-func goto-anchor-func)
+(defun cpo-tree-walk--transpose-sibling-once (bounds-func move-func goto-anchor-func)
   "Transpose a tree node forward by swapping it with its next neighbor forward, based on the given functions to operate on it.
 If GOTO-ANCHOR-FUNC is nil, then the beginning of the bounds is assumed to be the anchor point.
 Leave the cursor on the original thing, so you can keep dragging it forward or back."
@@ -231,10 +231,10 @@ Leave the cursor on the original thing, so you can keep dragging it forward or b
                             (if goto-anchor-func
                                 (funcall goto-anchor-func)
                               (goto-char (car bounds-1)))
-                            (and (tree-walk--motion-moved move-func)
+                            (and (cpo-tree-walk--motion-moved move-func)
                                  (funcall bounds-func (point))))))
            (when (and bounds-2
-                      (tree-walk--regions-not-overlapping bounds-1 bounds-2))
+                      (cpo-tree-walk--regions-not-overlapping bounds-1 bounds-2))
              (let* ((s1 (buffer-substring-no-properties (car bounds-1)
                                                         (cdr bounds-1)))
                     (s2 (buffer-substring-no-properties (car bounds-2)
@@ -258,7 +258,7 @@ Leave the cursor on the original thing, so you can keep dragging it forward or b
                                 (+ len-diff (car bounds-2))
                               (car bounds-2)))
                  (undo-boundary))))))))
-(defun tree-walk--transpose-siblings (count bounds-func move-func goto-anchor-func move-backward-func)
+(defun cpo-tree-walk--transpose-siblings (count bounds-func move-func goto-anchor-func move-backward-func)
   "Transpose siblings COUNT times.  Use the other args to move and find the things."
   (setq count (or count 1))
   (let ((fwd (< 0 count))
@@ -266,14 +266,14 @@ Leave the cursor on the original thing, so you can keep dragging it forward or b
     (let ((cg (prepare-change-group)))
       (while (< 0 count)
         (if fwd
-            (tree-walk--transpose-sibling-once bounds-func move-func goto-anchor-func)
-          (tree-walk--transpose-sibling-once bounds-func (or move-backward-func (lambda () (funcall move-func -1))) goto-anchor-func))
+            (cpo-tree-walk--transpose-sibling-once bounds-func move-func goto-anchor-func)
+          (cpo-tree-walk--transpose-sibling-once bounds-func (or move-backward-func (lambda () (funcall move-func -1))) goto-anchor-func))
         (setq count (- count 1)))
       (undo-amalgamate-change-group cg))))
 
 
 ;; TODO - all of this code about getting bounds is just a disaster.  I wanted to make the code I already had work, but I should have just started from scratch.  At any rate, it's mostly working.  I should come back and clean it up.  Eg. remove the stuff that's specific to evil-mode, and make things simpler and less super higher order due to whatever whims of the day I threw together the evil-mode version and then my desire to use that rather than starting over.
-(defun tree-walk--bounds-of-thing-at-point-for-tree-with-no-end-delimiter
+(defun cpo-tree-walk--bounds-of-thing-at-point-for-tree-with-no-end-delimiter
     (up down down-to-last-descendant finalize-left finalize-left-inner finalize-right)
   "Helper to define bounds for a tree with no end delimiter.
 It takes motion functions up, down, down-to-last-descendant.
@@ -283,10 +283,10 @@ It takes finalize functions that take a point and give a final full region.
          (lambda (&optional anchor-point)
            "Takes ANCHOR-POINT (buffer location, default to `point') and returns region as (beg . end), or nil if it can't find the thing at the anchor point."
            (let ((anchor-point (or anchor-point (point))))
-             (let ((left (funcall (tree-walk--outer-bounds-no-end-tree-for-point_left
+             (let ((left (funcall (cpo-tree-walk--outer-bounds-no-end-tree-for-point_left
                                    finalize-left)
                                   anchor-point))
-                   (right (funcall (tree-walk--outer-bounds-no-end-tree-for-point_right
+                   (right (funcall (cpo-tree-walk--outer-bounds-no-end-tree-for-point_right
                                     up down-to-last-descendant finalize-right)
                                    anchor-point)))
                (and left right (cons left right))))))
@@ -295,10 +295,10 @@ It takes finalize functions that take a point and give a final full region.
            "Takes ANCHOR-POINT (buffer location, default to `point') and returns region as (beg . end), or nil if it can't find the thing at the anchor point.
 Returns the region of the children, not the full tree."
            (let ((anchor-point (or anchor-point (point))))
-             (let ((left (funcall (tree-walk--inner-bounds-no-end-tree-for-point_left
+             (let ((left (funcall (cpo-tree-walk--inner-bounds-no-end-tree-for-point_left
                                    up down (or finalize-left-inner finalize-left))
                                   anchor-point))
-                   (right (funcall (tree-walk--inner-bounds-no-end-tree-for-point_right
+                   (right (funcall (cpo-tree-walk--inner-bounds-no-end-tree-for-point_right
                                     up down-to-last-descendant finalize-right)
                                    anchor-point)))
                (and left right (cons left right)))))))
@@ -308,40 +308,40 @@ Returns the region of the children, not the full tree."
      )))
 
 ;; For these helpers, `final` is a function that gets the begin/end point after doing the tree motions to get to the node, first child, or last child.
-(defun tree-walk--inner-bounds-no-end-tree-for-point_left (up down final)
+(defun cpo-tree-walk--inner-bounds-no-end-tree-for-point_left (up down final)
   (lambda (start-point)
     (save-excursion
       (goto-char start-point)
-      (and (tree-walk--motion-moved down)
+      (and (cpo-tree-walk--motion-moved down)
            (funcall final)))))
-(defun tree-walk--inner-bounds-no-end-tree-for-point_left_inner-bounds-for-parent-of-start-point (up down final)
+(defun cpo-tree-walk--inner-bounds-no-end-tree-for-point_left_inner-bounds-for-parent-of-start-point (up down final)
   (lambda (start-point)
     (save-excursion
       (goto-char start-point)
-      (and (tree-walk--motion-moved up)
+      (and (cpo-tree-walk--motion-moved up)
            (funcall down))
       (funcall final))))
-(defun tree-walk--inner-bounds-no-end-tree-for-point_right (up down-to-last-descendant final)
+(defun cpo-tree-walk--inner-bounds-no-end-tree-for-point_right (up down-to-last-descendant final)
   (lambda (start-point)
     (save-excursion
       (goto-char start-point)
       (funcall up)
       (funcall down-to-last-descendant)
       (funcall final))))
-(defun tree-walk--outer-bounds-no-end-tree-for-point_left (final)
+(defun cpo-tree-walk--outer-bounds-no-end-tree-for-point_left (final)
   (lambda (start-point)
     (save-excursion
       (goto-char start-point)
       ;; if the final function returns point, use it, otherwise assume it was a movement and get point.
       (or (funcall final) (point)))))
-(defun tree-walk--outer-bounds-no-end-tree-for-point_right (up down-to-last-descendant final)
+(defun cpo-tree-walk--outer-bounds-no-end-tree-for-point_right (up down-to-last-descendant final)
   (lambda (start-point)
     (save-excursion
       (goto-char start-point)
       (funcall down-to-last-descendant)
       (or (funcall final) (point)))))
 
-(cl-defmacro tree-walk--define-bounds-functions-for-tree-with-no-end-delimiter
+(cl-defmacro cpo-tree-walk--define-bounds-functions-for-tree-with-no-end-delimiter
     (&key def-bounds-name
           def-children-bounds-name
 
@@ -354,7 +354,7 @@ Returns the region of the children, not the full tree."
           right-finalize-func
           )
   `(progn
-     (let ((funcs (tree-walk--bounds-of-thing-at-point-for-tree-with-no-end-delimiter
+     (let ((funcs (cpo-tree-walk--bounds-of-thing-at-point-for-tree-with-no-end-delimiter
                    ,up-func ,down-func ,down-to-last-descendant-func ,left-finalize-func
                    ,left-inner-finalize-func ,right-finalize-func)))
        (fset ',def-bounds-name
@@ -362,7 +362,7 @@ Returns the region of the children, not the full tree."
        (fset ',def-children-bounds-name
              (cadr funcs)))))
 
-(defun tree-walk--expanded-region
+(defun cpo-tree-walk--expanded-region
     (get-bounds-func up-func)
   "
 GET-BOUNDS-FUNC: takes an anchor point and returns a region or nil.
@@ -379,8 +379,8 @@ It does not actually move the active region, it just takes and returns region da
 If REGION is null, then any region succeeds.
 "
               (let ((compare-func (if strictly-grow
-                                      'tree-walk--region-strictly-less
-                                    'tree-walk--region-less-or-equal)))
+                                      'cpo-tree-walk--region-strictly-less
+                                    'cpo-tree-walk--region-less-or-equal)))
                 (save-mark-and-excursion
                   (let* ((bounds (funcall get-bounds-func anchor-point))
                          (success (and bounds (or (and (not region) bounds)
@@ -389,13 +389,13 @@ If REGION is null, then any region succeeds.
                     (if success
                         success
                       (and
-                       (tree-walk--motion-moved up-func)
+                       (cpo-tree-walk--motion-moved up-func)
                        (funcall grow-func strictly-grow (point) region)))))))))
     grow-func))
 
-(defun tree-walk--expand-region (expansion-func strictly-grow)
+(defun cpo-tree-walk--expand-region (expansion-func strictly-grow)
   "
-Takes an expansion func as is returned by tree-walk--expanded-region.
+Takes an expansion func as is returned by cpo-tree-walk--expanded-region.
 Returns an interactive command to expand region.
 "
   (lambda (&optional count)
@@ -421,7 +421,7 @@ Returns an interactive command to expand region.
               (goto-char (cdr new-bounds)))))))))
 
 
-(defun tree-walk--text-object-no-end-helper (lfunc rfunc up-func)
+(defun cpo-tree-walk--text-object-no-end-helper (lfunc rfunc up-func)
   "Helper for making evil-mode objects."
   (lambda (beg end)
     (let* ((get-l (lambda (beg end) (min (funcall lfunc beg)
@@ -444,7 +444,7 @@ Returns an interactive command to expand region.
 
 ;; The outer object is the more sensible one, it highlights the tree rooted at the current point, or, if the whole current tree is in the region, it expands to the parent tree.
 ;; The inner object is... probably worse semantically but it's the way I could think of making it work and be semi-correct.  It highlights all the children of the parent node, or if that's already covered then it expands to all children of the grandparent.
-(defmacro tree-walk-define-text-objects-no-end-tree
+(defmacro cpo-tree-walk-define-text-objects-no-end-tree
     (inner-name outer-name
                 up down down-to-last-child
                 left-finalize right-finalize)
@@ -474,23 +474,23 @@ If no region is given, it uses the current region (or ((point) . (point))).
         )
     `(progn
        (setq ,inner-left
-             (tree-walk--inner-bounds-no-end-tree-for-point_left ,up ,down ,left-finalize))
+             (cpo-tree-walk--inner-bounds-no-end-tree-for-point_left ,up ,down ,left-finalize))
        (setq ,outer-left
-             (tree-walk--outer-bounds-no-end-tree-for-point_left ,left-finalize))
+             (cpo-tree-walk--outer-bounds-no-end-tree-for-point_left ,left-finalize))
        (setq ,inner-right
-             (tree-walk--inner-bounds-no-end-tree-for-point_right
+             (cpo-tree-walk--inner-bounds-no-end-tree-for-point_right
               ,up
-              (lambda () (tree-walk--down-to-last-descendant ,down-to-last-child))
+              (lambda () (cpo-tree-walk--down-to-last-descendant ,down-to-last-child))
               ,right-finalize))
        (setq ,outer-right
-             (tree-walk--outer-bounds-no-end-tree-for-point_right
+             (cpo-tree-walk--outer-bounds-no-end-tree-for-point_right
               ,up
-              (lambda () (tree-walk--down-to-last-descendant ,down-to-last-child))
+              (lambda () (cpo-tree-walk--down-to-last-descendant ,down-to-last-child))
               ,right-finalize))
        (setq ,inner-helper
-             (tree-walk--text-object-no-end-helper ,inner-left ,inner-right ,up))
+             (cpo-tree-walk--text-object-no-end-helper ,inner-left ,inner-right ,up))
        (setq ,outer-helper
-             (tree-walk--text-object-no-end-helper ,outer-left ,outer-right ,up))
+             (cpo-tree-walk--text-object-no-end-helper ,outer-left ,outer-right ,up))
        (with-eval-after-load 'evil-macros
          (evil-define-text-object ,inner-name (count &optional beg end type)
                                   ;; TODO - handle count, type
@@ -503,7 +503,7 @@ If no region is given, it uses the current region (or ((point) . (point))).
 
 
 
-(cl-defmacro tree-walk--define-expand-region-funcs
+(cl-defmacro cpo-tree-walk--define-expand-region-funcs
     (&key def-expand-region
           def-expand-region-idempotent
           def-select-children-once
@@ -514,22 +514,22 @@ If no region is given, it uses the current region (or ((point) . (point))).
   `(progn
      ,@(when def-expand-region
          `((fset ',def-expand-region
-                 (tree-walk--expand-region
-                  (tree-walk--expanded-region ,bounds-func ,up-func)
+                 (cpo-tree-walk--expand-region
+                  (cpo-tree-walk--expanded-region ,bounds-func ,up-func)
                   'strictly-grow))))
      ,@(when def-expand-region-idempotent
          `((fset ',def-expand-region-idempotent
-                 (tree-walk--expand-region (tree-walk--expanded-region ,bounds-func ,up-func) nil))))
+                 (cpo-tree-walk--expand-region (cpo-tree-walk--expanded-region ,bounds-func ,up-func) nil))))
 
      ,@(when def-select-children-once
          `((fset ',def-select-children-once
-                 (tree-walk--expand-region (tree-walk--expanded-region ,children-bounds-func ,up-func) nil))))
+                 (cpo-tree-walk--expand-region (cpo-tree-walk--expanded-region ,children-bounds-func ,up-func) nil))))
 
      ,@(when def-expand-region-to-children/ancestor-generation
          `((fset ',def-expand-region-to-children/ancestor-generation
-                 (tree-walk--expand-region (tree-walk--expanded-region ,children-bounds-func ,up-func) 'strictly-grow))))))
+                 (cpo-tree-walk--expand-region (cpo-tree-walk--expanded-region ,children-bounds-func ,up-func) 'strictly-grow))))))
 
-(defun tree-walk--ancestor-reorder (parent-to-ancestor-distance expand-region-func)
+(defun cpo-tree-walk--ancestor-reorder (parent-to-ancestor-distance expand-region-func)
   "Given operations for regions, and a number for the distance between parent and the ancestor to swap it with, swap ancestors.
 This always swaps the parent of the tree object at point with its parent or some ancestor.
 TODO - add an optional fix-up function, eg. to fix indentation for indent tree, fix org-mode depth, etc.
@@ -546,8 +546,8 @@ TODO - add an optional fix-up function, eg. to fix indentation for indent tree, 
         ;; Select grandparent/ancestor object.
         (dotimes (i parent-to-ancestor-distance) (funcall expand-region-func))
         (let ((ancestor-region (cons (region-beginning) (region-end))))
-          (if (and (tree-walk--region-strictly-less init-region parent-region)
-                   (tree-walk--region-strictly-less parent-region ancestor-region))
+          (if (and (cpo-tree-walk--region-strictly-less init-region parent-region)
+                   (cpo-tree-walk--region-strictly-less parent-region ancestor-region))
               (let ((child-text (buffer-substring-no-properties (car init-region) (cdr init-region)))
                     (parent-pre-text (buffer-substring-no-properties (car parent-region) (car init-region)))
                     (parent-post-text (buffer-substring-no-properties (cdr init-region) (cdr parent-region)))
@@ -565,14 +565,14 @@ TODO - add an optional fix-up function, eg. to fix indentation for indent tree, 
                 (undo-amalgamate-change-group change-group))
             (error "regions for thing, parent, and ancestor not strictly growing")))))))
 
-(defun tree-walk--up-to-root (up-func)
-  (while (tree-walk--motion-moved up-func)))
-(defun tree-walk--select-root (up-func expand-region-func)
+(defun cpo-tree-walk--up-to-root (up-func)
+  (while (cpo-tree-walk--motion-moved up-func)))
+(defun cpo-tree-walk--select-root (up-func expand-region-func)
   ;; Alternatively I could repeat the expand-region-func, but this seems better as long as it works.
-  (tree-walk--up-to-root up-func)
+  (cpo-tree-walk--up-to-root up-func)
   (funcall expand-region-func))
 
-(cl-defmacro tree-walk-define-operations
+(cl-defmacro cpo-tree-walk-define-operations
     (&key
      def-inorder-forward
      def-inorder-backward
@@ -619,15 +619,15 @@ TODO - add an optional fix-up function, eg. to fix indentation for indent tree, 
          (when def-down-to-last-child
            `(defun ,def-down-to-last-child ()
               (interactive)
-              (tree-walk--down-to-last-child-default-impl ,use-down-to-first-child ,use-next-sibling)))
+              (cpo-tree-walk--down-to-last-child-default-impl ,use-down-to-first-child ,use-next-sibling)))
          (when def-down-to-last-descendant
            `(defun ,def-down-to-last-descendant ()
               (interactive)
-              (tree-walk--down-to-last-descendant
+              (cpo-tree-walk--down-to-last-descendant
                ,(or use-down-to-last-child `',def-down-to-last-child))))
          (when (or def-evil-inner-object-for-tree-with-no-end-delimiter
                    def-evil-outer-object-for-tree-with-no-end-delimiter)
-           `(tree-walk-define-text-objects-no-end-tree
+           `(cpo-tree-walk-define-text-objects-no-end-tree
              ,def-evil-inner-object-for-tree-with-no-end-delimiter
              ,def-evil-outer-object-for-tree-with-no-end-delimiter
              ,use-up-to-parent
@@ -637,7 +637,7 @@ TODO - add an optional fix-up function, eg. to fix indentation for indent tree, 
              ,use-right-finalizer-for-tree-with-no-end-delimiter))
          (when (or def-bounds-for-tree-with-no-end-delimiter
                    def-children-bounds-for-tree-with-no-end-delimiter)
-           `(tree-walk--define-bounds-functions-for-tree-with-no-end-delimiter
+           `(cpo-tree-walk--define-bounds-functions-for-tree-with-no-end-delimiter
              :def-bounds-name ,def-bounds-for-tree-with-no-end-delimiter
              :def-children-bounds-name ,def-children-bounds-for-tree-with-no-end-delimiter
              :up-func ,use-up-to-parent
@@ -650,7 +650,7 @@ TODO - add an optional fix-up function, eg. to fix indentation for indent tree, 
          (when (or def-expand-region def-expand-region-idempotent
                    def-select-children-once
                    def-expand-region-to-children/ancestor-generation)
-           `(tree-walk--define-expand-region-funcs
+           `(cpo-tree-walk--define-expand-region-funcs
              :def-expand-region ,def-expand-region
              :def-expand-region-idempotent ,def-expand-region-idempotent
              :def-select-children-once ,def-select-children-once
@@ -663,24 +663,24 @@ TODO - add an optional fix-up function, eg. to fix indentation for indent tree, 
            `(defun ,def-up-to-root ()
               ,(format "Go up to the top tree ancestor for %s." use-object-name)
               (interactive)
-              (tree-walk--up-to-root ,use-up-to-parent)))
+              (cpo-tree-walk--up-to-root ,use-up-to-parent)))
          (when def-select-root
            `(defun ,def-select-root ()
               ,(format "Select region (activate region with the bounds) of top tree ancestor for %s." use-object-name)
               (interactive)
-              (tree-walk--select-root ,use-up-to-parent ',def-expand-region)))
+              (cpo-tree-walk--select-root ,use-up-to-parent ',def-expand-region)))
          (when def-ancestor-reorder
            `(defun ,def-ancestor-reorder (count)
               ,(format "Reorder ancestors for %s.  Take the region of the thing at point, the region of the parent, and the region of the ancestor COUNT generations above parent, and swap the parent and the ancestor.  Essentially, take the ancestor out, leaving a hole in the overall buffer, take the parent out of the ancestor, leaving a hole in the ancestor, and take the child out of the parent, leaving a hole in the parent.  Reassemble putting the parent in the ancestor's old hole, the ancestor in the parent's hole, and the child in the ancestor's hole." (or use-object-name "thing"))
               (interactive "p")
-              (tree-walk--ancestor-reorder (or count 1) ',def-expand-region)))
+              (cpo-tree-walk--ancestor-reorder (or count 1) ',def-expand-region)))
          (when (or def-transpose-sibling-forward def-transpose-sibling-backward)
            `(progn
               (fset ',def-transpose-sibling-forward
                     (lambda (&optional count)
                       ,(format "Transpose sibling %s forward COUNT times, moving point with the moved object so it can be dragged.  This movement respects tree boundaries." (or use-object-name "thing"))
                       (interactive "p")
-                      (tree-walk--transpose-siblings
+                      (cpo-tree-walk--transpose-siblings
                        (or count 1)
                        ,(or use-bounds `',def-bounds-for-tree-with-no-end-delimiter)
                        ,use-next-sibling
@@ -690,14 +690,14 @@ TODO - add an optional fix-up function, eg. to fix indentation for indent tree, 
                     (lambda (&optional count)
                       ,(format "Transpose sibling %s backward COUNT times, moving point with the moved object so it can be dragged.  This movement respects tree boundaries." (or use-object-name "thing"))
                       (interactive "p")
-                      (tree-walk--transpose-siblings
+                      (cpo-tree-walk--transpose-siblings
                        (or count 1)
                        ,(or use-bounds `',def-bounds-for-tree-with-no-end-delimiter)
                        ,use-previous-sibling
                        nil
                        ,use-next-sibling)))))
          (when (or def-inorder-forward def-inorder-backward)
-           `(tree-walk-define-inorder-traversal
+           `(cpo-tree-walk-define-inorder-traversal
              ,(or use-object-name "thing")
              ,def-inorder-forward
              ,def-inorder-backward
@@ -707,4 +707,4 @@ TODO - add an optional fix-up function, eg. to fix indentation for indent tree, 
              ))
          ))))
 
-(provide 'tree-walk)
+(provide 'cpo-tree-walk)

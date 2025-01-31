@@ -25,7 +25,7 @@
 ;; TODO - this has an issue when changing direction.  The first time it repeats backward after going forward, it skips one.
 (defun cpo-isearch-repeat-forward (&optional count)
   (interactive "p")
-  (require 'tree-walk) ;; for tree-walk--motion-moved
+  (require 'cpo-tree-walk) ;; for cpo-tree-walk--motion-moved
   (let* ((count-fwd (<= 0 (or count 1)))
          (count-num (abs (or count 1)))
          (fwd (not (xor count-fwd cpo--isearch-repeat-forward-p)))
@@ -43,7 +43,7 @@
                                 (- count-num 1))
                                (t count-num)))
 
-         (moved (tree-walk--motion-moved
+         (moved (cpo-tree-walk--motion-moved
                  (lambda () (funcall repeat-func count-adjusted)))))
     (setq cpo--isearch-last-direction-absolute (if fwd 'forward 'backward))
     (cond ((not moved) nil)

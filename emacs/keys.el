@@ -394,14 +394,14 @@
 ;; Quick select any delimiter
 (emmap "(" (lambda (n)
              (interactive "p")
-             (require 'tree-walk-smartparens-integration)
+             (require 'cpo-smartparens)
              (funcall (cs/ae (cs/mod 'direction 'expand-region)
                              (cs/mod 'delimiter 'any)
                              (cs/obj 'sptw))
                       n)))
 (emmap ")" (lambda (n)
              (interactive "p")
-             (require 'tree-walk-smartparens-integration)
+             (require 'cpo-smartparens)
              (funcall (cs/ae (cs/mod 'direction 'expand-region)
                              (cs/mod 'tree-inner t "inner")
                              (cs/mod 'delimiter 'any)
@@ -508,7 +508,7 @@
 ;; composiphrase object-select map
 
 (defun with-sptw-req (x)
-  (require 'tree-walk-smartparens-integration)
+  (require 'cpo-smartparens)
   x)
 (defhydra object-select (:foreign-keys warn :exit nil) "Obj:"
   ;; TODO - Hydra handles lambda specially.  I would love to just use higher order functions, but to work with Hydra I seem to need to use lambdas...  Maybe I should do this without hydra.
@@ -522,12 +522,12 @@
   ("w" (lambda (n) (interactive "p") (funcall (cs/ae (cs/obj 'cpo-vi-like-word)) n)) "vi-like-word" :exit t)
   ("W" (lambda (n) (interactive "p") (funcall (cs/ae (cs/obj 'word)) n)) "word" :exit t)
   ("s" (lambda (n) (interactive "p") (funcall (cs/ae (with-sptw-req (cs/obj 'sptw))) n)) "smartparens" :exit t)
-  ("i" (lambda (n) (interactive "p") (funcall (cs/ae (progn (require 'indent-tree) (cs/obj 'indent-tree))) n)) "indent-tree" :exit t)
+  ("i" (lambda (n) (interactive "p") (funcall (cs/ae (progn (require 'cpo-indent-tree) (cs/obj 'indent-tree))) n)) "indent-tree" :exit t)
   ;; TODO - I want this one, but I keep using this accidentally due to my old key bindings, and it is so frustrating.  So I'll leave it as a no-op for now.
   ;;("o" (funcall (cs/ae (cs/obj 'outline))) "outline" :exit t)
   ("o" (lambda (n) (interactive "p") (funcall (cs/ae (cs/obj 'NOOP-STOP-USING-THIS-BINDING-FOR-OLD-PURPOSE)) n)) "break habit!" :exit t)
-  ("O" (lambda (n) (interactive "p") (funcall (cs/ae (progn (require 'tree-walk-outline-integration) (cs/obj 'outline))) n)) "outline" :exit t)
-  ("t" (lambda (n) (interactive "p") (funcall (cs/ae (progn (require 'tree-walk-treesitter-integration)
+  ("O" (lambda (n) (interactive "p") (funcall (cs/ae (progn (require 'cpo-outline) (cs/obj 'outline))) n)) "outline" :exit t)
+  ("t" (lambda (n) (interactive "p") (funcall (cs/ae (progn (require 'cpo-treesitter-qd)
                                                             (wgh/initialize-treesit-for-buffer)
                                                             ;; TODO - also need to initialize treesitter in the buffer before first use...
                                                             (cs/obj 'tstw-qd)))

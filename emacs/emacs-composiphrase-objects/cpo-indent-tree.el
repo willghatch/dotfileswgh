@@ -22,7 +22,7 @@
 ;;
 
 
-(require 'tree-walk)
+(require 'cpo-tree-walk)
 (require 'repeatable-motion)
 
 (defun indent-tree--current-line-whitespace-only-p ()
@@ -233,13 +233,13 @@ It always moves to the FIRST sibling in the full sibling region, regardless of m
 
 (defun indent-tree-forward-to-last-full-sibling ()
   (interactive)
-  (while (tree-walk--motion-moved (lambda () (indent-tree-forward-full-sibling 1)))))
+  (while (cpo-tree-walk--motion-moved (lambda () (indent-tree-forward-full-sibling 1)))))
 (defun indent-tree-backward-to-first-full-sibling ()
   (interactive)
-  (while (tree-walk--motion-moved (lambda () (indent-tree-forward-full-sibling -1)))))
+  (while (cpo-tree-walk--motion-moved (lambda () (indent-tree-forward-full-sibling -1)))))
 
 (defun indent-tree--indent-tree-forward-to-last-full-or-half-sibling ()
-  (while (tree-walk--motion-moved (lambda () (indent-tree-forward-full-or-half-sibling 1)))))
+  (while (cpo-tree-walk--motion-moved (lambda () (indent-tree-forward-full-or-half-sibling 1)))))
 
 (defun indent-tree-up-to-parent (num)
   ;; TODO - this should probably error if num is negative
@@ -303,13 +303,13 @@ It always moves to the FIRST sibling in the full sibling region, regardless of m
         (index 0))
     (while (and (< index times)
                 (setq index (+ 1 index)))
-      (and (tree-walk--motion-moved (lambda () (indent-tree-down-to-first-child 1)))
+      (and (cpo-tree-walk--motion-moved (lambda () (indent-tree-down-to-first-child 1)))
            (indent-tree--indent-tree-forward-to-last-full-or-half-sibling)))))
 (repeatable-motion-define 'indent-tree-down-to-last-child
                           ;; down to last child has the same inverse as down to first child, but up to parent inverses as down to first child
                           'indent-tree-up-to-parent)
 
-(tree-walk-define-operations
+(cpo-tree-walk-define-operations
  :def-inorder-forward indent-tree-inorder-traversal-forward
  :def-inorder-backward indent-tree-inorder-traversal-backward
  :def-down-to-last-descendant indent-tree-down-to-last-descendant
@@ -397,4 +397,4 @@ It always moves to the FIRST sibling in the full sibling region, regardless of m
     (backward-char 1)
     (dotimes (i indentation) (insert " "))))
 
-(provide 'indent-tree)
+(provide 'cpo-indent-tree)
