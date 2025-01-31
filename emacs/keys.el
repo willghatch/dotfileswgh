@@ -800,8 +800,8 @@
 
 (define-key isearch-mode-map "\C-g" 'isearch-abort-abort-gosh-darn-it)
 
-(define-key isearch-mode-map (kbd "RET") (lambda () (interactive) (setq wgh/isearch-go-part 'beginning) (call-interactively 'my-isearch-bor-exit)))
-(define-key isearch-mode-map "\C-j" (lambda () (interactive) (setq wgh/isearch-go-part 'end) (call-interactively 'my-isearch-eor-exit)))
+(define-key isearch-mode-map (kbd "RET") 'cpo-isearch-bor-exit)
+(define-key isearch-mode-map "\C-j" 'cpo-isearch-eor-exit)
 
 
 
