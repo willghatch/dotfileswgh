@@ -34,6 +34,7 @@
     ;;(straight-use-package 'undo-tree) ;; NOTE: this depends on the queue package, which is resolved by straight, but I want to remember why I have the queue package as a submodule now
     (straight-use-package (submod 'estate))
     (straight-use-package (submod 'repeatable-motion))
+    (straight-use-package (submod 'this-command-all-keys))
     (straight-use-package (submod 'hydra))
     (straight-use-package (submod 'queue))
     (straight-use-package (submod 'undo-tree))

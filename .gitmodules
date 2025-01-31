@@ -13,6 +13,9 @@
 [submodule "external/emacs/repeatable-motion"]
 	path = external/emacs/repeatable-motion
 	url = https://github.com/willghatch/emacs-repeatable-motion
+[submodule "external/emacs/this-command-all-keys"]
+	path = external/emacs/this-command-all-keys
+	url = https://github.com/willghatch/emacs-this-command-all-keys
 [submodule "external/emacs/hydra"]
 	path = external/emacs/hydra
 	url = https://github.com/abo-abo/hydra
