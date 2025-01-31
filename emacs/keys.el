@@ -28,7 +28,8 @@
 (require 'composiphrase)
 (require 'composiphrase-demo-config)
 (setq composiphrase-current-configuration composiphrase-demo-config)
-(require 'estate-and-composiphrase-repeat)
+(require 'aggreact)
+(aggreact-mode 1)
 
 (require 'cpo-search-movements)
 (require 'cpo-helpers)
@@ -251,7 +252,7 @@
 
 (emmap "m" nil) ;;;;;;;;;; m will be my prefix for mode-specific bindings
 
-(enmap "." 'eacsr-repeat-latest-editing)
+(enmap "." 'aggreact-repeat-latest-editing)
 
 ;; TODO - use command sentence
 (enmap "x" 'delete-char)
