@@ -276,8 +276,14 @@
                (funcall (cs/add (cs/verb 'copy))
                         n))))
 (emmap " yc" 'xcopy)
-(enmap "p" (lambda () (interactive) (cpo-paste-with-registers cpo-paste-default-register nil)))
+(enmap "p" (cs/ae (cs/verb 'paste-to-region-from-move)
+                  (cs/obj 'region)))
 (enmap " pc" 'xpaste)
+
+(enmap "\"" (lambda (n) (interactive "p")
+              (funcall (cs/add (let ((reg (read-key "Register: ")))
+                                 (cs/mod 'register reg (format "r:%c" reg))))
+                       n)))
 
 (enmap "u" 'undo)
 (enmap "\C-r" 'undo-tree-redo)
@@ -557,7 +563,9 @@
   ("u" (lambda (n) (interactive "p") (funcall (cs/add (cs/mod 'tree-vertical 'up)) n)) "up" :exit nil)
   ("d" (lambda (n) (interactive "p") (funcall (cs/add (cs/mod 'tree-vertical 'down)) n)) "down" :exit nil)
   ("T" (lambda (n) (interactive "p") (funcall (cs/add (cs/mod 'tree-traversal 'inorder)) n)) "inorder" :exit nil)
-  ("r" TODO_register-select "register" :exit nil)
+  ("r" (lambda (n) (interactive "p") (let ((reg (read-key "register: ")))
+                                       (funcall (cs/add (cs/mod 'register reg (format "r:%c" reg))) n)))
+   "register" :exit nil)
   (" " (lambda (n) (interactive "p") (funcall (cs/add (cs/mod 'surrounding-space 'surrounding-space)) n)) "surrounding-space" :exit nil)
   ("g" (lambda (n) (interactive "p") (funcall (cs/add (cs/mod 'current-line-only 'current-line-only)) n)) "current-line-only" :exit nil)
 

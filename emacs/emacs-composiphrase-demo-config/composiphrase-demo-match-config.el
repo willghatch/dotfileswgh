@@ -672,15 +672,14 @@
                    sentence-with-defaults))
 
           (copy region ()
-                (cpo-copy
-                 (register)))
+                (cpo-copy (register)))
           (copy ,(lambda (x) (not (memq x '(region)))) ()
                 (,(composiphrase--make-movement-delegated-command
                    (lambda (beg end sentence)
                      (let ((register (cdr (assq 'register
                                                 (composiphrase-sentence-modifiers
-                                                 sentence))))))
-                     (cpo-copy register (cons beg end)))
+                                                 sentence)))))
+                       (cpo-copy register (cons beg end))))
                    'pass-sentence)
                  sentence-with-defaults))
 
