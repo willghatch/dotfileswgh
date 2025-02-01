@@ -45,7 +45,7 @@
 
 
 
-(defun cpo-paste-with-registers (register-for-paste register-to-copy-old-region)
+(defun cpo-paste (register-for-paste register-to-copy-old-region)
   "Paste from REGISTER-FOR-PASTE.
 If there is an active region, save it to REGISTER-TO-COPY-OLD-REGION if non-nil.
 Returns the size of the pasted text (minus size of replaced text).
@@ -86,7 +86,7 @@ Returns the size of the pasted text (minus size of replaced text).
          (register-for-old (cdr (assq 'register-for-old sentence-modifiers))))
     (progn
       (goto-char new-point)
-      (let ((pasted-length (cpo-paste-with-registers register register-for-old)))
+      (let ((pasted-length (cpo-paste register register-for-old)))
         (goto-char (if (< orig-point new-point)
                        orig-point
                      (+ orig-point pasted-length)))))))
@@ -126,12 +126,22 @@ Returns the size of the pasted text (minus size of replaced text).
 
 
 ;; Default registers a la vim...
-(defvar cpo-paste-default-register ?\")
-(defvar cpo-copy-default-register ?\")
-(defvar cpo-copy-sync-with-kill-ring-register ?\")
-(defvar cpo-delete-default-register ?\")
-(defvar cpo-change-default-register ?\")
-(defvar cpo-paste-copy-old-default-register ?\")
+(defvar cpo-paste-default-register ?\©
+  "Default register to read from for cpo-paste.
+To have Vim-like behavior, set to ?\".")
+(defvar cpo-copy-default-register ?\©
+  "Default register to write to for cpo-copy.
+To have Vim-like behavior, set to ?\".")
+(defvar cpo-copy-sync-with-kill-ring-register ?\©
+  "When this register is equal to the register used for a copy, also put the copy in the kill ring.")
+(defvar cpo-delete-default-register ?\␡
+  "Default register to write to for cpo-delete.
+To have Vim-like behavior, set to ?\".")
+(defvar cpo-change-default-register ?\␡
+  "Default register to write to for cpo-change.
+To have Vim-like behavior, set to ?\".")
+(defvar cpo-paste-copy-old-default-register ?\␡
+  "Default register to write to for cpo-copy when replacing a region.")
 
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;

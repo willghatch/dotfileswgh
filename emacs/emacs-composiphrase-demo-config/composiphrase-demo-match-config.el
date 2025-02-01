@@ -700,14 +700,14 @@
                        sentence-with-defaults))
           (paste-to-region-from-move region
                                      ()
-                                     (cpo-paste-with-registers (register register-for-old)))
+                                     (cpo-paste (register register-for-old)))
           (paste-to-region-from-move ,(lambda (x) (not (memq x '(region))))
                                      ()
                                      ;; The intention of this one is that it deletes region from the move and replaces it with a paste.  But it doesn't seem as useful as move-paste, so I don't feel very motivated to implement it right now.
                                      (TODO-paste-to-region-from-move-handler))
           (move-paste region
                   ()
-                  (cpo-paste-with-registers (register register-for-old)))
+                  (cpo-paste (register register-for-old)))
           (move-paste ,(lambda (x) (not (memq x '(region))))
                       ()
                       (cpo-move-paste-sentence-execute
