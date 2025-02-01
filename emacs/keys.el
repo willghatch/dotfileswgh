@@ -35,6 +35,14 @@
 (require 'cpo-search-movements)
 (require 'cpo-helpers)
 
+(setq cpo-paste-default-register ?P)
+(setq cpo-copy-default-register ?P)
+(setq cpo-copy-sync-with-kill-ring-register ?P)
+(setq cpo-delete-default-register ?D)
+(setq cpo-change-default-register ?D)
+(setq cpo-paste-copy-old-default-register ?C)
+
+
 
 (defun cs/verb (name)
   `((word-type . verb)
@@ -268,8 +276,7 @@
                (funcall (cs/add (cs/verb 'copy))
                         n))))
 (emmap " yc" 'xcopy)
-(enmap "p" 'estate-paste)
-(enmap "P" 'estate-paste/swap)
+(enmap "p" (lambda () (interactive) (cpo-paste-with-registers cpo-paste-default-register nil)))
 (enmap " pc" 'xpaste)
 
 (enmap "u" 'undo)
@@ -500,6 +507,9 @@
   ("D" (lambda (n) (interactive "p")
          (funcall (cs/add (cs/verb 'demote)) n))
    "demote" :exit t)
+  ("p" (lambda (n) (interactive "p")
+         (funcall (cs/add (cs/verb 'move-paste)) n))
+   "move-paste" :exit t)
   )
 
 

@@ -33,62 +33,7 @@
 ;;; Now some helpers for operations that I want.  IE functions and infrastructure to have some things that are vim-like.
 
 
-(defvar estate-default-register ?\🄯)
-(defvar estate-copy-sync-with-kill-ring-register estate-default-register)
-(setq estate-current-register estate-default-register)
 
-;; TODO - I probably want to just get rid of extra visual states like visual-line and visual-block for now.
-(defun estate-copy (&optional region)
-  "TODO - copy but with extra handling, REGION is nil or a cons pair (beg . end)."
-  (interactive)
-  (save-mark-and-excursion
-    (let ((str (buffer-substring-no-properties (if region (car region) (region-beginning))
-                                               (if region (cdr region) (region-end)))))
-      (set-register estate-default-register str)
-      (when (equal estate-current-register
-                   estate-copy-sync-with-kill-ring-register)
-        (kill-new str)))))
-
-(defun estate--paste-helper (copy-from-active-region)
-  "TODO - paste but with extra handling"
-  ;; TODO - currently this also copies if region is active.  Do I want to do that?
-  (let* ((to-paste (get-register estate-current-register))
-         ;; TODO - use emacs register instead of my register stuff that I wrote thinking that registers were an evil-mode thing instead of an emacs feature.
-         (to-paste-text (if (stringp to-paste) to-paste (car to-paste)))
-         (to-paste-metadata (if (stringp to-paste) nil (cdr to-paste))))
-    (cond
-     ((and (eq estate-state 'visual-line) (eq to-paste-metadata 'line))
-      (when copy-from-active-region
-        (estate-copy))
-      (estate-visual-execution-helper
-       (lambda () (replace-region-contents (region-beginning) (region-end)
-                                           (lambda () to-paste-text)))))
-     ((and (region-active-p) (eq to-paste-metadata 'line))
-      (error "Paste of line text in non-line visual state not yet supported"))
-     ((eq to-paste-metadata 'line)
-      ;; No region active with line mode.
-      (save-mark-and-excursion
-        (atomic-change-group
-          (end-of-line)
-          (if (eobp)
-              (insert "\n")
-            (forward-char 1))
-          (insert to-paste-text))))
-     ((eq estate-state 'visual-line)
-      (error "Paste of non-line text in visual-line state not yet supported"))
-     ((region-active-p)
-      (when copy-from-active-region
-        (estate-copy))
-      (replace-region-contents (region-beginning) (region-end)
-                               (lambda () to-paste-text)))
-     (t (insert to-paste-text)))))
-
-(defun estate-paste ()
-  (interactive)
-  (estate--paste-helper nil))
-(defun estate-paste/swap ()
-  (interactive)
-  (estate--paste-helper t))
 
 ;; TODO - get rid of this or make a working version
 (defun estate-restore-region ()
@@ -97,6 +42,96 @@
     (activate-mark)))
 
 
+
+
+
+(defun cpo-paste-with-registers (register-for-paste register-to-copy-old-region)
+  "Paste from REGISTER-FOR-PASTE.
+If there is an active region, save it to REGISTER-TO-COPY-OLD-REGION if non-nil.
+Returns the size of the pasted text (minus size of replaced text).
+"
+  (let* ((use-register (or register-for-paste cpo-paste-default-register))
+         (use-register (if (functionp use-register) (funcall use-register) use-register))
+         (to-paste (get-register use-register))
+         (to-paste-text (cond
+                         ((not to-paste) "")
+                         ((stringp to-paste) to-paste)
+                         (t (format "%s" to-paste))))
+         (region-size (and (region-active-p) (- (region-end) (region-beginning))))
+         (paste-diff-size (- (length to-paste-text) (or region-size 0))))
+    (if (region-active-p)
+        (progn
+          (when register-to-copy-old-region
+            (set-register (if (functionp register-to-copy-old-region)
+                              (funcall register-to-copy-old-region)
+                            register-to-copy-old-region)
+                          (buffer-substring-no-properties (region-beginning) (region-end))))
+          (replace-region-contents (region-beginning) (region-end)
+                                   (lambda () to-paste-text)))
+      (insert to-paste-text))
+    paste-diff-size))
+
+(defun cpo-move-paste-sentence-execute (sentence-with-defaults)
+  "Takes a command sentence for move-paste, executes a move with it, then does paste.  Depends on the specific composiphrase config from the demo setup..."
+  (let* ((orig-point (point))
+         (new-point (save-mark-and-excursion
+                      (composiphrase-execute
+                       ;; TODO - I should maybe delete the old verb, but I'll just use alist shadowing...
+                       (cons '((word-type . verb) (contents . move)) sentence-with-defaults)
+                       composiphrase-current-configuration)
+                      (point)))
+         (sentence-modifiers (composiphrase-sentence-modifiers
+                              sentence-with-defaults))
+         (register (cdr (assq 'register sentence-modifiers)))
+         (register-for-old (cdr (assq 'register-for-old sentence-modifiers))))
+    (progn
+      (goto-char new-point)
+      (let ((pasted-length (cpo-paste-with-registers register register-for-old)))
+        (goto-char (if (< orig-point new-point)
+                       orig-point
+                     (+ orig-point pasted-length)))))))
+
+(defun cpo-copy (register &optional region)
+  "REGION is nil or a cons pair (beg . end)."
+  (let ((register-use (if (functionp register)
+                          (funcall register)
+                        register))
+        (str (buffer-substring-no-properties (if region (car region) (region-beginning))
+                                             (if region (cdr region) (region-end)))))
+    (set-register register-use str)
+    (when (equal register-use
+                 cpo-copy-sync-with-kill-ring-register)
+      (kill-new str))))
+
+(defun cpo-delete (register &optional region)
+  (let ((register-use (if (functionp register)
+                          (funcall register)
+                        register))
+        (beg (if region (car region) (region-beginning)))
+        (end (if region (cdr region) (region-end))))
+    (when register-use
+      (cpo-copy register (cons beg end)))
+    (delete-region beg end)))
+
+(defun cpo-change (register &optional region)
+  (let ((register-use (if (functionp register)
+                          (funcall register)
+                        register))
+        (beg (if region (car region) (region-beginning)))
+        (end (if region (cdr region) (region-end))))
+    (when register-use
+      (cpo-copy register (cons beg end)))
+    (estate-insert-state-with-thunk (lambda ()
+                                      (delete-region beg end)))))
+
+
+;; Default registers a la vim...
+(defvar cpo-paste-default-register ?\")
+(defvar cpo-copy-default-register ?\")
+(defvar cpo-copy-sync-with-kill-ring-register ?\")
+(defvar cpo-delete-default-register ?\")
+(defvar cpo-change-default-register ?\")
+(defvar cpo-paste-copy-old-default-register ?\")
 
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;

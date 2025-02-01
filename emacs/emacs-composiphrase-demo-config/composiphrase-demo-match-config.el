@@ -4,7 +4,7 @@
 
 (require 'composiphrase)
 
-(defun composiphrase--make-movement-delegated-command (f-on-region)
+(defun composiphrase--make-movement-delegated-command (f-on-region &optional pass-sentence)
   "F-ON-REGION must take two args, region start and region end."
   (lambda (sentence-with-defaults)
     (let ((orig-point (point))
@@ -17,10 +17,12 @@
                            (cons (region-beginning) (region-end))
                          (point)))))
       (if (consp new-point)
-          (funcall f-on-region (car new-point) (cdr new-point))
-        (funcall f-on-region
-                 (min orig-point new-point)
-                 (max orig-point new-point))))))
+          (apply f-on-region (car new-point) (cdr new-point)
+                 (and pass-sentence (list sentence-with-defaults)))
+        (apply f-on-region
+               (min orig-point new-point)
+               (max orig-point new-point)
+               (and pass-sentence (list sentence-with-defaults)))))))
 
 (setq composiphrase-demo-match-config
       `((verbs
@@ -35,9 +37,13 @@
           ;; TODO - what arguments do most of these mean?  Eg. tree movement also needs arguments about up/down, when going down you can have a child index, etc.  I generally want an idempotence argument for movements, though maybe it's really only useful for things like “go to the end of the line” without going to the next line, but it's likely a useful option in principle especially for keyboard macros.  Also want movement to sibling vs strict full/half sibling (indent/org trees) vs unbound by tree (eg. move to next s-expression beginning whether or not it moves out of the current tree).
           ;; TODO - add modifier limit-to-single-line.
           ;; TODO - modifier for surrounding white space.  Eg. for expand-region to expand to the object, then expand again to include surrounding white space.  But there are several versions of this that I may want... sometimes I want all surrounding space, sometimes just the space before or after.  And for lines, by default I want to include the white space, but I want a modifier for eg. back-to-indentation and a similar one for the line end before extra white space.  So I probably want the key to invert for that case, or have some kind of special handling.
-          (delete)
-          (change)
-          (copy)
+          (delete (register . ,(lambda () cpo-delete-default-register)))
+          (change (register . ,(lambda () cpo-change-default-register)))
+          (copy (register . ,(lambda () cpo-copy-default-register)))
+          (paste-to-region-from-move (register . ,(lambda () cpo-paste-default-register))
+                                     (register-for-old . ,(lambda () cpo-paste-copy-old-default-register))) ;; IE form a region by moving, paste into that region.
+          (move-paste (register . ,(lambda () cpo-paste-default-register))
+                      (register-for-old . ,(lambda () cpo-paste-copy-old-default-register))) ;; IE move, then paste at the new point, but restoring the original point.
           (upcase)
           (downcase)
           (capitalize) ;; TODO - what is the difference between capitalize-region and upcase-initials-region?
@@ -643,28 +649,39 @@
           ;; TODO - deduplicate these operations that delegate to the move command...
           (delete region
                   ()
-                  (,(lambda () (delete-region (region-beginning) (region-end)))))
+                  (cpo-delete (register)))
           (delete ,(lambda (x) (not (memq x '(region))))
                   ()
-                  (,(composiphrase--make-movement-delegated-command 'delete-region)
+                  (,(composiphrase--make-movement-delegated-command
+                     (lambda (beg end sentence)
+                       (cpo-delete (cdr (assq 'register (composiphrase-sentence-modifiers sentence)))
+                                   (cons beg end)))
+                     'pass-sentence)
                    sentence-with-defaults))
 
           (change region
                   ()
-                  (,(lambda ()
-                      (estate-insert-state-with-thunk
-                       (lambda () (delete-region (region-beginning) (region-end)))))))
+                  (cpo-change (register)))
           (change ,(lambda (x) (not (memq x '(region))))
                   ()
                   (,(composiphrase--make-movement-delegated-command
-                     (lambda (beg end) (estate-insert-state-with-thunk
-                                        (lambda () (delete-region beg end)))))
+                     (lambda (beg end sentence)
+                       (cpo-change (cdr (assq 'register (composiphrase-sentence-modifiers sentence)))
+                                   (cons beg end)))
+                     'pass-sentence)
                    sentence-with-defaults))
 
           (copy region ()
-                (estate-copy))
+                (cpo-copy
+                 (register)))
           (copy ,(lambda (x) (not (memq x '(region)))) ()
-                (,(composiphrase--make-movement-delegated-command (lambda (beg end) (estate-copy (cons beg end))))
+                (,(composiphrase--make-movement-delegated-command
+                   (lambda (beg end sentence)
+                     (let ((register (cdr (assq 'register
+                                                (composiphrase-sentence-modifiers
+                                                 sentence))))))
+                     (cpo-copy register (cons beg end)))
+                   'pass-sentence)
                  sentence-with-defaults))
 
           (upcase region ()
@@ -681,6 +698,20 @@
                       (,(lambda () (capitalize-region (region-beginning) (region-end)))))
           (capitalize ,(lambda (x) (not (memq x '(region)))) ()
                       (,(composiphrase--make-movement-delegated-command 'capitalize-region)
+                       sentence-with-defaults))
+          (paste-to-region-from-move region
+                                     ()
+                                     (cpo-paste-with-registers (register register-for-old)))
+          (paste-to-region-from-move ,(lambda (x) (not (memq x '(region))))
+                                     ()
+                                     ;; The intention of this one is that it deletes region from the move and replaces it with a paste.  But it doesn't seem as useful as move-paste, so I don't feel very motivated to implement it right now.
+                                     (TODO-paste-to-region-from-move-handler))
+          (move-paste region
+                  ()
+                  (cpo-paste-with-registers (register register-for-old)))
+          (move-paste ,(lambda (x) (not (memq x '(region))))
+                      ()
+                      (cpo-move-paste-sentence-execute
                        sentence-with-defaults))
 
           ;; (initiate-isearch region ((direction forward))

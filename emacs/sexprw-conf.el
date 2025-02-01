@@ -24,3 +24,5 @@
 
 
 (require 'racket-rewrites)
+
+(provide 'sexprw-conf)
