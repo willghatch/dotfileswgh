@@ -4,6 +4,7 @@
 (setq cp-demo-aggreact--editing-groups-ring (make-ring 100))
 
 (setq cp-demo-aggreact--pre-command-prefix-arg-state nil)
+(setq cp-demo--aggreact-repeat-active-p nil)
 
 (defun cp-demo-aggreact--pre-command ()
   (setq cp-demo-aggreact--pre-command-prefix-arg-state prefix-arg))
@@ -52,15 +53,20 @@
                                     (member length-1-command
                                             '(undo undo-tree-undo undo-tree-redo)))))
            (when (and edited-p
-                      (not single-undo-p))
+                      (not single-undo-p)
+                      (not cp-demo--aggreact-repeat-active-p)
+                      )
              (ring-insert cp-demo-aggreact--editing-groups-ring group))))
        aggreact-command-group-split-functions))
 
+
 (defun cp-demo-aggreact-repeat-latest-editing (&optional count)
   (interactive "p")
+  (setq cp-demo--aggreact-repeat-active-p t)
   (let ((last-command (ring-ref cp-demo-aggreact--editing-groups-ring 0)))
     (dotimes (i (or count 1))
-      (aggreact-execute-command-group-as-keyboard-macro last-command))))
+      (aggreact-execute-command-group-as-keyboard-macro last-command))
+    (setq cp-demo--aggreact-repeat-active-p nil)))
 
 
 (provide 'composiphrase-estate-aggreact-config)
