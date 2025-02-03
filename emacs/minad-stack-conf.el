@@ -4,8 +4,6 @@
 (setq wgh/init-minad-done nil)
 (defun wgh/init-minad ()
   (when (not wgh/init-minad-done)
-    (setq wgh/init-minad-done t)
-
     (require 'vertico) ;; vertico provides a completion UI in a window at the bottom, like helm, good for M-x and big lists
     (require 'marginalia) ;; provides extra documentation to completion display
     (require 'consult)
@@ -41,6 +39,7 @@
     ;; (global-set-key (kbd "\C-o d") 'embark-dwim)
     ;; (global-set-key (kbd "\C-h B") 'embark-bindings)
 
+    (setq wgh/init-minad-done t)
 
     ))
 

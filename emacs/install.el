@@ -170,6 +170,25 @@
 
   (in 'scad-mode)
 
+  ;;;;;;;; trying new packages, or at least looking at some to consider trying in the future.
+  (in 'magit-delta) ;; run with magit-delta-mode, adds syntax highlighting to magit diff views, including highlighting the changes within similar lines.
+  (in 'avy) ;; jump to char, like ace-jump, or like pentadactyl link highlighting.  I never used it back in the day when I had ace-jump installed, but maybe worth another try.
+  (in 'dumb-jump) ;; go to definition heuristically using ripgrep, I hear good things about it.  (add-hook 'xref-backend-functions #'dumb-jump-xref-activate), also can set xref-show-definitions-function for completing-read.
+  (in 'symbol-overlay) ;; use symbol-overlay-put to put an overlay on the symbol at point.  Has symbol-overlay-switch-forward/backward to move between highlighted symbols, symbol-overlay-remove-all to remove highlights.  Has some more features, but these look the most interesting.
+  ;;(in 'visual-regexp) (in 'visual-regexp-steroids) ;; has vr/replace, vr/query-replace, vr/mc-mark (multiple-cursors), steroids version adds pcre2el/python support for “normal” regexps.  The steroids package also lets you use pcre for isearch.
+  ;;(in 'devdocs) ;; uses the devdocs.io documentation website, but views things in editor.  But maybe requires gui emacs?  Unclear from 2 minute look.  But maybe makes looking at other language documentation more like emacs documentation, which is convenient.
+  ;; (in 'git-time-machine) ;; use M-x git-time-machine to enter the time machine, then it has bindings to go back/forward between versions, copy the hash, go to revision by commit message, view magit-blame on the old version, etc.
+  ;; link-hint ;; provides pentadactyl-like hints for “links”, and it supports many different kinds of “links” including file paths, xref, org agenda items... but does this provide something better than moving point to the thing and then using some act-on-thing-at-point library (maybe embark? maybe hyperbole?) or such?  Eg. this is like a less general avy plus action-on-thing-at-point.  Maybe worth a try, but probably not right now.
+  ;; inspector ;; inspect elisp data, some kind of improved data viewer
+  ;; vlf ;; for viewing very large files in chunks
+  ;; deadgrep ;; another ripgrep frontend, maybe it is better than the rg  package.
+  ;; dirvish ;; alternate UI for dired.
+  ;; puni ;; alternative for smartparens, hooks in to various modes to give tree motions to siblings and parents (but not down!), doesn't have automatic paren balancing like smartparens.  But its big selling point is that it works better for xml, it seems.
+  ;; jinx ;; spell checker, I hear it is good.  It only works on the visible part of the buffer.  Handles camelCase.  Highlights misspelled words.  Requires libenchant dynamic library, needs special handling in NixOS probably, but can be pulled in with jinx from elpa-packages.nix.
+  ;; iedit ;; an alternative to multiple-cursors.  Maybe worth trying this and/or mc again.  iedit supports visible rectangles.
+  ;; dape ;; dap-mode alternative for Debug Adapter Protocol.
+  ;; hyperbole ;; referenced as being like plan9 acme text buttons, or recognizing text patterns in arbitrary butters to become buttons that can do things (eg. arbitrary lisp).
+
   ;; some other packages I don't currently use, but might want to later:
 
   ;; figlet -- make ascii banners

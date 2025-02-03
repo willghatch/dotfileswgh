@@ -125,6 +125,7 @@
 (defmacro myhydradef (hydra-name &rest hydra-keys)
   `(defhydra ,hydra-name (:exit t :foreign-keys warn)
      ,@hydra-keys))
+;; Hydra note: add more bindings with (defhydra+ NAME HYDRA-OPTIONS HEAD ...), where HYDRA-OPTIONS can be nil to not change the options.
 
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -160,10 +161,10 @@
 (emmap (kbd "M-c") 'helm-M-x)
 (global-set-key (kbd "M-c") 'helm-M-x)
 
-(emmap "z" (lambda () (interactive) (require 'minad-stack-conf) (wgh/init-minad) (call-interactively 'execute-extended-command)))
-(eimap (kbd "M-c") (lambda () (interactive) (require 'minad-stack-conf) (wgh/init-minad) (call-interactively 'execute-extended-command)))
-(emmap (kbd "M-c") (lambda () (interactive) (require 'minad-stack-conf) (wgh/init-minad) (call-interactively 'execute-extended-command)))
-(global-set-key (kbd "M-c") (lambda () (interactive) (require 'minad-stack-conf) (wgh/init-minad) (call-interactively 'execute-extended-command)))
+(emmap "z" (lambda () (interactive) (require 'minad-stack-conf) (nobreak (wgh/init-minad)) (call-interactively 'execute-extended-command)))
+(eimap (kbd "M-c") (lambda () (interactive) (require 'minad-stack-conf) (nobreak (wgh/init-minad)) (call-interactively 'execute-extended-command)))
+(emmap (kbd "M-c") (lambda () (interactive) (require 'minad-stack-conf) (nobreak (wgh/init-minad)) (call-interactively 'execute-extended-command)))
+(global-set-key (kbd "M-c") (lambda () (interactive) (require 'minad-stack-conf) (nobreak (wgh/init-minad)) (call-interactively 'execute-extended-command)))
 
 
 (enmap "=" 'indent-region)
@@ -380,6 +381,7 @@
                    ("m" helm-multi-swoop "multi-swoop")
                    ("r" wgh/fzf-repo "fzf-repo")
                    ))
+
 
 
 ;; Ex
@@ -608,6 +610,11 @@
 (enmap "gq" (with-evil 'evil-fill-and-move))
 (enmap "gw" (with-evil 'evil-fill))
 (emmap "gv" 'estate-restore-region)
+;; TODO - avy can be customized with different targets.  Maybe add it as a composiphrase verb.
+(emmap "gac" (lambda () (interactive) (require 'avy) (call-interactively 'avy-goto-char)))
+(emmap "gan" (lambda () (interactive) (require 'avy) (call-interactively 'avy-next)))
+(emmap "gap" (lambda () (interactive) (require 'avy) (call-interactively 'avy-prev)))
+(emmap "gal" (lambda () (interactive) (require 'avy) (call-interactively 'avy-goto-line))) ;; This is maybe worse than just looking at the line number and using a command to jump to the line number...
 
 
 ;; t map
@@ -686,7 +693,7 @@
 
 
 ;; "ta" will be an assortment of handy stuff...
-(enmap "tac" 'comment-region)
+(enmap "tac" 'comment-region) ;; TODO - maybe put comment/uncomment and/or toggle-comment in composiphrase verb map, behind some prefix for less common verbs.
 (enmap "taC" 'uncomment-region)
 (enmap "tam" (lambda () (interactive) (exchange-point-and-mark)))
 (enmap "tad" 'insert-date)
@@ -696,6 +703,10 @@
 (enmap "tarc" (lambda () (interactive) (require 'alternate-region) (alternate-region-cycle)))
 (enmap "tav" 'sp-convolute-sexp)
 (enmap "tag" 'gptel-send)
+(enmap "tayp" (cons "symbol-overlay-put" (lambda () (interactive) (require 'symbol-overlay) (symbol-overlay-put)))) ;; TODO - symbol overlay seems like it could be helpful.  I should add a modifier to symbol to have forward/back symbol motions go to the next instance of the highlighted symbol at point, or to the next highlighted symbol.  Also think about keys for marking, this binding is terrible.  Maybe symbol-overlay can share a verb with marking alternate region?  Are there other ways one might mark something that would be useful to group with these?  Maybe also marking char can be setting point-to-register?
+(with-eval-after-load 'symbol-overlay
+  ;; I don't appreciate symbol-overlay taking over my keymap.
+  (setcdr symbol-overlay-map nil))
 
 
 
