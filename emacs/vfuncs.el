@@ -306,6 +306,19 @@ abort."
     (end-of-line)
     (org-increase-number-at-point)))
 
+
+(defun wgh/send-line-to-bottom-of-buffer ()
+  (interactive)
+  (save-excursion
+    (let* ((beg (line-beginning-position))
+           (end (+ 1 (line-end-position)))
+           (text (buffer-substring-no-properties beg end)))
+      (delete-region beg end)
+      (goto-char (point-max))
+      (when (not (bolp))
+        (insert "\n"))
+      (insert text))))
+
 (defun wgh/lisp-indent-region ()
   (interactive)
   (if (< (point) (mark))
