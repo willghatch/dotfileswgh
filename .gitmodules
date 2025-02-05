@@ -13,12 +13,6 @@
 [submodule "external/emacs/repeatable-motion"]
 	path = external/emacs/repeatable-motion
 	url = https://github.com/willghatch/emacs-repeatable-motion
-[submodule "external/emacs/this-command-all-keys"]
-	path = external/emacs/this-command-all-keys
-	url = https://github.com/willghatch/emacs-this-command-all-keys
-[submodule "external/emacs/aggreact"]
-	path = external/emacs/aggreact
-	url = https://github.com/willghatch/emacs-aggreact
 [submodule "external/emacs/composiphrase"]
 	path = external/emacs/composiphrase
 	url = https://github.com/willghatch/emacs-composiphrase
