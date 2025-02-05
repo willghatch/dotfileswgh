@@ -493,6 +493,11 @@
   ;; Verbs that don't automatically take region -- they still need an object argument to decide what to do.
   ;; Some of these should still work with a region -- eg. transpose with a region should transpose based on the text object given, but with multiple of the object based on the current region.  Eg. transpose multiple lines together, multiple s-expressions together, multiple indent trees together, etc.
   ;; But some of these... should probably just error if given a region.
+
+  ;; Move is the default, but let's add it to the map anyway.
+  ("m" (lambda (n) (interactive "p")
+         (funcall (cp/add (cp/verb 'move)) n))
+   "move" :exit t)
   ("p" (lambda (n) (interactive "p")
          (funcall (cp/add (cp/verb 'move-paste)) n))
    "move-paste" :exit t)
@@ -539,52 +544,58 @@
 
 
 (defhydra wgh/object-select (:foreign-keys warn :exit nil) "Obj:"
-  ;; TODO - Hydra handles lambda specially.  I would love to just use higher order functions, but to work with Hydra I seem to need to use lambdas...  Maybe I should do this without hydra.
+  ;; TODO - Hydra handles lambda specially.  I would love to just use higher order functions, but to work with Hydra I seem to need to use lambdas...  Maybe I should do this without hydra.  But I really want the “stay in the map” functionality, and I like the documentation popup, too.
   ("C-g" keyboard-quit-and-clear-composiphrase-and-maybe-leave-visual-state "quit" :exit t)
+
   ("c" (lambda (n) (interactive "p") (funcall (cp/ae (cp/obj 'character)) n)) "character" :exit t)
+  ;; This encoding is sketchy... but oh well.
   ("f" (lambda (n) (interactive "p") (funcall (cp/ae (cp/mod 'specific t)
                                                      (cp/obj 'character))
                                               n))
    "character-specific" :exit t)
   ("l" (lambda (n) (interactive "p") (funcall (cp/ae (cp/obj 'line)) n)) "line" :exit t)
+  ;; TODO - consider whether to keep using this vi-like word, or the emacs word, or something else.  Also how to deal with sub-words in symbols.
   ("w" (lambda (n) (interactive "p") (funcall (cp/ae (cp/obj 'cpo-vi-like-word)) n)) "vi-like-word" :exit t)
   ("W" (lambda (n) (interactive "p") (funcall (cp/ae (cp/obj 'word)) n)) "word" :exit t)
+  ("y" (lambda (n) (interactive "p") (funcall (cp/ae (cp/obj 'symbol)) n)) "symbol" :exit t)
+  ("P" (lambda (n) (interactive "p") (funcall (cp/ae (cp/obj 'paragraph)) n)) "paragraph" :exit t)
+  ("S" (lambda (n) (interactive "p") (funcall (cp/ae (cp/obj 'sentence)) n)) "sentence" :exit t)
+  ("B" (lambda (n) (interactive "p") (funcall (cp/ae (cp/obj 'buffer)) n)) "buffer" :exit t)
   ("s" (lambda (n) (interactive "p") (funcall (cp/ae (with-cpo-smartparens-req (cp/obj 'cpo-smartparens))) n)) "smartparens" :exit t)
   ("e" (lambda (n) (interactive "p") (funcall (cp/ae (progn (require 'cpo-indent-tree) (cp/obj 'cpo-indent-tree))) n)) "indent-tree" :exit t)
   ;; TODO - I want this one, but I keep using this accidentally due to my old key bindings, and it is so frustrating.  So I'll leave it as a no-op for now.
-  ;;("o" (funcall (cp/ae (cp/obj 'outline))) "outline" :exit t)
   ;;("o" (lambda (n) (interactive "p") (funcall (cp/ae (cp/obj 'NOOP-STOP-USING-THIS-BINDING-FOR-OLD-PURPOSE)) n)) "break habit!" :exit t)
   ("o" (lambda (n) (interactive "p") (funcall (cp/ae (progn (require 'cpo-outline) (cp/obj 'outline))) n)) "outline" :exit t)
-  ("O" (lambda (n) (interactive "p") (funcall (cp/ae (progn (require 'cpo-outline) (cp/obj 'outline))) n)) "outline" :exit t)
   ("t" (lambda (n) (interactive "p") (funcall (cp/ae (progn (require 'cpo-treesitter-qd)
                                                             (wgh/initialize-treesit-for-buffer)
                                                             ;; TODO - also need to initialize treesitter in the buffer before first use...
                                                             (cp/obj 'cpo-treesitter-qd)))
                                               n))
-   "treesitter-thumb" :exit t)
+   "treesitter-qd" :exit t)
   ("x" (lambda (n) (interactive "p") (funcall (cp/ae (cp/obj 'xml)) n)) "xml" :exit t)
-  ("y" (lambda (n) (interactive "p") (funcall (cp/ae (cp/obj 'symbol)) n)) "symbol" :exit t)
-  ("p" (lambda (n) (interactive "p") (funcall (cp/ae (cp/obj 'paragraph)) n)) "paragraph" :exit t)
-  ("S" (lambda (n) (interactive "p") (funcall (cp/ae (cp/obj 'sentence)) n)) "sentence" :exit t)
-  ("B" (lambda (n) (interactive "p") (funcall (cp/ae (cp/obj 'buffer)) n)) "buffer" :exit t)
-  ;; TODO - more objects -- defun/definition, comment, function arg, need to actually implement tree-sitter stuff, ...
+  ("X" (lambda (n) (interactive "p") (funcall (cp/ae (cp/obj 'xml-tag)) n)) "xml-tag" :exit t)
+  ("j" (lambda (n) (interactive "p") (funcall (cp/ae (cp/obj 'json)) n)) "json" :exit t)
 
-
-  ;; Modifiers -- maybe these should have a separate map, but that adds verbosity, and I'm not yet certain there are enough objects and modifiers to warrant splitting -- I can have a prefix within this map for infrequent things, and I can always add another separateprefix map.
-  ("n" (lambda (n) (interactive "p") (funcall (cp/add (cp/mod 'location-within 'end)) n)) "end" :exit nil)
-  ("i" (lambda (n) (interactive "p") (funcall (cp/add (cp/mod 'inner t "inner")) n)) "tree-inner" :exit nil)
-  ("u" (lambda (n) (interactive "p") (funcall (cp/add (cp/mod 'tree-vertical 'up)) n)) "up" :exit nil)
-  ("d" (lambda (n) (interactive "p") (funcall (cp/add (cp/mod 'tree-vertical 'down)) n)) "down" :exit nil)
-  ("T" (lambda (n) (interactive "p") (funcall (cp/add (cp/mod 'tree-traversal 'inorder)) n)) "inorder" :exit nil)
-  ("r" (lambda (n) (interactive "p") (let ((reg (read-key "register: ")))
-                                       (funcall (cp/add (cp/mod 'register reg (format "r:%c" reg))) n)))
-   "register" :exit nil)
-  (" " (lambda (n) (interactive "p") (funcall (cp/add (cp/mod 'surrounding-space 'surrounding-space)) n)) "surrounding-space" :exit nil)
-  ("g" (lambda (n) (interactive "p") (funcall (cp/add (cp/mod 'current-line-only 'current-line-only)) n)) "current-line-only" :exit nil)
-
+  ;; It's hard to decide priorities for myself, especially for things not yet implemented.  I want to reserve space in my map for future things.
+  ("g" (lambda (n) (interactive "p") (funcall (cp/ae (cp/obj 'argument)) n)) "argument" :exit t)
+  ("D" (lambda (n) (interactive "p") (funcall (cp/ae (cp/obj 'definition)) n)) "definition" :exit t)
+  ("F" (lambda (n) (interactive "p") (funcall (cp/ae (cp/obj 'function)) n)) "function" :exit t)
+  ("M" (lambda (n) (interactive "p") (funcall (cp/ae (cp/obj 'statement)) n)) "statement" :exit t)
+  ("C" (lambda (n) (interactive "p") (funcall (cp/ae (cp/obj 'comment)) n)) "comment" :exit t)
+  ("L" (lambda (n) (interactive "p") (funcall (cp/ae (cp/obj 'linter-warning)) n)) "linter-warning" :exit t)
+  ("p" (lambda (n) (interactive "p") (funcall (cp/ae (cp/obj 'proposed-change)) n)) "proposed-change" :exit t)
+  ("hC" (lambda (n) (interactive "p") (funcall (cp/ae (cp/obj 'class)) n)) "class" :exit t)
+  ("hX" (lambda (n) (interactive "p") (funcall (cp/ae (cp/obj 'test)) n)) "test" :exit t)
+  ("hc" (lambda (n) (interactive "p") (funcall (cp/ae (cp/obj 'buffer-change)) n)) "buffer-change" :exit t)
+  ("hg" (lambda (n) (interactive "p") (funcall (cp/ae (cp/obj 'vcs-change)) n)) "vcs-change" :exit t)
+  ("h SPC" (lambda (n) (interactive "p") (funcall (cp/ae (cp/obj 'whitespace)) n)) "whitespace" :exit t)
   ("hu" (lambda (n) (interactive "p") (funcall (cp/ae (cp/obj 'url)) n)) "url" :exit t)
   ("he" (lambda (n) (interactive "p") (funcall (cp/ae (cp/obj 'email)) n)) "email" :exit t)
+  ("hP" (lambda (n) (interactive "p") (funcall (cp/ae (cp/obj 'phone-number)) n)) "phone-number" :exit t)
+  ("hf" (lambda (n) (interactive "p") (funcall (cp/ae (cp/obj 'file-name)) n)) "file-name" :exit t)
 
+
+  ;; Specific delimiters, use smartparens for them.
   ("\"" (lambda (n) (interactive "p") (funcall (cp/ae (cp/mod 'delimiter "\"") (with-cpo-smartparens-req (cp/obj 'cpo-smartparens))) n)) "\"" :exit t)
   ("'" (lambda (n) (interactive "p") (funcall (cp/ae (cp/mod 'delimiter "'") (with-cpo-smartparens-req (cp/obj 'cpo-smartparens))) n)) "'" :exit t)
   ("`" (lambda (n) (interactive "p") (funcall (cp/ae (cp/mod 'delimiter "`") (with-cpo-smartparens-req (cp/obj 'cpo-smartparens))) n)) "`" :exit t)
@@ -601,6 +612,30 @@
   ("⟅" (lambda (n) (interactive "p") (funcall (cp/ae (cp/mod 'delimiter "⟅") (with-cpo-smartparens-req (cp/obj 'cpo-smartparens))) n)) "⟅⟆" :exit t)
   ("⟆" (lambda (n) (interactive "p") (funcall (cp/ae (cp/mod 'delimiter "⟅") (with-cpo-smartparens-req (cp/obj 'cpo-smartparens))) n)) "⟅⟆" :exit t)
   ("#" (lambda (n) (interactive "p") (funcall (cp/ae (cp/mod 'delimiter "#|") (with-cpo-smartparens-req (cp/obj 'cpo-smartparens))) n)) "#||#" :exit t)
+
+  ;; Modifiers -- maybe these should have a separate map, but that adds verbosity, and I'm not yet certain there are enough objects and modifiers to warrant splitting -- I can have a prefix within this map for infrequent things, and I can always add another separate prefix map.
+  ("n" (lambda (n) (interactive "p") (funcall (cp/add (cp/mod 'location-within 'end)) n)) "end" :exit nil)
+  ;;("hb" (lambda (n) (interactive "p") (funcall (cp/add (cp/mod 'location-within 'beginning)) n)) "beginning" :exit nil) ;; Default, but let's add it anyway.
+  ;;("he" (lambda (n) (interactive "p") (funcall (cp/add (cp/mod 'location-within 'emacs-style)) n)) "emacs-style" :exit nil)
+  ("i" (lambda (n) (interactive "p") (funcall (cp/add (cp/mod 'inner 'inner)) n)) "inner" :exit nil)
+  ("u" (lambda (n) (interactive "p") (funcall (cp/add (cp/mod 'tree-vertical 'up)) n)) "up" :exit nil)
+  ("d" (lambda (n) (interactive "p") (funcall (cp/add (cp/mod 'tree-vertical 'down)) n)) "down" :exit nil)
+  ("T" (lambda (n) (interactive "p") (funcall (cp/add (cp/mod 'tree-traversal 'inorder)) n)) "inorder" :exit nil)
+  ("r" (lambda (n) (interactive "p") (let ((reg (read-key "register: ")))
+                                       (funcall (cp/add (cp/mod 'register reg (format "r:%c" reg))) n)))
+   "register" :exit nil)
+  (" " (lambda (n) (interactive "p") (funcall (cp/add (cp/mod 'surrounding-space 'surrounding-space)) n)) "surrounding-space" :exit nil)
+  ("b" (lambda (n) (interactive "p") (funcall (cp/add (cp/mod 'absolute 'absolute)) n)) "absolute" :exit nil) ;; For absolute numbering (within tree if respect tree is on).  Ignore forward/backward direction.
+  ("m" (lambda (n) (interactive "p") (funcall (cp/add (cp/mod 'matching 'matching)) n)) "matching" :exit nil) ;; Eg. for finding the next matching word, symbol, whatever.
+  ("a" (lambda (n) (interactive "p") (funcall (cp/add (cp/mod 'alternate 'alternate)) n)) "alternate" :exit nil) ;; For object-specific alternate behavior...
+  ("A" (lambda (n) (interactive "p") (funcall (cp/add (cp/mod 'alternate 2)) n)) "alternate-2" :exit nil)
+
+  ("hR" (lambda (n) (interactive "p") (funcall (cp/add (cp/mod 'respect-tree 'respect-tree)) n)) "respect-tree" :exit nil)
+  ("hr" (lambda (n) (interactive "p") (funcall (cp/add (cp/mod 'respect-tree nil)) n)) "DISrespect-tree" :exit nil)
+  ("hD" (lambda (n) (interactive "p") (funcall (cp/add (cp/mod 'direction nil)) n)) "No direction" :exit nil) ;; Is this useful?  Maybe.  Currently I have no way to get into the map without specifying a direction...
+  ("hi" (lambda (n) (interactive "p") (funcall (cp/add (cp/mod 'idempotent 'idempotent)) n)) "idempotent" :exit nil) ;; Eg. only move if not at a place where this movement would have moved to.  Useful for keyboard macros, maybe.
+  ("hl" (lambda (n) (interactive "p") (funcall (cp/add (cp/mod 'current-line-only 'current-line-only)) n)) "current-line-only" :exit nil) ;; Eg. do something on the current line only.  Uncertain how useful this is.
+
   )
 
 

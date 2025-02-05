@@ -8,19 +8,26 @@
   (delete-char (- n)))
 
 
-(defun cpo-goto-line-default-first (n)
+(defun cpo-goto-line-default-first (&optional n)
+  "Go to line n.  But also handle negative n with -1 as the last line, etc."
   (interactive "p")
-  (if (= n 0) (goto-line 1) (goto-line n)))
-(defun cpo-goto-line-default-last (n)
+  (cond ((null n) (goto-line 1))
+        ((= n 0) (goto-line 1))
+        ((< n 0) (goto-line (+ 1 (line-number-at-pos (point-max)) n)))
+        (t (goto-line n))))
+(defun cpo-goto-line-default-last (&optional n)
+  "Go to line n.  But also handle negative n with -1 as the last line, etc.
+If no argument is given, go to the last line."
   (interactive "P")
   (cond ((null n) (goto-line (line-number-at-pos (point-max))))
-        ((numberp n) (goto-line n))
-        ((consp n) (goto-line (car n)))
+        ((numberp n) (cpo-goto-line-default-first n))
+        ((consp n) (cpo-goto-line-default-first (car n)))
         (t (error))))
 
 
 
 (defun keyboard-quit-and-clear-composiphrase-and-maybe-leave-visual-state ()
+  "Like `keyboard-quit', but also clear 'composiphrase-current-sentence' and quit `estate-visual-state'."
   (interactive)
   (setq composiphrase-current-sentence nil)
   (when (equal estate-state 'visual)
@@ -37,6 +44,8 @@
 
 ;; TODO - get rid of this or make a working version
 (defun estate-restore-region ()
+  "Restore previous visual region.
+TODO this is broken.  Implement correctly by having a visual state hook that saves the last region, and then after-change-functions hook to update the last region."
   (interactive)
   (let ((last-state estate-previous-state))
     (activate-mark)))
@@ -256,7 +265,8 @@ TODO - maybe I should also save the recording to some data structure?
    count
    estate--most-recent-register-macro-recorded))
 
-(defvar estate-default-keyboard-macro-register ?\⌨)
+(defvar estate-default-keyboard-macro-register ?\⌨
+  "Register used to save macro for `estate-keyboard-macro-to-register-end-most-recent-or-start-default'.  Wow that's a terrible name.  This is demo-ware, after all.")
 
 (defun estate-keyboard-macro-to-register-end-most-recent-or-start-default ()
   "If currently recording from an estate-keyboard-macro-to-register-* function, end the most recently started one.

@@ -32,7 +32,8 @@
                 ;; TODO - inner is very specific to smartparens object so I can go up to inner parent...
                 (inner . ,nil) ;; boolean.  Somewhat specific to trees with delimiters (eg. smartparens) to go up to delimiter or just inside delimiter, but also for tree child area selection.
                 (tree-traversal . ,nil) ;; nil or 'inorder
-                (num . 1))
+                ;;(num . 1) ;; Things that take a number typically allow nil for one.  But goto-column should default to 0.
+                )
           ;; TODO - what arguments do most of these mean?  Eg. tree movement also needs arguments about up/down, when going down you can have a child index, etc.  I generally want an idempotence argument for movements, though maybe it's really only useful for things like “go to the end of the line” without going to the next line, but it's likely a useful option in principle especially for keyboard macros.  Also want movement to sibling vs strict full/half sibling (indent/org trees) vs unbound by tree (eg. move to next s-expression beginning whether or not it moves out of the current tree).
           ;; TODO - add modifier limit-to-single-line.
           ;; TODO - modifier for surrounding white space.  Eg. for expand-region to expand to the object, then expand again to include surrounding white space.  But there are several versions of this that I may want... sometimes I want all surrounding space, sometimes just the space before or after.  And for lines, by default I want to include the white space, but I want a modifier for eg. back-to-indentation and a similar one for the line end before extra white space.  So I probably want the key to invert for that case, or have some kind of special handling.
@@ -45,7 +46,11 @@
                       (register-for-old . ,(lambda () cpo-paste-copy-old-default-register))) ;; IE move, then paste at the new point, but restoring the original point.
           (upcase)
           (downcase)
+          (toggle-case)
           (capitalize) ;; TODO - what is the difference between capitalize-region and upcase-initials-region?
+          (indent)
+          (dedent)
+          (format)
           (initiate-isearch) ;; TODO - I want to write something similar to vim's * command, to search the thing at point, except maybe with an argument to choose word or symbol or whatnot.  But my first attempt at actually implementing it was unsuccessful.  I'll probably come back to it later.
           (transpose (direction . forward) (tree-vertical . nil) (num . 1))
           (join (direction . forward) (num . 1))
@@ -74,10 +79,10 @@
           (paragraph (default-verb . move) (location-within . beginning))
           (line (default-verb . move) (location-within . beginning))
           (symbol (default-verb . move) (location-within . beginning))
-          (cpo-smartparens (default-verb . move) (location-within . beginning) (respect-tree . ,t) (delimiter . ,nil))
-          (cpo-indent-tree (default-verb . move) (location-within . beginning) (respect-tree . ,t))
-          (outline (default-verb . move) (location-within . beginning) (respect-tree . ,t))
-          (cpo-treesitter-qd (default-verb . move) (location-within . anchor) (respect-tree . ,t)) ;; IE treesitter generic handler
+          (cpo-smartparens (default-verb . move) (location-within . beginning) (respect-tree . respect-tree) (delimiter . ,nil))
+          (cpo-indent-tree (default-verb . move) (location-within . beginning) (respect-tree . respect-tree))
+          (outline (default-verb . move) (location-within . beginning) (respect-tree . respect-tree))
+          (cpo-treesitter-qd (default-verb . move) (location-within . anchor) (respect-tree . respect-tree)) ;; IE treesitter generic handler
           ;; TODO - other tree-sitter things that are more tuned to the language.  Well, maybe it would be good to have the generic cpo-treesitter-qd and a more specific one on the same map, where the specific one pulls in some language config.  I think it's likely worthwhile to still keep a generic one in the map, though.
           (region)
           (buffer (default-verb . move) (location-within . ,nil))
@@ -164,6 +169,13 @@
           ;; TODO - how do I want to encode go-to-line-number-X and go-to-column-X?  I'm considering an “absolute” modifier, that ignores forward/backward to go to the Nth thing.  But that's probably only useful for going to numbered line, column, or point.  I have buffer with a numeric arg as going to point.  Do I want absolute-char to mean column, and absolute line to mean go-to-line?
 
           ;; TODO - expand region to specific char inner/outer -- good for ad-hoc regions delimited by the same character, can be used for '' strings and "" strings that don't have escapes, for $$ regions in latex, etc.
+          ;; TODO - absolute movement for character -- I've implemented it as column, with alternate absolute movement as absolute position in buffer, (and with absolute buffer position as numeric movement for buffer...) but maybe should swap... I think column is more useful and frequent to have be more convenient...
+          (move character
+                ((absolute absolute) (alternate alternate))
+                (goto-char (num)))
+          (move character
+                ((absolute absolute))
+                (goto-column (num)))
           (move character
                 ((direction forward) (specific ,t) (location-within beginning))
                 (rmo/cpo-find-char-beginning-in-line-forward (num)))
@@ -289,7 +301,13 @@
                 (rmo/backward-paragraph (num)))
 
           (move line
-                ((direction expand-region) (inner ,t))
+                ((absolute absolute)
+                 ;; TODO - handle expand-region, too
+                 ;; TODO - handle position modifiers -- beginning/end
+                 )
+                (cpo-goto-line-default-first (num)))
+          (move line
+                ((direction expand-region) (inner inner))
                 (,(lambda () (cpo-expand-region-to-fill-lines nil)) ()))
           (move line
                 ((direction expand-region) (inner ,nil))
@@ -314,6 +332,7 @@
                 ((direction backward) (location-within keep-if-possible))
                 (rmo-c/cpo-prev-line (num)))
 
+          ;; TODO - for all trees, make absolute movement go to the Nth sibling.
           (move cpo-smartparens
                 ((tree-vertical up) (direction expand-region) (inner ,nil))
                 (cpo-smartparens-select-root ()))
@@ -324,7 +343,7 @@
                 ((direction expand-region) (inner ,nil) (delimiter any) (tree-vertical ,nil))
                 (cpo-smartparens-expand-region-to-any-delimiter (num)))
           (move cpo-smartparens
-                ((direction expand-region) (inner ,t) (delimiter any) (tree-vertical ,nil))
+                ((direction expand-region) (inner inner) (delimiter any) (tree-vertical ,nil))
                 (cpo-smartparens-expand-region/children-region (num)))
 
           (move cpo-smartparens
@@ -332,14 +351,14 @@
                  (delimiter t ,(lambda (actual expected) (stringp actual))))
                 (cpo-smartparens-expand-region-to-delimiter (delimiter num)))
           (move cpo-smartparens
-                ((direction expand-region) (tree-vertical ,nil) (inner ,t) (delimiter t ,(lambda (actual expected) (stringp actual))))
+                ((direction expand-region) (tree-vertical ,nil) (inner inner) (delimiter t ,(lambda (actual expected) (stringp actual))))
                 (cpo-smartparens-expand-region-to-delimiter/children-region (delimiter num)))
 
           (move cpo-smartparens
                 ((direction expand-region) (tree-vertical ,nil) (inner ,nil) (delimiter ,nil))
                 (cpo-smartparens-expand-region (num)))
           (move cpo-smartparens
-                ((direction expand-region) (tree-vertical ,nil) (inner ,t) (delimiter ,nil))
+                ((direction expand-region) (tree-vertical ,nil) (inner inner) (delimiter ,nil))
                 (cpo-smartparens-expand-region/children-region (num)))
 
           (move cpo-smartparens
@@ -349,16 +368,16 @@
                 ((direction backward) (tree-vertical ,nil) (tree-traversal inorder))
                 (rmo/cpo-smartparens-backward-inorder-traversal (num)))
           (move cpo-smartparens
-                ((direction forward) (location-within beginning) (tree-vertical ,nil) (tree-traversal ,nil) (respect-tree ,t))
+                ((direction forward) (location-within beginning) (tree-vertical ,nil) (tree-traversal ,nil) (respect-tree respect-tree))
                 (rmo/cpo-smartparens-forward-sibling-beginning (num)))
           (move cpo-smartparens
-                ((direction backward) (location-within beginning) (tree-vertical ,nil) (tree-traversal ,nil) (respect-tree ,t))
+                ((direction backward) (location-within beginning) (tree-vertical ,nil) (tree-traversal ,nil) (respect-tree respect-tree))
                 (rmo/cpo-smartparens-backward-sibling-beginning (num)))
           (move cpo-smartparens
-                ((direction forward) (location-within end) (tree-vertical ,nil) (tree-traversal ,nil) (respect-tree ,t))
+                ((direction forward) (location-within end) (tree-vertical ,nil) (tree-traversal ,nil) (respect-tree respect-tree))
                 (rmo/cpo-smartparens-forward-sibling-end (num)))
           (move cpo-smartparens
-                ((direction backward) (location-within end) (tree-vertical ,nil) (tree-traversal ,nil) (respect-tree ,t))
+                ((direction backward) (location-within end) (tree-vertical ,nil) (tree-traversal ,nil) (respect-tree respect-tree))
                 (rmo/cpo-smartparens-backward-sibling-end (num)))
           (move cpo-smartparens
                 ((direction forward) (location-within emacs-style) (tree-vertical ,nil) (tree-traversal ,nil) (respect-tree ,nil))
@@ -384,11 +403,11 @@
                 (rmo/cpo-smartparens-down-last-child-end (num)))
           (move cpo-smartparens
                 ;; TODO - for my current key binding purposes, I want to use forward/backward to determine begin/end for parent...
-                ((direction forward) (tree-vertical up) (inner ,t))
+                ((direction forward) (tree-vertical up) (inner inner))
                 (rmo/sp-end-of-sexp (num)))
           (move cpo-smartparens
                 ;; TODO - for my current key binding purposes, I want to use forward/backward to determine begin/end for parent...
-                ((direction backward) (tree-vertical up) (inner ,t))
+                ((direction backward) (tree-vertical up) (inner inner))
                 (rmo/sp-beginning-of-sexp (num)))
           (slurp cpo-smartparens
                  ((direction forward))
@@ -445,7 +464,7 @@
                 ((direction expand-region) (tree-vertical ,nil) (inner ,nil))
                 (cpo-treesitter-qd-expand-region (num)))
           (move cpo-treesitter-qd
-                ((direction expand-region) (tree-vertical ,nil) (inner ,t))
+                ((direction expand-region) (tree-vertical ,nil) (inner inner))
                 (cpo-treesitter-qd-expand-region/children-region (num)))
 
           (move cpo-treesitter-qd
@@ -499,7 +518,7 @@
                 ((direction expand-region) (tree-vertical ,nil) (inner ,nil))
                 (cpo-outline-expand-region (num)))
           (move outline
-                ((direction expand-region) (tree-vertical ,nil) (inner ,t))
+                ((direction expand-region) (tree-vertical ,nil) (inner inner))
                 (cpo-outline-expand-region/children-region (num)))
           (move outline
                 ((direction forward) (tree-traversal inorder))
@@ -544,7 +563,7 @@
                 ((direction expand-region) (tree-vertical ,nil) (inner ,nil))
                 (cpo-indent-tree-expand-region (num)))
           (move cpo-indent-tree
-                ((direction expand-region) (tree-vertical ,nil) (inner ,t))
+                ((direction expand-region) (tree-vertical ,nil) (inner inner))
                 (cpo-indent-tree-expand-region/children-region (num)))
           (move cpo-indent-tree
                 ((direction forward) (tree-traversal inorder))
@@ -553,10 +572,10 @@
                 ((direction backward) (tree-traversal inorder))
                 (rmo/cpo-indent-tree-inorder-traversal-backward (num)))
           (move cpo-indent-tree
-                ((direction forward) (tree-vertical ,nil) (tree-traversal ,nil) (respect-tree ,t))
+                ((direction forward) (tree-vertical ,nil) (tree-traversal ,nil) (respect-tree respect-tree))
                 (rmo/cpo-indent-tree-forward-full-sibling (num)))
           (move cpo-indent-tree
-                ((direction backward) (tree-vertical ,nil) (tree-traversal ,nil) (respect-tree ,t))
+                ((direction backward) (tree-vertical ,nil) (tree-traversal ,nil) (respect-tree respect-tree))
                 (rmo/cpo-indent-tree-backward-full-sibling (num)))
           ;; It's not really fair to say that these half-sibling movements don't respect the tree, but I'm not sure what other modifier to use right now.  It is an alternate way of respecting the tree.
           (move cpo-indent-tree
@@ -700,21 +719,42 @@
           (downcase ,(lambda (x) (not (memq x '(region)))) ()
                     (,(composiphrase--make-movement-delegated-command 'downcase-region)
                      sentence-with-defaults))
+          (toggle-case region ()
+                    (,(lambda () (TODO-toggle-case-region (region-beginning) (region-end)))))
+          (toggle-case ,(lambda (x) (not (memq x '(region)))) ()
+                    (,(composiphrase--make-movement-delegated-command 'TODO-toggle-case-region)
+                     sentence-with-defaults))
           (capitalize region ()
                       (,(lambda () (capitalize-region (region-beginning) (region-end)))))
           (capitalize ,(lambda (x) (not (memq x '(region)))) ()
                       (,(composiphrase--make-movement-delegated-command 'capitalize-region)
                        sentence-with-defaults))
-          (paste-to-region-from-move region
-                                     ()
+          (paste-to-region-from-move region ()
                                      (cpo-paste (register register-for-old)))
           (paste-to-region-from-move ,(lambda (x) (not (memq x '(region))))
                                      ()
                                      ;; The intention of this one is that it deletes region from the move and replaces it with a paste.  But it doesn't seem as useful as move-paste, so I don't feel very motivated to implement it right now.
                                      (TODO-paste-to-region-from-move-handler))
+          (indent region ()
+                  (TODO-increase-indent ()))
+          (indent (,(lambda (x) (not (memq x '(region))))) ()
+                  (,(composiphrase--make-movement-delegated-command 'TODO-increase-indent ())))
+          (dedent region ()
+                  (TODO-dedent-region ()))
+          (dedent (,(lambda (x) (not (memq x '(region))))) ()
+                  (,(composiphrase--make-movement-delegated-command 'TODO-dedent-region ())))
+          (auto-indent region ()
+                       (indent-region ()))
+          (auto-indent (,(lambda (x) (not (memq x '(region))))) ()
+                       (,(composiphrase--make-movement-delegated-command 'indent-region ())))
+          (format region ()
+                  (TODO-format-command ()))
+          (format (,(lambda (x) (not (memq x '(region))))) ()
+                  (,(composiphrase--make-movement-delegated-command 'TODO-format-command ())))
+
           (move-paste region
-                  ()
-                  (cpo-paste (register register-for-old)))
+                      ()
+                      (cpo-paste (register register-for-old)))
           (move-paste ,(lambda (x) (not (memq x '(region))))
                       ()
                       (cpo-move-paste-sentence-execute
