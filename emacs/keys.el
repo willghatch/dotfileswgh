@@ -57,14 +57,21 @@
     (parameter-name . ,name)
     (contents . ,contents)
     (ui-hint . ,(or ui-hint contents))))
-(defun cp/ae (&rest words)
-  (apply 'composiphrase-add-to-current-sentence-with-numeric-handling
-         'exec-after
-         words))
 (defun cp/add (&rest words)
   (apply 'composiphrase-add-to-current-sentence-with-numeric-handling
          nil
          words))
+(defun cp/ae (&rest words)
+  (apply 'composiphrase-add-to-current-sentence-with-numeric-handling
+         'exec-after
+         words))
+(defun cp/ar (&rest words)
+  (apply 'composiphrase-add-to-current-sentence-with-numeric-handling
+         (region-active-p)
+         (if (region-active-p)
+             (cons (cp/obj 'region)
+                   words)
+           words)))
 
 
 (require 'cpo-text-object-stuff)
@@ -329,12 +336,12 @@
                  (estate-insert-state) ;; TODO - handle number
                (progn
                  (funcall (cp/add (cp/mod 'direction 'expand-region)
-                                  (cp/mod 'tree-inner t "inner"))
+                                  (cp/mod 'inner t "inner"))
                           n)
                  (wgh/object-select/body)))))
 (evmap "i" (lambda (n) (interactive "p")
              (funcall (cp/add (cp/mod 'direction 'expand-region)
-                              (cp/mod 'tree-inner t "inner"))
+                              (cp/mod 'inner t "inner"))
                       n)
              (wgh/object-select/body)))
 (emmap "a" (lambda (n) (interactive "p")
@@ -418,7 +425,7 @@
              (interactive "p")
              (require 'cpo-smartparens)
              (funcall (cp/ae (cp/mod 'direction 'expand-region)
-                             (cp/mod 'tree-inner t "inner")
+                             (cp/mod 'inner t "inner")
                              (cp/mod 'delimiter 'any)
                              (cp/obj 'cpo-smartparens))
                       n)))
@@ -441,56 +448,54 @@
 ;; composiphrase wgh/verb-select map
 (defhydra wgh/verb-select (:foreign-keys warn :exit nil) "Verb:"
   ("C-g" keyboard-quit-and-clear-composiphrase-and-maybe-leave-visual-state "quit" :exit t)
+
+  ;; Verbs that automatically take region if the region is active.
+  ;; These are the ones where you maybe should select first anyway.
   ("c" (lambda (n) (interactive "p")
-         (if (region-active-p)
-             (funcall (cp/ae (cp/verb 'change)
-                             (cp/obj 'region))
-                      n)
-           (funcall (cp/add (cp/verb 'change))
-                    n)))
+         (funcall (cp/ar (cp/verb 'change)) n))
    "change" :exit t)
   ("d" (lambda (n) (interactive "p")
-         (if (region-active-p)
-             (funcall (cp/ae (cp/verb 'delete)
-                             (cp/obj 'region))
-                      n)
-           (funcall (cp/add (cp/verb 'delete))
-                    n)))
+         (funcall (cp/ar (cp/verb 'delete)) n))
    "delete" :exit t)
   ("y" (lambda (n) (interactive "p")
-         (if (region-active-p)
-             (funcall (cp/ae (cp/verb 'copy)
-                             (cp/obj 'region))
-                      n)
-           (funcall (cp/add (cp/verb 'copy))
-                    n)))
+         (funcall (cp/ar (cp/verb 'copy)) n))
    "copy" :exit t)
   ("u" (lambda (n) (interactive "p")
-         (if (region-active-p)
-             (funcall (cp/ae (cp/verb 'downcase)
-                             (cp/obj 'region)))
-           (funcall (cp/add (cp/verb 'downcase)) n)))
+         (funcall (cp/ar (cp/verb 'downcase)) n))
    "downcase" :exit t)
   ("U" (lambda (n) (interactive "p")
-         (if (region-active-p)
-             (funcall (cp/ae (cp/verb 'upcase)
-                             (cp/obj 'region)))
-           (funcall (cp/add (cp/verb 'upcase)) n)))
+         (funcall (cp/ar (cp/verb 'upcase)) n))
+   "upcase" :exit t)
+  ("~" (lambda (n) (interactive "p")
+         (funcall (cp/ar (cp/verb 'toggle-case)) n))
    "upcase" :exit t)
   ("C" (lambda (n) (interactive "p")
-         (if (region-active-p)
-             (funcall (cp/ae (cp/verb 'capitalize)
-                             (cp/obj 'region)))
-           (funcall (cp/add (cp/verb 'capitalize)) n)))
+         (funcall (cp/ar (cp/verb 'capitalize)) n))
    "capitalize" :exit t)
-  ("i" (lambda (n) (interactive "p")
-         (if (region-active-p)
-             (funcall (cp/ae (cp/verb 'initiate-isearch)
-                             (cp/obj 'region))))
-         (funcall (cp/add (cp/verb 'initiate-isearch)) n))
+  ("n" (lambda (n) (interactive "p")
+         (funcall (cp/ar (cp/verb 'initiate-isearch)) n))
    "isearch-thing" :exit t)
+  ("f" (lambda (n) (interactive "p")
+         (funcall (cp/ar (cp/verb 'format)) n))
+   "format" :exit t)
+  ("i" (lambda (n) (interactive "p")
+         (funcall (cp/ar (cp/verb 'indent)) n))
+   "indent" :exit t)
+  ("I" (lambda (n) (interactive "p")
+         (funcall (cp/ar (cp/verb 'dedent)) n))
+   "dedent" :exit t)
+  ;; Note that I'm reserving h as a prefix here...
+  ("hp" (lambda (n) (interactive "p")
+          ;; Note that I'm putting this on a prefix map because it is just less useful than move-paste.
+          (funcall (cp/add (cp/verb 'paste-to-region-from-move)) n))
+   "paste-over-region" :exit t)
 
-  ;; TODO - handle the fact that some verbs take region, and other verbs don't work well in visual state.  Except that some should be able to take an object and behave differently with region active.  Eg. transpose with a region containing multiple tree siblings or lines should transpose a group.
+  ;; Verbs that don't automatically take region -- they still need an object argument to decide what to do.
+  ;; Some of these should still work with a region -- eg. transpose with a region should transpose based on the text object given, but with multiple of the object based on the current region.  Eg. transpose multiple lines together, multiple s-expressions together, multiple indent trees together, etc.
+  ;; But some of these... should probably just error if given a region.
+  ("p" (lambda (n) (interactive "p")
+         (funcall (cp/add (cp/verb 'move-paste)) n))
+   "move-paste" :exit t)
   ("j" (lambda (n) (interactive "p")
          (funcall (cp/add (cp/verb 'join)) n))
    "join" :exit t)
@@ -506,6 +511,9 @@
   ("s" (lambda (n) (interactive "p")
          (funcall (cp/add (cp/verb 'slurp)) n))
    "slurp" :exit t)
+  ("S" (lambda (n) (interactive "p")
+         (funcall (cp/add (cp/verb 'barf)) n))
+   "barf" :exit t)
   ("b" (lambda (n) (interactive "p")
          (funcall (cp/add (cp/verb 'barf)) n))
    "barf" :exit t)
@@ -515,9 +523,9 @@
   ("D" (lambda (n) (interactive "p")
          (funcall (cp/add (cp/verb 'demote)) n))
    "demote" :exit t)
-  ("p" (lambda (n) (interactive "p")
-         (funcall (cp/add (cp/verb 'move-paste)) n))
-   "move-paste" :exit t)
+  ("w" (lambda (n) (interactive "p")
+         (funcall (cp/add (cp/verb 'change-delimiter)) n))
+   "change-delimiter" :exit t)
   )
 
 
@@ -528,6 +536,8 @@
 (defun with-cpo-smartparens-req (x)
   (require 'cpo-smartparens)
   x)
+
+
 (defhydra wgh/object-select (:foreign-keys warn :exit nil) "Obj:"
   ;; TODO - Hydra handles lambda specially.  I would love to just use higher order functions, but to work with Hydra I seem to need to use lambdas...  Maybe I should do this without hydra.
   ("C-g" keyboard-quit-and-clear-composiphrase-and-maybe-leave-visual-state "quit" :exit t)
@@ -562,7 +572,7 @@
 
   ;; Modifiers -- maybe these should have a separate map, but that adds verbosity, and I'm not yet certain there are enough objects and modifiers to warrant splitting -- I can have a prefix within this map for infrequent things, and I can always add another separateprefix map.
   ("n" (lambda (n) (interactive "p") (funcall (cp/add (cp/mod 'location-within 'end)) n)) "end" :exit nil)
-  ("i" (lambda (n) (interactive "p") (funcall (cp/add (cp/mod 'tree-inner t "inner")) n)) "tree-inner" :exit nil)
+  ("i" (lambda (n) (interactive "p") (funcall (cp/add (cp/mod 'inner t "inner")) n)) "tree-inner" :exit nil)
   ("u" (lambda (n) (interactive "p") (funcall (cp/add (cp/mod 'tree-vertical 'up)) n)) "up" :exit nil)
   ("d" (lambda (n) (interactive "p") (funcall (cp/add (cp/mod 'tree-vertical 'down)) n)) "down" :exit nil)
   ("T" (lambda (n) (interactive "p") (funcall (cp/add (cp/mod 'tree-traversal 'inorder)) n)) "inorder" :exit nil)

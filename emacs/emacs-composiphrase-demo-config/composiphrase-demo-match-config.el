@@ -29,11 +29,10 @@
          .
          ((move (direction . forward) ;; options: forward, backward, expand-region
                 (tree-vertical . ,nil) ;; options: nil, 'up, 'down
-                ;; TODO - tree-inner is very specific to smartparens object so I can go up to inner parent...
-                (tree-inner . ,nil)     ;; boolean
+                ;; TODO - inner is very specific to smartparens object so I can go up to inner parent...
+                (inner . ,nil) ;; boolean.  Somewhat specific to trees with delimiters (eg. smartparens) to go up to delimiter or just inside delimiter, but also for tree child area selection.
                 (tree-traversal . ,nil) ;; nil or 'inorder
                 (num . 1))
-          ;; TODO - add registers for delete, change, copy.  They should all copy, but delete and change can have a different default register if I don't want them to copy by default.  Also paste should have a register to paste from, but also have a register for replaced contents when replacing.
           ;; TODO - what arguments do most of these mean?  Eg. tree movement also needs arguments about up/down, when going down you can have a child index, etc.  I generally want an idempotence argument for movements, though maybe it's really only useful for things like “go to the end of the line” without going to the next line, but it's likely a useful option in principle especially for keyboard macros.  Also want movement to sibling vs strict full/half sibling (indent/org trees) vs unbound by tree (eg. move to next s-expression beginning whether or not it moves out of the current tree).
           ;; TODO - add modifier limit-to-single-line.
           ;; TODO - modifier for surrounding white space.  Eg. for expand-region to expand to the object, then expand again to include surrounding white space.  But there are several versions of this that I may want... sometimes I want all surrounding space, sometimes just the space before or after.  And for lines, by default I want to include the white space, but I want a modifier for eg. back-to-indentation and a similar one for the line end before extra white space.  So I probably want the key to invert for that case, or have some kind of special handling.
@@ -120,6 +119,14 @@
          .
          (
           ;; TODO - consider using more params and matching less.  I can replace several matches of forward/back begin/end by turning those things into parameters, if there is a function that implements them.  Though I need to consider repeatable motion.
+
+          ;; TODO - absolute modifier -- turns into goto, goto Nth line, Nth column, Nth position.  For trees, go to Nth sibling.  Allow negative number to go from end.  For trees, absolute plus up can mean absolute top-level tree.  I mostly see this as useful for line, column, position, and first/last sibling...
+          ;; TODO - matching modifier -- go to the next thing that matches.  Eg. go to the next matching word, the next matching symbol, etc.
+          ;; TODO - surrounding-space modifier -- for selection, select with surrounding white space
+          ;; TODO - alternate modifier -- some things have some alternate mode.  This modifier is not well specified, and maybe takes a number or something so you can have multiple alternates... it can capture the fact that some modifiers are very noun or very verb specific, giving one or two keys for modifying many things.
+          ;; TODO - idempotent modifier -- for movement or selection, don't move when already at a place that such a movement could have moved to.  Useful for keyboard macros, I think.
+
+
           (move repeatable-motion-repeat
                 ((direction forward))
                 (repeatable-motion-forward (num)))
@@ -282,10 +289,10 @@
                 (rmo/backward-paragraph (num)))
 
           (move line
-                ((direction expand-region) (tree-inner ,t))
+                ((direction expand-region) (inner ,t))
                 (,(lambda () (cpo-expand-region-to-fill-lines nil)) ()))
           (move line
-                ((direction expand-region) (tree-inner ,nil))
+                ((direction expand-region) (inner ,nil))
                 (,(lambda () (cpo-expand-region-to-fill-lines t)) ()))
           (move line
                 ((direction forward) (location-within beginning))
@@ -308,31 +315,31 @@
                 (rmo-c/cpo-prev-line (num)))
 
           (move cpo-smartparens
-                ((tree-vertical up) (direction expand-region) (tree-inner ,nil))
+                ((tree-vertical up) (direction expand-region) (inner ,nil))
                 (cpo-smartparens-select-root ()))
           (move cpo-smartparens
-                ((tree-vertical up) (direction expand-region) (tree-inner ,nil))
+                ((tree-vertical up) (direction expand-region) (inner ,nil))
                 (cpo-smartparens-up-to-root ()))
           (move cpo-smartparens
-                ((direction expand-region) (tree-inner ,nil) (delimiter any) (tree-vertical ,nil))
+                ((direction expand-region) (inner ,nil) (delimiter any) (tree-vertical ,nil))
                 (cpo-smartparens-expand-region-to-any-delimiter (num)))
           (move cpo-smartparens
-                ((direction expand-region) (tree-inner ,t) (delimiter any) (tree-vertical ,nil))
+                ((direction expand-region) (inner ,t) (delimiter any) (tree-vertical ,nil))
                 (cpo-smartparens-expand-region/children-region (num)))
 
           (move cpo-smartparens
-                ((direction expand-region) (tree-vertical ,nil) (tree-inner ,nil)
+                ((direction expand-region) (tree-vertical ,nil) (inner ,nil)
                  (delimiter t ,(lambda (actual expected) (stringp actual))))
                 (cpo-smartparens-expand-region-to-delimiter (delimiter num)))
           (move cpo-smartparens
-                ((direction expand-region) (tree-vertical ,nil) (tree-inner ,t) (delimiter t ,(lambda (actual expected) (stringp actual))))
+                ((direction expand-region) (tree-vertical ,nil) (inner ,t) (delimiter t ,(lambda (actual expected) (stringp actual))))
                 (cpo-smartparens-expand-region-to-delimiter/children-region (delimiter num)))
 
           (move cpo-smartparens
-                ((direction expand-region) (tree-vertical ,nil) (tree-inner ,nil) (delimiter ,nil))
+                ((direction expand-region) (tree-vertical ,nil) (inner ,nil) (delimiter ,nil))
                 (cpo-smartparens-expand-region (num)))
           (move cpo-smartparens
-                ((direction expand-region) (tree-vertical ,nil) (tree-inner ,t) (delimiter ,nil))
+                ((direction expand-region) (tree-vertical ,nil) (inner ,t) (delimiter ,nil))
                 (cpo-smartparens-expand-region/children-region (num)))
 
           (move cpo-smartparens
@@ -361,11 +368,11 @@
                 (rmo/sp-backward-sexp (num)))
           (move cpo-smartparens
                 ;; TODO - for my current key binding purposes, I want to use forward/backward to determine begin/end for parent...
-                ((direction forward) (tree-vertical up) (tree-inner ,nil))
+                ((direction forward) (tree-vertical up) (inner ,nil))
                 (rmo/cpo-smartparens-up-parent-end (num)))
           (move cpo-smartparens
                 ;; TODO - for my current key binding purposes, I want to use forward/backward to determine begin/end for parent...
-                ((direction backward) (tree-vertical up) (tree-inner ,nil))
+                ((direction backward) (tree-vertical up) (inner ,nil))
                 (rmo/cpo-smartparens-up-parent-beginning (num)))
           (move cpo-smartparens
                 ;; TODO - for my current key binding purposes, I want to use forward/backward to determine begin/end for parent...
@@ -377,11 +384,11 @@
                 (rmo/cpo-smartparens-down-last-child-end (num)))
           (move cpo-smartparens
                 ;; TODO - for my current key binding purposes, I want to use forward/backward to determine begin/end for parent...
-                ((direction forward) (tree-vertical up) (tree-inner ,t))
+                ((direction forward) (tree-vertical up) (inner ,t))
                 (rmo/sp-end-of-sexp (num)))
           (move cpo-smartparens
                 ;; TODO - for my current key binding purposes, I want to use forward/backward to determine begin/end for parent...
-                ((direction backward) (tree-vertical up) (tree-inner ,t))
+                ((direction backward) (tree-vertical up) (inner ,t))
                 (rmo/sp-beginning-of-sexp (num)))
           (slurp cpo-smartparens
                  ((direction forward))
@@ -429,16 +436,16 @@
 
 
           (move cpo-treesitter-qd
-                ((tree-vertical up) (direction expand-region) (tree-inner ,nil))
+                ((tree-vertical up) (direction expand-region) (inner ,nil))
                 (cpo-treesitter-qd-select-root ()))
           (move cpo-treesitter-qd
-                ((tree-vertical up) (direction expand-region) (tree-inner ,nil))
+                ((tree-vertical up) (direction expand-region) (inner ,nil))
                 (cpo-treesitter-qd-up-to-root ()))
           (move cpo-treesitter-qd
-                ((direction expand-region) (tree-vertical ,nil) (tree-inner ,nil))
+                ((direction expand-region) (tree-vertical ,nil) (inner ,nil))
                 (cpo-treesitter-qd-expand-region (num)))
           (move cpo-treesitter-qd
-                ((direction expand-region) (tree-vertical ,nil) (tree-inner ,t))
+                ((direction expand-region) (tree-vertical ,nil) (inner ,t))
                 (cpo-treesitter-qd-expand-region/children-region (num)))
 
           (move cpo-treesitter-qd
@@ -454,10 +461,10 @@
                 ((direction backward) (location-within anchor) (tree-vertical ,nil) (tree-traversal ,nil))
                 (rmo/cpo-treesitter-qd-backward-sibling-anchor-point (num)))
           (move cpo-treesitter-qd
-                ((direction forward) (tree-vertical up) (tree-inner ,nil))
+                ((direction forward) (tree-vertical up) (inner ,nil))
                 (rmo/cpo-treesitter-qd-up-to-parent-anchor-point (num)))
           (move cpo-treesitter-qd
-                ((direction backward) (tree-vertical up) (tree-inner ,nil))
+                ((direction backward) (tree-vertical up) (inner ,nil))
                 (rmo/cpo-treesitter-qd-up-to-parent-anchor-point (num)))
           (move cpo-treesitter-qd
                 ((direction backward) (tree-vertical down))
@@ -483,16 +490,16 @@
                 (nxml-up-element))
 
           (move outline
-                ((tree-vertical up) (direction expand-region) (tree-inner ,nil))
+                ((tree-vertical up) (direction expand-region) (inner ,nil))
                 (cpo-outline-select-root ()))
           (move outline
-                ((tree-vertical up) (direction expand-region) (tree-inner ,nil))
+                ((tree-vertical up) (direction expand-region) (inner ,nil))
                 (cpo-outline-up-to-root ()))
           (move outline
-                ((direction expand-region) (tree-vertical ,nil) (tree-inner ,nil))
+                ((direction expand-region) (tree-vertical ,nil) (inner ,nil))
                 (cpo-outline-expand-region (num)))
           (move outline
-                ((direction expand-region) (tree-vertical ,nil) (tree-inner ,t))
+                ((direction expand-region) (tree-vertical ,nil) (inner ,t))
                 (cpo-outline-expand-region/children-region (num)))
           (move outline
                 ((direction forward) (tree-traversal inorder))
@@ -527,17 +534,17 @@
 
           (move cpo-indent-tree
                 ;; TODO - the modifiers aren't correct, but I'm not sure where to shoehorn this in, so I'm going to roll with this for now.
-                ((tree-vertical up) (direction expand-region) (tree-inner ,nil))
+                ((tree-vertical up) (direction expand-region) (inner ,nil))
                 (cpo-indent-tree-select-root ()))
           (move cpo-indent-tree
                 ;; TODO - the modifiers aren't correct, but I'm not sure where to shoehorn this in, so I'm going to roll with this for now.
-                ((tree-vertical up) (direction expand-region) (tree-inner ,nil))
+                ((tree-vertical up) (direction expand-region) (inner ,nil))
                 (cpo-indent-tree-up-to-root ()))
           (move cpo-indent-tree
-                ((direction expand-region) (tree-vertical ,nil) (tree-inner ,nil))
+                ((direction expand-region) (tree-vertical ,nil) (inner ,nil))
                 (cpo-indent-tree-expand-region (num)))
           (move cpo-indent-tree
-                ((direction expand-region) (tree-vertical ,nil) (tree-inner ,t))
+                ((direction expand-region) (tree-vertical ,nil) (inner ,t))
                 (cpo-indent-tree-expand-region/children-region (num)))
           (move cpo-indent-tree
                 ((direction forward) (tree-traversal inorder))
