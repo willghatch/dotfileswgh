@@ -540,10 +540,11 @@
   ("w" (lambda (n) (interactive "p") (funcall (cp/ae (cp/obj 'cpo-vi-like-word)) n)) "vi-like-word" :exit t)
   ("W" (lambda (n) (interactive "p") (funcall (cp/ae (cp/obj 'word)) n)) "word" :exit t)
   ("s" (lambda (n) (interactive "p") (funcall (cp/ae (with-cpo-smartparens-req (cp/obj 'cpo-smartparens))) n)) "smartparens" :exit t)
-  ("i" (lambda (n) (interactive "p") (funcall (cp/ae (progn (require 'cpo-indent-tree) (cp/obj 'cpo-indent-tree))) n)) "indent-tree" :exit t)
+  ("e" (lambda (n) (interactive "p") (funcall (cp/ae (progn (require 'cpo-indent-tree) (cp/obj 'cpo-indent-tree))) n)) "indent-tree" :exit t)
   ;; TODO - I want this one, but I keep using this accidentally due to my old key bindings, and it is so frustrating.  So I'll leave it as a no-op for now.
   ;;("o" (funcall (cp/ae (cp/obj 'outline))) "outline" :exit t)
-  ("o" (lambda (n) (interactive "p") (funcall (cp/ae (cp/obj 'NOOP-STOP-USING-THIS-BINDING-FOR-OLD-PURPOSE)) n)) "break habit!" :exit t)
+  ;;("o" (lambda (n) (interactive "p") (funcall (cp/ae (cp/obj 'NOOP-STOP-USING-THIS-BINDING-FOR-OLD-PURPOSE)) n)) "break habit!" :exit t)
+  ("o" (lambda (n) (interactive "p") (funcall (cp/ae (progn (require 'cpo-outline) (cp/obj 'outline))) n)) "outline" :exit t)
   ("O" (lambda (n) (interactive "p") (funcall (cp/ae (progn (require 'cpo-outline) (cp/obj 'outline))) n)) "outline" :exit t)
   ("t" (lambda (n) (interactive "p") (funcall (cp/ae (progn (require 'cpo-treesitter-qd)
                                                             (wgh/initialize-treesit-for-buffer)
@@ -560,8 +561,8 @@
 
 
   ;; Modifiers -- maybe these should have a separate map, but that adds verbosity, and I'm not yet certain there are enough objects and modifiers to warrant splitting -- I can have a prefix within this map for infrequent things, and I can always add another separateprefix map.
-  ("e" (lambda (n) (interactive "p") (funcall (cp/add (cp/mod 'location-within 'end)) n)) "end" :exit nil)
-  ("n" (lambda (n) (interactive "p") (funcall (cp/add (cp/mod 'tree-inner t "inner")) n)) "tree-inner" :exit nil)
+  ("n" (lambda (n) (interactive "p") (funcall (cp/add (cp/mod 'location-within 'end)) n)) "end" :exit nil)
+  ("i" (lambda (n) (interactive "p") (funcall (cp/add (cp/mod 'tree-inner t "inner")) n)) "tree-inner" :exit nil)
   ("u" (lambda (n) (interactive "p") (funcall (cp/add (cp/mod 'tree-vertical 'up)) n)) "up" :exit nil)
   ("d" (lambda (n) (interactive "p") (funcall (cp/add (cp/mod 'tree-vertical 'down)) n)) "down" :exit nil)
   ("T" (lambda (n) (interactive "p") (funcall (cp/add (cp/mod 'tree-traversal 'inorder)) n)) "inorder" :exit nil)
