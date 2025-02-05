@@ -159,16 +159,16 @@
           ;; TODO - expand region to specific char inner/outer -- good for ad-hoc regions delimited by the same character, can be used for '' strings and "" strings that don't have escapes, for $$ regions in latex, etc.
           (move character
                 ((direction forward) (specific ,t) (location-within beginning))
-                (rmo/cpo-find-char-beginning-in-line-forward) (num))
+                (rmo/cpo-find-char-beginning-in-line-forward (num)))
           (move character
                 ((direction backward) (specific ,t) (location-within beginning))
-                (rmo/cpo-find-char-beginning-in-line-backward) (num))
+                (rmo/cpo-find-char-beginning-in-line-backward (num)))
           (move character
                 ((direction forward) (specific ,t) (location-within end))
-                (rmo/cpo-find-char-end-in-line-forward) (num))
+                (rmo/cpo-find-char-end-in-line-forward (num)))
           (move character
                 ((direction backward) (specific ,t) (location-within end))
-                (rmo/cpo-find-char-end-in-line-backward) (num))
+                (rmo/cpo-find-char-end-in-line-backward (num)))
           (move character
                 ((direction forward) (specific nil))
                 (rmo/forward-char (num)))
