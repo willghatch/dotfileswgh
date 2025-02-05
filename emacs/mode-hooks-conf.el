@@ -245,9 +245,9 @@
           (lambda ()
             (when start-on-pager-state
               (progn
-                (evil-pager-state)
-                (pkmap "q" 'kill-buffer-or-quit-emacs-ignore-dirty)
-                (pkmap "tic" 'kill-buffer-or-quit-emacs-ignore-dirty)
+                (estate-pager-state)
+                (epmap "q" 'kill-buffer-or-quit-emacs-ignore-dirty)
+                (epmap "tic" 'kill-buffer-or-quit-emacs-ignore-dirty)
                 (ansi-color-buffer)
                 ))))
 
@@ -289,8 +289,8 @@
 
 (add-hook 'nxml-mode-hook
           (lambda ()
-            (ikmap ">" 'wgh/xml-magic-tag-close)
-            (require 'on-xml)
+            ;;(ikmap ">" 'wgh/xml-magic-tag-close)
+            ;;(require 'on-xml)
             ))
 
 (defun cpp-conf-setup ()

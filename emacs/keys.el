@@ -100,30 +100,17 @@
   (nobreak-define-key global-map keys func))
 (defun egmap (keys func)
   (nobreak-define-key global-map keys func))
-;; TODO - pager mode/state
 
-
-;; TODO - These are defined in init-helpers, but I'm redefining them for now for compatibility until I finish the a full transition to the new config...
-;; TODO - I should move the above definitions into init-helpers instead and replace uses of these everywhere.  At least a bit in mode-hooks.
-(defun mkmap (keys func)
-  (nobreak-define-key estate-motion-state-keymap keys func))
-(defun nkmap (keys func)
-  (nobreak-define-key estate-normal-state-keymap keys func))
-(defun vkmap (keys func)
-  (nobreak-define-key estate-visual-state-keymap keys func))
-(defun ikmap (keys func)
-  (nobreak-define-key estate-insert-state-keymap keys func))
-(defun pkmap (keys func)
-  (nobreak-define-key estate-pager-state-keymap keys func))
 
 (defun lnkmap (keys func)
   (when (not estate-normal-state-buffer-local-keymap)
     (setq-local estate-normal-state-buffer-local-keymap (make-sparse-keymap)))
   (nobreak-define-key estate-normal-state-buffer-local-keymap keys func))
 
+
 ;; for temporary on-the-fly bindings
 (define-prefix-command 'temp-key-map)
-(defun tkmap (keys func)
+(defun etmap (keys func)
   (nobreak-define-key temp-key-map keys func))
 
 
