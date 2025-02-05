@@ -28,6 +28,8 @@
 
 ;; TODO - I have no idea what the minimum emacs version required here is.  It can probably work with much earlier versions.
 
+;; TODO - this is fundamentally broken when considering recursive editing.  I'll probably re-think how I'm doing this.
+
 (require 'this-command-all-keys)
 
 (setq aggreact--current-groups nil)
