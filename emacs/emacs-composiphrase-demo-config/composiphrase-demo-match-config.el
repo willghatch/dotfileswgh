@@ -315,6 +315,13 @@
           (move line
                 ((direction expand-region) (inner ,nil))
                 (,(lambda () (cpo-expand-region-to-fill-lines t)) ()))
+          ;; TODO - alternate for back-to-indentation?  I don't love it, but I want this somewhere.
+          (move line
+                ((direction backward) (alternate alternate))
+                (back-to-indentation ()))
+          (move line
+                ((direction forward) (alternate alternate))
+                (TODO-forward-until-trailing-white-space ()))
           (move line
                 ((direction forward) (location-within beginning))
                 (rmo/cpo-forward-cpo-line-no-newline-beginning (num)))
