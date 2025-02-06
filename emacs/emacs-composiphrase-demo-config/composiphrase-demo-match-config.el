@@ -51,6 +51,9 @@
           (indent)
           (dedent)
           (format)
+          (comment)
+          (uncomment)
+          (toggle-comment)
           (initiate-isearch) ;; TODO - I want to write something similar to vim's * command, to search the thing at point, except maybe with an argument to choose word or symbol or whatnot.  But my first attempt at actually implementing it was unsuccessful.  I'll probably come back to it later.
           (transpose (direction . forward) (tree-vertical . nil) (num . 1))
           (join (direction . forward) (num . 1))
@@ -751,6 +754,18 @@
                   (TODO-format-command ()))
           (format (,(lambda (x) (not (memq x '(region))))) ()
                   (,(composiphrase--make-movement-delegated-command 'TODO-format-command ())))
+          (comment region ()
+                  (comment-region ()))
+          (comment (,(lambda (x) (not (memq x '(region))))) ()
+                  (,(composiphrase--make-movement-delegated-command 'comment-region ())))
+          (uncomment region ()
+                  (uncomment-region ()))
+          (uncomment (,(lambda (x) (not (memq x '(region))))) ()
+                  (,(composiphrase--make-movement-delegated-command 'uncomment-region ())))
+          (toggle-comment region ()
+                  (comment-or-uncomment-region ()))
+          (toggle-comment (,(lambda (x) (not (memq x '(region))))) ()
+                  (,(composiphrase--make-movement-delegated-command 'comment-or-uncomment-region ())))
 
           (move-paste region
                       ()

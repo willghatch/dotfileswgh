@@ -518,6 +518,15 @@
   ("w" (lambda (n) (interactive "p")
          (funcall (cp/add (cp/verb 'change-delimiter)) n))
    "change-delimiter" :exit t)
+  ("C" (lambda (n) (interactive "p")
+         (funcall (cp/add (cp/verb 'toggle-comment)) n))
+   "toggle-comment" :exit t)
+  ("hc" (lambda (n) (interactive "p")
+          (funcall (cp/add (cp/verb 'comment)) n))
+   "comment" :exit t)
+  ("hC" (lambda (n) (interactive "p")
+          (funcall (cp/add (cp/verb 'uncomment)) n))
+   "uncomment" :exit t)
   )
 
 
