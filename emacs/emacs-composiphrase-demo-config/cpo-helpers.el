@@ -100,6 +100,7 @@ Returns the size of the pasted text (minus size of replaced text).
                        orig-point
                      (+ orig-point pasted-length)))))))
 
+
 (defun cpo-copy (register &optional region)
   "REGION is nil or a cons pair (beg . end)."
   (let ((register-use (if (functionp register)

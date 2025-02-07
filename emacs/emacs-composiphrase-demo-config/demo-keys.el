@@ -1,5 +1,7 @@
 ;;; -*- lexical-binding: t; -*-
 
+;; TODO - review motion vs normal state bindings -- these accreted over time with little thought, and maybe I should just remove motion map?
+
 (require 'estate)
 (require 'estate-default-states)
 (setq estate-set-initial-state-function
@@ -103,6 +105,8 @@
 (eimap "\C-c" 'estate-normal-state)
 (eImap "\C-c" 'estate-normal-state)
 (eimap "\C-l" 'estate-normal-state)
+(eImap (kbd "<escape>") 'estate-normal-state)
+(eImap (kbd "<escape>") 'estate-normal-state)
 
 (emmap "\C-g" 'keyboard-quit-and-clear-composiphrase-and-maybe-leave-visual-state)
 (eimap "\C-g" 'keyboard-quit-and-clear-composiphrase-and-maybe-leave-visual-state)
@@ -407,6 +411,9 @@
   ("p" (lambda (n) (interactive "p")
          (funcall (cp/add (cp/verb 'move-paste)) n))
    "move-paste" :exit t)
+  ("A" (lambda (n) (interactive "p")
+         (funcall (cp/add (cp/verb 'move-insert)) n))
+   "move-insert" :exit t)
   ("j" (lambda (n) (interactive "p")
          (funcall (cp/add (cp/verb 'join)) n))
    "join" :exit t)
@@ -546,15 +553,14 @@
 
 
 
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;; Big prefix maps
-
 ;; g map
 ;; TODO - try to figure out a theme for this prefix map.  Maybe goto, which fits some of my bindings as well as what the helix editor does.  This map has grown by accretion over time and I would like to organize my accreted maps better.  That said, is it worth re-learning all of these miscellaneous key bindings, esp. those that are relatively low-use but that I have memorized?
 ;; TODO - if I turn this into a goto-themed map, I should put jump-to-register functions here.
 (emmap "gg" 'cpo-goto-line-default-first)
 (emmap "G" 'cpo-goto-line-default-last)
 
+(enmap "m" 'point-to-register)
+(enmap "z" 'execute-extended-command)
 
 
 

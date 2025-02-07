@@ -44,6 +44,7 @@
                                      (register-for-old . ,(lambda () cpo-paste-copy-old-default-register))) ;; IE form a region by moving, paste into that region.
           (move-paste (register . ,(lambda () cpo-paste-default-register))
                       (register-for-old . ,(lambda () cpo-paste-copy-old-default-register))) ;; IE move, then paste at the new point, but restoring the original point.
+          (move-insert)
           (upcase)
           (downcase)
           (toggle-case)
@@ -848,6 +849,15 @@
                       ()
                       (cpo-move-paste-sentence-execute
                        sentence-with-defaults))
+          (move-insert ,(lambda (x) (not (memq x '(region))))
+                       ()
+                       (,(lambda (s)
+                           (composiphrase-execute
+                            ;; TODO - I should maybe delete the old verb, but I'll just use alist shadowing...
+                            (cons '((word-type . verb) (contents . move)) s)
+                            composiphrase-current-configuration)
+                           (estate-insert-state))
+                        sentence-with-defaults))
 
           ;; (initiate-isearch region ((direction forward))
           ;;                   (,(lambda () (cpo-isearch-forward-for-text-in-region (region-beginning) (region-end))) ()))
