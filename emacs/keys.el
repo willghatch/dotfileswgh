@@ -209,8 +209,8 @@
 
 ;; (enmap "D" (lambda () (interactive) (progn (kill-line))))
 ;; (evmap "D" (lambda () (interactive) (progn (kill-region nil nil t))))
-(enmap "C" (lambda () (interactive) (message "Training wheels: use cceel")))
-(enmap "D" (lambda () (interactive) (message "Training wheels: use cdeel")))
+(enmap "C" (lambda () (interactive) (message "Training wheels: use long composed keys")))
+(enmap "D" (lambda () (interactive) (message "Training wheels: use long composed keys")))
 
 (enmap "Y" (lambda () (interactive) (message "Y not mapped...")))
 
@@ -549,11 +549,14 @@
                                                      (cp/obj 'character))
                                               n))
    "character-specific" :exit t)
-  ("l" (lambda (n) (interactive "p") (funcall (cp/ae (cp/obj 'line)) n)) "line" :exit t)
+  ;;("l" (lambda (n) (interactive "p") (funcall (cp/ae (cp/obj 'line)) n)) "line" :exit t)
+  ("l" (lambda (n) (interactive "p") (message "use g, less mnemonic but works better for keyboard layout")) "line-norm" :exit t) ;; TODO - I want to leave this here and not bind something new to l, since l is the good mnemonic for line.  But I keep going to “end line”, and I want that to just be nicer to type.  Dvorak put L in a terrible place, a big mistake of the layout.
+  ("g" (lambda (n) (interactive "p") (funcall (cp/ae (cp/obj 'line)) n)) "line" :exit t)
   ;; TODO - consider whether to keep using this vi-like word, or the emacs word, or something else.  Also how to deal with sub-words in symbols.
   ("w" (lambda (n) (interactive "p") (funcall (cp/ae (cp/obj 'cpo-vi-like-word)) n)) "vi-like-word" :exit t)
   ("W" (lambda (n) (interactive "p") (funcall (cp/ae (cp/obj 'word)) n)) "word" :exit t)
   ("y" (lambda (n) (interactive "p") (funcall (cp/ae (cp/obj 'symbol)) n)) "symbol" :exit t)
+  ("Y" (lambda (n) (interactive "p") (funcall (cp/ae (cp/obj 'sexp)) n)) "sexp" :exit t)
   ("P" (lambda (n) (interactive "p") (funcall (cp/ae (cp/obj 'paragraph)) n)) "paragraph" :exit t)
   ("S" (lambda (n) (interactive "p") (funcall (cp/ae (cp/obj 'sentence)) n)) "sentence" :exit t)
   ("B" (lambda (n) (interactive "p") (funcall (cp/ae (cp/obj 'buffer)) n)) "buffer" :exit t)
@@ -573,12 +576,14 @@
   ("j" (lambda (n) (interactive "p") (funcall (cp/ae (cp/obj 'json)) n)) "json" :exit t)
 
   ;; It's hard to decide priorities for myself, especially for things not yet implemented.  I want to reserve space in my map for future things.
-  ("g" (lambda (n) (interactive "p") (funcall (cp/ae (cp/obj 'argument)) n)) "argument" :exit t)
+  ;;("g" (lambda (n) (interactive "p") (funcall (cp/ae (cp/obj 'argument)) n)) "argument" :exit t)
+  ("G" (lambda (n) (interactive "p") (funcall (cp/ae (cp/obj 'argument)) n)) "argument" :exit t)
   ("D" (lambda (n) (interactive "p") (funcall (cp/ae (cp/obj 'definition)) n)) "definition" :exit t)
   ("F" (lambda (n) (interactive "p") (funcall (cp/ae (cp/obj 'function)) n)) "function" :exit t)
   ("M" (lambda (n) (interactive "p") (funcall (cp/ae (cp/obj 'statement)) n)) "statement" :exit t)
   ("C" (lambda (n) (interactive "p") (funcall (cp/ae (cp/obj 'comment)) n)) "comment" :exit t)
-  ("L" (lambda (n) (interactive "p") (funcall (cp/ae (cp/obj 'linter-warning)) n)) "linter-warning" :exit t)
+  ("L" (lambda (n) (interactive "p") (funcall (cp/ae (cp/obj 'list)) n)) "list" :exit t)
+  ("hL" (lambda (n) (interactive "p") (funcall (cp/ae (cp/obj 'linter-warning)) n)) "linter-warning" :exit t)
   ("p" (lambda (n) (interactive "p") (funcall (cp/ae (cp/obj 'proposed-change)) n)) "proposed-change" :exit t)
   ("hC" (lambda (n) (interactive "p") (funcall (cp/ae (cp/obj 'class)) n)) "class" :exit t)
   ("hX" (lambda (n) (interactive "p") (funcall (cp/ae (cp/obj 'test)) n)) "test" :exit t)

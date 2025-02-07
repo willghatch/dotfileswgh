@@ -82,6 +82,8 @@
           (paragraph (default-verb . move) (location-within . beginning))
           (line (default-verb . move) (location-within . beginning))
           (symbol (default-verb . move) (location-within . beginning))
+          (sexp (default-verb . move) (location-within . beginning))
+          (list (default-verb . move) (location-within . beginning))
           (cpo-smartparens (default-verb . move) (location-within . beginning) (respect-tree . respect-tree) (delimiter . ,nil))
           (cpo-indent-tree (default-verb . move) (location-within . beginning) (respect-tree . respect-tree))
           (outline (default-verb . move) (location-within . beginning) (respect-tree . respect-tree))
@@ -258,6 +260,51 @@
           (move symbol
                 ((direction backward) (location-within emacs-style))
                 (rmo/backward-symbol (num)))
+
+          (move sexp
+                ((direction expand-region))
+                (cpo-expand-region-to-sexp ()))
+          (move sexp
+                ((direction forward) (location-within beginning))
+                (rmo/cpo-forward-sexp-beginning (num)))
+          (move sexp
+                ((direction backward) (location-within beginning))
+                (rmo/cpo-backward-sexp-beginning (num)))
+          (move sexp
+                ((direction forward) (location-within end))
+                (rmo/cpo-forward-sexp-end (num)))
+          (move sexp
+                ((direction backward) (location-within end))
+                (rmo/cpo-backward-sexp-end (num)))
+          (move sexp
+                ((direction forward) (location-within emacs-style))
+                (rmo/forward-sexp (num)))
+          (move sexp
+                ((direction backward) (location-within emacs-style))
+                (rmo/backward-sexp (num)))
+
+          (move list
+                ((direction expand-region))
+                (cpo-expand-region-to-list ()))
+          (move list
+                ((direction forward) (location-within beginning))
+                (rmo/cpo-forward-list-beginning (num)))
+          (move list
+                ((direction backward) (location-within beginning))
+                (rmo/cpo-backward-list-beginning (num)))
+          (move list
+                ((direction forward) (location-within end))
+                (rmo/cpo-forward-list-end (num)))
+          (move list
+                ((direction backward) (location-within end))
+                (rmo/cpo-backward-list-end (num)))
+          (move list
+                ((direction forward) (location-within emacs-style))
+                (rmo/forward-list (num)))
+          (move list
+                ((direction backward) (location-within emacs-style))
+                (rmo/backward-list (num)))
+
 
           (move sentence
                 ((direction expand-region))
@@ -643,6 +690,10 @@
           (transpose sentence ((direction backward)) (cpo-transpose-sentence-backward (num)))
           (transpose paragraph ((direction forward)) (cpo-transpose-paragraph-forward (num)))
           (transpose paragraph ((direction backward)) (cpo-transpose-paragraph-backward (num)))
+          (transpose sexp ((direction forward)) (cpo-transpose-sexp-forward (num)))
+          (transpose sexp ((direction backward)) (cpo-transpose-sexp-backward (num)))
+          (transpose list ((direction forward)) (cpo-transpose-list-forward (num)))
+          (transpose list ((direction backward)) (cpo-transpose-list-backward (num)))
           (transpose line ((direction forward)) (cpo-transpose-line-forward (num)))
           (transpose line ((direction backward)) (cpo-transpose-line-backward (num)))
           ;;(transpose url ((direction forward)) (cpo-transpose-url-forward (num)))
