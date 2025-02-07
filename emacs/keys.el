@@ -323,12 +323,12 @@
                  (estate-insert-state) ;; TODO - handle number
                (progn
                  (funcall (cp/add (cp/mod 'direction 'expand-region)
-                                  (cp/mod 'inner t "inner"))
+                                  (cp/mod 'inner 'inner "inner"))
                           n)
                  (wgh/object-select/body)))))
 (evmap "i" (lambda (n) (interactive "p")
              (funcall (cp/add (cp/mod 'direction 'expand-region)
-                              (cp/mod 'inner t "inner"))
+                              (cp/mod 'inner 'inner "inner"))
                       n)
              (wgh/object-select/body)))
 (emmap "a" (lambda (n) (interactive "p")
@@ -412,7 +412,7 @@
              (interactive "p")
              (require 'cpo-smartparens)
              (funcall (cp/ae (cp/mod 'direction 'expand-region)
-                             (cp/mod 'inner t "inner")
+                             (cp/mod 'inner 'inner "inner")
                              (cp/mod 'delimiter 'any)
                              (cp/obj 'cpo-smartparens))
                       n)))

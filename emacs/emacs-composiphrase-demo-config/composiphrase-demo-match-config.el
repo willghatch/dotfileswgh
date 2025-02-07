@@ -551,15 +551,19 @@
           (move outline
                 ((tree-vertical down) (direction forward))
                 (rmo/cpo-outline-down-to-last-child (num)))
-          (promote outline () ((lambda () (outline-promote 'subtree)) ()))
-          (demote outline () ((lambda () (outline-demote 'subtree)) ()))
+          ;; (promote outline () (,(lambda () (outline-promote 'subtree)) ()))
+          ;; (demote outline () (,(lambda () (outline-demote 'subtree)) ()))
+          (promote outline ((alternate alternate)) (,(lambda () (require 'org) (org-promote)) ()))
+          (demote outline ((alternate alternate)) (,(lambda () (require 'org) (org-demote)) ()))
+          (promote outline () (,(lambda () (require 'org) (org-promote-subtree)) ()))
+          (demote outline () (,(lambda () (require 'org) (org-demote-subtree)) ()))
           ;; TODO - commented out because they are broken
-          ;; (slurp outline
-          ;;        ((direction forward))
-          ;;        (cpo-outline-forward-slurp-heading ()))
-          ;; (barf outline
-          ;;       ((direction forward))
-          ;;       (cpo-outline-forward-barf-heading ()))
+          (slurp outline
+                 ((direction forward))
+                 (cpo-outline-forward-slurp-heading ()))
+          (barf outline
+                ((direction forward))
+                (cpo-outline-forward-barf-heading ()))
 
           (move cpo-indent-tree
                 ;; TODO - the modifiers aren't correct, but I'm not sure where to shoehorn this in, so I'm going to roll with this for now.
@@ -660,7 +664,10 @@
           (open line ((direction backward)) (,(lambda () (estate-insert-state-with-thunk 'cpo-open-line-above))))
           (open outline ((direction forward) (tree-vertical ,nil)) (,(lambda () (estate-insert-state-with-thunk 'cpo-outline-add-heading-below))))
           (open outline ((direction backward) (tree-vertical ,nil)) (,(lambda () (estate-insert-state-with-thunk 'cpo-outline-add-heading-above))))
-          (open outline ((tree-vertical down)) (,(lambda () (message "TODO - implement open outline child"))))
+          (open outline ((direction forward) (tree-vertical down)) (,(lambda (num) (estate-insert-state-with-thunk (lambda () (cpo-outline-add-child-heading num))))
+                                                                    (num)))
+          (open outline ((direction forward) (tree-vertical up)) (,(lambda (num) (estate-insert-state-with-thunk (lambda () (cpo-outline-add-ancestor-next-sibling-heading num))))
+                                                                  (num)))
           (open cpo-indent-tree ((direction forward) (tree-vertical ,nil)) (,(lambda () (estate-insert-state-with-thunk 'cpo-indent-tree-open-sibling-forward))))
           (open cpo-indent-tree ((direction backward) (tree-vertical ,nil)) (,(lambda () (estate-insert-state-with-thunk 'cpo-indent-tree-open-sibling-backward))))
           (open cpo-indent-tree ((tree-vertical down)) (,(lambda () (message "TODO - implement open cpo-indent-tree child"))))
