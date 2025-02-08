@@ -11,4 +11,11 @@
   (let ((default-directory (concat demo-dir "straight/build")))
    (normal-top-level-add-subdirs-to-load-path)))
 
+;; I don't want to bother figuring out how to display things on the default
+;; modeline right now.  So now the demo will include my mode line config.  Bask
+;; in its beauty.  Or call it ugly.  Whatever, I don't care.  It shows the
+;; estate-state and current sentence state.  Actually, now that I look at it, I
+;; would also have to add some of my theme to get it to work right.  Too much
+;; work.  So now the demo has an extra ugly version of my mode line.
+(load-library "demo-modeline")
 (load-library "demo-keys")
