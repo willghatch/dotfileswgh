@@ -264,14 +264,14 @@ The command also executes the sentence, with region as the object, if the region
 (enmap "s" (lambda ()
              (interactive)
              (funcall (cp/add `((word-type . ignore))))
-             (wgh/verb-select/body)))
+             (cpo/verb-select/body)))
 
 (emmap "l" (lambda (n) (interactive "p")
              (funcall (cp/add (cp/mod 'direction 'forward)) n)
-             (wgh/object-select/body)))
+             (cpo/object-select/body)))
 (emmap "h" (lambda (n) (interactive "p")
              (funcall (cp/add (cp/mod 'direction 'backward)) n)
-             (wgh/object-select/body)))
+             (cpo/object-select/body)))
 
 
 (emmap "i" (lambda (n) (interactive "p")
@@ -281,16 +281,16 @@ The command also executes the sentence, with region as the object, if the region
                  (funcall (cp/add (cp/mod 'direction 'expand-region)
                                   (cp/mod 'inner t "inner"))
                           n)
-                 (wgh/object-select/body)))))
+                 (cpo/object-select/body)))))
 (evmap "i" (lambda (n) (interactive "p")
              (funcall (cp/add (cp/mod 'direction 'expand-region)
                               (cp/mod 'inner t "inner"))
                       n)
-             (wgh/object-select/body)))
+             (cpo/object-select/body)))
 (emmap "a" (lambda (n) (interactive "p")
              (funcall (cp/add (cp/mod 'direction 'expand-region))
                       n)
-             (wgh/object-select/body)))
+             (cpo/object-select/body)))
 
 
 
@@ -362,8 +362,8 @@ The command also executes the sentence, with region as the object, if the region
 
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;; composiphrase wgh/verb-select map
-(defhydra wgh/verb-select (:foreign-keys warn :exit nil) "Verb:"
+;; composiphrase cpo/verb-select map
+(defhydra cpo/verb-select (:foreign-keys warn :exit nil) "Verb:"
   ;; Hydra handles commands specially, such that I need a defun for each one or
   ;; I need to wrap with a literal lambda.  So it adds a lot of verbosity.
   ;; Maybe I should write a macro to reduce boilerplate.  But at any rate, Hydra
@@ -481,7 +481,7 @@ The command also executes the sentence, with region as the object, if the region
   x)
 
 
-(defhydra wgh/object-select (:foreign-keys warn :exit nil) "Obj:"
+(defhydra cpo/object-select (:foreign-keys warn :exit nil) "Obj:"
   ;; Hydra handles commands specially, such that I need a defun for each one or
   ;; I need to wrap with a literal lambda.  So it adds a lot of verbosity.
   ;; Maybe I should write a macro to reduce boilerplate.  But at any rate, Hydra
@@ -532,7 +532,7 @@ The command also executes the sentence, with region as the object, if the region
    "outline" :exit t)
   ("t" (lambda (n) (interactive "p")
          (funcall (cp/ae (progn (require 'cpo-treesitter-qd)
-                                (wgh/initialize-treesit-for-buffer)
+                                ;;(cpo/initialize-treesit-for-buffer)
                                 ;; TODO - also need to initialize treesitter in the buffer before first use...
                                 (cp/obj 'cpo-treesitter-qd)))
                   n))
