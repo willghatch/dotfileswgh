@@ -1,0 +1,8 @@
+#!/bin/sh
+
+themeFile=$DOTFILESWGH/xdg-config-ro/kitty/solarized-dark.conf
+if [ "$(lightdark-status)" = "light" ]; then
+  themeFile=$DOTFILESWGH/xdg-config-ro/kitty/solarized-light.conf
+fi
+
+exec kitty --config $themeFile --config $DOTFILESWGH/xdg-config-ro/kitty/kitty.conf "$@"
