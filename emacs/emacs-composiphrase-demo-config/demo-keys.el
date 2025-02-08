@@ -38,27 +38,40 @@
 
 
 (defun cp/verb (name)
+  "Construct a composiphrase word alist for verb NAME."
   `((word-type . verb)
     (contents . ,name)
     (ui-hint . ,name)))
 (defun cp/obj (name)
+  "Construct a composiphrase word alist for object NAME."
   `((word-type . object)
     (contents . ,name)
     (ui-hint . ,name)))
 (defun cp/mod (name contents &optional ui-hint)
+  "Construct a composiphrase word alist for modifier NAME with value CONTENTS.
+UI-HINT is used for the ui-hint field if non-nil, else CONTENTS is also used as the hint."
   `((word-type . modifier)
     (parameter-name . ,name)
     (contents . ,contents)
     (ui-hint . ,(or ui-hint contents))))
+
 (defun cp/add (&rest words)
+  "Return a command that adds WORDS to current command sentence (and handles numeric argument, adding it to sentence).
+"
   (apply 'composiphrase-add-to-current-sentence-with-numeric-handling
          nil
          words))
 (defun cp/ae (&rest words)
+  "Return a command that adds WORDS to current command sentence (and handles numeric argument, adding it to sentence).
+The command then executes the sentence.
+"
   (apply 'composiphrase-add-to-current-sentence-with-numeric-handling
          'exec-after
          words))
 (defun cp/ar (&rest words)
+  "Return a command that adds WORDS to current command sentence (and handles numeric argument, adding it to sentence).
+The command also executes the sentence, with region as the object, if the region is active.
+"
   (apply 'composiphrase-add-to-current-sentence-with-numeric-handling
          (region-active-p)
          (if (region-active-p)
@@ -163,7 +176,8 @@
 (enmap "X" 'delete-char-backward)
 
 
-;; TODO - consider A/I to open object selection, so that they are longer commands in terms of keys but dot repetition captures the movement and the insertion for arbitrary movements instead of just end of line / back-to-indentation...
+;; TODO - should I re-implement these in terms of composiphrase?  I wrote these
+;; implementations after I wrote estate-mode but before I wrote composiphrase.
 (enmap "A" (lambda () (interactive)
              (progn (move-end-of-line nil) (estate-insert-state))))
 (evmap "A" (lambda () (interactive) (progn (goto-char (region-end))
@@ -229,11 +243,6 @@
 (enmap "u" 'undo)
 (enmap "\C-r" 'undo-tree-redo)
 
-(defmacro with-evil (func)
-  `(lambda ()
-     (interactive)
-     (require 'evil)
-     (call-interactively ,func)))
 
 
 (enmap (kbd "DEL") 'rmo/backward-char)
@@ -355,6 +364,10 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; composiphrase wgh/verb-select map
 (defhydra wgh/verb-select (:foreign-keys warn :exit nil) "Verb:"
+  ;; Hydra handles commands specially, such that I need a defun for each one or
+  ;; I need to wrap with a literal lambda.  So it adds a lot of verbosity.
+  ;; Maybe I should write a macro to reduce boilerplate.  But at any rate, Hydra
+  ;; provides the “stay in map until hitting an object” behavior.
   ("C-g" keyboard-quit-and-clear-composiphrase-and-maybe-leave-visual-state "quit" :exit t)
 
   ;; Verbs that automatically take region if the region is active.
@@ -407,8 +420,13 @@
           (funcall (cp/add (cp/verb 'paste-to-region-from-move)) n))
    "paste-over-region" :exit t)
 
-  ;; Verbs that don't automatically take region -- they still need an object argument to decide what to do.
-  ;; Some of these should still work with a region -- eg. transpose with a region should transpose based on the text object given, but with multiple of the object based on the current region.  Eg. transpose multiple lines together, multiple s-expressions together, multiple indent trees together, etc.
+  ;; Verbs that don't automatically take region -- they still need an object
+  ;; argument to decide what to do.
+  ;; Some of these should still work with a region -- eg. transpose with a
+  ;; region should transpose based on the text object given, but with multiple
+  ;; of the object based on the current region.  Eg. transpose multiple lines
+  ;; together, multiple s-expressions together, multiple indent trees together,
+  ;; etc.
   ;; But some of these... should probably just error if given a region.
 
   ;; Move is the default, but let's add it to the map anyway.
@@ -464,105 +482,279 @@
 
 
 (defhydra wgh/object-select (:foreign-keys warn :exit nil) "Obj:"
-  ;; TODO - Hydra handles lambda specially.  I would love to just use higher order functions, but to work with Hydra I seem to need to use lambdas...  Maybe I should do this without hydra.  But I really want the “stay in the map” functionality, and I like the documentation popup, too.
-  ("C-g" keyboard-quit-and-clear-composiphrase-and-maybe-leave-visual-state "quit" :exit t)
+  ;; Hydra handles commands specially, such that I need a defun for each one or
+  ;; I need to wrap with a literal lambda.  So it adds a lot of verbosity.
+  ;; Maybe I should write a macro to reduce boilerplate.  But at any rate, Hydra
+  ;; provides the “stay in map until hitting an object” behavior.
+  ("C-g" keyboard-quit-and-clear-composiphrase-and-maybe-leave-visual-state
+   "quit" :exit t)
 
-  ("c" (lambda (n) (interactive "p") (funcall (cp/ae (cp/obj 'character)) n)) "character" :exit t)
+  ("c" (lambda (n) (interactive "p")
+         (funcall (cp/ae (cp/obj 'character)) n))
+   "character" :exit t)
   ;; This encoding is sketchy... but oh well.
-  ("f" (lambda (n) (interactive "p") (funcall (cp/ae (cp/mod 'specific t)
-                                                     (cp/obj 'character))
-                                              n))
+  ("f" (lambda (n) (interactive "p")
+         (funcall (cp/ae (cp/mod 'specific t)
+                         (cp/obj 'character))
+                  n))
    "character-specific" :exit t)
-  ("l" (lambda (n) (interactive "p") (funcall (cp/ae (cp/obj 'line)) n)) "line" :exit t)
+  ("l" (lambda (n) (interactive "p")
+         (funcall (cp/ae (cp/obj 'line)) n))
+   "line" :exit t)
   ;; TODO - consider whether to keep using this vi-like word, or the emacs word, or something else.  Also how to deal with sub-words in symbols.
   ;;("w" (lambda (n) (interactive "p") (funcall (cp/ae (cp/obj 'cpo-vi-like-word)) n)) "vi-like-word" :exit t)
-  ("w" (lambda (n) (interactive "p") (funcall (cp/ae (cp/obj 'word)) n)) "word" :exit t)
-  ("y" (lambda (n) (interactive "p") (funcall (cp/ae (cp/obj 'symbol)) n)) "symbol" :exit t)
-  ("Y" (lambda (n) (interactive "p") (funcall (cp/ae (cp/obj 'sexp)) n)) "sexp" :exit t)
-  ("P" (lambda (n) (interactive "p") (funcall (cp/ae (cp/obj 'paragraph)) n)) "paragraph" :exit t)
-  ("S" (lambda (n) (interactive "p") (funcall (cp/ae (cp/obj 'sentence)) n)) "sentence" :exit t)
-  ("B" (lambda (n) (interactive "p") (funcall (cp/ae (cp/obj 'buffer)) n)) "buffer" :exit t)
-  ("s" (lambda (n) (interactive "p") (funcall (cp/ae (with-cpo-smartparens-req (cp/obj 'cpo-smartparens))) n)) "smartparens" :exit t)
-  ("e" (lambda (n) (interactive "p") (funcall (cp/ae (progn (require 'cpo-indent-tree) (cp/obj 'cpo-indent-tree))) n)) "indent-tree" :exit t)
-  ("o" (lambda (n) (interactive "p") (funcall (cp/ae (progn (require 'cpo-outline) (cp/obj 'outline))) n)) "outline" :exit t)
-  ("t" (lambda (n) (interactive "p") (funcall (cp/ae (progn (require 'cpo-treesitter-qd)
-                                                            (wgh/initialize-treesit-for-buffer)
-                                                            ;; TODO - also need to initialize treesitter in the buffer before first use...
-                                                            (cp/obj 'cpo-treesitter-qd)))
-                                              n))
+  ("w" (lambda (n) (interactive "p")
+         (funcall (cp/ae (cp/obj 'word)) n))
+   "word" :exit t)
+  ("y" (lambda (n) (interactive "p")
+         (funcall (cp/ae (cp/obj 'symbol)) n))
+   "symbol" :exit t)
+  ("Y" (lambda (n) (interactive "p")
+         (funcall (cp/ae (cp/obj 'sexp)) n))
+   "sexp" :exit t)
+  ("P" (lambda (n) (interactive "p")
+         (funcall (cp/ae (cp/obj 'paragraph)) n))
+   "paragraph" :exit t)
+  ("S" (lambda (n) (interactive "p")
+         (funcall (cp/ae (cp/obj 'sentence)) n))
+   "sentence" :exit t)
+  ("B" (lambda (n) (interactive "p")
+         (funcall (cp/ae (cp/obj 'buffer)) n))
+   "buffer" :exit t)
+  ("s" (lambda (n) (interactive "p")
+         (funcall (cp/ae (with-cpo-smartparens-req (cp/obj 'cpo-smartparens))) n))
+   "smartparens" :exit t)
+  ("e" (lambda (n) (interactive "p")
+         (funcall (cp/ae (progn (require 'cpo-indent-tree) (cp/obj 'cpo-indent-tree))) n))
+   "indent-tree" :exit t)
+  ("o" (lambda (n) (interactive "p")
+         (funcall (cp/ae (progn (require 'cpo-outline) (cp/obj 'outline))) n))
+   "outline" :exit t)
+  ("t" (lambda (n) (interactive "p")
+         (funcall (cp/ae (progn (require 'cpo-treesitter-qd)
+                                (wgh/initialize-treesit-for-buffer)
+                                ;; TODO - also need to initialize treesitter in the buffer before first use...
+                                (cp/obj 'cpo-treesitter-qd)))
+                  n))
    "treesitter-qd" :exit t)
-  ("x" (lambda (n) (interactive "p") (funcall (cp/ae (cp/obj 'xml)) n)) "xml" :exit t)
-  ("X" (lambda (n) (interactive "p") (funcall (cp/ae (cp/obj 'xml-tag)) n)) "xml-tag" :exit t)
-  ("j" (lambda (n) (interactive "p") (funcall (cp/ae (cp/obj 'json)) n)) "json" :exit t)
+  ("x" (lambda (n) (interactive "p")
+         (funcall (cp/ae (cp/obj 'xml)) n))
+   "xml" :exit t)
+  ("X" (lambda (n) (interactive "p")
+         (funcall (cp/ae (cp/obj 'xml-tag)) n))
+   "xml-tag" :exit t)
+  ("j" (lambda (n) (interactive "p")
+         (funcall (cp/ae (cp/obj 'json)) n))
+   "json" :exit t)
 
   ;; It's hard to decide priorities for myself, especially for things not yet implemented.  I want to reserve space in my map for future things.
-  ("g" (lambda (n) (interactive "p") (funcall (cp/ae (cp/obj 'argument)) n)) "argument" :exit t)
-  ("D" (lambda (n) (interactive "p") (funcall (cp/ae (cp/obj 'definition)) n)) "definition" :exit t)
-  ("F" (lambda (n) (interactive "p") (funcall (cp/ae (cp/obj 'function)) n)) "function" :exit t)
-  ("M" (lambda (n) (interactive "p") (funcall (cp/ae (cp/obj 'statement)) n)) "statement" :exit t)
-  ("C" (lambda (n) (interactive "p") (funcall (cp/ae (cp/obj 'comment)) n)) "comment" :exit t)
-  ("L" (lambda (n) (interactive "p") (funcall (cp/ae (cp/obj 'list)) n)) "list" :exit t)
-  ("hL" (lambda (n) (interactive "p") (funcall (cp/ae (cp/obj 'linter-warning)) n)) "linter-warning" :exit t)
-  ("p" (lambda (n) (interactive "p") (funcall (cp/ae (cp/obj 'proposed-change)) n)) "proposed-change" :exit t)
-  ("hC" (lambda (n) (interactive "p") (funcall (cp/ae (cp/obj 'class)) n)) "class" :exit t)
-  ("hX" (lambda (n) (interactive "p") (funcall (cp/ae (cp/obj 'test)) n)) "test" :exit t)
-  ("hc" (lambda (n) (interactive "p") (funcall (cp/ae (cp/obj 'buffer-change)) n)) "buffer-change" :exit t)
-  ("hg" (lambda (n) (interactive "p") (funcall (cp/ae (cp/obj 'vcs-change)) n)) "vcs-change" :exit t)
-  ("h SPC" (lambda (n) (interactive "p") (funcall (cp/ae (cp/obj 'whitespace)) n)) "whitespace" :exit t)
-  ("hu" (lambda (n) (interactive "p") (funcall (cp/ae (cp/obj 'url)) n)) "url" :exit t)
-  ("he" (lambda (n) (interactive "p") (funcall (cp/ae (cp/obj 'email)) n)) "email" :exit t)
-  ("hP" (lambda (n) (interactive "p") (funcall (cp/ae (cp/obj 'phone-number)) n)) "phone-number" :exit t)
-  ("hf" (lambda (n) (interactive "p") (funcall (cp/ae (cp/obj 'file-name)) n)) "file-name" :exit t)
+
+  ("g" (lambda (n) (interactive "p")
+         (funcall (cp/ae (cp/obj 'argument)) n))
+   "argument" :exit t)
+  ("D" (lambda (n) (interactive "p")
+         (funcall (cp/ae (cp/obj 'definition)) n))
+   "definition" :exit t)
+  ("F" (lambda (n) (interactive "p")
+         (funcall (cp/ae (cp/obj 'function)) n))
+   "function" :exit t)
+  ("M" (lambda (n) (interactive "p")
+         (funcall (cp/ae (cp/obj 'statement)) n))
+   "statement" :exit t)
+  ("C" (lambda (n) (interactive "p")
+         (funcall (cp/ae (cp/obj 'comment)) n))
+   "comment" :exit t)
+  ("L" (lambda (n) (interactive "p")
+         (funcall (cp/ae (cp/obj 'list)) n))
+   "list" :exit t)
+  ("hL" (lambda (n) (interactive "p")
+          (funcall (cp/ae (cp/obj 'linter-warning)) n))
+   "linter-warning" :exit t)
+  ("p" (lambda (n) (interactive "p")
+         (funcall (cp/ae (cp/obj 'proposed-change)) n))
+   "proposed-change" :exit t)
+  ("hC" (lambda (n) (interactive "p")
+          (funcall (cp/ae (cp/obj 'class)) n))
+   "class" :exit t)
+  ("hX" (lambda (n) (interactive "p")
+          (funcall (cp/ae (cp/obj 'test)) n))
+   "test" :exit t)
+  ("hc" (lambda (n) (interactive "p")
+          (funcall (cp/ae (cp/obj 'buffer-change)) n))
+   "buffer-change" :exit t)
+  ("hg" (lambda (n) (interactive "p")
+          (funcall (cp/ae (cp/obj 'vcs-change)) n))
+   "vcs-change" :exit t)
+  ("h SPC" (lambda (n) (interactive "p")
+             (funcall (cp/ae (cp/obj 'whitespace)) n))
+   "whitespace" :exit t)
+  ("hu" (lambda (n) (interactive "p")
+          (funcall (cp/ae (cp/obj 'url)) n))
+   "url" :exit t)
+  ("he" (lambda (n) (interactive "p")
+          (funcall (cp/ae (cp/obj 'email)) n))
+   "email" :exit t)
+  ("hP" (lambda (n) (interactive "p")
+          (funcall (cp/ae (cp/obj 'phone-number)) n))
+   "phone-number" :exit t)
+  ("hf" (lambda (n) (interactive "p")
+          (funcall (cp/ae (cp/obj 'file-name)) n))
+   "file-name" :exit t)
 
 
   ;; Specific delimiters, use smartparens for them.
-  ("\"" (lambda (n) (interactive "p") (funcall (cp/ae (cp/mod 'delimiter "\"") (with-cpo-smartparens-req (cp/obj 'cpo-smartparens))) n)) "\"" :exit t)
-  ("'" (lambda (n) (interactive "p") (funcall (cp/ae (cp/mod 'delimiter "'") (with-cpo-smartparens-req (cp/obj 'cpo-smartparens))) n)) "'" :exit t)
-  ("`" (lambda (n) (interactive "p") (funcall (cp/ae (cp/mod 'delimiter "`") (with-cpo-smartparens-req (cp/obj 'cpo-smartparens))) n)) "`" :exit t)
-  ("(" (lambda (n) (interactive "p") (funcall (cp/ae (cp/mod 'delimiter "(") (with-cpo-smartparens-req (cp/obj 'cpo-smartparens))) n)) "()" :exit t)
-  (")" (lambda (n) (interactive "p") (funcall (cp/ae (cp/mod 'delimiter "(") (with-cpo-smartparens-req (cp/obj 'cpo-smartparens))) n)) "()" :exit t)
-  ("[" (lambda (n) (interactive "p") (funcall (cp/ae (cp/mod 'delimiter "[") (with-cpo-smartparens-req (cp/obj 'cpo-smartparens))) n)) "[]" :exit t)
-  ("]" (lambda (n) (interactive "p") (funcall (cp/ae (cp/mod 'delimiter "[") (with-cpo-smartparens-req (cp/obj 'cpo-smartparens))) n)) "[]" :exit t)
-  ("{" (lambda (n) (interactive "p") (funcall (cp/ae (cp/mod 'delimiter "{") (with-cpo-smartparens-req (cp/obj 'cpo-smartparens))) n)) "{}" :exit t)
-  ("}" (lambda (n) (interactive "p") (funcall (cp/ae (cp/mod 'delimiter "{") (with-cpo-smartparens-req (cp/obj 'cpo-smartparens))) n)) "{}" :exit t)
-  ("«" (lambda (n) (interactive "p") (funcall (cp/ae (cp/mod 'delimiter "«") (with-cpo-smartparens-req (cp/obj 'cpo-smartparens))) n)) "«»" :exit t)
-  ("»" (lambda (n) (interactive "p") (funcall (cp/ae (cp/mod 'delimiter "«") (with-cpo-smartparens-req (cp/obj 'cpo-smartparens))) n)) "«»" :exit t)
-  ("“" (lambda (n) (interactive "p") (funcall (cp/ae (cp/mod 'delimiter "“") (with-cpo-smartparens-req (cp/obj 'cpo-smartparens))) n)) "“”" :exit t)
-  ("”" (lambda (n) (interactive "p") (funcall (cp/ae (cp/mod 'delimiter "“") (with-cpo-smartparens-req (cp/obj 'cpo-smartparens))) n)) "“”" :exit t)
-  ("⟅" (lambda (n) (interactive "p") (funcall (cp/ae (cp/mod 'delimiter "⟅") (with-cpo-smartparens-req (cp/obj 'cpo-smartparens))) n)) "⟅⟆" :exit t)
-  ("⟆" (lambda (n) (interactive "p") (funcall (cp/ae (cp/mod 'delimiter "⟅") (with-cpo-smartparens-req (cp/obj 'cpo-smartparens))) n)) "⟅⟆" :exit t)
-  ("#" (lambda (n) (interactive "p") (funcall (cp/ae (cp/mod 'delimiter "#|") (with-cpo-smartparens-req (cp/obj 'cpo-smartparens))) n)) "#||#" :exit t)
 
-  ;; Modifiers -- maybe these should have a separate map, but that adds verbosity, and I'm not yet certain there are enough objects and modifiers to warrant splitting -- I can have a prefix within this map for infrequent things, and I can always add another separate prefix map.
-  ("n" (lambda (n) (interactive "p") (funcall (cp/add (cp/mod 'location-within 'end)) n)) "end" :exit nil)
+  ("\"" (lambda (n) (interactive "p")
+          (funcall (cp/ae (cp/mod 'delimiter "\"")
+                          (with-cpo-smartparens-req (cp/obj 'cpo-smartparens)))
+                   n))
+   "\"" :exit t)
+  ("'" (lambda (n) (interactive "p")
+         (funcall (cp/ae (cp/mod 'delimiter "'")
+                         (with-cpo-smartparens-req (cp/obj 'cpo-smartparens)))
+                  n))
+   "'" :exit t)
+  ("`" (lambda (n) (interactive "p")
+         (funcall (cp/ae (cp/mod 'delimiter "`")
+                         (with-cpo-smartparens-req (cp/obj 'cpo-smartparens)))
+                  n))
+   "`" :exit t)
+  ("(" (lambda (n) (interactive "p")
+         (funcall (cp/ae (cp/mod 'delimiter "(")
+                         (with-cpo-smartparens-req (cp/obj 'cpo-smartparens)))
+                  n))
+   "()" :exit t)
+  (")" (lambda (n) (interactive "p")
+         (funcall (cp/ae (cp/mod 'delimiter "(")
+                         (with-cpo-smartparens-req (cp/obj 'cpo-smartparens)))
+                  n))
+   "()" :exit t)
+  ("[" (lambda (n) (interactive "p")
+         (funcall (cp/ae (cp/mod 'delimiter "[")
+                         (with-cpo-smartparens-req (cp/obj 'cpo-smartparens)))
+                  n))
+   "[]" :exit t)
+  ("]" (lambda (n) (interactive "p")
+         (funcall (cp/ae (cp/mod 'delimiter "[")
+                         (with-cpo-smartparens-req (cp/obj 'cpo-smartparens)))
+                  n))
+   "[]" :exit t)
+  ("{" (lambda (n) (interactive "p")
+         (funcall (cp/ae (cp/mod 'delimiter "{")
+                         (with-cpo-smartparens-req (cp/obj 'cpo-smartparens)))
+                  n))
+   "{}" :exit t)
+  ("}" (lambda (n) (interactive "p")
+         (funcall (cp/ae (cp/mod 'delimiter "{")
+                         (with-cpo-smartparens-req (cp/obj 'cpo-smartparens)))
+                  n))
+   "{}" :exit t)
+  ("«" (lambda (n) (interactive "p")
+         (funcall (cp/ae (cp/mod 'delimiter "«")
+                         (with-cpo-smartparens-req (cp/obj 'cpo-smartparens)))
+                  n))
+   "«»" :exit t)
+  ("»" (lambda (n) (interactive "p")
+         (funcall (cp/ae (cp/mod 'delimiter "«")
+                         (with-cpo-smartparens-req (cp/obj 'cpo-smartparens)))
+                  n))
+   "«»" :exit t)
+  ("“" (lambda (n) (interactive "p")
+         (funcall (cp/ae (cp/mod 'delimiter "“")
+                         (with-cpo-smartparens-req (cp/obj 'cpo-smartparens)))
+                  n))
+   "“”" :exit t)
+  ("”" (lambda (n) (interactive "p")
+         (funcall (cp/ae (cp/mod 'delimiter "“")
+                         (with-cpo-smartparens-req (cp/obj 'cpo-smartparens)))
+                  n))
+   "“”" :exit t)
+  ("⟅" (lambda (n) (interactive "p")
+         (funcall (cp/ae (cp/mod 'delimiter "⟅")
+                         (with-cpo-smartparens-req (cp/obj 'cpo-smartparens)))
+                  n))
+   "⟅⟆" :exit t)
+  ("⟆" (lambda (n) (interactive "p")
+         (funcall (cp/ae (cp/mod 'delimiter "⟅")
+                         (with-cpo-smartparens-req (cp/obj 'cpo-smartparens)))
+                  n))
+   "⟅⟆" :exit t)
+  ("#" (lambda (n) (interactive "p")
+         (funcall (cp/ae (cp/mod 'delimiter "#|")
+                         (with-cpo-smartparens-req (cp/obj 'cpo-smartparens)))
+                  n))
+   "#||#" :exit t)
+
+  ;; Modifiers -- maybe these should have a separate map, but that adds
+  ;; verbosity, and I'm not yet certain there are enough objects and modifiers
+  ;; to warrant splitting -- I can have a prefix within this map for infrequent
+  ;; things, and I can always add another separate prefix map.
+  ("n" (lambda (n) (interactive "p")
+         (funcall (cp/add (cp/mod 'location-within 'end)) n))
+   "end" :exit nil)
   ;;("hb" (lambda (n) (interactive "p") (funcall (cp/add (cp/mod 'location-within 'beginning)) n)) "beginning" :exit nil) ;; Default, but let's add it anyway.
   ;;("he" (lambda (n) (interactive "p") (funcall (cp/add (cp/mod 'location-within 'emacs-style)) n)) "emacs-style" :exit nil)
-  ("i" (lambda (n) (interactive "p") (funcall (cp/add (cp/mod 'inner 'inner)) n)) "inner" :exit nil)
-  ("u" (lambda (n) (interactive "p") (funcall (cp/add (cp/mod 'tree-vertical 'up)) n)) "up" :exit nil)
-  ("d" (lambda (n) (interactive "p") (funcall (cp/add (cp/mod 'tree-vertical 'down)) n)) "down" :exit nil)
-  ("T" (lambda (n) (interactive "p") (funcall (cp/add (cp/mod 'tree-traversal 'inorder)) n)) "inorder" :exit nil)
-  ("r" (lambda (n) (interactive "p") (let ((reg (read-key "register: ")))
-                                       (funcall (cp/add (cp/mod 'register reg (format "r:%c" reg))) n)))
+  ("i" (lambda (n) (interactive "p")
+         (funcall (cp/add (cp/mod 'inner 'inner)) n))
+   "inner" :exit nil)
+  ("u" (lambda (n) (interactive "p")
+         (funcall (cp/add (cp/mod 'tree-vertical 'up)) n))
+   "up" :exit nil)
+  ("d" (lambda (n) (interactive "p")
+         (funcall (cp/add (cp/mod 'tree-vertical 'down)) n))
+   "down" :exit nil)
+  ("T" (lambda (n) (interactive "p")
+         (funcall (cp/add (cp/mod 'tree-traversal 'inorder)) n))
+   "inorder" :exit nil)
+  ("r" (lambda (n) (interactive "p")
+         (let ((reg (read-key "register: ")))
+           (funcall (cp/add (cp/mod 'register reg (format "r:%c" reg))) n)))
    "register" :exit nil)
-  (" " (lambda (n) (interactive "p") (funcall (cp/add (cp/mod 'surrounding-space 'surrounding-space)) n)) "surrounding-space" :exit nil)
-  ("b" (lambda (n) (interactive "p") (funcall (cp/add (cp/mod 'absolute 'absolute)) n)) "absolute" :exit nil) ;; For absolute numbering (within tree if respect tree is on).  Ignore forward/backward direction.
-  ("m" (lambda (n) (interactive "p") (funcall (cp/add (cp/mod 'matching 'matching)) n)) "matching" :exit nil) ;; Eg. for finding the next matching word, symbol, whatever.
-  ("a" (lambda (n) (interactive "p") (funcall (cp/add (cp/mod 'alternate 'alternate)) n)) "alternate" :exit nil) ;; For object-specific alternate behavior...
-  ("A" (lambda (n) (interactive "p") (funcall (cp/add (cp/mod 'alternate 2)) n)) "alternate-2" :exit nil)
+  (" " (lambda (n) (interactive "p")
+         (funcall (cp/add (cp/mod 'surrounding-space 'surrounding-space)) n))
+   "surrounding-space" :exit nil)
+  ("b" (lambda (n) (interactive "p")
+         (funcall (cp/add (cp/mod 'absolute 'absolute)) n))
+   "absolute" :exit nil) ;; For absolute numbering (within tree if respect tree is on).  Ignore forward/backward direction.
+  ("m" (lambda (n) (interactive "p")
+         (funcall (cp/add (cp/mod 'matching 'matching)) n))
+   "matching" :exit nil) ;; Eg. for finding the next matching word, symbol, whatever.
+  ("a" (lambda (n) (interactive "p")
+         (funcall (cp/add (cp/mod 'alternate 'alternate)) n))
+   "alternate" :exit nil) ;; For object-specific alternate behavior...
+  ("A" (lambda (n) (interactive "p")
+         (funcall (cp/add (cp/mod 'alternate 2)) n))
+   "alternate-2" :exit nil)
 
-  ("hR" (lambda (n) (interactive "p") (funcall (cp/add (cp/mod 'respect-tree 'respect-tree)) n)) "respect-tree" :exit nil)
-  ("hr" (lambda (n) (interactive "p") (funcall (cp/add (cp/mod 'respect-tree nil)) n)) "DISrespect-tree" :exit nil)
-  ("hD" (lambda (n) (interactive "p") (funcall (cp/add (cp/mod 'direction nil)) n)) "No direction" :exit nil) ;; Is this useful?  Maybe.  Currently I have no way to get into the map without specifying a direction...
-  ("hi" (lambda (n) (interactive "p") (funcall (cp/add (cp/mod 'idempotent 'idempotent)) n)) "idempotent" :exit nil) ;; Eg. only move if not at a place where this movement would have moved to.  Useful for keyboard macros, maybe.
-  ("hl" (lambda (n) (interactive "p") (funcall (cp/add (cp/mod 'current-line-only 'current-line-only)) n)) "current-line-only" :exit nil) ;; Eg. do something on the current line only.  Uncertain how useful this is.
+  ("hR" (lambda (n) (interactive "p")
+          (funcall (cp/add (cp/mod 'respect-tree 'respect-tree)) n))
+   "respect-tree" :exit nil)
+  ("hr" (lambda (n) (interactive "p")
+          (funcall (cp/add (cp/mod 'respect-tree nil)) n))
+   "DISrespect-tree" :exit nil)
+  ("hD" (lambda (n) (interactive "p")
+          (funcall (cp/add (cp/mod 'direction nil)) n))
+   "No direction" :exit nil) ;; Is this useful?  Maybe.  Currently I have no way to get into the map without specifying a direction...
+  ("hi" (lambda (n) (interactive "p")
+          (funcall (cp/add (cp/mod 'idempotent 'idempotent)) n))
+   "idempotent" :exit nil) ;; Eg. only move if not at a place where this movement would have moved to.  Useful for keyboard macros, maybe.
+  ("hl" (lambda (n) (interactive "p")
+          (funcall (cp/add (cp/mod 'current-line-only 'current-line-only)) n))
+   "current-line-only" :exit nil) ;; Eg. do something on the current line only.  Uncertain how useful this is.
 
   )
 
 
 
 ;; g map
-;; TODO - try to figure out a theme for this prefix map.  Maybe goto, which fits some of my bindings as well as what the helix editor does.  This map has grown by accretion over time and I would like to organize my accreted maps better.  That said, is it worth re-learning all of these miscellaneous key bindings, esp. those that are relatively low-use but that I have memorized?
-;; TODO - if I turn this into a goto-themed map, I should put jump-to-register functions here.
+
+;; TODO - try to figure out a theme for this prefix map.  Maybe goto, which fits
+;; some of my bindings as well as what the helix editor does.  This map has
+;; grown by accretion over time and I would like to organize my accreted maps
+;; better.  That said, is it worth re-learning all of these miscellaneous key
+;; bindings, esp. those that are relatively low-use but that I have memorized?
+;; TODO - if I turn this into a goto-themed map, I should put jump-to-register
+;; functions here.
 (emmap "gg" 'cpo-goto-line-default-first)
 (emmap "G" 'cpo-goto-line-default-last)
 

@@ -45,27 +45,40 @@
 
 
 (defun cp/verb (name)
+  "Construct a composiphrase word alist for verb NAME."
   `((word-type . verb)
     (contents . ,name)
     (ui-hint . ,name)))
 (defun cp/obj (name)
+  "Construct a composiphrase word alist for object NAME."
   `((word-type . object)
     (contents . ,name)
     (ui-hint . ,name)))
 (defun cp/mod (name contents &optional ui-hint)
+  "Construct a composiphrase word alist for modifier NAME with value CONTENTS.
+UI-HINT is used for the ui-hint field if non-nil, else CONTENTS is also used as the hint."
   `((word-type . modifier)
     (parameter-name . ,name)
     (contents . ,contents)
     (ui-hint . ,(or ui-hint contents))))
+
 (defun cp/add (&rest words)
+  "Return a command that adds WORDS to current command sentence (and handles numeric argument, adding it to sentence).
+"
   (apply 'composiphrase-add-to-current-sentence-with-numeric-handling
          nil
          words))
 (defun cp/ae (&rest words)
+  "Return a command that adds WORDS to current command sentence (and handles numeric argument, adding it to sentence).
+The command then executes the sentence.
+"
   (apply 'composiphrase-add-to-current-sentence-with-numeric-handling
          'exec-after
          words))
 (defun cp/ar (&rest words)
+  "Return a command that adds WORDS to current command sentence (and handles numeric argument, adding it to sentence).
+The command also executes the sentence, with region as the object, if the region is active.
+"
   (apply 'composiphrase-add-to-current-sentence-with-numeric-handling
          (region-active-p)
          (if (region-active-p)
