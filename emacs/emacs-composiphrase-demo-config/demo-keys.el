@@ -2,6 +2,13 @@
 
 ;; TODO - review motion vs normal state bindings -- these accreted over time with little thought, and maybe I should just remove motion map?
 
+;; Repeatable-motion config.  Long ago I set the default for these to be some
+;; annoyingly long thing that also doesn't have a slash, for Melpa coding
+;; standards, but I always have used these shorter prefixes.
+(setq repeatable-motion-count-needed-prefix "rmo-c/")
+(setq repeatable-motion-definition-prefix "rmo/")
+(setq repeatable-motion-training-wheels-p nil)
+(require 'repeatable-motion)
 (require 'estate)
 (require 'estate-default-states)
 (setq estate-set-initial-state-function
@@ -67,7 +74,7 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 (defun nobreak-define-key (map keys func)
-  (nobreak (define-key map keys func)))
+  (with-demoted-errors "Error: %s" (define-key map keys func)))
 (defun emmap (keys func)
   (nobreak-define-key estate-motion-state-keymap keys func))
 (defun enmap (keys func)
