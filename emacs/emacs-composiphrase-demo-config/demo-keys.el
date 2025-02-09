@@ -126,7 +126,9 @@ The command also executes the sentence, with region as the object, if the region
 (eImap "\C-c" 'estate-normal-state)
 (eimap "\C-l" 'estate-normal-state)
 (eImap (kbd "<escape>") 'estate-normal-state)
-(eImap (kbd "<escape>") 'estate-normal-state)
+(evmap (kbd "<escape>") 'estate-normal-state)
+(eImap (kbd "ESC") 'estate-normal-state)
+(evmap (kbd "ESC") 'estate-normal-state)
 
 (emmap "\C-g" 'keyboard-quit-and-clear-composiphrase-and-maybe-leave-visual-state)
 (eimap "\C-g" 'keyboard-quit-and-clear-composiphrase-and-maybe-leave-visual-state)

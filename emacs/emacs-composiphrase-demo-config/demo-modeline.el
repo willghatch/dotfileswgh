@@ -61,7 +61,7 @@
 ;; use setq-default to set it for /all/ modes
 (setq-default mode-line-format
               (list
-               ;; Evil state
+               ;; estate state
                '(:eval (cond ((and (boundp 'estate-state) estate-local-mode)
                               (cond
                                ((eq estate-state 'normal)
@@ -79,25 +79,6 @@
                                ((eq estate-state 'pager)
                                 (propertize "<PAGE>" 'face 'estate-mode-line-pager-face))
                                (t (propertize "WHAT ESTATE??" 'face 'estate-mode-line-emacs-face))))
-                             ((boundp 'evil-state)
-                              (cond
-                               ((eq evil-state 'visual)
-                                (propertize "< VI >" 'face 'estate-mode-line-visual-face))
-                               ((eq evil-state 'normal)
-                                (propertize "<NORM>" 'face 'estate-mode-line-normal-face))
-                               ((eq evil-state 'motion)
-                                (propertize "<MOTN>" 'face 'estate-mode-line-motion-face))
-                               ((eq evil-state 'insert)
-                                (propertize "<INST>" 'face 'estate-mode-line-insert-face))
-                               ((eq evil-state 'replace)
-                                (propertize "<REPL>" 'face 'estate-mode-line-replace-face))
-                               ((eq evil-state 'emacs)
-                                (propertize "<EMCS>" 'face 'estate-mode-line-emacs-face))
-                               ((eq evil-state 'operator)
-                                (propertize "<OPER>" 'face 'estate-mode-line-operator-face))
-                               ((eq evil-state 'pager)
-                                (propertize "<PAGE>" 'face 'estate-mode-line-pager-face))
-                               (t (propertize "WHAT STATE??" 'face 'estate-mode-line-emacs-face))))
                              (t (propertize "<NO STATE INFO>" 'face 'estate-mode-line-emacs-face))))
 
                '(:eval (propertize " %b " 'face 'cpo-mode-line-bufname-face))
