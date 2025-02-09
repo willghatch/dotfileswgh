@@ -22,7 +22,8 @@
 ;; in its beauty.  Or call it ugly.  Whatever, I don't care.  It shows the
 ;; estate-state and current sentence state.
 (load-library "demo-modeline")
-;; TODO - why is the mode line out of sync?  It is displaying one character late...
+;; And the default emacs theme works poorly with my mode line, so now the demo
+;; also gets a copy of my custom ad-hoc angry fruit salad theme of beauty.
 (load-theme 'composiphrase-demo t)
 
 ;; In my personal config the mode line, which is almost exactly the same as this
