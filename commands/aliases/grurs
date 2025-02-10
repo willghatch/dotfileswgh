@@ -1,2 +1,2 @@
 #!/bin/sh
-git remote update && git rebase && git submodule foreach --recursive git submodule update
+git remote update && git rebase && git submodule update && git submodule foreach --recursive git submodule update
