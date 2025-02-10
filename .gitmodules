@@ -19,6 +19,9 @@
 [submodule "external/emacs/composiphrase-objects"]
 	path = external/emacs/composiphrase-objects
 	url = https://github.com/willghatch/emacs-composiphrase-objects
+[submodule "external/emacs/composiphrase-demo"]
+	path = external/emacs/composiphrase-demo
+	url = https://github.com/willghatch/emacs-composiphrase-demo
   
 [submodule "external/emacs/hydra"]
 	path = external/emacs/hydra
