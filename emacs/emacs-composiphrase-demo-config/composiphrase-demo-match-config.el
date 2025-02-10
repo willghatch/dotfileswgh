@@ -399,10 +399,10 @@
                 (cpo-smartparens-up-to-root ()))
           (move cpo-smartparens
                 ((direction expand-region) (inner ,nil) (delimiter any) (tree-vertical ,nil))
-                (cpo-smartparens-expand-region-to-any-delimiter (num)))
+                (rmo/cpo-smartparens-expand-region-to-any-delimiter (num)))
           (move cpo-smartparens
                 ((direction expand-region) (inner inner) (delimiter any) (tree-vertical ,nil))
-                (cpo-smartparens-expand-region/children-region (num)))
+                (rmo/cpo-smartparens-expand-region/children-region (num)))
 
           (move cpo-smartparens
                 ((direction expand-region) (tree-vertical ,nil) (inner ,nil)
@@ -414,10 +414,10 @@
 
           (move cpo-smartparens
                 ((direction expand-region) (tree-vertical ,nil) (inner ,nil) (delimiter ,nil))
-                (cpo-smartparens-expand-region (num)))
+                (rmo/cpo-smartparens-expand-region (num)))
           (move cpo-smartparens
                 ((direction expand-region) (tree-vertical ,nil) (inner inner) (delimiter ,nil))
-                (cpo-smartparens-expand-region/children-region (num)))
+                (rmo/cpo-smartparens-expand-region/children-region (num)))
 
           (move cpo-smartparens
                 ((direction forward) (tree-vertical ,nil) (tree-traversal inorder))
@@ -520,10 +520,10 @@
                 (cpo-treesitter-qd-up-to-root ()))
           (move cpo-treesitter-qd
                 ((direction expand-region) (tree-vertical ,nil) (inner ,nil))
-                (cpo-treesitter-qd-expand-region (num)))
+                (rmo/cpo-treesitter-qd-expand-region (num)))
           (move cpo-treesitter-qd
                 ((direction expand-region) (tree-vertical ,nil) (inner inner))
-                (cpo-treesitter-qd-expand-region/children-region (num)))
+                (rmo/cpo-treesitter-qd-expand-region/children-region (num)))
 
           (move cpo-treesitter-qd
                 ((direction forward) (tree-traversal inorder))
@@ -574,10 +574,10 @@
                 (cpo-outline-up-to-root ()))
           (move outline
                 ((direction expand-region) (tree-vertical ,nil) (inner ,nil))
-                (cpo-outline-expand-region (num)))
+                (rmo/cpo-outline-expand-region (num)))
           (move outline
                 ((direction expand-region) (tree-vertical ,nil) (inner inner))
-                (cpo-outline-expand-region/children-region (num)))
+                (rmo/cpo-outline-expand-region/children-region (num)))
           (move outline
                 ((direction forward) (tree-traversal inorder))
                 (rmo/cpo-outline-inorder-traversal-forward (num)))
@@ -623,10 +623,10 @@
                 (cpo-indent-tree-up-to-root ()))
           (move cpo-indent-tree
                 ((direction expand-region) (tree-vertical ,nil) (inner ,nil))
-                (cpo-indent-tree-expand-region (num)))
+                (rmo/cpo-indent-tree-expand-region (num)))
           (move cpo-indent-tree
                 ((direction expand-region) (tree-vertical ,nil) (inner inner))
-                (cpo-indent-tree-expand-region/children-region (num)))
+                (rmo/cpo-indent-tree-expand-region/children-region (num)))
           (move cpo-indent-tree
                 ((direction forward) (tree-traversal inorder))
                 (rmo/cpo-indent-tree-inorder-traversal-forward (num)))
