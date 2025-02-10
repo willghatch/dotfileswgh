@@ -1,3 +1,3 @@
 #!/usr/bin/env bash
 
-SHELL=/bin/sh exec emacs -nw -l $DOTFILESWGH/emacs/def "$@"
+SHELL=/bin/sh exec emacs -nw -q -l $DOTFILESWGH/emacs/def "$@"
