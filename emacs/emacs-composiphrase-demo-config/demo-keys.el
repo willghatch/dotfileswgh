@@ -166,10 +166,10 @@ The command also executes the sentence, with region as the object, if the region
 
 (emmap "v" 'estate-visual-state)
 
-(enmap "q" 'estate-keyboard-macro-to-register-end-most-recent-or-start-default)
-(enmap "Q" 'estate-keyboard-macro-to-register-start)
-(enmap "r" 'estate-keyboard-macro-execute-from-most-recently-macro-recorded-register)
-(enmap "R" 'estate-keyboard-macro-execute-from-register)
+(emmap "q" 'estate-keyboard-macro-to-register-end-most-recent-or-start-default)
+(emmap "Q" 'estate-keyboard-macro-to-register-start)
+(emmap "r" 'estate-keyboard-macro-execute-from-most-recently-macro-recorded-register)
+(emmap "R" 'estate-keyboard-macro-execute-from-register)
 
 (enmap "." 'cp-demo-aggreact-repeat-latest-editing)
 
@@ -199,7 +199,7 @@ The command also executes the sentence, with region as the object, if the region
 (enmap "D" (lambda () (interactive) (progn (kill-line))))
 (evmap "D" (lambda () (interactive) (progn (kill-region nil nil t))))
 
-(enmap "Y" (lambda (n) (interactive "p")
+(emmap "Y" (lambda (n) (interactive "p")
              (if (region-active-p)
                  (funcall (cp/ae (cp/verb 'copy)
                                  (cp/obj 'region))
@@ -237,7 +237,7 @@ The command also executes the sentence, with region as the object, if the region
 (enmap "p" (cp/ae (cp/verb 'paste-to-region-from-move)
                   (cp/obj 'region)))
 
-(enmap "\"" (lambda (n) (interactive "p")
+(emmap "\"" (lambda (n) (interactive "p")
               (funcall (cp/add (let ((reg (read-key "Register: ")))
                                  (cp/mod 'register reg (format "r:%c" reg))))
                        n)))
@@ -247,8 +247,8 @@ The command also executes the sentence, with region as the object, if the region
 
 
 
-(enmap (kbd "DEL") 'rmo/backward-char)
-(enmap (kbd "<deletechar>") 'rmo/forward-char)
+(emmap (kbd "DEL") 'rmo/backward-char)
+(emmap (kbd "<deletechar>") 'rmo/forward-char)
 
 
 
@@ -263,7 +263,7 @@ The command also executes the sentence, with region as the object, if the region
 
 
 ;; Enter prefix maps for composiphrase
-(enmap "s" (lambda ()
+(emmap "s" (lambda ()
              (interactive)
              (funcall (cp/add `((word-type . ignore))))
              (cpo/verb-select/body)))
@@ -760,8 +760,8 @@ The command also executes the sentence, with region as the object, if the region
 (emmap "gg" 'cpo-goto-line-default-first)
 (emmap "G" 'cpo-goto-line-default-last)
 
-(enmap "m" 'point-to-register)
-(enmap "z" 'execute-extended-command)
+(emmap "m" 'point-to-register)
+(emmap "z" 'execute-extended-command)
 
 
 

@@ -260,10 +260,10 @@ The command also executes the sentence, with region as the object, if the region
 (emmap "_" 'eval-expression)
 
 ;; TODO - figure out good keys to use, especially for the “quick” ones that record to change.
-(enmap "q" 'estate-keyboard-macro-to-register-end-most-recent-or-start-default)
-(enmap "Q" 'estate-keyboard-macro-to-register-start)
-(enmap "r" 'estate-keyboard-macro-execute-from-most-recently-macro-recorded-register)
-(enmap "R" 'estate-keyboard-macro-execute-from-register)
+(emmap "q" 'estate-keyboard-macro-to-register-end-most-recent-or-start-default)
+(emmap "Q" 'estate-keyboard-macro-to-register-start)
+(emmap "r" 'estate-keyboard-macro-execute-from-most-recently-macro-recorded-register)
+(emmap "R" 'estate-keyboard-macro-execute-from-register)
 ;;(enmap "h" 'estate-record-quick-keyboard-macro-to-buffer-change)
 
 
@@ -288,7 +288,7 @@ The command also executes the sentence, with region as the object, if the region
                   (cp/obj 'region)))
 (enmap " pc" 'xpaste)
 
-(enmap "\"" (lambda (n) (interactive "p")
+(emmap "\"" (lambda (n) (interactive "p")
               (funcall (cp/add (let ((reg (read-key "Register: ")))
                                  (cp/mod 'register reg (format "r:%c" reg))))
                        n)))
@@ -306,8 +306,8 @@ The command also executes the sentence, with region as the object, if the region
 (enmap ">" (with-evil 'evil-shift-right))
 (emmap "%" 'cpo-smartparens-move-to-other-end-of-sexp) ;; TODO - maybe just stop using this?  I can accomplish it with forward/backward beg/end.  Turn it into training wheels message binding.
 
-(enmap (kbd "DEL") 'rmo/backward-char)
-(enmap (kbd "<deletechar>") 'rmo/forward-char)
+(emmap (kbd "DEL") 'rmo/backward-char)
+(emmap (kbd "<deletechar>") 'rmo/forward-char)
 
 
 
@@ -318,7 +318,7 @@ The command also executes the sentence, with region as the object, if the region
 
 
 ;; Enter prefix maps for composiphrase
-(enmap "c" (lambda ()
+(emmap "c" (lambda ()
              (interactive)
              (funcall (cp/add `((word-type . ignore))))
              (wgh/verb-select/body)))
@@ -758,7 +758,7 @@ The command also executes the sentence, with region as the object, if the region
 ;; "ta" will be an assortment of handy stuff...
 (enmap "tac" 'comment-region) ;; TODO - maybe put comment/uncomment and/or toggle-comment in composiphrase verb map, behind some prefix for less common verbs.
 (enmap "taC" 'uncomment-region)
-(enmap "tam" (lambda () (interactive) (exchange-point-and-mark)))
+(emmap "tam" (lambda () (interactive) (exchange-point-and-mark)))
 (enmap "tad" 'insert-date)
 (enmap "taD" 'insert-date-time)
 (enmap "tara" (lambda () (interactive) (require 'alternate-region) (alternate-region-activate)))
@@ -766,7 +766,7 @@ The command also executes the sentence, with region as the object, if the region
 (enmap "tarc" (lambda () (interactive) (require 'alternate-region) (alternate-region-cycle)))
 (enmap "tav" 'sp-convolute-sexp)
 (enmap "tag" 'gptel-send)
-(enmap "tayp" (cons "symbol-overlay-put" (lambda () (interactive) (require 'symbol-overlay) (symbol-overlay-put)))) ;; TODO - symbol overlay seems like it could be helpful.  I should add a modifier to symbol to have forward/back symbol motions go to the next instance of the highlighted symbol at point, or to the next highlighted symbol.  Also think about keys for marking, this binding is terrible.  Maybe symbol-overlay can share a verb with marking alternate region?  Are there other ways one might mark something that would be useful to group with these?  Maybe also marking char can be setting point-to-register?
+(emmap "tayp" (cons "symbol-overlay-put" (lambda () (interactive) (require 'symbol-overlay) (symbol-overlay-put)))) ;; TODO - symbol overlay seems like it could be helpful.  I should add a modifier to symbol to have forward/back symbol motions go to the next instance of the highlighted symbol at point, or to the next highlighted symbol.  Also think about keys for marking, this binding is terrible.  Maybe symbol-overlay can share a verb with marking alternate region?  Are there other ways one might mark something that would be useful to group with these?  Maybe also marking char can be setting point-to-register?
 (with-eval-after-load 'symbol-overlay
   ;; I don't appreciate symbol-overlay taking over my keymap.
   (setcdr symbol-overlay-map nil))
@@ -781,10 +781,10 @@ The command also executes the sentence, with region as the object, if the region
 (enmap "s)" 'eval-last-sexp)
 (evmap "s)" 'eval-region)
 (evmap "s/" (kbd ":s/ ")) ; TODO - fix this...
-(enmap "sm" 'point-to-register)
-(enmap "sM" 'bookmark-set)
-(enmap "sg" (cp/ae (cp/obj 'jump-to-register)))
-(enmap "sG" 'bookmark-jump)
+(emmap "sm" 'point-to-register)
+(emmap "sM" 'bookmark-set)
+(emmap "sg" (cp/ae (cp/obj 'jump-to-register)))
+(emmap "sG" 'bookmark-jump)
 (emmap "sx" 'eval-expression)
 (emmap "sj" 'rmo/pscroll-down-half)
 (emmap "sk" 'rmo/pscroll-up-half)
