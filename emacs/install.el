@@ -36,6 +36,7 @@
     (straight-use-package (submod 'repeatable-motion))
     (straight-use-package (submod 'composiphrase))
     (straight-use-package (submod 'composiphrase-objects))
+    (straight-use-package (submod 'composiphrase-demo))
 
     (straight-use-package (submod 'hydra))
     (straight-use-package (submod 'queue))
