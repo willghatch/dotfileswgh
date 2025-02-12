@@ -42,7 +42,8 @@ source $DOTFILESWGH/bazshrc
 typeset -U PATH
 fpath=($fpath /run/current-system/sw/share/zsh/site-functions)
 fpath=($fpath $DOTFILESWGH/zsh/completion/)
-fpath=($fpath $DOTFILESWGH/pri/zsh/completion/)
+fpath=($fpath $DOTFILESWGH_PRI/zsh/completion/)
+fpath=($fpath $DOTFILESWGH_DOTLOCAL/zsh/completion/)
 
 xclip-to-zsh(){
     BUFFER="${LBUFFER}$(xclip -o -selection clipboard)${RBUFFER}"
