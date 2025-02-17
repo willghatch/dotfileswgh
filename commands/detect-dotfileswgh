@@ -4,7 +4,6 @@ unset DOTFILESWGH
 unset DOTFILESWGH_DOTLOCAL
 unset DOTFILESWGH_PRI
 unset DOTFILESWGH_PRI_DOTLOCAL
-unset WGHHOME
 if [[ -d "$HOME/dotfileswgh" ]]; then
     export DOTFILESWGH="$HOME/dotfileswgh"
 elif [[ -d /rootgit/base.rootgit/dotfileswgh ]]; then

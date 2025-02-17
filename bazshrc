@@ -1,4 +1,7 @@
+# -*- mode: shell-script; -*-
+
 export DOTFILESWGH="${DOTFILESWGH:-$HOME/dotfileswgh}"
+source $DOTFILESWGH/bazsh-lib
 source $DOTFILESWGH/env-more.sh
 
 
@@ -20,7 +23,7 @@ fi
 # that use it, eg en_DK) uses Monday as the first day of the week.
 # Also, en_US uses imperial units while I want metric, and mine
 # customizes telephone layouts to display as NNN-NNN-NNNN rather than
-# (NNN) NNN-NNNN... though I don't know where that even comes up in 
+# (NNN) NNN-NNNN... though I don't know where that even comes up in
 # software that uses locale settings...
 #if [[ -f /usr/share/i18n/locales/en_US@willghatch ]]; then
 #    # maybe I should test with `localectl list-locales`, except I'll have to grep as well.
@@ -199,28 +202,4 @@ lesskey $DOTFILESWGH/lesskey 2>/dev/null
 source $DOTFILESWGH/bazsh/grml-funcs.sh
 
 
-######## Add private stuff #######
-bazsh_common_pri=$DOTFILESWGH_PRI/bazshrc
-if [ -f $bazsh_common_pri ]
-then
-    source $bazsh_common_pri
-fi
-
-bazsh_common_rootgit=$HOME/rootgit-dotfiles/bazshrc
-if [ -f $bazsh_common_rootgit ]
-then
-    source $bazsh_common_rootgit
-fi
-
-bazsh_common_local=$DOTFILESWGH_DOTLOCAL/bazshrc
-if [ -f $bazsh_common_local ]
-then
-    source $bazsh_common_local
-fi
-
-bazsh_common_pri_local=$DOTFILESWGH_PRI/dotlocal/bazshrc
-if [ -f $bazsh_common_pri_local ]
-then
-    source $bazsh_common_pri_local
-fi
-
+sourceFromDotfileswghAlts bazshrc

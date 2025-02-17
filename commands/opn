@@ -1,0 +1,35 @@
+#!/usr/bin/env bash
+
+# script for opening things, like xdg-open, but with different configuration...
+
+source "$DOTFILESWGH/bazsh-lib"
+
+openDefault() {
+    if [[ "$1" == *.html
+                || "$1" == *.htm
+        ]]; then
+        exec a ffxd "$1"
+    elif [[ "$1" == *.pdf ]]; then
+        exec a zathura "$1"
+    elif [[ "$1" == *.mp3
+                || "$1" == *.ogg
+                || "$1" == *.flac
+                || "$1" == *.aac
+                || "$1" == *.mp4
+                || "$1" == *.mkv
+                || "$1" == *.mov
+          ]]; then
+        exec a vlc "$1"
+    fi
+}
+
+openFuncs=()
+# extend in other dotfiles by adding another function to openFuncs, which should exec on a match.
+sourceFromDotfileswghAlts opn-conf.sh
+openFuncs+=(openDefault)
+
+for f in "${openFuncs[@]}"; do
+    $f "$1"
+done
+
+exec a xdg-open "$1"

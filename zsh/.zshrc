@@ -1,10 +1,4 @@
-
-source-if-exists() {
-    if [[ -f "$1" ]]; then
-        source "$1"
-    fi
-}
-
+# -*- mode: shell-script; -*-
 
 COMPDUMPFILE=$HOME/.cache/zshcompdump
 ZSH_COMPDUMP=$COMPDUMPFILE
@@ -43,7 +37,9 @@ typeset -U PATH
 fpath=($fpath /run/current-system/sw/share/zsh/site-functions)
 fpath=($fpath $DOTFILESWGH/zsh/completion/)
 fpath=($fpath $DOTFILESWGH_PRI/zsh/completion/)
+fpath=($fpath $DOTFILESWGH_ROOTGIT/zsh/completion/)
 fpath=($fpath $DOTFILESWGH_DOTLOCAL/zsh/completion/)
+fpath=($fpath $DOTFILESWGH_PRI_DOTLOCAL/zsh/completion/)
 
 xclip-to-zsh(){
     BUFFER="${LBUFFER}$(xclip -o -selection clipboard)${RBUFFER}"
@@ -158,19 +154,18 @@ lazy_source () {
 #     zgen save
 # fi
 
-source-if-exists "$DOTFILESWGH/external/zsh/zsh-history-substring-search/zsh-history-substring-search.plugin.zsh"
-source-if-exists "$DOTFILESWGH/external/zsh/zsh-cdr/cdr.plugin.zsh"
-source-if-exists "$DOTFILESWGH/external/zsh/zaw/zaw.plugin.zsh"
-source-if-exists "$DOTFILESWGH/external/zsh/zsh-zaw-mpd/zaw-mpd.plugin.zsh"
-source-if-exists "$DOTFILESWGH/external/zsh/zsh-zaw-todoman/zaw-todoman.plugin.zsh"
-source-if-exists "$DOTFILESWGH/external/zsh/zsh-saneopt/saneopt.plugin.zsh"
-source-if-exists "$DOTFILESWGH/external/zsh/zsh-hooks/zsh-hooks.plugin.zsh"
-source-if-exists "$DOTFILESWGH/external/zsh/zsh-megaprompt/zsh-megaprompt.plugin.zsh"
-source-if-exists "$DOTFILESWGH/external/zsh/zsh-snippets/snippets.plugin.zsh"
-source-if-exists "$DOTFILESWGH/external/zsh/zsh-grml-funcs/zsh-grml-funcs.plugin.zsh"
-source-if-exists "$DOTFILESWGH/external/zsh/vzsh/vzsh.plugin.zsh"
-source-if-exists "$DOTFILESWGH/external/zsh/zsh-syntax-highlighting/zsh-syntax-highlighting.plugin.zsh"
-source-if-exists "$DOTFILESWGH/external/zsh/racket-shell-completion/racket-completion.zsh"
+sourceIfExists "$DOTFILESWGH/external/zsh/zsh-history-substring-search/zsh-history-substring-search.plugin.zsh"
+sourceIfExists "$DOTFILESWGH/external/zsh/zsh-cdr/cdr.plugin.zsh"
+sourceIfExists "$DOTFILESWGH/external/zsh/zaw/zaw.plugin.zsh"
+sourceIfExists "$DOTFILESWGH/external/zsh/zsh-zaw-mpd/zaw-mpd.plugin.zsh"
+sourceIfExists "$DOTFILESWGH/external/zsh/zsh-zaw-todoman/zaw-todoman.plugin.zsh"
+sourceIfExists "$DOTFILESWGH/external/zsh/zsh-saneopt/saneopt.plugin.zsh"
+sourceIfExists "$DOTFILESWGH/external/zsh/zsh-hooks/zsh-hooks.plugin.zsh"
+sourceIfExists "$DOTFILESWGH/external/zsh/zsh-megaprompt/zsh-megaprompt.plugin.zsh"
+sourceIfExists "$DOTFILESWGH/external/zsh/zsh-snippets/snippets.plugin.zsh"
+sourceIfExists "$DOTFILESWGH/external/zsh/zsh-grml-funcs/zsh-grml-funcs.plugin.zsh"
+sourceIfExists "$DOTFILESWGH/external/zsh/vzsh/vzsh.plugin.zsh"
+sourceIfExists "$DOTFILESWGH/external/zsh/zsh-syntax-highlighting/zsh-syntax-highlighting.plugin.zsh"
 
 
 
@@ -573,10 +568,10 @@ fi
 #alias mv="echo training wheels: use muv wrapper"
 #alias rm="echo training wheels: use rb wrapper"
 
-#source-if-exists "$WGHHOME/rootgit-dotfiles/env.sh"
-#source-if-exists "$WGHHOME/rootgit-dotfiles/bazshrc"
-#source-if-exists "$WGHHOME/rootgit-dotfiles/zshrc"
-source-if-exists "$DOTFILESWGH_DOTLOCAL/zshrc"
+
+sourceFromDotfileswghAlts env.sh
+sourceFromDotfileswghAlts zshrc
+
 
 if [ -x ~/vscripts/motd.sh ]
 then

@@ -1,0 +1,37 @@
+# -*- mode: shell-script; -*-
+
+# Some helpers for bash scripts.
+sourceIfExists()
+{
+    for f in $@; do
+        if [[ -f $f ]]; then
+            source $f
+        fi
+    done
+
+}
+
+sourceFromPathArray() {
+    # $1 is a relative path
+    # all other args are prefixes for $1 for sourcing.
+    local offset;
+    offset="$1"
+    shift;
+    local sourceDir;
+    for sourceDir in "$@"; do
+        if [[ -n "$sourceDir" ]]; then
+            sourceIfExists "$sourceDir/$offset"
+        fi
+    done
+}
+
+dotfileswghAlts=("$DOTFILESWGH_PRI" "$DOTFILESWGH_ROOTGIT" "$DOTFILESWGH_DOTLOCAL" "$DOTFILESWGH_PRI_DOTLOCAL")
+dotfileswghAll=("$DOTFILESWGH" "${dotfileswghAlts[@]}")
+
+sourceFromDotfileswghAll() {
+    sourceFromPathArray "$1" "${dotfileswghAll[@]}"
+}
+sourceFromDotfileswghAlts() {
+    sourceFromPathArray "$1" "${dotfileswghAlts[@]}"
+}
+

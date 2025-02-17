@@ -1,6 +1,9 @@
 #!/bin/bash
 # If not running interactively, don't do anything
-[ -z "$PS1" ] && return
+#[ -z "$PS1" ] && return
+if [[ "${-#*i}" = "$-" ]]; then
+    return;
+fi
 
 
 #-------------------------------------------------------------
@@ -17,10 +20,6 @@ if [ -f ~/.bazshrc.pre ]; then
       . ~/.bazshrc.pre
 fi
 
-if [[ -z "$WGHHOME" ]]; then
-    export WGHHOME=$HOME # I want to be able to reference this, and when it's
-    #not true(IE when I use su), I'll set this elsewhere
-fi
 
 ### detect dotfileswgh snippet
 if [ -z "$DOTFILESWGH" ]; then
@@ -33,11 +32,7 @@ fi
 export DOTFILESWGH="${DOTFILESWGH:-$HOME/dotfileswgh}"
 ###
 
-bazsh_common=$DOTFILESWGH/bazshrc
-if [ -f $bazsh_common ]; then
-      . $bazsh_common
-fi
-
+. $DOTFILESWGH/bazshrc
 
 
 # Turn off TTY "start" and "stop" commands in all interactive shells.
@@ -64,9 +59,7 @@ if test -n "$CURRENT_DEV_MODE"; then
 fi
 
 
-sourceIfExists $WGHHOME/rootgit-dotfiles/env.sh
-sourceIfExists $WGHHOME/rootgit-dotfiles/bazshrc
-sourceIfExists $WGHHOME/rootgit-dotfiles/bashrc
-sourceIfExists $DOTFILESWGH/dotlocal/bashrc
+sourceFromDotfileswghAlts env.sh
+sourceFromDotfileswghAlts bashrc
 
 
