@@ -52,6 +52,14 @@ buffer, it will call the next-buffer-func once more if advance-on-failure-p."
   (require 'ffap)
   (find-file-at-point (ffap-file-at-point)))
 
+(defun wgh/find-file-no-ffap ()
+  (interactive)
+  (require 'minad-stack-conf)
+  (nobreak (wgh/init-minad))
+  (let ((file-name-at-point-functions nil))
+    (call-interactively 'find-file)))
+
+;; TODO - I have now stopped using ido, I should probably just delete these.
 (defun ido-ffap-no ()
   (interactive)
   (require 'ido)

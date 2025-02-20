@@ -168,10 +168,11 @@ The command also executes the sentence, with region as the object, if the region
 (emmap (kbd "M-c") 'helm-M-x)
 (global-set-key (kbd "M-c") 'helm-M-x)
 
-(emmap "z" (lambda () (interactive) (require 'minad-stack-conf) (nobreak (wgh/init-minad)) (call-interactively 'execute-extended-command)))
-(eimap (kbd "M-c") (lambda () (interactive) (require 'minad-stack-conf) (nobreak (wgh/init-minad)) (call-interactively 'execute-extended-command)))
-(emmap (kbd "M-c") (lambda () (interactive) (require 'minad-stack-conf) (nobreak (wgh/init-minad)) (call-interactively 'execute-extended-command)))
-(global-set-key (kbd "M-c") (lambda () (interactive) (require 'minad-stack-conf) (nobreak (wgh/init-minad)) (call-interactively 'execute-extended-command)))
+(autoload 'wgh/init-minad "minad-stack-conf" "" t)
+(emmap "z" (lambda () (interactive) (nobreak (wgh/init-minad)) (call-interactively 'execute-extended-command)))
+(eimap (kbd "M-c") (lambda () (interactive) (nobreak (wgh/init-minad)) (call-interactively 'execute-extended-command)))
+(emmap (kbd "M-c") (lambda () (interactive) (nobreak (wgh/init-minad)) (call-interactively 'execute-extended-command)))
+(global-set-key (kbd "M-c") (lambda () (interactive) (nobreak (wgh/init-minad)) (call-interactively 'execute-extended-command)))
 
 
 (enmap "=" 'indent-region)
@@ -193,7 +194,7 @@ The command also executes the sentence, with region as the object, if the region
 (eimap "\C-l" 'estate-normal-state-keymap)
 
 ;;(eimap "\M-h" 'completer-map/body)
-(eimap "\M-h" (lambda () (interactive) (require 'minad-stack-conf) (wgh/init-corfu) (completer-map/body)))
+(eimap "\M-h" (lambda () (interactive) (require 'minad-stack-conf) (nobreak (wgh/init-corfu)) (completer-map/body)))
 ;;(eimap (kbd "C-SPC TAB") 'completer-map/body)
 ;;(eimap (kbd "C-@ TAB") 'completer-map/body)
 ;;(eimap (kbd "TAB") 'company-complete-common-wgh)
@@ -683,7 +684,10 @@ The command also executes the sentence, with region as the object, if the region
 ;; t map
 (emmap "tt" 'temp-key-map)
 
-(emmap "tia" 'wgh/ido-switch-buffer)
+;;(emmap "tia" 'wgh/ido-switch-buffer)
+(emmap "tia" (lambda () (interactive)
+               (nobreak (wgh/init-minad))
+               (call-interactively 'switch-to-buffer)))
 (emmap "tic" 'kill-buffer-or-quit-emacs)
 (emmap " tica" 'save-buffers-kill-terminal)
 (emmap "tis" 'save-buffer)
@@ -692,17 +696,19 @@ The command also executes the sentence, with region as the object, if the region
 (emmap " tiea" 'TODO-save-all-and-quit)
 (emmap "tip" 'ffap/no-confirm)
 ;; TODO - I want to switch from "tif" and friends to "tf*" for the variety of ways I want to find files.
-(emmap "tif" 'ido-ffap-no)
-(emmap " tifd" 'ido-find-file-from-pwd)
+;;(emmap "tif" 'ido-ffap-no)
+(emmap "tif" 'wgh/find-file-no-ffap)
+;;(emmap " tifd" 'ido-find-file-from-pwd)
 (emmap " tiff" 'ffap/no-confirm)
 (emmap "tiw" 'next-buffer-no-star)
 (emmap "tib" 'prev-buffer-no-star)
 (emmap " tiwd" 'next-dirty-buffer-no-star)
 (emmap " tibd" 'prev-dirty-buffer-no-star)
-(emmap "tff" 'ido-ffap-no)
+;;(emmap "tff" 'ido-ffap-no)
+(emmap "tff" 'wgh/find-file-no-ffap)
 (emmap "tfp" 'ffap/no-confirm)
 (emmap "tfh" 'ff-find-other-file) ; IE switch between header and source file for C/C++
-(emmap "tfd" 'ido-find-file-from-pwd)
+;;(emmap "tfd" 'ido-find-file-from-pwd)
 (emmap "tfg" (lambda () (interactive) (require 'helm-projectile) (helm-projectile)))
 (autoload 'fzf-git-files "fzf" "" t)
 (emmap "tfz" 'fzf-git-files)
