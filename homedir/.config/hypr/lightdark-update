@@ -9,9 +9,9 @@ fi
 
 if [[ "$mode" = "light" ]]; then
     hyprctl keyword general:col.active_border "rgba(336cfdee)"
-    hyprctl setcursor phinger-cursors-light ${XCURSOR_SIZE:-24}
+    hyprctl setcursor phinger-cursors-light ${XCURSOR_SIZE:-32}
 else
     hyprctl keyword general:col.active_border "rgba(33ccffee) rgba(00ff99ee) 45deg"
-    hyprctl setcursor phinger-cursors-dark ${XCURSOR_SIZE:-24}
+    hyprctl setcursor phinger-cursors-dark ${XCURSOR_SIZE:-32}
 fi
 
