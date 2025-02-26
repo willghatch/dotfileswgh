@@ -12,8 +12,13 @@
   side-by-side = true
 [diff]
   colorMoved = dimmed-zebra
+  algorithm = histogram # argued online that it is typically a better diff
+  mnemonicPrefix = true # instead of a/ and b/, use prefixes related to current op, like (i)ndex, (w)ork tree, (c)ommit, (o)bject
+  renames = true # detect if files have been renamed
 [push]
 	default = current
+  autoSetupRemote = true
+  #followTags = true # automatically push tags
 [alias]
     # Get and check out pull requests.
     pr  = "!f() { git fetch -fu ${2:-origin} refs/pull/$1/head:pr/$1 && git checkout pr/$1; }; f"
@@ -69,3 +74,25 @@
 
 [color]
 	ui = auto
+[column]
+  #ui = auto # detect whether to use columns in UI
+[branch]
+  sort = committerdate # sort by commit date instead of alphabetically
+[tag]
+  sort = version:refname # sorts treating the tag as a version number
+
+[rebase]
+  autoSquash = true # automatically squash commits with specially formatted messages, eg. starting with "squash!", "fixup!", or "amend!"
+  autoStash = true # automatically stash and stash pop when rebasing, rather than erroring and requiring manual stash management.  But can create merge conflicts!
+  #updateRefs = true # automatically force-update any branches that point to commits that are being rebased.  I don't think I want this as default behavior.
+
+[merge]
+  #conflictstyle = zdiff3 # shows both new versions and also old version before changes
+[commit]
+  verbose = true # show diff in commit message below --- >8 --- scissors line
+
+[rerere]
+  # REuse REcorded REsolutions
+  # IE record before and after states of rebase conflicts and, with autoupdate, automatically re-apply the resolutions if they are seen again
+  enabled = true
+  autoupdate = true
