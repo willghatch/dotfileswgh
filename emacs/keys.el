@@ -725,6 +725,10 @@ The command also executes the sentence, with region as the object, if the region
        (defhydra settings-toggle (:foreign-keys warn :exit t) "Toggle:"
          ("p" smartparens-mode "smartparens")
          ("b" (lambda () (interactive) (require 'blamer (blamer-mode))) "git blame")
+         ("B" (lambda () (interactive) (if (equal browse-url-browser-function 'browse-url-firefox)
+                                           (setq browse-url-browser-function 'eww)
+                                         (setq browse-url-browser-function 'browse-url-firefox)))
+          "browser_ffx_eww")
          ("w" whitespace "whitespace")
          ("C" (lambda () (interactive) (require 'rainbow-mode) (rainbow-mode)) "#aabbcc")
          ("c" company-mode "company")
@@ -816,6 +820,7 @@ The command also executes the sentence, with region as the object, if the region
 (emmap "sdii" (cons "info-top" (lambda () (interactive) (wgh/init-minad) (info)))) ;; TODO - this is also C-h i, should I move other doc stuff under C-h?
 (emmap "sdis" (cons "info-search" (lambda () (interactive) (wgh/init-minad) (info-search))))
 (emmap "sdi/" (cons "info-search" (lambda () (interactive) (wgh/init-minad) (info-search))))
+(emmap "sdb" 'browse-url-at-point)
 ;; TODO - C-h r is the emacs manual, and there are several other related things, eg. for packages, etc.  Should I try to put them all under one umbrella here, or should I move what I'm doing under C-h?
 
 
