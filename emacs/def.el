@@ -299,7 +299,22 @@
  ;;(guide-key-mode 1)
  (setq whitespace-final-newline-message "\n<-- No final newline")
  (require 'whitespace-final-newline)
- (global-whitespace-final-newline-mode 1)
+ (define-global-minor-mode blacklisted-global-whitespace-final-newline-mode
+   whitespace-final-newline-mode
+   (lambda ()
+     (when (or (buffer-file-name)
+               (equal (buffer-name) "*scratch*"))
+       (whitespace-final-newline-mode 1))))
+ (blacklisted-global-whitespace-final-newline-mode 1)
+
+ (setq browse-url-browser-function 'browse-url-firefox)
+ (setq browse-url-firefox-program "ffxd")
+
+ ;;(setq eldoc-echo-area-prefer-doc-buffer t) ;; only use echo area if doc buffer is not visible
+ (setq eldoc-documentation-strategy 'eldoc-documentation-compose)
+ (setq lsp-eldoc-render-all t)
+ ;;(setq eldoc-echo-area-use-multiline-p nil) ;; TODO - the default is 'truncate-sym-name-if-fit
+ ;; TODO - eldoc - try using display-buffer-alist to have dedicated space for eldoc-doc-buffers, as suggested in https://www.masteringemacs.org/article/seamlessly-merge-multiple-documentation-sources-eldoc
 
  (savehist-mode 1) ;; Save minibuffer history.
 

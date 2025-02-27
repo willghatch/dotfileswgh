@@ -797,6 +797,27 @@ The command also executes the sentence, with region as the object, if the region
 (emmap "sf" 'fold-toggle-wgh)
 (emmap "sF" 'fold-toggle-wgh-all)
 
+;; Documentation
+;; TODO - these are also related to LSP doc functionality that I have bound to gdi, related to gdd go-to-def.  I would like to consolidate, but looking up docs is not always related to a symbol at point, though it usually is.
+;; TODO - also I use C-h f, C-h v, and C-h o to look up elisp function, value, and function+value docs.  It would be nice to have all docs together in some useful way.
+;; TODO - also bindings for racket-xp-describe and racket-xp-documentation
+
+;; TODO - can set devdocs-current-docs for buffer.  Using devdocs-lookup will set it on first run, but if you want multiple doc sources at once, you need to set the variable manually.
+(emmap "sdd" (cons "devdocs" (lambda () (interactive) (require 'devdocs) (wgh/init-minad) (devdocs-lookup)))) ;; TODO - use symbol at point
+;; TODO - must set dash-docs-common-docsets or dash-doc-docsets, or run dash-docs-activate-docset
+;; TODO - can set dash-docs-browser-func to 'eww, but it maybe doesn't work beautifully.
+;; TODO - can I switch counsel-dash here to just dash-docs, and have a useful function to call at the end, maybe filtered with vertico?  I didn't find the function after a brief search, but I should look again some time.
+(emmap "sdh" (cons "dash-docs" (lambda () (interactive) (require 'counsel-dash) (counsel-dash-at-point))))
+(emmap "sdH" (cons "dash-docs-eww" (lambda () (interactive) (require 'counsel-dash) (let ((counsel-dash-browser-func 'eww)) (counsel-dash-at-point)))))
+(emmap "sdb" 'eldoc-doc-buffer)
+(emmap "sdt" (cons "tldr" (lambda () (interactive) (require 'tldr) (wgh/init-minad) (tldr))))
+(emmap "sdm" (cons "(wo)man" (lambda () (interactive) (wgh/init-minad) (woman))))
+(emmap "sdM" (cons "man" (lambda () (interactive) (wgh/init-minad) (man))))
+(emmap "sdii" (cons "info-top" (lambda () (interactive) (wgh/init-minad) (info)))) ;; TODO - this is also C-h i, should I move other doc stuff under C-h?
+(emmap "sdis" (cons "info-search" (lambda () (interactive) (wgh/init-minad) (info-search))))
+(emmap "sdi/" (cons "info-search" (lambda () (interactive) (wgh/init-minad) (info-search))))
+;; TODO - C-h r is the emacs manual, and there are several other related things, eg. for packages, etc.  Should I try to put them all under one umbrella here, or should I move what I'm doing under C-h?
+
 
 
 

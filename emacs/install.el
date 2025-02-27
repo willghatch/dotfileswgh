@@ -169,6 +169,12 @@
 
   (in 'scad-mode)
 
+  (in 'tldr)
+  (in 'devdocs) ;; Has very nice documentation formatting in terminal emacs with hyperlinks
+  ;;(in 'devdocs-browser) ;; Seems about the same as devdocs...
+  (in 'dash-docs) ;; Has some different doc sources than devdocs, though lots of overlap.  This will open in browser, which can be set to 'eww, but which doesn't necessarily work great in eww.
+  (in 'counsel-dash) ;; requires dash-docs, provides counsel integration
+
   ;;;;;;;; trying new packages, or at least looking at some to consider trying in the future.
   (in 'magit-delta) ;; run with magit-delta-mode, adds syntax highlighting to magit diff views, including highlighting the changes within similar lines.
   (in 'avy) ;; jump to char, like ace-jump, or like pentadactyl link highlighting.  I never used it back in the day when I had ace-jump installed, but maybe worth another try.

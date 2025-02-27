@@ -21,6 +21,9 @@
   (lsp-common-setup)
   (lsp)
 
+  ;; TODO - set devdocs-current-docs, with javascript, dom, react, maybe more
+  (setq dash-docs-docsets '("JavaScript"))
+
   (require 'sgml-mode)
 
   (when nil

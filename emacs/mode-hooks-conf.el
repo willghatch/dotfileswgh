@@ -78,8 +78,11 @@
              (require 'rainbow-identifiers)
              (rainbow-identifiers-mode 1)
              (whitespace-mode 1)
-             (company-conf-init)
-             (company-mode 1)
+             ;; Something is breaking the lazy loading in at least some prog modes...
+             (wgh/init-minad)
+             (wgh/init-corfu)
+             ;;(company-conf-init)
+             ;;(company-mode 1)
              ;;(projectile-mode 1)
              ;; The electric-indent-mode adds a hook to the post-self-insert-hook, and then does auto-indentation on things like comma.  This is extremely annoying when editing a file that doesn't conform to my auto-indent rules (eg. javascript with a different style of indent for method calls on a new line).  Yet it's not necessary for indent-after-newline, which is done with the newline-and-indent command which I already have bound to enter.  So I think I prefer just using newline-and-indent and indent-region without electric-indent-mode.  But something seems to be turning it on automatically.
              (electric-indent-mode -1)
@@ -90,6 +93,7 @@
              (require 'highlight-indent-guides)
              (highlight-indent-guides-mode 1)
              (outline-minor-mode 1)
+             (eldoc-mode 1) ;; automatic docs in echo area, also in eldoc-doc-buffer
              )
             ))
 
