@@ -94,6 +94,10 @@
              (highlight-indent-guides-mode 1)
              (outline-minor-mode 1)
              (eldoc-mode 1) ;; automatic docs in echo area, also in eldoc-doc-buffer
+             (require 'dumb-jump)
+             (add-hook 'xref-backend-functions 'dumb-jump-xref-activate 0 t)
+             (setq xref-show-definitions-function 'xref-show-definitions-completing-read) ;; Show alternate options as completing read rather than in a buffer.  The default is xref-show-definitions-buffer.  For going to definition, completing read is probably nicer, as a help for dumb-jump.
+             ;;(setq xref-show-xrefs-function 'xref--show-xref-buffer) ;; TODO should I sometimes toggle this to be a completing-read variant?  I think I probably often want both.  Maybe this should be added to my settings toggles...
              )
             ))
 
@@ -125,6 +129,12 @@
             ;;(setq lsp-java-jdt-download-url  "https://download.eclipse.org/jdtls/milestones/0.57.0/jdt-language-server-0.57.0-202006172108.tar.gz")
             (lsp)
             (setq-local outline-regexp wgh/c-outline-regexp)
+            ))
+
+(add-hook 'rust-mode-hook
+          (lambda ()
+            (lsp-common-setup)
+            (lsp)
             ))
 
 (add-to-hooks
@@ -350,6 +360,7 @@
       `(
         (emacs-lisp-mode . elisp)
         (lisp-interaction-mode . elisp)
+        (rust-mode . rust)
         ))
 (defun wgh/initialize-treesit-for-buffer ()
   (when (not wgh/treesit-initialized)
