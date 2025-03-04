@@ -1,0 +1,10 @@
+[Desktop Entry]
+Name=ffxd
+GenericName=web browser
+Comment=browse da interwebs
+MimeType=text/html
+Exec=ffxd %F
+Icon=firefox
+Type=Application
+Terminal=false
+Keywords=Web;Browser;
