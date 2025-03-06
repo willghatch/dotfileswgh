@@ -285,9 +285,11 @@ The command also executes the sentence, with region as the object, if the region
                (funcall (cp/add (cp/verb 'copy))
                         n))))
 (emmap " yc" 'xcopy)
+(emmap " yt" 'wgh/tmux-copy)
 (enmap "p" (cp/ae (cp/verb 'paste-to-region-from-move)
                   (cp/obj 'region)))
 (enmap " pc" 'xpaste)
+(enmap " pt" 'wgh/tmux-paste)
 
 (emmap "\"" (lambda (n) (interactive "p")
               (funcall (cp/add (let ((reg (read-key "Register: ")))

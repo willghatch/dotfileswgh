@@ -19,7 +19,7 @@
                               (filter-buffer-substring beg end)))
        (let ((eol (eolp))
              (point-at-region-end (equal end (point))))
-         (call-interactively 'evil-normal-state)
+         ;;(call-interactively 'evil-normal-state)
          (if (and point-at-region-end (not eol))
              (backward-char))))
 
@@ -41,5 +41,21 @@
        (unless (eolp) (forward-char))
        (xpaste)
        (backward-char))
+
+(defun wgh/tmux-copy ()
+  (interactive)
+  (call-process-region (region-beginning)
+                       (region-end)
+                       "tmux"
+                       nil nil nil
+                       "load-buffer"
+                       "-"
+                       ))
+(defun wgh/tmux-paste ()
+  (interactive)
+  (call-process "tmux"
+                nil t nil
+                "show-buffer"
+                ))
 
 (provide 'xclip-conf)
