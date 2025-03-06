@@ -58,4 +58,16 @@
                 "show-buffer"
                 ))
 
+(defun wgh/terminal-copy-osc-string (str)
+  ;; TODO - maybe check length, if it is too long the terminal might abort.
+  (send-string-to-terminal
+   (concat "\e]52;c;"
+           (base64-encode-string str)
+           ;; BEL character
+           "\07")))
+(defun wgh/terminal-copy-osc ()
+  (interactive)
+  (wgh/terminal-copy-osc-string
+   (buffer-substring-no-properties (region-beginning) (region-end))))
+
 (provide 'xclip-conf)

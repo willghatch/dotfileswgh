@@ -1,0 +1,4 @@
+#!/bin/sh
+
+# send tmux copy buffer to stdout
+tmux show-buffer

@@ -1,0 +1,13 @@
+#!/usr/bin/env bash
+
+# Takes input text from stdin.
+# Use OSC-52 terminal sequence to send text through terminal to be copied into system clipboard, which works through ssh by going through the terminal.
+
+# set up the OSC sequence beginning, plus first argument "c" meaning to use clipboard.  Switch to p to use primary selection, or some other arguments, see https://invisible-island.net/xterm/ctlseqs/ctlseqs.html#h3-Operating-System-Commands
+echo -n -e "\e]52;c;"
+
+# The stuff to paste must be base64 encoded.
+cat - | base64
+
+# send BEL to end OSC sequence.
+echo -n -e "\a"

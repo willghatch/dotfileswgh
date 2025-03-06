@@ -1,0 +1,4 @@
+#!/bin/sh
+
+# read stdin to tmux copy buffer
+tmux load-buffer -
