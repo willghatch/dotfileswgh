@@ -550,5 +550,23 @@ I'm sick of doing this manually."
 
 ;;;;;;;;;;;;;
 
+(defun wgh/set-terminal-cursor-style (style &optional blink)
+  "Set terminal cursor to STYLE and optionally BLINK.
+STYLE must be one of 'block, 'underline, or 'bar.
+
+This works in most graphical terminals, I think, as DECSCUSR CSI code.
+"
+  ;; TODO - maybe I want to use this with estate-mode.  If I do, I need hooks on state change or buffer change to set the current cursor style.  I also would need to set it on exit to hopefully restore the previous state.  But do I really even care about this?  Unclear.
+  (let ((style-number (cond
+                       ((and (eq style 'block) blink) 1)
+                       ((and (eq style 'block) (not blink)) 2)
+                       ((and (eq style 'underline) blink) 3)
+                       ((and (eq style 'underline) (not blink)) 4)
+                       ((and (eq style 'bar) blink) 5)
+                       ((and (eq style 'bar) (not blink)) 6)
+                       ;; Default to block non-blinking, I guess?
+                       (t 2))))
+    (send-string-to-terminal
+     (concat "\e[" (number-to-string style-number) " q"))))
 
 (provide 'vfuncs)
