@@ -180,6 +180,12 @@ The command also executes the sentence, with region as the object, if the region
 (enmap (kbd "TAB") 'sp-indent-defun)
 (eimap (kbd "<backtab>") 'indent-for-tab-command)
 
+(emmap (kbd "RET") 'ignore)
+(emmap "\C-m" 'ignore)
+(emmap "\C-j" 'ignore)
+
+
+
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Insert state
 
@@ -725,18 +731,18 @@ The command also executes the sentence, with region as the object, if the region
 ;; "ts" will stand for "toggle setting"
 (emmap "ts"
        (defhydra settings-toggle (:foreign-keys warn :exit t) "Toggle:"
-         ("p" smartparens-mode "smartparens")
+         ("p" (lambda () (interactive) (require 'smartparens) (smartparens-mode)) "smartparens")
          ("b" (lambda () (interactive) (require 'blamer (blamer-mode))) "git blame")
          ("B" (lambda () (interactive) (if (equal browse-url-browser-function 'browse-url-firefox)
                                            (setq browse-url-browser-function 'eww)
                                          (setq browse-url-browser-function 'browse-url-firefox)))
           "browser_ffx_eww")
-         ("w" whitespace "whitespace")
+         ("w" whitespace-mode "whitespace")
          ("C" (lambda () (interactive) (require 'rainbow-mode) (rainbow-mode)) "#aabbcc")
          ("c" company-mode "company")
          ("t" toggle-truncate-lines "trunc")
          ("i" toggle-case-fold-search "/? case")
-         ("W" toggle-wrap-scan "search-wrap")
+         ("W" wgh/toggle-search-wrap "search-wrap")
          ("f" flycheck-mode "flycheck")
          ("F" display-fill-column-indicator-mode "fill-col")
          ("s" flyspell-mode "flyspell")

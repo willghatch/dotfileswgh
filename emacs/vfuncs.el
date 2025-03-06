@@ -149,9 +149,14 @@ quit emacs."
 (defmacro setq-not (symbol)
   `(setq ,symbol (not ,symbol)))
 
-(defun toggle-wrap-scan ()
+;; TODO - I like having config in def.el and functions here, but this is sort of a mix and I want them together...
+;; isearch-wrap-pause can be t (default) to signal an error, then actually wrap the next time, 'no to wrap immediately but flash, 'no-ding to wrap immediately but not flash, or nil to disallow wrapping entirely.
+(setq isearch-wrap-pause 'no)
+(defun wgh/toggle-search-wrap ()
   (interactive)
-  (setq-not evil-search-wrap))
+  (if (equal isearch-wrap-pause nil)
+      (setq isearch-wrap-pause 'no)
+    (setq isearch-wrap-pause nil)))
 
 (defun reformat-file ()
   (interactive)

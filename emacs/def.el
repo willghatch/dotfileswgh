@@ -318,8 +318,6 @@
 
  (savehist-mode 1) ;; Save minibuffer history.
 
- ;; isearch-wrap-pause can be t (default) to signal an error, then actually wrap the next time, 'no to wrap immediately but flash, 'no-ding to wrap immediately but not flash, or nil to disallow wrapping entirely.
- (setq isearch-wrap-pause 'no)
 
 
  ;; TODO - completion config -- there is a lot of completion config that I've never really used that I should consider.
