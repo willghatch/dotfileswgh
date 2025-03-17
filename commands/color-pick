@@ -1,0 +1,14 @@
+#!/usr/bin/env bash
+
+# xcolor prints RGB code to stdout, and I think I want that on wayland, too.
+
+if [[ "$XDG_SESSION_TYPE" = "wayland" ]]; then
+  # slurp selects a region, -b sets bg color, -p sets single-pixel mode
+  # slurp outputs something like: X,Y XSIZExYSIZE
+  pixelPos="$(slurp -b 00000000 -p)"
+  colorData="$(grim -g "$pixelPos" -t png - | magick - -format '%pixel:p{0,0}]' txt:- | tail -n 1)"
+  colorHex="$(echo $colorData | awk '{print $3}')"
+  echo $colorHex
+else
+  exec xcolor
+fi
