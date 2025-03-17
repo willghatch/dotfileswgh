@@ -22,6 +22,12 @@ profile="$DOTFILESWGH_DOTLOCAL/firefox-profiles/firefox-profile_$prof"
 
 if [[ "$new" = "true" ]]; then
     mkdir -p "$profile"
+    pushd "$profile"
+    ln -s "$DOTFILESWGH/firefox-user.js" user.js
+    # TODO - consider a flag to NOT install any preferences, to have total vanilla setup.  I can just manually make an empty directory to do this, though.
+    # TODO - consider auto-installing some extensions, since default firefox is unfortunately missing things that should be core functionality of a proper user agent...
+    # TODO - is there a good way to install firefox with NixOS with a set of extensions pre-loaded?
+    popd
 fi
 
 if [[ -d "$profile" ]]; then
