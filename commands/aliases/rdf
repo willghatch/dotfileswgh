@@ -1,2 +1,2 @@
 #!/usr/bin/env bash
-dr.rkt --browser firefox "$@"
+dr.rkt --browser ffxd "$@"
