@@ -78,14 +78,16 @@
  kept-old-versions 4
  version-control t)       ;; use versioned backups
 (setq auto-save-file-name-transforms '((".*" "~/.cache/emacs/auto/\\1" t))) ;; auto-saves (## files) here
-(make-directory "~/.cache/emacs/bak/" t)
-(make-directory "~/.cache/emacs/auto/" t)
+(nobreak
+ (make-directory "~/.cache/emacs/bak/" t)
+ (make-directory "~/.cache/emacs/auto/" t))
 ;; For now, just don't make backups -- I haven't needed them since I started using git everywhere.
 (setq make-backup-files nil)
 
 ;; mouse settings
-(if (fboundp 'xterm-mouse-mode) (xterm-mouse-mode) nil) ;; shift-click for normal xterm mouse behavior
-(if (fboundp 'mouse-wheel-mode) (mouse-wheel-mode) nil)
+(nobreak
+ (if (fboundp 'xterm-mouse-mode) (xterm-mouse-mode) nil) ;; shift-click for normal xterm mouse behavior
+ (if (fboundp 'mouse-wheel-mode) (mouse-wheel-mode) nil))
 
 ;; settings that need to be loaded before their packages
 (setq
@@ -333,17 +335,14 @@
  ;;(load-library "keyfreq-conf")
  )
 
-(let ((file (concat dotfileswgh-pri "emacs/def.el")))
-  (if (file-exists-p file) (load-file file) nil))
-(let ((file (concat dotfileswgh-dotlocal "emacs/def.el")))
-  (if (file-exists-p file) (load-file file) nil))
-
-
 (nobreak
- (if (string-match "light"
-                   (shell-command-to-string "lightdark-status"))
-     (light-theme)
-   (dark-theme)))
+ (let ((file (concat dotfileswgh-pri "emacs/def.el")))
+   (if (file-exists-p file) (load-file file) nil))
+ (let ((file (concat dotfileswgh-dotlocal "emacs/def.el")))
+   (if (file-exists-p file) (load-file file) nil)))
+
+
+(nobreak (lightdark-update-theme))
 (nobreak (lightdark-update-theme-watch))
 
 (nobreak
