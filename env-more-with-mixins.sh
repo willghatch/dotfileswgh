@@ -1,5 +1,6 @@
 # Requires $HOME and $DOTFILESWGH be set
 
+export DOTFILESWGH="${DOTFILESWGH:-$HOME/dotfileswgh}"
 source $DOTFILESWGH/env-more.sh
 
 # source other dotfileswgh mixin envs if they exist
