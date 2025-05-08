@@ -50,6 +50,7 @@ export EDITOR=e
 #export ALTERNATE_EDITOR=v
 #export PAGER=premacs-pager
 export PAGER=less
+export BROWSER=ffxd
 
 export XDG_DOWNLOAD_DIR="$HOME/dl"
 export VLAUNCHRC="$DOTFILESWGH/vlaunchrc"
@@ -59,3 +60,5 @@ export GREP_COLOR="1;32"
 export TODOMAN_CONFIG=$DOTFILESWGH_PRI/todoman.conf
 export VDIRSYNCER_CONFIG=$DOTFILESWGH_PRI/vdirsyncer.conf
 export KHARD_CONFIG=$DOTFILESWGH_PRI/khard.conf
+
+export DOTFILESWGH_ENV_LOADED=true
