@@ -179,6 +179,7 @@ config.color_scheme = scheme_for_appearance(get_appearance())
 
 wezterm.on("open-uri", function(window, pane, uri)
              --window:copy_to_clipboard(uri, "Clipboard")
+             --window:copy_to_clipboard(os.getenv("DOT_XPROFILE_LOADED") or "nothing", "Clipboard")
              -- returning false prevents the default action, returning true runs the default action (xdg-open)
              return true
 end)

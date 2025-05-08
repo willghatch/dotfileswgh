@@ -7,15 +7,14 @@
 
 export WGHHOME="$HOME"
 export DOTFILESWGH=${DOTFILESWGH:-$WGHHOME/dotfileswgh}
-source $DOTFILESWGH/env-more.sh
+export DOT_XPROFILE_LOADED=true
+source $DOTFILESWGH/env-more-with-mixins.sh
 # I used to conditionally source this, but I really don't remember why.
 # If I find a reason to do this again, I think I'll reverse the test.
 
 
 # only load xsession-common if we're in X11.
-if [ "$XDG_SESSION_TYPE" = "x11" ]; then
-    source $DOTFILESWGH/xsession-common
-elif [ "$XDG_SESSION_TYPE" = "wayland" ]; then
+if [ "$XDG_SESSION_TYPE" = "wayland" ]; then
     echo "in wayland session..."
     if [ "$XDG_SESSION_DESKTOP" = "sway" ]; then
         # there is gui-session-common stuff, mostly about launching background processes, in gui-session common that sway launches later.
@@ -27,7 +26,8 @@ elif [ "$XDG_SESSION_TYPE" = "wayland" ]; then
         echo "about to start hyprland..."
         sleep 2
     fi
-    fi
+elif [ "$XDG_SESSION_TYPE" = "x11" ]; then
+    source $DOTFILESWGH/xsession-common
 else
     source $DOTFILESWGH/xsession-common
 fi
