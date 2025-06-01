@@ -62,7 +62,7 @@
   ;; TODO - maybe check length, if it is too long the terminal might abort.
   (send-string-to-terminal
    (concat "\e]52;c;"
-           (base64-encode-string str)
+           (base64-encode-string (encode-coding-string str 'utf-8))
            ;; BEL character
            "\07")))
 (defun wgh/terminal-copy-osc ()
