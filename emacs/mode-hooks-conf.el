@@ -123,19 +123,21 @@
 
 (add-hook 'java-mode-hook
           (lambda ()
-            (lsp-common-setup)
-            (require 'lsp-java)
-            ;; This lsp download url should work with openjdk11.
-            ;;(setq lsp-java-jdt-download-url  "https://download.eclipse.org/jdtls/milestones/0.57.0/jdt-language-server-0.57.0-202006172108.tar.gz")
-            (lsp)
-            (setq-local outline-regexp wgh/c-outline-regexp)
-            ))
+            (nobreak
+             (lsp-common-setup)
+             (require 'lsp-java)
+             ;; This lsp download url should work with openjdk11.
+             ;;(setq lsp-java-jdt-download-url  "https://download.eclipse.org/jdtls/milestones/0.57.0/jdt-language-server-0.57.0-202006172108.tar.gz")
+             (lsp)
+             (setq-local outline-regexp wgh/c-outline-regexp)
+             )))
 
 (add-hook 'rust-mode-hook
           (lambda ()
-            (lsp-common-setup)
-            (lsp)
-            ))
+            (nobreak
+             (lsp-common-setup)
+             (lsp)
+             )))
 
 (add-to-hooks
  (lambda ()
@@ -308,43 +310,45 @@
             ))
 
 (defun cpp-conf-setup ()
-  (setq-local outline-regexp wgh/c-outline-regexp)
-  ;; This really ought to be set per-file or per-project
-  (setq c-basic-offset 2)
+  (nobreak
+   (setq-local outline-regexp wgh/c-outline-regexp)
+   ;; This really ought to be set per-file or per-project
+   (setq c-basic-offset 2)
 
-  (message "about to require lsp")
-  (lsp-common-setup)
-  ;; Require all of these things, which are apparently not properly required transitively, so lsp finishes initialization and can properly work when opening multiple files.
-  ;; LSP setup -- the clangd server figures out build info to get include paths and hook everything up by looking for a `compile-commands.json` file in parent dirs and in `build` directories it finds on this path.  If building somewhere else, symlink the actual build dir to `build` at the root or something.
-  (lsp)
+   (message "about to require lsp")
+   (lsp-common-setup)
+   ;; Require all of these things, which are apparently not properly required transitively, so lsp finishes initialization and can properly work when opening multiple files.
+   ;; LSP setup -- the clangd server figures out build info to get include paths and hook everything up by looking for a `compile-commands.json` file in parent dirs and in `build` directories it finds on this path.  If building somewhere else, symlink the actual build dir to `build` at the root or something.
+   (lsp)
 
-  ;; TODO - maybe try eglot instead of lsp-mode some time.
-  ;;(require 'eglot)
+   ;; TODO - maybe try eglot instead of lsp-mode some time.
+   ;;(require 'eglot)
 
-  (require 'dap-mode)
-  (require 'dap-mouse)
-  (require 'dap-ui)
-  (require 'dap-cpptools)
-  ;;(require 'dap-lldb)
-  (require 'dap-hydra)
-  ;; Something is trying to access this and crashing, so let's just define it.
-  (defun treemacs--setup-mode-line () nil)
-  ;; dap-mode uses treemacs to build debugger UI stuff, and I guess I want to use the mouse with it sometimes.
-  (require 'treemacs-mouse-interface)
-  ;; Remember to run dap-cpptools-setup to install, and put "type":"cppdbg" and "MIMode":"lldb" in dap config
-  (require 'all-the-icons)
+   (require 'dap-mode)
+   (require 'dap-mouse)
+   (require 'dap-ui)
+   (require 'dap-cpptools)
+   ;;(require 'dap-lldb)
+   (require 'dap-hydra)
+   ;; Something is trying to access this and crashing, so let's just define it.
+   (defun treemacs--setup-mode-line () nil)
+   ;; dap-mode uses treemacs to build debugger UI stuff, and I guess I want to use the mouse with it sometimes.
+   (require 'treemacs-mouse-interface)
+   ;; Remember to run dap-cpptools-setup to install, and put "type":"cppdbg" and "MIMode":"lldb" in dap config
+   (require 'all-the-icons)
 
-  ;;(require 'helm-lsp)
-  ;; TODO - try helm-lsp
-  (lnkmap "m}" 'wgh/trivial-if-braces-remove)
-  )
+   ;;(require 'helm-lsp)
+   ;; TODO - try helm-lsp
+   (lnkmap "m}" 'wgh/trivial-if-braces-remove)
+   ))
 (add-hook 'c++-mode-hook 'cpp-conf-setup)
 
 (defun wgh/start-lsp-for-mlir ()
-  (lsp-common-setup)
-  (require 'mlir-lsp-client)
-  (lsp-mlir-setup)
-  (lsp))
+  (nobreak
+   (lsp-common-setup)
+   (require 'mlir-lsp-client)
+   (lsp-mlir-setup)
+   (lsp)))
 (add-hook 'tablegen-mode-hook 'wgh/start-lsp-for-mlir)
 (add-hook 'mlir-mode-hook 'wgh/start-lsp-for-mlir)
 
