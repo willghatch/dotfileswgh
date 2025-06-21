@@ -116,7 +116,7 @@
   (in 'helm-ag-r)
   (in 'helm-projectile)
   ;;(in 'helm-package)
-  (in 'helm-mode-manager)
+  ;;(in 'helm-mode-manager)
   (in 'helm-helm-commands)
   ;;(in 'helm-c-yasnippet)
   ;;(in 'helm-company)
