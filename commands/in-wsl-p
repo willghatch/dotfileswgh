@@ -1,0 +1,10 @@
+#!/usr/bin/env bash
+
+# print true/false for whether in wsl
+
+if [[ -f /proc/sys/fs/binfmt_misc/WSLInterop && -d /mnt/c && -n "$WSL_DISTRO_NAME" ]]; then
+  echo true
+  exit 0
+fi
+echo false
+exit 0

@@ -32,6 +32,17 @@ macos-update(){
     # set iterm2 style
     $DOTFILESWGH_DOTLOCAL/iterm2-python3-venv/bin/python $DOTFILESWGH/commands/iterm2-set-profile.py "$iterm2Style"
 }
+wsl-update() {
+    local themeNumber=0
+    if [[ "$1" = "light" ]]; then
+        themeNumber=1
+    fi
+    echo "
+    Set-ItemProperty 'HKCU:\SOFTWARE\Microsoft\Windows\CurrentVersion\Themes\Personalize' -Name AppsUseLightTheme -Value $themeNumber
+    Set-ItemProperty 'HKCU:\SOFTWARE\Microsoft\Windows\CurrentVersion\Themes\Personalize' -Name SystemUsesLightTheme -Value $themeNumber
+    " | powershell.exe
+    linux-update
+}
 linux-update(){
     # $1 is either "light" or "dark"
     lightdark-konsole-dbus-update
@@ -58,6 +69,8 @@ soft-update(){
     # Do system-specific updates
     if [[ "$(uname)" = "Darwin" ]]; then
         macos-update "$1"
+    elif [[ "$(in-wsl-p)" = "true" ]]; then
+        wsl-update "$1"
     else
         linux-update "$1"
     fi
