@@ -21,6 +21,10 @@ function is_macos()
   -- and x86_64-apple-darwin
   return wezterm.target_triple:find "darwin"
 end
+function is_windows()
+  return wezterm.target_triple:find "windows"
+end
+
 
 config.enable_scroll_bar=true
 config.hide_tab_bar_if_only_one_tab = true
@@ -37,6 +41,11 @@ config.font = wezterm.font "Deja Vu Sans Mono"
 if is_macos() then
   config.font = wezterm.font("Monaco")
   --config.font = wezterm.font("Monaco", {weight = "Thin"})
+end
+if is_windows() then
+  config.font = wezterm.font("Cascadia Mono")
+  --config.default_domain = "WSL:Ubuntu"
+  config.default_prog = {"wsl.exe"}
 end
 
 config.keys = {
@@ -139,6 +148,16 @@ function get_appearance_from_lightdark()
   elseif (ldStatus == "dark\n") then
     return "Dark"
   else
+    if (is_windows()) then
+      local f = io.open(os.getenv("UserProfile") .. "/lightdark-current")
+      local str = f:read("*a")
+      f:close()
+      if (str == "light\n") then
+        return "Light"
+      else
+        return "Dark"
+      end
+    end
     return "Dark"
   end
 end
@@ -148,6 +167,9 @@ function get_appearance()
   if wezterm.gui then
     -- TODO - this doesn't seem to be working on Linux.
     if is_macos() then
+      return wezterm.gui.get_appearance()
+    end
+    if is_windows() then
       return wezterm.gui.get_appearance()
     end
   end
@@ -176,6 +198,26 @@ config.color_scheme = scheme_for_appearance(get_appearance())
 --               window:set_config_overrides({font_size=12})
 --             end
 --end)
+
+function updateAppearanceDynamic(window, pane)
+  --print("in updateAppearanceDynamic\n")
+  local overrides = window:get_config_overrides() or {}
+  local appearance = window:get_appearance()
+  local scheme = scheme_for_appearance(appearance)
+  if overrides.color_scheme ~= scheme then
+    overrides.color_scheme = scheme
+    window:set_config_overrides(overrides)
+  end
+end
+
+--wezterm.on('window-config-reloaded', updateAppearanceDynamic)
+-- the update-status event fires based on status_update_interval in milliseconds
+-- It is suggested as a good way to update appearance...
+-- It only fires when the window is active.
+if is_windows() then
+  wezterm.on('update-status', updateAppearanceDynamic)
+  config.status_update_interval = 2000
+end
 
 wezterm.on("open-uri", function(window, pane, uri)
              --window:copy_to_clipboard(uri, "Clipboard")
