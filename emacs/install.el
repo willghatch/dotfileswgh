@@ -169,6 +169,8 @@
 
   (in 'scad-mode)
 
+  (in 'lsp-pyright)
+
   (in 'tldr)
   (in 'devdocs) ;; Has very nice documentation formatting in terminal emacs with hyperlinks
   ;;(in 'devdocs-browser) ;; Seems about the same as devdocs...
