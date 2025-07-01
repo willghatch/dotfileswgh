@@ -2,38 +2,38 @@
 (defun add-to-hooks (fun hooklist)
   (mapcar (lambda (hook) (add-hook hook fun)) hooklist))
 
-(add-to-list 'auto-mode-alist '("\\.zsh\\'" . shell-script-mode))
-(add-to-list 'auto-mode-alist '("PKGBUILD" . shell-script-mode))
-(add-to-list 'auto-mode-alist '("\\.install" . shell-script-mode))
+(add-to-list 'auto-mode-alist '("\\.zsh$" . shell-script-mode))
+(add-to-list 'auto-mode-alist '("^PKGBUILD$" . shell-script-mode))
+(add-to-list 'auto-mode-alist '("\\.install$" . shell-script-mode))
 
 (autoload 'systemd-mode "systemd")
-(add-to-list 'auto-mode-alist '("\\.service" . systemd-mode))
-(add-to-list 'auto-mode-alist '("\\.socket" . systemd-mode))
+(add-to-list 'auto-mode-alist '("\\.service$" . systemd-mode))
+(add-to-list 'auto-mode-alist '("\\.socket$" . systemd-mode))
 
 (autoload 'rust-mode "rust-mode")
-(add-to-list 'auto-mode-alist '("\\.rs" . rust-mode))
+(add-to-list 'auto-mode-alist '("\\.rs$" . rust-mode))
 (autoload 'lua-mode "lua-mode")
-(add-to-list 'auto-mode-alist '("\\.lua" . lua-mode))
+(add-to-list 'auto-mode-alist '("\\.lua$" . lua-mode))
 (autoload 'solidity-mode "solidity-mode")
-(add-to-list 'auto-mode-alist '("\\.sol" . solidity-mode))
+(add-to-list 'auto-mode-alist '("\\.sol$" . solidity-mode))
 
 (autoload 'scad-mode "scad-mode")
-(add-to-list 'auto-mode-alist '("\\.scad" . scad-mode))
+(add-to-list 'auto-mode-alist '("\\.scad$" . scad-mode))
 
 (autoload 'tablegen-mode "tablegen-mode")
-(add-to-list 'auto-mode-alist '("\\.td" . tablegen-mode))
+(add-to-list 'auto-mode-alist '("\\.td$" . tablegen-mode))
 
 (autoload 'mlir-mode "mlir-mode")
-(add-to-list 'auto-mode-alist '("\\.mlir" . mlir-mode))
+(add-to-list 'auto-mode-alist '("\\.mlir$" . mlir-mode))
 
 (autoload 'markdown-mode "markdown-mode")
-(add-to-list 'auto-mode-alist '("\\.md" . markdown-mode))
+(add-to-list 'auto-mode-alist '("\\.md$" . markdown-mode))
 
-(add-to-list 'auto-mode-alist '(".gitmodules" . conf-unix-mode))
-(add-to-list 'auto-mode-alist '(".gitignore" . conf-unix-mode))
+(add-to-list 'auto-mode-alist '("^.gitmodules$" . conf-unix-mode))
+(add-to-list 'auto-mode-alist '("^.gitignore$" . conf-unix-mode))
 
 (autoload 'nix-mode "nix-mode")
-(add-to-list 'auto-mode-alist '("\\.nix" . nix-mode))
+(add-to-list 'auto-mode-alist '("\\.nix$" . nix-mode))
 
 
 (add-hook 'after-save-hook 'executable-make-buffer-file-executable-if-script-p)
@@ -294,7 +294,7 @@
   (lnkmap "mm" 'wgh/increment-number-at-end-of-line)
   (lnkmap "md" 'wgh/send-line-to-bottom-of-buffer)
   )
-(add-to-list 'auto-mode-alist '("\\.checklist" . wgh-checklist-mode))
+(add-to-list 'auto-mode-alist '("\\.checklist$" . wgh-checklist-mode))
 
 
 (defun wgh/xml-magic-tag-close ()
