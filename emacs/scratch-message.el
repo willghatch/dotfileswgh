@@ -8,6 +8,9 @@
         (apply #'concat (mapcar (lambda (x) (concat ";; " x "\n"))
                                 (file->lines banner-file)))))
 
+;; If I don't set this, straight single quotes are turned into curved quotes.
+(setq text-quoting-style 'straight)
+
 (setq scratch-useful-message
       "
 
@@ -22,8 +25,11 @@
 
 ;;(define-key evil-normal-state-map \"a\" 'evil-append)
 ;;(defalias 'eb 'eval-buffer)
-;; [m,n,i,v,w,t]kmap
-;;(tkmap \"p\" 'previous-something)
+;; e[m,n,i,I,v,w,t]map
+;;(etmap \"p\" 'previous-something)
+;;;; For terminal paste when newline-and-indent breaks things...
+;;(eimap (kbd \"RET\") 'newline)
+;;(eimap (kbd \"RET\") 'newline-and-indent)
 ;;
 ;;(defun foo (n)
 ;;  (interactive)
