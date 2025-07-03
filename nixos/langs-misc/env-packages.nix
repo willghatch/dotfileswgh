@@ -10,7 +10,7 @@ in [
   pp.rustfmt
   pp.mrustc
 
-  pp.swift
+  #pp.swift
 
   pp.clang
   pp.llvmPackages_latest.llvm
@@ -40,7 +40,7 @@ in [
   pp.nodePackages.typescript-language-server
   pp.nodePackages.prettier
 
-  pp.solc
+  #pp.solc
 
   pp.openssl
   pp.openssl.dev
@@ -62,6 +62,7 @@ in [
   cp.gitAndTools.gitFull
   cp.tig
   #(cp.callPackage ../misc/ripgrep-renamed.nix {})
+  cp.ripgrep
   cp.silver-searcher
   # poor man's gitk...
   cp.gitg

@@ -2,8 +2,8 @@
 let pinnedPackages = pkgs.fetchFromGitHub {
       owner = "NixOS";
       repo = "nixpkgs";
-      # nixos-21.05 as of 2021-07-06
-      rev = "fefb0df7d2ab2e1cabde7312238026dcdc972441";
-      sha256 = "1ckzhh24mgz6jd1xhfgx0i9mijk6xjqxwsshnvq789xsavrmsc36";
+      # nixos-24.05 as of 2025-07-02
+      rev = "628f7826b70243902032764585f36cbcc71ce246";
+      hash = "sha256-DiO+E3lu1yj0sa/ovjmOtZ1VJ7wW7IJyUC9oTg41ZTA=";
     };
     in import pinnedPackages {}
