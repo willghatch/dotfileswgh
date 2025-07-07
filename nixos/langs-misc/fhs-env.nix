@@ -2,7 +2,7 @@
 let
 pp = import ./env-pin.nix {};
 in
-(pp.buildFHSUserEnv {
+(pp.buildFHSEnv {
   name = "fhs-env";
   targetPkgs = pkgs: import ./env-packages.nix {};
   runScript = ./post-env.sh;
