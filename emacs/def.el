@@ -46,7 +46,9 @@
      (normal-top-level-add-subdirs-to-load-path)))
  (setq load-path (cons (concat local-emacs.d-path "single-files/") load-path))
  (setq load-path (cons (concat dotfileswgh "emacs/") load-path))
+ (setq load-path (cons (concat dotfileswgh-ghp "emacs/") load-path))
  (setq load-path (cons (concat dotfileswgh-pri "emacs/") load-path))
+ (setq load-path (cons (concat dotfileswgh-pri-dotlocal "emacs/") load-path))
  (setq load-path (cons (concat dotfileswgh-dotlocal "emacs/") load-path))
  ;; Add straight build dirs, so that emacs can search in them, rather than using
  ;; straight on every emacs load.  It won't process autoloads, but I can wrap
@@ -343,7 +345,11 @@
  )
 
 (nobreak
+ (let ((file (concat dotfileswgh-ghp "emacs/def.el")))
+   (if (file-exists-p file) (load-file file) nil))
  (let ((file (concat dotfileswgh-pri "emacs/def.el")))
+   (if (file-exists-p file) (load-file file) nil))
+ (let ((file (concat dotfileswgh-pri-dotlocal "emacs/def.el")))
    (if (file-exists-p file) (load-file file) nil))
  (let ((file (concat dotfileswgh-dotlocal "emacs/def.el")))
    (if (file-exists-p file) (load-file file) nil)))
