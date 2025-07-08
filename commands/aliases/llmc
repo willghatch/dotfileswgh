@@ -1,0 +1,15 @@
+#!/bin/sh
+
+# Notes:
+# -m MODEL
+# -q search-for-closest-model, lazy -m
+# -s SYSTEM-PROMPT
+# -c -- continue previous conversation, --cid ID to choose specific rather than most recent, use `llm logs` to find it
+# -a ATTACHMENT (can be image, etc, as file path or URI)
+# -f FRAGMENT (as a path or URI, TODO how is this different from attachment for text files)
+# llm chat -- start interactive chat
+# llm models -- list available models
+# -t TEMPLATE -- use saved template
+
+export XDG_CONFIG_HOME="${DOTFILESWGH_PRI_DOTLOCAL:-${XDG_RUNTIME_DIR:-/nowhere/}}/llm-xdg-config-home/"
+exec llm "$@"
