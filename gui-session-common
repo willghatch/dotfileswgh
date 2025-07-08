@@ -48,11 +48,14 @@ if [ -z "$GUI_SESSION_COMMON_RUN_P" ]; then
   fi
 
 
+  if [ -f $DOTFILESWGH_GHP/gui-session-rc ]; then
+      source $DOTFILESWGH_GHP/gui-session-rc
+  fi
   if [ -f $DOTFILESWGH_PRI/gui-session-rc ]; then
       source $DOTFILESWGH_PRI/gui-session-rc
   fi
-  if [ -f $HOME/rootgit-dotfiles/gui-session-rc ]; then
-      source $HOME/rootgit-dotfiles/gui-session-rc
+  if [ -f $DOTFILESWGH_ROOTGIT/gui-session-rc ]; then
+      source $DOTFILESWGH_ROOTGIT/gui-session-rc
   fi
   if [ -f $DOTFILESWGH_DOTLOCAL/gui-session-rc ]; then
       source $DOTFILESWGH_DOTLOCAL/gui-session-rc

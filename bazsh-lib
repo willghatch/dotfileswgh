@@ -25,7 +25,7 @@ sourceFromPathArray() {
     done
 }
 
-dotfileswghAlts=("$DOTFILESWGH_PRI" "$DOTFILESWGH_ROOTGIT" "$DOTFILESWGH_DOTLOCAL" "$DOTFILESWGH_PRI_DOTLOCAL")
+dotfileswghAlts=("$DOTFILESWGH_GHP" "$DOTFILESWGH_PRI" "$DOTFILESWGH_ROOTGIT" "$DOTFILESWGH_DOTLOCAL" "$DOTFILESWGH_PRI_DOTLOCAL")
 dotfileswghAll=("$DOTFILESWGH" "${dotfileswghAlts[@]}")
 
 sourceFromDotfileswghAll() {
@@ -35,3 +35,4 @@ sourceFromDotfileswghAlts() {
     sourceFromPathArray "$1" "${dotfileswghAlts[@]}"
 }
 
+bazshLibSourced=true

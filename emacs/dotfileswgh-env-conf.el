@@ -10,6 +10,9 @@
 (setq dotfileswgh (ensure-final-slash (getenv "DOTFILESWGH")))
 (setq dotfileswgh-dotlocal (ensure-final-slash (getenv "DOTFILESWGH_DOTLOCAL")))
 (setq dotfileswgh-pri (ensure-final-slash (getenv "DOTFILESWGH_PRI")))
+(setq dotfileswgh-pri-dotlocal (ensure-final-slash (getenv "DOTFILESWGH_PRI_DOTLOCAL")))
+(setq dotfileswgh-ghp (ensure-final-slash (getenv "DOTFILESWGH_GHP")))
+
 
 (setq local-emacs.d-path
       (ensure-final-slash
