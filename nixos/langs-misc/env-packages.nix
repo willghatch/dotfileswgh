@@ -61,6 +61,7 @@ in [
   cp.man
   cp.gitAndTools.gitFull
   cp.tig
+  cp.aider-chat
   #(cp.callPackage ../misc/ripgrep-renamed.nix {})
   cp.ripgrep
   cp.silver-searcher

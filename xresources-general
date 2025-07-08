@@ -3,6 +3,11 @@
 ! this file to window manager startup files...
 ! the command is:
 ! xrdb $PATH_TO_THIS_FILE
+
+Xcursor.theme: catppuccin-frappe-green
+! 16 is probably a better size for 1080p monitors, but since I got 4k monitors I prefer a bigger cursor...
+Xcursor.size: 32
+
 xterm*termName: xterm-256color
 XTerm*metaSendsEscape: true
 Xterm*saveLines: 4096

@@ -7,6 +7,10 @@ if [[ -n "$HYPRLAND_INSTANCE_SIGNATURE" ]]; then
   monitorOn='hyprctl dispatch dpms on'
 fi
 
+# don't actually use monitorOff for now... it seems to be causing problems
+monitorOff='true'
+monitorOn='true'
+
 lockTimeout=600
 lockWarn=$(( $lockTimeout - 10 ))
 monitorTimeout=900
