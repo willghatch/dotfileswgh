@@ -851,6 +851,7 @@ The command also executes the sentence, with region as the object, if the region
             ("y" (cape-interactive 'cape-elisp-symbol) "cape-elisp")
             ("d" (cape-interactive 'cape-dabbrev) "dabbrev -- text-in-buffer")
             ("s" yas-expand "yas")
+            ("c" 'copilot-map/body "copilot")
             ("C-g" 'ignore "quit")
             )
 

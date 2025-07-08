@@ -48,6 +48,7 @@
   (straight-use-package (submod 'whitespace-final-newline))
   (straight-use-package (submod 'alternate-region))
 
+;;; Next most important group
   (straight-use-package (submod 'dash))
   (straight-use-package (submod 'smartparens))
   (straight-use-package (submod 'rainbow-delimiters))
@@ -58,18 +59,8 @@
   (straight-use-package (submod 'magit))
   (straight-use-package (submod 'evil))
   (straight-use-package (submod 'nix-mode))
-;;; Next most important group
-;;; These are also now submodules
-  ;;(in 'smartparens)
-  ;;(in 'rainbow-delimiters)
-  ;;(in 'rainbow-identifiers)
-  ;;(in 'company)
-  ;;(in 'rainbow-mode) ; for #123456 colors
-  ;;(in 'xclip)
-  ;;(in 'magit)
-  ;;(in 'evil)
-  ;;(in 'nix-mode)
 
+;;; Tertiary packages
   (in 'rg)
   (in 'systemd)
   (in 'yafolding)
@@ -170,6 +161,12 @@
   (in 'scad-mode)
 
   (in 'lsp-pyright)
+
+  (in 'gptel)
+  (in 'copilot)
+  (in 'copilot-chat)
+  (in '(aidermacs :type git :repo "https://github.com/MatthewZMD/aidermacs"))
+  (in '(aider :type git :repo "https://github.com/tninja/aider.el"))
 
   (in 'tldr)
   (in 'devdocs) ;; Has very nice documentation formatting in terminal emacs with hyperlinks

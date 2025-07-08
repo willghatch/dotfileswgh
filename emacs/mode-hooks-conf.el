@@ -365,7 +365,12 @@
 (add-hook 'tablegen-mode-hook 'wgh/start-lsp-for-mlir)
 (add-hook 'mlir-mode-hook 'wgh/start-lsp-for-mlir)
 
-
+(add-hook 'aidermacs-comint-mode-hook
+          (lambda ()
+            ;; TODO - check out aidermacs-comint-mode-map
+            (nobreak-define-key estate-insert-state-buffer-local-keymap
+                                (kbd "C-j") 'comint-send-input)
+            ))
 
 
 (load-library "js-conf")
