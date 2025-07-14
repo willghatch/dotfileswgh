@@ -138,6 +138,15 @@ config.color_schemes = {
   },
 }
 
+-- audible_bell options are "Disabled" and "SystemBeep", currently no way to set another sound yet
+config.audible_bell = "Disabled"
+config.visual_bell = {
+  fade_in_function = 'EaseIn',
+  fade_in_duration_ms = 50,
+  fade_out_function = 'EaseOut',
+  fade_out_duration_ms = 50,
+  -- TODO - set visual_bell color in color schemes
+}
 
 function get_appearance_from_lightdark()
   local ldStatusProc = io.popen("lightdark-status")
