@@ -383,6 +383,7 @@
         (emacs-lisp-mode . elisp)
         (lisp-interaction-mode . elisp)
         (rust-mode . rust)
+        (python-mode . python)
         ))
 (defun wgh/initialize-treesit-for-buffer ()
   (when (not wgh/treesit-initialized)
