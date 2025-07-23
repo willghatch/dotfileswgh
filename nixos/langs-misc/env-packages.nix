@@ -27,6 +27,7 @@ in [
   pp.ninja
 
   pp.python3
+  #pp.python2
 
   pp.zlib
   pp.zlib.dev
@@ -58,6 +59,7 @@ in [
   cp.zsh
   cp.coreutils
   cp.emacs
+  cp.fzf
   cp.man
   cp.gitAndTools.gitFull
   cp.tig

@@ -45,6 +45,7 @@ in [
   cp.zsh
   cp.coreutils
   cp.emacs
+  cp.fzf
   cp.man
   cp.gitAndTools.gitFull
   cp.tig
