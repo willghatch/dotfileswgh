@@ -851,16 +851,21 @@ The command also executes the sentence, with region as the object, if the region
             ("y" (cape-interactive 'cape-elisp-symbol) "cape-elisp")
             ("d" (cape-interactive 'cape-dabbrev) "dabbrev -- text-in-buffer")
             ("s" yas-expand "yas")
-            ("c" 'copilot-map/body "copilot")
+            ("c" copilot-complete "copilot")
             ("C-g" 'ignore "quit")
             )
 
-(myhydradef copilot-map
-            ("a" copilot-accept-completion "accept")
-            ("j" copilot-next-completion "next")
-            ("k" copilot-previous-completion "prev")
-            ("s" copilot-complete "start")
-            )
+(defhydra copilot-hydra (:foreign-keys warn) "CP:"
+  ("tab" copilot-accept-completion "accept")
+  ("a" copilot-accept-completion "accept")
+  ("w" copilot-accept-completion-by-word "accept-word")
+  ("l" copilot-accept-completion-by-line "accept-line")
+  ("p" copilot-accept-completion-by-paragraph "accept-para")
+  ("j" copilot-next-completion "next")
+  ("k" copilot-previous-completion "prev")
+  ("s" copilot-complete "start")
+  ("C-g" nil "quit")
+  )
 
 
 (defhydra my-window-map (:foreign-keys warn) "WM:"

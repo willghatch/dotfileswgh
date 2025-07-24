@@ -329,6 +329,7 @@
 
  (savehist-mode 1) ;; Save minibuffer history.
 
+ (setq copilot-idle-delay nil) ;; Don't auto-suggest, just complete when requested.
 
 
  ;; TODO - completion config -- there is a lot of completion config that I've never really used that I should consider.

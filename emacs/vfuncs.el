@@ -438,16 +438,22 @@ I'm sick of doing this manually."
 
 (defun wgh/start-copilot ()
   (interactive)
-  (require 'copilot)
+  (nobreak
+   (require 'copilot)
 
-  (require 'request)
-  (require 'org)
-  (require 'markdown-mode)
-  (require 'shell-maker)
-  (require 'magit)
-  (require 'copilot-chat)
+   (define-key copilot-completion-map (kbd "C-n") 'copilot-next-completion)
+   (define-key copilot-completion-map (kbd "C-p") 'copilot-previous-completion)
+   (define-key copilot-completion-map (kbd "C-i") 'copilot-accept-completion)
+   (define-key copilot-completion-map (kbd "C-m") 'copilot-hydra/body)
 
-  (copilot-mode))
+   (require 'request)
+   (require 'org)
+   (require 'markdown-mode)
+   ;;(require 'shell-maker)
+   (require 'magit)
+   (require 'copilot-chat)
+
+   (copilot-mode)))
 
 
 (defun refresh-buffer-from-file ()
