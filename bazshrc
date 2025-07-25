@@ -190,12 +190,16 @@ cpost()
 }
 
 # fix terminal
-tic -x $DOTFILESWGH/xterm-256color-italic.terminfo
-tic -x $DOTFILESWGH/xterm-24bit.terminfo
-tic -x $DOTFILESWGH/xterm-24bit-italic.terminfo
-if [[ "$TERM" = "xterm" || "$TERM" = "xterm-256color" ]]; then
-    TERM=xterm-24bit-italic
-fi
+dftic() {
+    tic -x $DOTFILESWGH/xterm-256color-italic.terminfo
+    tic -x $DOTFILESWGH/xterm-24bit.terminfo
+    tic -x $DOTFILESWGH/xterm-24bit-italic.terminfo
+}
+dfterm() {
+    if [[ "$TERM" = "xterm" || "$TERM" = "xterm-256color" ]]; then
+        TERM=xterm-24bit-italic
+    fi
+}
 
 lesskey $DOTFILESWGH/lesskey 2>/dev/null
 
