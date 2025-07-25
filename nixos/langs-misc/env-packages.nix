@@ -28,6 +28,7 @@ in [
 
   pp.python3
   #pp.python2
+  pp.uv
 
   pp.zlib
   pp.zlib.dev
