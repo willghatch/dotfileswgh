@@ -12,4 +12,7 @@ in
   name = "racket-fhs-env";
   targetPkgs = pkgs: import ./racket-env-packages.nix {};
   runScript = ./racket-post-env.sh;
+  profile = ''
+    export LOCALE_ARCHIVE="${pp.glibcLocales}/lib/locale/locale-archive";
+  '';
 }).env
