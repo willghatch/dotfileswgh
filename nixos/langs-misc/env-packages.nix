@@ -59,6 +59,7 @@ in [
   cp.ncurses5
   cp.zsh
   cp.coreutils
+  cp.tmux
   cp.emacs
   cp.fzf
   cp.man

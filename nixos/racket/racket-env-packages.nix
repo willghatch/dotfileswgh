@@ -53,6 +53,7 @@ in [
   cp.bashInteractive
   cp.zsh
   cp.coreutils
+  cp.tmux
   cp.emacs
   cp.fzf
   cp.man
