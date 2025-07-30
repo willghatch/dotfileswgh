@@ -1,2 +1,2 @@
 #!/bin/sh
-exec tmux -L red -f $DOTFILESWGH/tmux-red.conf "$@"
+exec tmux -L "${TMUX_COLOR:-red}" -f $DOTFILESWGH/tmux.conf "$@"

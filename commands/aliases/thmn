@@ -1,8 +1,11 @@
 #!/bin/sh
-if test "red" = "$TMUX_COLOR"; then
+color="$1"
+shift
+if test "$color" = "$TMUX_COLOR"; then
     cd ~
     TMUX="" thm new-session -d -s "$@"
     thm switch-client -t "$@"
 else
+    export TMUX_COLOR="$color"
     exec thm new-session -s "$@"
 fi

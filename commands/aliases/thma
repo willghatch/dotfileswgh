@@ -1,2 +1,4 @@
 #!/bin/sh
+export TMUX_COLOR="$1"
+shift
 exec thm attach-session -t "$@"

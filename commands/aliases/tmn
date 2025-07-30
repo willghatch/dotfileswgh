@@ -5,5 +5,6 @@ if test "blue" = "$TMUX_COLOR"; then
     tm switch-client -t "$@"
 else
     unset TMUX
+    export TMUX_COLOR=blue
     exec tm new-session -s "$@"
 fi
