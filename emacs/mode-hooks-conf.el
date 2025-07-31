@@ -264,6 +264,13 @@
    (define-key wgh/magit-log-m-keymap "brh" 'wgh/magit-current-branch-reset-hard-at-point)
    (define-key wgh/magit-log-m-keymap "brm" 'wgh/magit-current-branch-reset-mixed-at-point)
    ))
+
+(add-hook 'magit-status-mode-hook
+          (lambda ()
+            (lnkmap "mt" 'magit-section-toggle)
+            (lnkmap "ms" 'magit-stage)
+            (lnkmap "mu" 'magit-unstage)
+            ))
                                         ;
 ;; so it doesn't barf when it's not set!
 (setq start-on-pager-state nil)

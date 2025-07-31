@@ -575,4 +575,7 @@ This works in most graphical terminals, I think, as DECSCUSR CSI code.
     (send-string-to-terminal
      (concat "\e[" (number-to-string style-number) " q"))))
 
+(autoload 'magit-status "magit" "magit-status" t)
+(defalias 'mgs 'magit-status)
+
 (provide 'vfuncs)
