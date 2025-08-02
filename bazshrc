@@ -1,8 +1,8 @@
 # -*- mode: shell-script; -*-
 
 export DOTFILESWGH="${DOTFILESWGH:-$HOME/dotfileswgh}"
+source $DOTFILESWGH/env-more-with-mixins.sh
 source $DOTFILESWGH/bazsh-lib
-source $DOTFILESWGH/env-more.sh
 
 
 if /system/bin/true >/dev/null 2>&1; then
