@@ -16,8 +16,8 @@
   mnemonicPrefix = true # instead of a/ and b/, use prefixes related to current op, like (i)ndex, (w)ork tree, (c)ommit, (o)bject
   renames = true # detect if files have been renamed
 [push]
-	default = current
-  autoSetupRemote = true
+  default = upstream
+  autoSetupRemote = false
   #followTags = true # automatically push tags
 [alias]
     # Get and check out pull requests.
