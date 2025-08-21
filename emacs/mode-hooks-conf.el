@@ -115,10 +115,14 @@
 (add-hook 'python-mode-hook
           (lambda ()
             (setq-local outline-regexp wgh/bash-outline-regexp)
-            (setq-local cpo-treesitter-qd-splicing-rules
-                        '(("argument_list" "call")
-                          ("assignment" "expression_statement")
-                          ))
+            (with-eval-after-load 'cpo-treesitter-qd
+              (setq-local cpo-treesitter-qd-splicing-predicates
+                          (list
+                           (cpo-treesitter-qd-ancestor-list-predicate
+                            '("argument_list" "call"))
+                           (cpo-treesitter-qd-ancestor-list-predicate
+                            '("assignment" "expression_statement"))
+                           )))
 
             (when (memq 'python wgh/lsp-modes)
               (lsp-common-setup)

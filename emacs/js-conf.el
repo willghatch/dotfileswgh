@@ -27,7 +27,11 @@
 
    (require 'sgml-mode)
 
-   (setq-local cpo-treesitter-qd-splicing-rules '(("arguments" "call_expression")))
+   (with-eval-after-load 'cpo-treesitter-qd
+     (setq-local cpo-treesitter-qd-splicing-predicates
+                 (list
+                  (cpo-treesitter-qd-ancestor-list-predicate
+                   '("arguments" "call_expression")))))
 
    (when nil
      (require 'js2-mode)
