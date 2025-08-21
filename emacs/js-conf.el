@@ -27,6 +27,8 @@
 
    (require 'sgml-mode)
 
+   (setq-local cpo-treesitter-qd-splicing-rules '(("arguments" "call_expression")))
+
    (when nil
      (require 'js2-mode)
      (js2-minor-mode 1)

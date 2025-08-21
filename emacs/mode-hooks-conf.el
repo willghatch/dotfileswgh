@@ -115,6 +115,11 @@
 (add-hook 'python-mode-hook
           (lambda ()
             (setq-local outline-regexp wgh/bash-outline-regexp)
+            (setq-local cpo-treesitter-qd-splicing-rules
+                        '(("argument_list" "call")
+                          ("assignment" "expression_statement")
+                          ))
+
             (when (memq 'python wgh/lsp-modes)
               (lsp-common-setup)
               (require 'lsp-pyright)
@@ -391,6 +396,7 @@
         (lisp-interaction-mode . elisp)
         (rust-mode . rust)
         (python-mode . python)
+        (js-mode . javascript)
         ))
 (defun wgh/initialize-treesit-for-buffer ()
   (when (not wgh/treesit-initialized)
