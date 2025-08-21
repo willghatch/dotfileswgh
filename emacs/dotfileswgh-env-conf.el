@@ -9,9 +9,18 @@
 
 (setq dotfileswgh (ensure-final-slash (getenv "DOTFILESWGH")))
 (setq dotfileswgh-dotlocal (ensure-final-slash (getenv "DOTFILESWGH_DOTLOCAL")))
+(setq dotfileswgh-rootgit (ensure-final-slash (getenv "DOTFILESWGH_ROOTGIT")))
 (setq dotfileswgh-pri (ensure-final-slash (getenv "DOTFILESWGH_PRI")))
 (setq dotfileswgh-pri-dotlocal (ensure-final-slash (getenv "DOTFILESWGH_PRI_DOTLOCAL")))
 (setq dotfileswgh-ghp (ensure-final-slash (getenv "DOTFILESWGH_GHP")))
+(setq dotfileswgh-list
+      (list dotfileswgh
+            dotfileswgh-ghp
+            dotfileswgh-pri
+            dotfileswgh-rootgit
+            dotfileswgh-dotlocal
+            dotfileswgh-pri-dotlocal
+            ))
 
 
 (setq local-emacs.d-path

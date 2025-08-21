@@ -850,7 +850,14 @@ The command also executes the sentence, with region as the object, if the region
             ("l" (cape-interactive 'elisp-completion-at-point) "elisp")
             ("y" (cape-interactive 'cape-elisp-symbol) "cape-elisp")
             ("d" (cape-interactive 'cape-dabbrev) "dabbrev -- text-in-buffer")
-            ("s" yas-expand "yas")
+            ("s"
+             (progn (require 'yasnippet-conf)
+                    (call-interactively 'yas-expand))
+             "yas")
+            ("t"
+             (progn (require 'tempel-conf)
+                    (call-interactively 'tempel-complete))
+             "tempel")
             ("c" copilot-complete "copilot")
             ("C-g" 'ignore "quit")
             )

@@ -113,6 +113,9 @@
   ;;(in 'helm-company)
   (in 'helm-descbinds)
 
+  (in 'tempel)
+  ;;(in 'yasnippet)
+
   ;; Let's try ivy and friends
   ;; On second thought, ivy requires that the snippets you type are in order, which is usually not what I want.  So I prefer Helm's functionality.
   ;;(in 'ivy)

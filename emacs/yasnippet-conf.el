@@ -2,7 +2,9 @@
 
 (require 'yasnippet)
 
-(setq yas-snippet-dirs '("~/dotfileswgh/emacs/yasnippets" "~/dotfileswgh-dotlocal/yasnippets"))
+(setq yas-snippet-dirs
+      (mapcar (lambda (dfdir) (concat dfdir "/emacs/yasnippets"))
+              dotfileswgh-list))
 
 (defun yas-insert-with-region ()
   (interactive )
@@ -22,3 +24,4 @@
 
 (yas-global-mode 1)
 
+(provide 'yasnippet-conf)
