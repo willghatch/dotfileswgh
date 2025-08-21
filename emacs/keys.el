@@ -461,6 +461,9 @@ The command also executes the sentence, with region as the object, if the region
 
   ;; Verbs that automatically take region if the region is active.
   ;; These are the ones where you maybe should select first anyway.
+  ("a" (lambda (n) (interactive "p")
+         (funcall (cp/ar (cp/verb 'action)) n))
+   "action" :exit t)
   ("c" (lambda (n) (interactive "p")
          (funcall (cp/ar (cp/verb 'change)) n))
    "change" :exit t)
