@@ -786,11 +786,11 @@ The command also executes the sentence, with region as the object, if the region
 (autoload 'alternate-region-activate "alternate-region" "" t)
 (autoload 'alternate-region-swap "alternate-region" "" t)
 (autoload 'alternate-region-cycle "alternate-region" "" t)
-(autoload 'alternate-region-pop "alternate-region" "" t)
+(autoload 'alternate-region-pop-go "alternate-region" "" t)
 (enmap "tara" 'alternate-region-activate)
 (enmap "tars" 'alternate-region-swap)
 (enmap "tarc" 'alternate-region-cycle)
-(enmap "tarp" 'alternate-region-pop)
+(enmap "tarp" 'alternate-region-pop-go)
 (enmap "tav" 'sp-convolute-sexp)
 (enmap "tag" 'gptel-send)
 (emmap "tayp" (cons "symbol-overlay-put" (lambda () (interactive) (require 'symbol-overlay) (symbol-overlay-put)))) ;; TODO - symbol overlay seems like it could be helpful.  I should add a modifier to symbol to have forward/back symbol motions go to the next instance of the highlighted symbol at point, or to the next highlighted symbol.  Also think about keys for marking, this binding is terrible.  Maybe symbol-overlay can share a verb with marking alternate region?  Are there other ways one might mark something that would be useful to group with these?  Maybe also marking char can be setting point-to-register?
