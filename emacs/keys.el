@@ -260,7 +260,10 @@ The command also executes the sentence, with region as the object, if the region
 
 
 (emmap "v" 'estate-visual-state)
-(emmap "V" 'estate-visual-line-state)
+;;(emmap "V" 'estate-visual-line-state)
+(enmap "V" (lambda () (interactive)
+             (funcall (cp/add (cp/verb 'activate-visual-modifier-state)))
+             (wgh/object-select/body)))
 (emmap "\C-v" 'estate-visual-rectangle-state)
 
 (emmap "|" 'eval-expression)
