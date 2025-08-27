@@ -528,15 +528,14 @@ fi
 MEGAPROMPT_DISPLAY_P[tty]=false
 prompt-dev-environment(){
     if [[ -n "$CURRENT_DEV_MODE" ]]; then
-        echo -e "Dev: \033[35m$CURRENT_DEV_MODE\n\033[0m"
+        echo -n -e "Dev: \033[35m$CURRENT_DEV_MODE\n\033[0m"
     fi
     # if [[ -n "$VIRTUAL_ENV" ]]; then
-    #     echo -e "Venv: \033[35m$(basename $VIRTUAL_ENV)\033[0m"
+    #     echo -n -e "Venv: \033[35m$(basename $VIRTUAL_ENV)\033[0m"
     # fi
     if [[ -n "$VIRTUAL_ENV_PROMPT" ]]; then
-        echo -e "Venv: \033[35m$VIRTUAL_ENV_PROMPT\n\033[0m"
+        echo -n -e "Venv: \033[35m$VIRTUAL_ENV_PROMPT\n\033[0m"
     fi
-
 }
 MEGAPROMPT_PRE_FUNCTION=prompt-dev-environment
 
