@@ -99,6 +99,7 @@
   (in 'expand-region)
   ;;(in 'popwin)
   ;;(in 'linum-relative)
+  ;;(in '(kkp :type git :repo "https://github.com/benotn/kkp"))
 
   (in 'helm)
   (in 'helm-lsp)

@@ -35,6 +35,7 @@ config.enable_wayland = true
 -- Keyboard handling
 -- Unfortunately, the CSI-U protocol is enabled by a CSI escape sequence (`\e[>4;1m`), which some programs do automatically.  The CSI-U protocol is basically broken for my keyboard layout, so I don't know that I ever want it on.  It is very buggy in emacs, and less so but still buggy in vim.  In emacs I've hacked around to disable it, but for other programs it will be annoying.  There is currently no option to disable and ignore the CSI escape sequence to turn on the csi_u key encoding.
 config.enable_csi_u_key_encoding = false
+--config.enable_kitty_keyboard = true
 
 config.font = wezterm.font "Deja Vu Sans Mono"
 --config.font = wezterm.font "Monaspace Radon"

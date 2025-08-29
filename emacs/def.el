@@ -370,7 +370,31 @@
        ;; Then send the terminal code to disable it immediately.
        (send-string-to-terminal "\e[>4;0m")
        )))
- (disable-csi-u-key-encoding))
+ (disable-csi-u-key-encoding)
+ )
+
+;; Some experiments with kkp package, the one thing I wanted was to distinguish C-i vs TAB and C-m vs RET.  I think it's possible if I fork the package and intercept the key as a string -- eg. it generates the string "C-i" or "C-m", but then sends those to the kbd function, which translates them to TAB and RET.
+;; (nobreak
+;;  ;; kitty keyboard protocol
+;;  (setq kkp-active-enhancements '(
+;;                                  disambiguate-escape-codes
+;;                                  report-alternate-keys
+;;                                  ))
+;;  (require 'kkp)
+;;  (global-kkp-mode 1)
+;;  ;; kkp-alternatives-map is used as parent for local-function-key-map, whose parent is function-key-map
+;;  (setq function-key-map (delq '(kp-tab . [9]) function-key-map))
+;;  (setq function-key-map (delq '(tab . [9]) function-key-map))
+;;  (setq local-function-key-map (delq '(tab . [9]) local-function-key-map))
+;;  ;;(define-key kkp-alternatives-map (kbd "TAB") (kbd "<tab>"))
+;;  ;; (define-key local-function-key-map [tab] nil)
+;;  ;; (define-key function-key-map [tab] nil)
+;;  ;; (define-key kkp-alternatives-map [tab] nil)
+;;  ;; (define-key local-function-key-map [kp-tab] nil)
+;;  ;; (define-key function-key-map [kp-tab] nil)
+;;  ;; (define-key kkp-alternatives-map [kp-tab] nil)
+;;  ;;(define-key input-decode-map [?\C-i] [C-i])
+;;  )
 
 (message "-")
 (message "--")

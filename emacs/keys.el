@@ -205,6 +205,8 @@ The command also executes the sentence, with region as the object, if the region
 ;;(eimap (kbd "C-@ TAB") 'completer-map/body)
 ;;(eimap (kbd "TAB") 'company-complete-common-wgh)
 ;;(eimap (kbd "TAB") (lambda () (interactive) (require 'minad-stack-conf) (wgh/init-corfu) (completion-at-point)))
+;;(eimap "\C-i" 'ignore)
+;;(eimap (kbd "<tab>") 'ignore)
 (eimap (kbd "TAB") (lambda () (interactive) (require 'minad-stack-conf) (wgh/completion-at-point-start)))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
