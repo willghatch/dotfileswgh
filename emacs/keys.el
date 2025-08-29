@@ -1071,6 +1071,41 @@ The command also executes the sentence, with region as the object, if the region
 ;; []{}
 ;; any weird unicode that I have in convenient places
 
+
+;; Training wheels: prevent repeating the same move command instead of using repeat
+(defvar-local wgh/composiphrase-training-wheels--last-sentence nil
+  "Last sentence executed, for training wheels duplicate detection.")
+(defun wgh/composiphrase-training-wheels-advice (orig-func sentence config)
+  "Advice to prevent repeated move commands, encouraging use of repeat key instead."
+  (let* ((verb (seq-find (lambda (word) (eq 'verb (cdr (assq 'word-type word))))
+                         sentence))
+         (object (seq-find (lambda (word) (eq 'object (cdr (assq 'word-type word))))
+                           sentence))
+         (verb-name (when verb (cdr (assq 'contents verb))))
+         (object-name (when object (cdr (assq 'contents object))))
+         (is-move-command (or (eq verb-name 'move)
+                              (null verb-name))) ; no verb defaults to move, typically
+         (is-exempt-object (memq object-name '(repeatable-motion-repeat
+                                               line
+                                               isearch-repeat
+                                               isearch-new
+                                               cpo-smartparens ;; mostly for paren-bound quick key
+                                               )))
+         (same-as-previous (equal sentence wgh/composiphrase-training-wheels--last-sentence)))
+    (if (and is-move-command same-as-previous wgh/composiphrase-training-wheels--last-sentence
+             (not is-exempt-object))
+        (progn
+          (composiphrase-clear-current-sentence)
+          (message "training wheels: use repeat key"))
+      (progn
+        (setq wgh/composiphrase-training-wheels--last-sentence sentence)
+        (funcall orig-func sentence config)))))
+
+(advice-add 'composiphrase-execute :around #'wgh/composiphrase-training-wheels-advice)
+
+
+(repeatable-motion-define-pair 'tempel-next 'tempel-previous)
+
 (let* ((verbs
         (append
          `(
@@ -1090,9 +1125,9 @@ The command also executes the sentence, with region as the object, if the region
         (append
          `(
            (open tempel-snippet-hole () (,(lambda () (estate-insert-state-with-thunk (lambda () (call-interactively 'tempel-insert)))) ()))
-           (move tempel-snippet-hole ((direction forward) (alternate ,nil)) (,(lambda (n) (tempel-next (or n 1))) (num)))
+           (move tempel-snippet-hole ((direction forward) (alternate ,nil)) (,(lambda (n) (rmo/tempel-next (or n 1))) (num)))
            (move tempel-snippet-hole ((direction forward) (alternate alternate)) (tempel-end ()))
-           (move tempel-snippet-hole ((direction backward) (alternate ,nil)) (,(lambda (n) (tempel-previous (or n 1))) (num)))
+           (move tempel-snippet-hole ((direction backward) (alternate ,nil)) (,(lambda (n) (rmo/tempel-previous (or n 1))) (num)))
            (move tempel-snippet-hole ((direction backward) (alternate alternate)) (tempel-beginning ()))
            (action tempel-snippet-hole ((direction forward)) (tempel-done ()))
            (action tempel-snippet-hole ((direction backward)) (tempel-abort ()))
