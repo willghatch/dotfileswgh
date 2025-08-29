@@ -210,7 +210,8 @@ local terminalMiscForHatchak = {
 
 config.keys = concatenateTables(uniqueKeys
                                 , terminalTooOverloadedKeys
-                                , terminalEncodeKeys
+                                -- TODO - I need to filter out the bindings that I actually use, or explicitly add them, eg. for copy/paste on C-C C-V
+                                --, terminalEncodeKeys
                                 , terminalMiscForHatchak
 )
 
