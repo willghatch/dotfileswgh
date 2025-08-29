@@ -426,6 +426,64 @@ toggle-konsole-theme(){
     fi
 }; zle -N toggle-konsole-theme
 
+
+if [[ -z "$USER" ]]; then
+    USER="$(whoami)"
+fi
+if [[ "$USER" != "wgh" ]]; then
+    MEGAPROMPT_STYLES[username]="%B%F{cyan}"
+    MEGAPROMPT_DISPLAY_P[username]=true
+else
+    MEGAPROMPT_DISPLAY_P[username]=false
+fi
+if [ -z "$SSH_CLIENT" -a -z "$TMUX" -a -n "$DISPLAY" ]; then
+    MEGAPROMPT_DISPLAY_P[host]=false
+fi
+# also, even with no display I don't want it in my Android chroot either...
+if [ -n "$ANDROID_CHROOT" -a -z "$SSH_CLIENT" -a -z "$TMUX" ]; then
+    MEGAPROMPT_DISPLAY_P[host]=false
+fi
+# a pox on systems that don't have real hostnames
+if [ "$HOST" = localhost -a -z "$SSH_CLIENT" -a -z "$TMUX" ]; then
+    MEGAPROMPT_DISPLAY_P[host]=false
+fi
+MEGAPROMPT_DISPLAY_P[tty]=false
+prompt-dev-environment(){
+    if [[ -n "$CURRENT_DEV_MODE" ]]; then
+        echo -n -e "Dev: \033[35m$CURRENT_DEV_MODE\n\033[0m"
+    fi
+    # if [[ -n "$VIRTUAL_ENV" ]]; then
+    #     echo -n -e "Venv: \033[35m$(basename $VIRTUAL_ENV)\033[0m"
+    # fi
+    if [[ -n "$VIRTUAL_ENV_PROMPT" ]]; then
+        echo -n -e "Venv: \033[35m$VIRTUAL_ENV_PROMPT\n\033[0m"
+    fi
+}
+MEGAPROMPT_PRE_FUNCTION=prompt-dev-environment
+
+if [[ -n "$CURRENT_DEV_MODE" ]]; then
+    # In my NixOS racket dev environment, a non-ascii character here messes
+    # up the buffer when I use completion
+    MEGAPROMPT_STYLES[prompt_char]=":"
+fi
+
+
+if [[ "$HOME" = /data/data/com.termux/files/home ]]; then
+    # zsh on termux lacks the pcre module
+    MEGAPROMPT_DISPLAY_P[branch_style_regex]=false
+    PAGER=less
+fi
+if [[ "$(uname)" = Darwin ]]; then
+    MEGAPROMPT_DISPLAY_P[branch_style_regex]=false
+fi
+
+unfunction compinit
+unfunction compdef
+autoload -Uz compinit
+${=COMPINIT_COMMAND}
+
+
+# bind keys after compinit, because it itself binds keys
 bindkey -M viins '^s' backward-kill-word
 bindkey -M viins '^[h' completionkey
 bindkey-to-prefix-map completionkey "l" insert-last-word-left-indexed
@@ -444,6 +502,15 @@ bindToMaps '^[c' zaw-widgets $(bindkey -l)
 bindkey -r -M viins '\e'
 bindkey -M viins 'jk' vi-cmd-mode
 bindkey -M viins 'kj' vi-cmd-mode
+# TODO - this isn't working - it can work if I use 'stty intr \^E' or such to change the interrupt key, but that is terrible.  I want zsh to capture the interrupt and interpret it during line editing as a command, not clearing the current edit buffer.
+bindkey -M viins '^C' vi-cmd-mode
+bindkey -r -M viins '^G'  # by default this is send-break, which cancels the current buffer...
+# TODO - do I use any terminals that do send C-h for backspace anymore?
+bindkey -r -M viins '^H'
+# Ignore these keys.  C-t I want to save for terminal multiplexing, C-w is too dangerous a habit to have with modern browsers that more-or-less disallow custom key bindings...
+bindkey -r -M viins '^T'
+bindkey -r -M viins '^W'
+bindkey '^C' vi-cmd-mode
 # o/e keys
 bindkey -r -M vicmd 'o'
 bindkey -r -M vicmd 'e'
@@ -505,60 +572,8 @@ bindkey -M filterselect "^[d" kill-word
 # Don't use rationalise-dot, the function to replace "..." with "../..", anymore.
 bindkey -M viins '.' self-insert
 
-if [[ -z "$USER" ]]; then
-    USER="$(whoami)"
-fi
-if [[ "$USER" != "wgh" ]]; then
-    MEGAPROMPT_STYLES[username]="%B%F{cyan}"
-    MEGAPROMPT_DISPLAY_P[username]=true
-else
-    MEGAPROMPT_DISPLAY_P[username]=false
-fi
-if [ -z "$SSH_CLIENT" -a -z "$TMUX" -a -n "$DISPLAY" ]; then
-    MEGAPROMPT_DISPLAY_P[host]=false
-fi
-# also, even with no display I don't want it in my Android chroot either...
-if [ -n "$ANDROID_CHROOT" -a -z "$SSH_CLIENT" -a -z "$TMUX" ]; then
-    MEGAPROMPT_DISPLAY_P[host]=false
-fi
-# a pox on systems that don't have real hostnames
-if [ "$HOST" = localhost -a -z "$SSH_CLIENT" -a -z "$TMUX" ]; then
-    MEGAPROMPT_DISPLAY_P[host]=false
-fi
-MEGAPROMPT_DISPLAY_P[tty]=false
-prompt-dev-environment(){
-    if [[ -n "$CURRENT_DEV_MODE" ]]; then
-        echo -n -e "Dev: \033[35m$CURRENT_DEV_MODE\n\033[0m"
-    fi
-    # if [[ -n "$VIRTUAL_ENV" ]]; then
-    #     echo -n -e "Venv: \033[35m$(basename $VIRTUAL_ENV)\033[0m"
-    # fi
-    if [[ -n "$VIRTUAL_ENV_PROMPT" ]]; then
-        echo -n -e "Venv: \033[35m$VIRTUAL_ENV_PROMPT\n\033[0m"
-    fi
-}
-MEGAPROMPT_PRE_FUNCTION=prompt-dev-environment
+bindkey -M viins "^x^r" history-incremental-search-backward
 
-if [[ -n "$CURRENT_DEV_MODE" ]]; then
-    # In my NixOS racket dev environment, a non-ascii character here messes
-    # up the buffer when I use completion
-    MEGAPROMPT_STYLES[prompt_char]=":"
-fi
-
-
-if [[ "$HOME" = /data/data/com.termux/files/home ]]; then
-    # zsh on termux lacks the pcre module
-    MEGAPROMPT_DISPLAY_P[branch_style_regex]=false
-    PAGER=less
-fi
-if [[ "$(uname)" = Darwin ]]; then
-    MEGAPROMPT_DISPLAY_P[branch_style_regex]=false
-fi
-
-unfunction compinit
-unfunction compdef
-autoload -Uz compinit
-${=COMPINIT_COMMAND}
 
 if [[ -z "$KONSOLE_DBUS_SESSION" ]]; then
     # currently some programs use the existance of this variable to know

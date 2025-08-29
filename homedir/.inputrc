@@ -7,14 +7,30 @@ set editing-mode emacs
 set keymap emacs
 "jk": vi-movement-mode
 "kj": vi-movement-mode
+# This doesn't seem to be working.  Apparently it doesn't catch the interrupt signal and interpret at C-c, it justs handles interrupt without caring about keymap.
+"\C-c": vi-movement-mode
 "\C-s": unix-word-rubout
+"\C-h": ignore
+"\C-t": ignore
+"\C-w": ignore
+"\C-x\C-r": reverse-search-history
+"\C-x\C-s": forward-search-history
+"\C-x\C-t": transpose-chars
+"\C-x\C-o": operate-and-get-next
+"\C-x\C-@": set-mark
 
 # In case I end up in this mode somehow, at least be sure I have the
 # same keybinding to get back to movement mode.
 set keymap vi-insert
 "jk": vi-movement-mode
 "kj": vi-movement-mode
+"\C-c": vi-movement-mode
 "\C-s": unix-word-rubout
+"\C-x\C-r": reverse-search-history
+"\C-x\C-s": forward-search-history
+"\C-x\C-t": transpose-chars
+"\C-x\C-o": operate-and-get-next
+"\C-x\C-@": set-mark
 
 
 

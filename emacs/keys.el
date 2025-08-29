@@ -201,6 +201,7 @@ The command also executes the sentence, with region as the object, if the region
 
 ;;(eimap "\M-h" 'completer-map/body)
 (eimap "\M-h" (lambda () (interactive) (require 'minad-stack-conf) (nobreak (wgh/init-corfu)) (completer-map/body)))
+(eimap "\C-r" (lambda () (interactive) (require 'minad-stack-conf) (nobreak (wgh/init-corfu)) (completer-map/body)))
 ;;(eimap (kbd "C-SPC TAB") 'completer-map/body)
 ;;(eimap (kbd "C-@ TAB") 'completer-map/body)
 ;;(eimap (kbd "TAB") 'company-complete-common-wgh)
@@ -208,6 +209,15 @@ The command also executes the sentence, with region as the object, if the region
 ;;(eimap "\C-i" 'ignore)
 ;;(eimap (kbd "<tab>") 'ignore)
 (eimap (kbd "TAB") (lambda () (interactive) (require 'minad-stack-conf) (wgh/completion-at-point-start)))
+
+;; save some key bindings that I'm overwriting
+(eimap (kbd "C-x C-r") 'isearch-backward)
+(eimap (kbd "C-x C-s") 'isearch-forward)
+(eimap (kbd "C-x C-l") 'recenter-top-bottom)
+(eimap (kbd "C-x C-t") 'transpose-chars)
+(eimap (kbd "C-x C-o") 'open-line)
+(eimap (kbd "C-x C-@") 'set-mark-command)
+(eimap (kbd "C-x C-SPC") 'set-mark-command)
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; vim-like keys to reconsider since I'm moving to composiphrase
