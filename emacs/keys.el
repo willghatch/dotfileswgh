@@ -653,6 +653,7 @@ The command also executes the sentence, with region as the object, if the region
   ("hf" (lambda (n) (interactive "p") (funcall (cp/ae (cp/obj 'file-name)) n)) "file-name" :exit t)
   ("ht" (lambda (n) (interactive "p") (funcall (cp/ae (progn (require 'tempel-conf) (cp/obj 'tempel-snippet-hole))) n)) "tempel" :exit t)
   ("hT" (lambda (n) (interactive "p") (funcall (cp/ae (progn (require 'yasnippet-conf) (cp/obj 'yasnippet-snippet-hole))) n)) "yasnippet" :exit t)
+  ("hF" (lambda (n) (interactive "p") (funcall (cp/ae (progn (require 'yafolding) (cp/obj 'yafold))) n)) "yafolding" :exit t)
 
 
   ;; Specific delimiters, use smartparens for them.
@@ -1080,7 +1081,8 @@ The command also executes the sentence, with region as the object, if the region
          `(
            (tempel-snippet-hole (default-verb . move) (location-within . beginning))
            (yasnippet-snippet-hole (default-verb . move) (location-within . beginning))
-           ;; TODO - code-fold object, action to toggle fold
+           ;; TODO - yafold doesn't have motions to go to folded regions.  Anyway, I never use folding, why am I bothering with this?
+           (yafold (default-verb . move) (location-within . beginning))
            ;; TODO - org-mode begin_src object, or maybe begin_* object
            )
          (cdr (assq 'objects composiphrase-current-configuration))))
@@ -1094,6 +1096,10 @@ The command also executes the sentence, with region as the object, if the region
            (move tempel-snippet-hole ((direction backward) (alternate alternate)) (tempel-beginning ()))
            (action tempel-snippet-hole ((direction forward)) (tempel-done ()))
            (action tempel-snippet-hole ((direction backward)) (tempel-abort ()))
+
+           (action yafold ((alternate ,nil)) (yafolding-toggle-element ()))
+           (action yafold ((alternate alternate)) (yafolding-show-all ()))
+
            ;; TODO - add yasnippet matchers
            )
          (cdr (assq 'match-table composiphrase-current-configuration)))))
