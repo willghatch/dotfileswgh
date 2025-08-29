@@ -27,6 +27,7 @@
 (estate-mode 1)
 (require 'composiphrase)
 (require 'composiphrase-demo-match-config)
+;; Note that I'm extending this composiphrase configuration below.
 (setq composiphrase-current-configuration composiphrase-demo-match-config)
 (require 'aggreact)
 (require 'composiphrase-estate-aggreact-config)
@@ -149,7 +150,6 @@ The command also executes the sentence, with region as the object, if the region
 (evmap "\C-c" 'estate-normal-state)
 (eimap "\C-c" 'estate-normal-state)
 (eImap "\C-c" 'estate-normal-state)
-(eimap "\C-l" 'estate-normal-state)
 
 (emmap "\C-g" 'keyboard-quit-and-clear-composiphrase-and-maybe-leave-visual-state)
 (eimap "\C-g" 'keyboard-quit-and-clear-composiphrase-and-maybe-leave-visual-state)
@@ -197,6 +197,8 @@ The command also executes the sentence, with region as the object, if the region
 (eimap "\C-q" 'ignore) ;; C-q - don't use, it is the terminal flow control binding to restart flow.
 (eimap "\C-v" 'quoted-insert)
 ;; C-o -- in readline the default action for this is “operate-and-get-next”, which executes the command, finds the command in the history, and sets the buffer to the next command in history.  So it is useful for those times when you go back in history 5 commands, hit enter, then go up in history 5 commands, hit enter, etc, you can just go back 5 commands, then hit C-o 5 times.
+
+;; TODO - make this add a hook to stay in normal state if the current composiphrase sentence is non-empty.
 (eimap "\C-l" 'estate-normal-state-keymap)
 
 ;;(eimap "\M-h" 'completer-map/body)
@@ -649,6 +651,8 @@ The command also executes the sentence, with region as the object, if the region
   ("he" (lambda (n) (interactive "p") (funcall (cp/ae (cp/obj 'email)) n)) "email" :exit t)
   ("hP" (lambda (n) (interactive "p") (funcall (cp/ae (cp/obj 'phone-number)) n)) "phone-number" :exit t)
   ("hf" (lambda (n) (interactive "p") (funcall (cp/ae (cp/obj 'file-name)) n)) "file-name" :exit t)
+  ("ht" (lambda (n) (interactive "p") (funcall (cp/ae (progn (require 'tempel-conf) (cp/obj 'tempel-snippet-hole))) n)) "tempel" :exit t)
+  ("hT" (lambda (n) (interactive "p") (funcall (cp/ae (progn (require 'yasnippet-conf) (cp/obj 'yasnippet-snippet-hole))) n)) "yasnippet" :exit t)
 
 
   ;; Specific delimiters, use smartparens for them.
@@ -1065,5 +1069,38 @@ The command also executes the sentence, with region as the object, if the region
 ;; also maybe I should use *
 ;; []{}
 ;; any weird unicode that I have in convenient places
+
+(let* ((verbs
+        (append
+         `(
+           )
+         (cdr (assq 'verbs composiphrase-current-configuration))))
+       (objects
+        (append
+         `(
+           (tempel-snippet-hole (default-verb . move) (location-within . beginning))
+           (yasnippet-snippet-hole (default-verb . move) (location-within . beginning))
+           ;; TODO - code-fold object, action to toggle fold
+           ;; TODO - org-mode begin_src object, or maybe begin_* object
+           )
+         (cdr (assq 'objects composiphrase-current-configuration))))
+       (match-table
+        (append
+         `(
+           (open tempel-snippet-hole () (,(lambda () (estate-insert-state-with-thunk (lambda () (call-interactively 'tempel-insert)))) ()))
+           (move tempel-snippet-hole ((direction forward) (alternate ,nil)) (,(lambda (n) (tempel-next (or n 1))) (num)))
+           (move tempel-snippet-hole ((direction forward) (alternate alternate)) (tempel-end ()))
+           (move tempel-snippet-hole ((direction backward) (alternate ,nil)) (,(lambda (n) (tempel-previous (or n 1))) (num)))
+           (move tempel-snippet-hole ((direction backward) (alternate alternate)) (tempel-beginning ()))
+           (action tempel-snippet-hole ((direction forward)) (tempel-done ()))
+           (action tempel-snippet-hole ((direction backward)) (tempel-abort ()))
+           ;; TODO - add yasnippet matchers
+           )
+         (cdr (assq 'match-table composiphrase-current-configuration)))))
+  (setq composiphrase-current-configuration
+        `((verbs . ,verbs)
+          (objects . ,objects)
+          (match-table . ,match-table)
+          )))
 
 (message "finished loading keys.el")
