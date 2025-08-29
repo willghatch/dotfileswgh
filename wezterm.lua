@@ -16,38 +16,10 @@ end
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 
-function is_macos()
-  -- The common triples for MacOS are aarch64-apple-darwin
-  -- and x86_64-apple-darwin
-  return wezterm.target_triple:find "darwin"
-end
-function is_windows()
-  return wezterm.target_triple:find "windows"
-end
 
-
-config.enable_scroll_bar=true
-config.hide_tab_bar_if_only_one_tab = true
-
--- Wezterm isn't working on hyprland without disabling wayland, but running in Xwayland hasa its own issues...
-config.enable_wayland = true
-
--- Keyboard handling
--- Unfortunately, the CSI-U protocol is enabled by a CSI escape sequence (`\e[>4;1m`), which some programs do automatically.  The CSI-U protocol is basically broken for my keyboard layout, so I don't know that I ever want it on.  It is very buggy in emacs, and less so but still buggy in vim.  In emacs I've hacked around to disable it, but for other programs it will be annoying.  There is currently no option to disable and ignore the CSI escape sequence to turn on the csi_u key encoding.
-config.enable_csi_u_key_encoding = false
-config.enable_kitty_keyboard = true
-
-config.font = wezterm.font "Deja Vu Sans Mono"
---config.font = wezterm.font "Monaspace Radon"
-if is_macos() then
-  config.font = wezterm.font("Monaco")
-  --config.font = wezterm.font("Monaco", {weight = "Thin"})
-end
-if is_windows() then
-  config.font = wezterm.font("Cascadia Mono")
-  --config.default_domain = "WSL:Ubuntu"
-  config.default_prog = {"wsl.exe"}
-end
+--------------------------------------------------------------------------------
+-- Lua helpers
+--------------------------------------------------------------------------------
 
 local function map(func, table)
     local newTable = {}
@@ -57,7 +29,7 @@ local function map(func, table)
     return newTable
 end
 
-function concatenateTables(...)
+local function concatenateTables(...)
     local result = {}
 
     for _, tbl in ipairs({...}) do
@@ -69,7 +41,7 @@ function concatenateTables(...)
     return result
 end
 
-function flattenOnce(tableOfTables)
+local function flattenOnce(tableOfTables)
     local flattened = {}
 
     for _, innerTable in ipairs(tableOfTables) do
@@ -80,6 +52,52 @@ function flattenOnce(tableOfTables)
 
     return flattened
 end
+
+
+local function is_macos()
+  -- The common triples for MacOS are aarch64-apple-darwin
+  -- and x86_64-apple-darwin
+  return wezterm.target_triple:find "darwin"
+end
+local function is_windows()
+  return wezterm.target_triple:find "windows"
+end
+
+
+
+--------------------------------------------------------------------------------
+-- Misc
+--------------------------------------------------------------------------------
+
+config.enable_scroll_bar=true
+config.hide_tab_bar_if_only_one_tab = true
+
+-- Wezterm isn't working on hyprland without disabling wayland, but running in Xwayland hasa its own issues...
+config.enable_wayland = true
+
+if is_windows() then
+  --config.default_domain = "WSL:Ubuntu"
+  config.default_prog = {"wsl.exe"}
+end
+
+wezterm.on("open-uri", function(window, pane, uri)
+             --window:copy_to_clipboard(uri, "Clipboard")
+             --window:copy_to_clipboard(os.getenv("DOT_XPROFILE_LOADED") or "nothing", "Clipboard")
+             -- returning false prevents the default action, returning true runs the default action (xdg-open)
+             return true
+end)
+
+
+
+
+--------------------------------------------------------------------------------
+-- Keyboard handling
+--------------------------------------------------------------------------------
+
+-- Unfortunately, the CSI-U protocol is enabled by a CSI escape sequence (`\e[>4;1m`), which some programs do automatically.  The CSI-U protocol is basically broken for my keyboard layout, so I don't know that I ever want it on.  It is very buggy in emacs, and less so but still buggy in vim.  In emacs I've hacked around to disable it, but for other programs it will be annoying.  There is currently no option to disable and ignore the CSI escape sequence to turn on the csi_u key encoding.
+config.enable_csi_u_key_encoding = false
+config.enable_kitty_keyboard = true
+
 
 local uniqueKeys = {
   {
@@ -196,7 +214,25 @@ config.keys = concatenateTables(uniqueKeys
                                 , terminalMiscForHatchak
 )
 
--- Color scheme
+
+
+
+--------------------------------------------------------------------------------
+-- Appearance
+--------------------------------------------------------------------------------
+
+config.font = wezterm.font "Deja Vu Sans Mono"
+--config.font = wezterm.font "Monaspace Radon"
+if is_macos() then
+  config.font = wezterm.font("Monaco")
+  --config.font = wezterm.font("Monaco", {weight = "Thin"})
+end
+if is_windows() then
+  config.font = wezterm.font("Cascadia Mono")
+  --config.default_domain = "WSL:Ubuntu"
+end
+
+
 config.color_schemes = {
   ['wgh-dark'] = {
     -- The default text color
@@ -287,7 +323,7 @@ config.visual_bell = {
   -- TODO - set visual_bell color in color schemes
 }
 
-function get_appearance_from_lightdark()
+local function get_appearance_from_lightdark()
   local ldStatusProc = io.popen("lightdark-status")
   local ldStatus = ldStatusProc:read("*a")
   ldStatusProc:close()
@@ -311,7 +347,7 @@ function get_appearance_from_lightdark()
 end
 
 -- This code is based on code from the wezterm docs.
-function get_appearance()
+local function get_appearance()
   if wezterm.gui then
     -- TODO - this doesn't seem to be working on Linux.
     if is_macos() then
@@ -324,7 +360,7 @@ function get_appearance()
   return get_appearance_from_lightdark()
 end
 
-function scheme_for_appearance(appearance)
+local function scheme_for_appearance(appearance)
   if appearance:find "Dark" then
     return "wgh-dark"
   else
@@ -347,7 +383,7 @@ config.color_scheme = scheme_for_appearance(get_appearance())
 --             end
 --end)
 
-function updateAppearanceDynamic(window, pane)
+local function updateAppearanceDynamic(window, pane)
   --print("in updateAppearanceDynamic\n")
   local overrides = window:get_config_overrides() or {}
   local appearance = window:get_appearance()
@@ -367,12 +403,12 @@ if is_windows() then
   config.status_update_interval = 2000
 end
 
-wezterm.on("open-uri", function(window, pane, uri)
-             --window:copy_to_clipboard(uri, "Clipboard")
-             --window:copy_to_clipboard(os.getenv("DOT_XPROFILE_LOADED") or "nothing", "Clipboard")
-             -- returning false prevents the default action, returning true runs the default action (xdg-open)
-             return true
-end)
+
+
+--------------------------------------------------------------------------------
+-- Misc
+--------------------------------------------------------------------------------
+
 
 -- and finally, return the configuration to wezterm
 return config
