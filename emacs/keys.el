@@ -206,9 +206,20 @@ The command also executes the sentence, with region as the object, if the region
 ;;(eimap (kbd "C-@ TAB") 'completer-map/body)
 ;;(eimap (kbd "TAB") 'company-complete-common-wgh)
 ;;(eimap (kbd "TAB") (lambda () (interactive) (require 'minad-stack-conf) (wgh/init-corfu) (completion-at-point)))
-;;(eimap "\C-i" 'ignore)
-;;(eimap (kbd "<tab>") 'ignore)
 (eimap (kbd "TAB") (lambda () (interactive) (require 'minad-stack-conf) (wgh/completion-at-point-start)))
+
+
+;;(eimap (kbd "<tab>") 'ignore) ;; This will bind tab in gui but not terminal.  In GUI and terminal C-i is always equivalent to TAB.  In GUI tab sends <tab>, in terminal tab sends C-i.
+;; TODO - should I even use things like this?
+(eimap (kbd "M-+ M-+ i") (lambda () (interactive) (message "C-i remapped")))
+(eimap (kbd "M-+ M-+ M-i") (lambda () (interactive) (message "C-M-i remapped")))
+(eimap (kbd "M-+ M-+ I") (lambda () (interactive) (message "C-I remapped")))
+(eimap (kbd "M-+ M-+ m") (lambda () (interactive) (message "C-m remapped")))
+(eimap (kbd "M-+ M-+ M-m") (lambda () (interactive) (message "C-M-m remapped")))
+(eimap (kbd "M-+ M-+ M") (lambda () (interactive) (message "C-M remapped")))
+(eimap (kbd "M-+ M-+ N") (lambda () (interactive) (message "C-N remapped")))
+(eimap (kbd "H-i") (lambda () (interactive) (message "H-i mapping")))
+(eimap (kbd "s-i") (lambda () (interactive) (message "s-i mapping")))
 
 ;; save some key bindings that I'm overwriting
 (eimap (kbd "C-x C-r") 'isearch-backward)

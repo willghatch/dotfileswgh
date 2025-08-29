@@ -35,7 +35,7 @@ config.enable_wayland = true
 -- Keyboard handling
 -- Unfortunately, the CSI-U protocol is enabled by a CSI escape sequence (`\e[>4;1m`), which some programs do automatically.  The CSI-U protocol is basically broken for my keyboard layout, so I don't know that I ever want it on.  It is very buggy in emacs, and less so but still buggy in vim.  In emacs I've hacked around to disable it, but for other programs it will be annoying.  There is currently no option to disable and ignore the CSI escape sequence to turn on the csi_u key encoding.
 config.enable_csi_u_key_encoding = false
---config.enable_kitty_keyboard = true
+config.enable_kitty_keyboard = true
 
 config.font = wezterm.font "Deja Vu Sans Mono"
 --config.font = wezterm.font "Monaspace Radon"
@@ -49,7 +49,39 @@ if is_windows() then
   config.default_prog = {"wsl.exe"}
 end
 
-config.keys = {
+local function map(func, table)
+    local newTable = {}
+    for i, value in ipairs(table) do
+        newTable[i] = func(value)
+    end
+    return newTable
+end
+
+function concatenateTables(...)
+    local result = {}
+
+    for _, tbl in ipairs({...}) do
+        for _, value in ipairs(tbl) do
+            table.insert(result, value)
+        end
+    end
+
+    return result
+end
+
+function flattenOnce(tableOfTables)
+    local flattened = {}
+
+    for _, innerTable in ipairs(tableOfTables) do
+        for _, value in ipairs(innerTable) do
+            table.insert(flattened, value)
+        end
+    end
+
+    return flattened
+end
+
+local uniqueKeys = {
   {
     -- Workaround for MacOS eating shift2 plus space...  I'm not sure why it's ALT, but I'll take it.
     key = " ",
@@ -57,6 +89,112 @@ config.keys = {
     action = wezterm.action.SendKey {key = " "},
   },
 }
+
+
+-- Encoding for keys that don't work well with terminal.
+-- I'm going to use M-+ M-+ <key> to mean C-<key>, where <key> can also have esc/meta prefixed, or be capitalized.
+local veCtrl = "\x1b+\x1b+"
+local eAlt = "\x1b"
+local terminalTooOverloadedKeys = {
+  {
+    key = "i",
+    mods = "CTRL",
+    action = wezterm.action.SendString (veCtrl .. "i"),
+  },
+  {
+    key = "i",
+    mods = "CTRL|ALT",
+    action = wezterm.action.SendString (veCtrl .. eAlt .. "i"),
+  },
+  {
+    key = "m",
+    mods = "CTRL",
+    action = wezterm.action.SendString (veCtrl .. "m"),
+  },
+  {
+    key = "m",
+    mods = "CTRL|ALT",
+    action = wezterm.action.SendString (veCtrl .. eAlt .. "m"),
+  },
+}
+
+local a_to_z = {}
+for i = 97, 122 do  -- 97 is the ASCII value for 'a' and 122 for 'z'
+    table.insert(a_to_z, string.char(i))
+end
+
+local terminalEncodeKeys = concatenateTables(
+  map(
+    (function(c)
+        return {
+          key = c,
+          mods = "CTRL|SHIFT",
+          action = wezterm.action.SendString (veCtrl .. string.upper(c))
+        }
+    end),
+    a_to_z),
+  map(
+    (function(c)
+        return {
+          key = c,
+          mods = "CTRL|ALT|SHIFT",
+          action = wezterm.action.SendString (veCtrl .. eAlt .. string.upper(c))
+        }
+    end),
+    a_to_z)
+)
+
+local terminalMiscForHatchak = {
+  {
+    key = "(",
+    mods = "CTRL",
+    action = wezterm.action.SendString (veCtrl .. "(")
+  },
+  {
+    key = "(",
+    mods = "CTRL|ALT",
+    action = wezterm.action.SendString (veCtrl .. eAlt .. "(")
+  },
+  {
+    key = ")",
+    mods = "CTRL",
+    action = wezterm.action.SendString (veCtrl .. ")")
+  },
+  {
+    key = ")",
+    mods = "CTRL|ALT",
+    action = wezterm.action.SendString (veCtrl .. eAlt .. ")")
+  },
+  -- Actually, some of these are working ok with the kitty protocol and kkp package in emacs.
+  -- At least, C-. and C-' are working with kkp.
+  -- {
+  --   key = ".",
+  --   mods = "CTRL",
+  --   action = wezterm.action.SendString (veCtrl .. ".")
+  -- },
+  -- {
+  --   key = ".",
+  --   mods = "CTRL|ALT",
+  --   action = wezterm.action.SendString (veCtrl .. eAlt .. ".")
+  -- },
+  -- {
+  --   key = "'",
+  --   mods = "CTRL",
+  --   action = wezterm.action.SendString (veCtrl .. "'")
+  -- },
+  -- {
+  --   key = "'",
+  --   mods = "CTRL|ALT",
+  --   action = wezterm.action.SendString (veCtrl .. eAlt .. "'")
+  -- },
+}
+
+
+config.keys = concatenateTables(uniqueKeys
+                                , terminalTooOverloadedKeys
+                                , terminalEncodeKeys
+                                , terminalMiscForHatchak
+)
 
 -- Color scheme
 config.color_schemes = {

@@ -374,27 +374,29 @@
  )
 
 ;; Some experiments with kkp package, the one thing I wanted was to distinguish C-i vs TAB and C-m vs RET.  I think it's possible if I fork the package and intercept the key as a string -- eg. it generates the string "C-i" or "C-m", but then sends those to the kbd function, which translates them to TAB and RET.
-;; (nobreak
-;;  ;; kitty keyboard protocol
-;;  (setq kkp-active-enhancements '(
-;;                                  disambiguate-escape-codes
-;;                                  report-alternate-keys
-;;                                  ))
-;;  (require 'kkp)
-;;  (global-kkp-mode 1)
-;;  ;; kkp-alternatives-map is used as parent for local-function-key-map, whose parent is function-key-map
-;;  (setq function-key-map (delq '(kp-tab . [9]) function-key-map))
-;;  (setq function-key-map (delq '(tab . [9]) function-key-map))
-;;  (setq local-function-key-map (delq '(tab . [9]) local-function-key-map))
-;;  ;;(define-key kkp-alternatives-map (kbd "TAB") (kbd "<tab>"))
-;;  ;; (define-key local-function-key-map [tab] nil)
-;;  ;; (define-key function-key-map [tab] nil)
-;;  ;; (define-key kkp-alternatives-map [tab] nil)
-;;  ;; (define-key local-function-key-map [kp-tab] nil)
-;;  ;; (define-key function-key-map [kp-tab] nil)
-;;  ;; (define-key kkp-alternatives-map [kp-tab] nil)
-;;  ;;(define-key input-decode-map [?\C-i] [C-i])
-;;  )
+(nobreak
+ ;; kitty keyboard protocol
+ ;; I'm not sure how important this is.  It lets me get s-<key> bindings, but wezterm is not sending (or understanding, probably) hyper for H-<key> bindings.  But I typically use super and hyper for window management or global keys, and I don't think I'm going to even use them in emacs.
+ ;; But it also lets me use C-. and C-' and such without special encoding.
+ ;; However, it does not allow me do disambiguate C-i vs TAB, or C-m vs RET, or even C-R vs C-r.  So I'm still using some custom encodings in Wezterm anyway.
+ ;; But I'm not sure how much I want to rely on key bindings that will only work within Wezterm, anyway, so I'm not sure why I'm even bothering with this.
+ ;;(require 'kkp)
+ ;;(global-kkp-mode 1)
+
+
+ ;; kkp-alternatives-map is used as parent for local-function-key-map, whose parent is function-key-map
+ ;;(setq function-key-map (delq '(kp-tab . [9]) function-key-map))
+ ;;(setq function-key-map (delq '(tab . [9]) function-key-map))
+ ;;(setq local-function-key-map (delq '(tab . [9]) local-function-key-map))
+ ;;(define-key kkp-alternatives-map (kbd "TAB") (kbd "<tab>"))
+ ;; (define-key local-function-key-map [tab] nil)
+ ;; (define-key function-key-map [tab] nil)
+ ;; (define-key kkp-alternatives-map [tab] nil)
+ ;; (define-key local-function-key-map [kp-tab] nil)
+ ;; (define-key function-key-map [kp-tab] nil)
+ ;; (define-key kkp-alternatives-map [kp-tab] nil)
+ ;;(define-key input-decode-map [?\C-i] [C-i])
+ )
 
 (message "-")
 (message "--")
