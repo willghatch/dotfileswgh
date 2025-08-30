@@ -299,7 +299,7 @@ The command also executes the sentence, with region as the object, if the region
 (emmap "Q" 'estate-keyboard-macro-to-register-start)
 (emmap "r" 'estate-keyboard-macro-execute-from-most-recently-macro-recorded-register)
 (emmap "R" 'estate-keyboard-macro-execute-from-register)
-;;(enmap "h" 'estate-record-quick-keyboard-macro-to-buffer-change)
+;;(enmap "   h" 'estate-record-quick-keyboard-macro-to-buffer-change)
 
 
 (emmap "m" nil) ;;;;;;;;;; m will be my prefix for mode-specific bindings
@@ -349,9 +349,13 @@ The command also executes the sentence, with region as the object, if the region
 
 
 
-(emmap "f" (cp/ae (cp/mod 'direction 'forward)
+;; (emmap "f" (cp/ae (cp/mod 'direction 'forward)
+;;                   (cp/obj 'repeatable-motion-repeat)))
+;; (emmap "F" (cp/ae (cp/mod 'direction 'backward)
+;;                   (cp/obj 'repeatable-motion-repeat)))
+(emmap "h" (cp/ae (cp/mod 'direction 'forward)
                   (cp/obj 'repeatable-motion-repeat)))
-(emmap "F" (cp/ae (cp/mod 'direction 'backward)
+(emmap "H" (cp/ae (cp/mod 'direction 'backward)
                   (cp/obj 'repeatable-motion-repeat)))
 
 
@@ -1096,7 +1100,7 @@ The command also executes the sentence, with region as the object, if the region
              (not is-exempt-object))
         (progn
           (composiphrase-clear-current-sentence)
-          (message "training wheels: use repeat key"))
+          (message "training wheels: use repeat key (now on h)"))
       (progn
         (setq wgh/composiphrase-training-wheels--last-sentence sentence)
         (funcall orig-func sentence config)))))
