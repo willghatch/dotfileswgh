@@ -12,7 +12,9 @@
 // TODO - keyboard layout or other status?
 
 {
-  "layer": "top", // Waybar at top layer
+  // layer: the top layer doesn't overlap with windows, but when setting a window to full screen it really means full screen and it covers the bar.  Setting layer to overlay makes it so that it is visible when a program is in full-screen in hyprland, but by literally overlaying on top of part of the other window.  There is also an `"exclusive": true` option that prevents drawing over the bar, but it is already true by default.
+  "layer": "top",
+  //"layer": "overlay",
   // "position": "bottom", // Waybar position (top|bottom|left|right)
   "height": 30, // Waybar height (to be removed for auto height)
   // "width": 1280, // Waybar width
