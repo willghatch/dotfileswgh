@@ -324,6 +324,11 @@ config.visual_bell = {
   -- TODO - set visual_bell color in color schemes
 }
 
+-- cursor style can be Steady or Blinking, Block, Bar, or Underline, default SteadyBlock.
+-- No matter which you choose, the cursor for inactive windows is an outline box that doesn't blink.
+--config.default_cursor_style = "BlinkingBlock"
+config.default_cursor_style = "SteadyBar"
+
 local function get_appearance_from_lightdark()
   local ldStatusProc = io.popen("lightdark-status")
   local ldStatus = ldStatusProc:read("*a")
