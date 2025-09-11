@@ -64,6 +64,7 @@ in [
   cp.fzf
   cp.man
   cp.gitAndTools.gitFull
+  (cp.callPackage ../packages/stack-pr.nix {})
   cp.tig
   #(cp.callPackage ../misc/ripgrep-renamed.nix {})
   cp.ripgrep
