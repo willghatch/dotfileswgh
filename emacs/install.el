@@ -100,6 +100,7 @@
   ;;(in 'popwin)
   ;;(in 'linum-relative)
   ;;(in '(kkp :type git :repo "https://github.com/benotn/kkp"))
+  (in '(eat :type git :repo "https://codeberg.org/akib/emacs-eat")) ;; "emulate a terminal"
 
   (in 'helm)
   (in 'helm-lsp)
