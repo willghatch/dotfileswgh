@@ -267,13 +267,16 @@ quit emacs."
       (light-theme)
     (dark-theme)))
 (defun lightdark-update-theme-watch ()
-  (file-notify-add-watch (concat
-                          ;; Keep this path synced with the lightdark-status script
-                          (or (getenv "LIGHTDARK_DIR") "/tmp/lightdark")
-                          "/lightdark")
-                         (list 'change)
-                         (lambda (event)
-                           (lightdark-update-theme)))
+  ;; Keep this path synced with the lightdark-status script
+  (let ((lightdark-dir (or (getenv "LIGHTDARK_DIR") "/tmp/lightdark")))
+    (when (not (file-directory-p lightdark-dir))
+      (make-directory lightdark-dir t))
+    (file-notify-add-watch (concat
+                            lightdark-dir
+                            "/lightdark")
+                           (list 'change)
+                           (lambda (event)
+                             (lightdark-update-theme))))
   (message "Watching theme file for light/dark changes..."))
 
 
