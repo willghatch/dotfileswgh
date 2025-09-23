@@ -14,6 +14,8 @@
 // * I don't see a way to reload the config.
 // * I don't see a way to source another file in the config, or do things conditionally, or use environment variables, etc.
 
+// uses only one bar at the bottom, more like tmux
+default_layout "compact"
 
 // Enable or disable automatic copy (and clear) of selection when releasing mouse
 // Default: true
@@ -141,8 +143,8 @@ keybinds clear-defaults=true {
 
 // TODO - I don't know if plugins are useful or helpful or anything... but they seem to include basic UI pieces.
 plugins {
-    tab-bar location="zellij:tab-bar"
-    status-bar location="zellij:status-bar"
+    //tab-bar location="zellij:tab-bar"
+    //status-bar location="zellij:status-bar"
     strider location="zellij:strider"
     compact-bar location="zellij:compact-bar"
     session-manager location="zellij:session-manager"
