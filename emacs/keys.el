@@ -1109,7 +1109,7 @@ The command also executes the sentence, with region as the object, if the region
         (setq wgh/composiphrase-training-wheels--last-sentence sentence)
         (funcall orig-func sentence config)))))
 
-(advice-add 'composiphrase-execute :around #'wgh/composiphrase-training-wheels-advice)
+;;(advice-add 'composiphrase-execute :around #'wgh/composiphrase-training-wheels-advice)
 
 
 (repeatable-motion-define-pair 'tempel-next 'tempel-previous)
