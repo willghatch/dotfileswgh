@@ -1,0 +1,1 @@
+Activate the user timers by making ~/.config/systemd/user/timers.target.wants/ and symlinking the timer unit files into that dir.  Or run `systemctl --user enable X.timer`, which also symlinks it.  But you may need to run `systemctl --user daemon-reload` and `systemctl --user restart timers.target` to load it.
