@@ -4,10 +4,14 @@ export DOTFILESWGH="${DOTFILESWGH:-$HOME/dotfileswgh}"
 source $DOTFILESWGH/env-more-with-mixins.sh
 source $DOTFILESWGH/bazsh-lib
 
-
 if /system/bin/true >/dev/null 2>&1; then
     # I'm on android... bleh...
     export ANDROID_TERMUX_MODE=true
+fi
+
+if [[ -z "$LIGHTDARK_DIR" ]]; then
+    export LIGHTDARK_DIR=/tmp/lightdark-dir
+    mkdir -p lightdark-dir
 fi
 
 export GUIX_PROFILE=$HOME/.guix-profile
