@@ -10,7 +10,7 @@ help() {
 
 # Using a user-specific directory is annoying when I run stuff with sudo.  So let's just use a global file for all users, because realistically it's just me.
 #lddir="${XDG_RUNTIME_DIR:-/tmp/$USER}"
-lddir="${LIGHTDARK_DIR:-/tmp/lightdark}"
+lddir="${LIGHTDARK_DIR:-/tmp/lightdark-dir}"
 ldfile="$lddir/lightdark"
 lightdark="$WGH_THEME_DARK_OR_LIGHT"
 lightdark="${lightdark:-$(cat $ldfile 2>/dev/null)}"
