@@ -241,6 +241,8 @@ config.color_schemes = {
     -- The default background color
     background = '#000000',
 
+    visual_bell = '#400020',
+
     -- Overrides the cell background color when the current cell is occupied by the
     -- cursor and the cursor style is set to Block
     --cursor_bg = '#52ad70',
