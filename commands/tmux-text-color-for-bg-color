@@ -1,0 +1,45 @@
+#!/usr/bin/env bash
+
+# motivated by tmux, but maybe I'll use it for something else?
+
+if [[ "$@" =~ "--help" ]]; then
+    echo "usage: $0 <color>"
+    echo "color is probably a hash-prefixed hex string like #123456, but may be a color name for a small number of colors."
+    exit 1
+fi
+
+color="$1"
+
+if echo "$color" | grep -qE '^#[0-9A-Fa-f]{6}$'; then
+    # Formula to choose white or black text from: https://gamedev.stackexchange.com/a/38561
+    # But translated to shell code by LLM.
+    R=$((0x${color:1:2}))
+    G=$((0x${color:3:2}))
+    B=$((0x${color:5:2}))
+
+    # Normalize to 0-1 range and apply gamma correction
+    # Using integer arithmetic: multiply by 1000000 for precision
+    # gamma = 2.2, so we approximate pow(x, 2.2) with x^2.2
+    # Simplified: compare linear RGB weighted sum against threshold
+    # L = 0.2126*R + 0.7152*G + 0.0722*B (using normalized values)
+    L=$((2126 * R + 7152 * G + 722 * B))
+
+    # Threshold is 128 * 10000 = 1280000 (for normalized 0-255 range)
+    if [ $L -gt 1280000 ]; then
+        echo "#000000"
+    else
+        echo "#ffffff"
+    fi
+else
+    # Named colors: use sensible defaults
+    case "$color" in
+        black|darkred|darkgreen|brown|darkblue|darkmagenta|darkcyan|darkgray|darkgrey|teal)
+            echo "#ffffff" ;;
+        red|green|yellow|blue|magenta|cyan|purple|orange|pink)
+            echo "#000000" ;;
+        white|lightgray|lightgrey|lightred|lightgreen|lightyellow|lightblue|lightmagenta|lightcyan)
+            echo "#000000" ;;
+        *)
+            echo "#ffffff" ;;
+    esac
+fi

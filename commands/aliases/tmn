@@ -6,5 +6,6 @@ if test "blue" = "$TMUX_COLOR"; then
 else
     unset TMUX
     export TMUX_COLOR=blue
+    export TMUX_FG_COLOR="#ffffff"
     exec tm new-session -s "$@"
 fi
