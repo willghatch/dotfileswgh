@@ -99,6 +99,7 @@ button:hover {
 #wireplumber,
 #custom-media,
 #custom-hmcounts,
+#custom-mooncrater,
 #custom-wl-gammarelay-temperature,
 #custom-wl-gammarelay-brightness,
 #custom-wl-gammarelay-gamma,
@@ -328,4 +329,10 @@ label:focus {
 
 #privacy-item.audio-out {
     background-color: #0069d4;
+}
+
+#custom-mooncrater {
+    background-color: #2d4d3d;
+    font-size: 11px;
+    font-family: monospace;
 }

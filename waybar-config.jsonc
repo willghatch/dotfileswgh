@@ -44,6 +44,7 @@
     // TODO - try waybar-privacy, which shows an icon when there is screen recording or a microphone on
     // TODO - make a custom waybar widget that shows current keyboard state
     // TODO - maybe make a custom waybar widget that shows something about email?  I mostly ignore this widget that I made on awesome, but sometimes it's useful to notice mail in a folder I don't check much.
+    "custom/mooncrater",
     "network",
     //"power-profiles-daemon",
     "temperature",
@@ -286,6 +287,12 @@
     //"max-length": 25, // This supposedly is a max length in characters, but it is shortening well before that.
     "exec": "waybar-hmcount.sh",
     "restart-interval": 60
+  },
+  "custom/mooncrater": {
+    "format": "⌨ {}",
+    "exec": "cat /tmp/mooncrater-input-status 2>/dev/null || echo 'MC: inactive'",
+    "interval": 1,
+    "tooltip": false
   },
   "custom/media": {
     "format": "{icon} {}",
