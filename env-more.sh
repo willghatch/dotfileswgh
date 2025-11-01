@@ -36,7 +36,7 @@ export XDG_DATA_DIRS=$DOTFILESWGH/local/share:$XDG_DATA_DIRS:/usr/local/share:/u
 # writable config location
 #XDG_CONFIG_HOME=$HOME/.config
 # read-only but searched config locations
-export XDG_CONFIG_DIRS=$DOTFILESWGH_PRI/xdg-config-ro:$DOTFILESWGH/xdg-config-ro:$HOME/rootgit-dotfiles/xdg-config-ro:$XDG_CONFIG_DIRS
+export XDG_CONFIG_DIRS=$DOTFILESWGH_PRI_DOTLOCAL/xdg-config-ro:$DOTFILESWGH_DOTLOCAL/xdg-config-ro:$DOTFILESWGH_ROOTGIT/xdg-config-ro:$DOTFILESWGH_PRI/xdg-config-ro:$DOTFILESWGH_GHP/xdg-config-ro:$DOTFILESWGH/xdg-config-ro:$XDG_CONFIG_DIRS
 #XDG_CONFIG_DIRS=/etc/xdg
 # writable cache dir
 export XDG_CACHE_HOME=$HOME/.cache
