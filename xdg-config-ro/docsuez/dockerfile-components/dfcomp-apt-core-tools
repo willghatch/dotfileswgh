@@ -5,3 +5,5 @@ RUN apt-get install -y --no-install-recommends curl ca-certificates
 RUN DEBIAN_FRONTEND=noninteractive apt install -y ripgrep fzf zsh tmux less openssh-client htop
 RUN DEBIAN_FRONTEND=noninteractive apt install -y jq
 RUN apt-get install -y --no-install-recommends racket
+# I want some basic networking tools so that I can tell if I can even reach the network
+RUN apt-get install -y --no-install-recommends net-tools iputils-ping
