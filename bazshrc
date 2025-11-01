@@ -5,6 +5,7 @@ export DOTFILESWGH="${DOTFILESWGH:-$HOME/dotfileswgh}"
 # Don't load env vars if they've already been loaded and there is a virtualenv loaded.  I'm not sure this is a great idea, but I need to not break the virtualenv path, but I normally want new shells to load the new environment to pick up any changes.  This is a quick hacky way to get what I want for now, but I'll probably change the details later...
 if [[ "$DOTFILESWGH_ENV_LOADED" == "true" && -n "$VIRTUAL_ENV" ]]; then
     # skip loading
+    true
 else
     source $DOTFILESWGH/env-more-with-mixins.sh
 fi
