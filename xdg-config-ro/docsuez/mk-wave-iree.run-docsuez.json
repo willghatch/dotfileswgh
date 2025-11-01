@@ -1,0 +1,18 @@
+{
+    "tags": {
+        "mk": {
+            "volumes": {
+                "$HOME/mk/amd/e-wave-iree": "/home/wgh/mk"
+            },
+            "pre-tmux-script": [
+                "source $DOTFILESWGH/env-more-with-mixins.sh",
+                "PATH=$PATH:$DOTFILESWGH/commands/iree",
+                "# Enter venv and wave dir.",
+                "cd mk",
+                "source dvenv/bin/activate",
+                "source iree-build/.env && export PYTHONPATH",
+                "cd wave"
+            ]
+        }
+    }
+}
