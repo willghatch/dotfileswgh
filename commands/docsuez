@@ -738,6 +738,7 @@ class Docsuez:
                 f.write("# Start docker container in background\n")
                 f.write("docker_cmd=(\n")
                 f.write("  docker run --rm -d\n")
+                f.write(f"  --name {session_name}\n")
 
                 # Add volumes
                 for external, internal in config.get_volumes().items():
