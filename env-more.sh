@@ -61,5 +61,6 @@ export GREP_COLOR="1;32"
 export TODOMAN_CONFIG=$DOTFILESWGH_PRI/todoman.conf
 export VDIRSYNCER_CONFIG=$DOTFILESWGH_PRI/vdirsyncer.conf
 export KHARD_CONFIG=$DOTFILESWGH_PRI/khard.conf
+export TSUEZ_TMUX_CONF=$DOTFILESWGH/tsuez-tmux.conf
 
 export DOTFILESWGH_ENV_LOADED=true
