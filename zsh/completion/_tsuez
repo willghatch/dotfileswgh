@@ -1,0 +1,66 @@
+#compdef tsuez
+#autoload
+
+_tsuez() {
+  local curcontext="$curcontext" state line
+  typeset -A opt_args
+
+  _arguments -C \
+    '(-f --tmux-conf)'{-f,--tmux-conf}'[Path to tmux.conf file]:tmux conf file:_files' \
+    '1: :->command' \
+    '*:: :->args'
+
+  case $state in
+    command)
+      local -a commands
+      commands=(
+        'list:List all tmux sessions across all sockets'
+        'attach:Attach to a session by name'
+        'next:Detach and attach to next session'
+        'previous:Detach and attach to previous session'
+        'new:Create a new tmux session'
+        'generate-docsuez-config:Generate configuration for docsuez'
+      )
+      _describe 'command' commands
+      ;;
+
+    args)
+      case $line[1] in
+        attach)
+          _arguments \
+            '1:session name:->sessions' \
+            '--socket-dir[Specific socket directory to use]:socket directory:_directories'
+
+          case $state in
+            sessions)
+              local -a sessions
+              sessions=(${(f)"$(tsuez list 2>/dev/null | awk '{print $1}')"})
+              _describe 'session name' sessions
+              ;;
+          esac
+          ;;
+
+        new)
+          local -a colors
+          colors=(${(f)"$(tsuez --list-color-names-and-exit 2>/dev/null)"})
+
+          _arguments \
+            '(-s --session-name)'{-s,--session-name}'[Name for the new session]:session name:' \
+            '(-c --color)'{-c,--color}'[Background color]:color:($colors)'
+          ;;
+
+        generate-docsuez-config)
+          local -a colors
+          colors=(${(f)"$(tsuez --list-color-names-and-exit 2>/dev/null)"})
+
+          _arguments \
+            '(-s --session-name)'{-s,--session-name}'[Name for the new session]:session name:' \
+            '(-b --base-name)'{-b,--base-name}'[Base name to generate session name from]:base name:' \
+            '(-c --color)'{-c,--color}'[Background color]:color:($colors)'
+          ;;
+      esac
+      ;;
+  esac
+}
+
+_tsuez "$@"

@@ -1,0 +1,69 @@
+#compdef docsuez
+#autoload
+
+_docsuez() {
+  local curcontext="$curcontext" state line
+  typeset -A opt_args
+
+  _arguments -C \
+    '1: :->command' \
+    '*:: :->args'
+
+  case $state in
+    command)
+      local -a commands
+      commands=(
+        'list-configurations:List available configuration names'
+        'list-addons:List available addon names'
+        'list-builds:List available build names'
+        'build:Build a docker image'
+        'run:Run a docker container'
+      )
+      _describe 'command' commands
+      ;;
+
+    args)
+      case $line[1] in
+        build)
+          _arguments \
+            '1:image spec:->builds' \
+            '--dry-show[Show the assembled Dockerfile without building]'
+
+          case $state in
+            builds)
+              local -a builds
+              builds=(${(f)"$(docsuez list-builds 2>/dev/null)"})
+              _describe 'image spec' builds
+              ;;
+          esac
+          ;;
+
+        run)
+          _arguments \
+            '1:config name:->configs' \
+            '(-b --build)'{-b,--build}'[Build mode]:build mode:(detect yes force true no false)' \
+            '(-a --addon)'{-a,--addon}'[Add configuration addon]:addon name:->addons' \
+            '--no-default-addons[Skip loading default addons]' \
+            '(-s --session-name)'{-s,--session-name}'[Name for the tmux session]:session name:' \
+            '(-c --color)'{-c,--color}'[Background color for the tmux session]:color:' \
+            '--dry-show[Show the run script without executing it]'
+
+          case $state in
+            configs)
+              local -a configs
+              configs=(${(f)"$(docsuez list-configurations 2>/dev/null)"})
+              _describe 'config name' configs
+              ;;
+            addons)
+              local -a addons
+              addons=(${(f)"$(docsuez list-addons 2>/dev/null)"})
+              _describe 'addon name' addons
+              ;;
+          esac
+          ;;
+      esac
+      ;;
+  esac
+}
+
+_docsuez "$@"

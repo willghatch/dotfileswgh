@@ -1,0 +1,643 @@
+#!/usr/bin/env python3
+"""
+tsuez - A tmux session manager that works across multiple socket directories
+"""
+
+import argparse
+import os
+import sys
+import subprocess
+import socket
+import tempfile
+from pathlib import Path
+from typing import List, Tuple, Optional, Dict
+
+
+class Tsuez:
+    def __init__(self, tmux_conf_path: Optional[Path] = None):
+        # Define search paths for tmux socket directories
+        search_paths = []
+
+        if "XDG_RUNTIME_DIR" in os.environ:
+            xdg_runtime = Path(os.environ["XDG_RUNTIME_DIR"])
+            search_paths.append(xdg_runtime / "tsuez-sockets")
+        search_paths.extend([Path("/tmp") / f"tsuez-{os.getuid()}",])
+
+        self.socket_search_paths = search_paths
+
+        # Use provided tmux_conf_path, or check TSUEZ_TMUX_CONF, or fall back to default
+        if tmux_conf_path:
+            self.tmux_conf = tmux_conf_path
+        elif "TSUEZ_TMUX_CONF" in os.environ:
+            self.tmux_conf = Path(os.environ["TSUEZ_TMUX_CONF"])
+        else:
+            # Fallback: use tmux.conf in home directory or current directory
+            self.tmux_conf = Path.home() / ".tmux.conf"
+
+        # Color dictionary for tmux session backgrounds
+        self.color_dict = {
+            "blue": "#4a90e2",
+            "green": "#50c878",
+            "purple": "#9b59b6",
+            "orange": "#e67e22",
+            "red": "#e74c3c",
+            "teal": "#008080",
+            "cyan": "#00bcd4",
+            "magenta": "#e91e63",
+            "pink": "#ff69b4",
+            "brown": "#8b4513",
+            "gray": "#808080",
+            "olive": "#808000",
+            "navy": "#000080",
+            "maroon": "#800000",
+            "lime": "#00ff00",
+            "indigo": "#4b0082",
+            "violet": "#ee82ee",
+            "turquoise": "#40e0d0",
+            "coral": "#ff7f50",
+            "salmon": "#fa8072",
+            "gold": "#ffd700",
+            "silver": "#c0c0c0",
+            "crimson": "#dc143c",
+            "tomato": "#ff6347",
+            "khaki": "#f0e68c",
+            "plum": "#dda0dd",
+            "orchid": "#da70d6",
+            "tan": "#d2b48c",
+            "peru": "#cd853f",
+            "sienna": "#a0522d",
+            "dark-blue": "#00008b",
+            "dark-green": "#006400",
+            "dark-red": "#8b0000",
+            "dark-cyan": "#008b8b",
+            "dark-magenta": "#8b008b",
+            "dark-gray": "#404040",
+            "light-blue": "#add8e6",
+            "light-green": "#90ee90",
+            "light-coral": "#f08080",
+            "light-pink": "#ffb6c1",
+            "light-gray": "#d3d3d3",
+            "sky-blue": "#87ceeb",
+            "steel-blue": "#4682b4",
+            "royal-blue": "#4169e1",
+            "dodger-blue": "#1e90ff",
+            "powder-blue": "#b0e0e6",
+            "sea-green": "#2e8b57",
+            "lime-green": "#32cd32",
+            "forest-green": "#228b22",
+            "olive-drab": "#6b8e23",
+            "yellow-green": "#9acd32",
+            "orange-red": "#ff4500",
+            "hot-pink": "#ff69b4",
+            "deep-pink": "#ff1493",
+            "medium-purple": "#9370db",
+            "slate-blue": "#6a5acd"
+        }
+
+    def find_tmux_sockets(self) -> List[Path]:
+        """Find all tmux socket files in the search paths"""
+        sockets = []
+        for search_path in self.socket_search_paths:
+            if not search_path.exists():
+                continue
+
+            # Look for files that match tmux socket patterns
+            for item in search_path.iterdir():
+                # Tmux sockets are typically named like "default" or "tmux-{uid}/default"
+                # They should be socket files
+                if item.is_socket():
+                    sockets.append(item)
+                elif item.is_dir():
+                    # Check subdirectories for socket files
+                    for subitem in item.iterdir():
+                        if subitem.is_socket():
+                            sockets.append(subitem)
+
+        return sockets
+
+    def get_sessions_from_socket(self, socket_path: Path) -> List[Tuple[str, Path]]:
+        """Get all sessions from a specific tmux socket"""
+        try:
+            result = subprocess.run(
+                ["tmux", "-S", str(socket_path), "list-sessions", "-F", "#{session_name}"],
+                capture_output=True,
+                text=True,
+                check=True
+            )
+            sessions = []
+            for line in result.stdout.strip().split("\n"):
+                if line:
+                    sessions.append((line, socket_path))
+            return sessions
+        except subprocess.CalledProcessError:
+            return []
+
+    def list_all_sessions(self) -> List[Tuple[str, Path]]:
+        """List all tmux sessions from all sockets"""
+        all_sessions = []
+        sockets = self.find_tmux_sockets()
+
+        for socket_path in sockets:
+            sessions = self.get_sessions_from_socket(socket_path)
+            all_sessions.extend(sessions)
+
+        return all_sessions
+
+    def cmd_list(self, args):
+        """List all tmux sessions across all sockets"""
+        sessions = self.list_all_sessions()
+
+        if not sessions:
+            print("No tmux sessions found")
+            return
+
+        for session_name, socket_path in sessions:
+            print(f"{session_name}\t(socket: {socket_path})")
+
+    def find_session(self, session_name: str) -> Optional[Tuple[str, Path]]:
+        """Find a session by name in the super-list"""
+        sessions = self.list_all_sessions()
+        for name, socket_path in sessions:
+            if name == session_name:
+                return (name, socket_path)
+        return None
+
+    def _get_control_info_file(self, socket_path: Path, session_name: str) -> Path:
+        """Get the path to the control info file for a session"""
+        socket_dir = socket_path.parent
+        socket_name = socket_path.name
+        return socket_dir / f"tsuez-info-{socket_name}-{session_name}.json"
+
+    def _get_control_command_file(self, socket_path: Path, session_name: str) -> Path:
+        """Get the path to the control command file for a session"""
+        socket_dir = socket_path.parent
+        socket_name = socket_path.name
+        return socket_dir / f"tsuez-cmd-{socket_name}-{session_name}.txt"
+
+    def _get_text_color_for_bg(self, bg_color: str) -> str:
+        """Get the appropriate text color for a given background color
+
+        Algorithm from tmux-text-color-for-bg-color, duplicated here to avoid dependency.
+        """
+        import re
+
+        # Check if it's a hex color
+        hex_match = re.match(r'^#([0-9A-Fa-f]{6})$', bg_color)
+        if hex_match:
+            # Formula to choose white or black text from: https://gamedev.stackexchange.com/a/38561
+            hex_str = hex_match.group(1)
+            R = int(hex_str[0:2], 16)
+            G = int(hex_str[2:4], 16)
+            B = int(hex_str[4:6], 16)
+
+            # Calculate luminance
+            # L = 0.2126*R + 0.7152*G + 0.0722*B
+            L = 2126 * R + 7152 * G + 722 * B
+
+            # Threshold is 128 * 10000 = 1280000 (for normalized 0-255 range)
+            if L > 1280000:
+                return "#000000"
+            else:
+                return "#ffffff"
+        else:
+            # Named colors: use sensible defaults
+            light_colors = {
+                "red", "green", "yellow", "blue", "magenta", "cyan", "purple", "orange", "pink",
+                "white", "lightgray", "lightgrey", "lightred", "lightgreen", "lightyellow",
+                "lightblue", "lightmagenta", "lightcyan"
+            }
+
+            if bg_color.lower() in light_colors:
+                return "#000000"
+            else:
+                return "#ffffff"
+
+    def _write_control_info(self, socket_path: Path, session_name: str):
+        """Write control info file so inner tsuez knows how to communicate"""
+        import json
+
+        info_file = self._get_control_info_file(socket_path, session_name)
+        control_file = self._get_control_command_file(socket_path, session_name)
+
+        info = {
+            "pid": os.getpid(),
+            "socket": str(socket_path),
+            "session": session_name,
+            "control_file": str(control_file)
+        }
+
+        with open(info_file, 'w') as f:
+            json.dump(info, f)
+
+    def _session_loop(self, session_name: str, socket_path: Path, create_new: bool = False, color: Optional[str] = None):
+        """Common loop for attach and new commands"""
+        socket_dir = socket_path.parent
+        control_file = self._get_control_command_file(socket_path, session_name)
+        info_file = self._get_control_info_file(socket_path, session_name)
+
+        # Set environment variable to indicate this is a tsuez-managed session
+        os.environ["TSUEZ_MANAGED"] = "1"
+
+        try:
+            while True:
+                # Write control info for inner tsuez to read
+                self._write_control_info(socket_path, session_name)
+
+                # Remove any previous control command file
+                if control_file.exists():
+                    control_file.unlink()
+
+                # Build tmux command
+                tmux_cmd = ["tmux", "-S", str(socket_path)]
+
+                if create_new:
+                    # Add config for new sessions
+                    if self.tmux_conf.exists():
+                        tmux_cmd.extend(["-f", str(self.tmux_conf)])
+
+                    # Check if session already exists
+                    existing_session = None
+                    for name, sock in self.list_all_sessions():
+                        if name == session_name and sock == socket_path:
+                            existing_session = name
+                            break
+
+                    if existing_session:
+                        tmux_cmd.extend(["attach-session", "-t", session_name])
+                    else:
+                        tmux_cmd.extend(["new-session", "-s", session_name])
+
+                        # Set up color environment if provided
+                        if color:
+                            # Export TMUX_COLOR
+                            os.environ["TMUX_COLOR"] = color
+
+                            # Get text color for the background
+                            text_color = self._get_text_color_for_bg(color)
+                            os.environ["TMUX_FG_COLOR"] = text_color
+                else:
+                    # Just attach to existing session
+                    if self.tmux_conf.exists():
+                        tmux_cmd.extend(["-f", str(self.tmux_conf)])
+                    tmux_cmd.extend(["attach-session", "-t", session_name])
+
+                subprocess.run(tmux_cmd)
+
+                # Check if a control command was written
+                if control_file.exists():
+                    control_command = control_file.read_text().strip()
+                    control_file.unlink()
+
+                    if control_command.startswith("tsuez-control:"):
+                        command = control_command.split(":", 1)[1].strip()
+
+                        if command == "next":
+                            session_info = self._get_adjacent_session(session_name, 1)
+                            if session_info:
+                                session_name, socket_path = session_info
+                                socket_dir = socket_path.parent
+                                control_file = self._get_control_command_file(socket_path, session_name)
+                                info_file = self._get_control_info_file(socket_path, session_name)
+                            # If no next session found, re-attach to current session
+                            continue
+                        elif command == "previous":
+                            session_info = self._get_adjacent_session(session_name, -1)
+                            if session_info:
+                                session_name, socket_path = session_info
+                                socket_dir = socket_path.parent
+                                control_file = self._get_control_command_file(socket_path, session_name)
+                                info_file = self._get_control_info_file(socket_path, session_name)
+                            # If no previous session found, re-attach to current session
+                            continue
+
+                # Normal detach without control command, exit
+                break
+        finally:
+            # Cleanup
+            if control_file.exists():
+                control_file.unlink()
+            if info_file.exists():
+                info_file.unlink()
+
+    def cmd_attach(self, args):
+        """Attach to a session by name"""
+        # If socket-dir is specified, use it directly
+        if hasattr(args, 'socket_dir') and args.socket_dir:
+            socket_dir = Path(args.socket_dir)
+            socket_path = socket_dir / "default"
+            session_name = args.session
+
+            # Verify the socket exists
+            if not socket_path.exists():
+                print(f"Socket not found at {socket_path}", file=sys.stderr)
+                sys.exit(1)
+
+            self._session_loop(session_name, socket_path, create_new=False)
+        else:
+            # Use the standard search mechanism
+            session_info = self.find_session(args.session)
+
+            if not session_info:
+                print(f"Session '{args.session}' not found", file=sys.stderr)
+                sys.exit(1)
+
+            session_name, socket_path = session_info
+            self._session_loop(session_name, socket_path, create_new=False)
+
+    def _get_adjacent_session(self, current_session: str, offset: int) -> Optional[Tuple[str, Path]]:
+        """Get the next or previous session in the list"""
+        sessions = self.list_all_sessions()
+
+        for i, (name, socket_path) in enumerate(sessions):
+            if name == current_session:
+                new_index = (i + offset) % len(sessions)
+                return sessions[new_index]
+
+        return None
+
+    def _read_control_info(self) -> Optional[Dict[str, str]]:
+        """Read control info from the current tmux session"""
+        import json
+
+        # Check if we're in a tsuez-managed session
+        if "TSUEZ_MANAGED" not in os.environ:
+            return None
+
+        # Get current tmux session info
+        try:
+            # Get socket path from TMUX environment variable
+            tmux_env = os.environ.get("TMUX")
+            if not tmux_env:
+                return None
+
+            # TMUX format: /path/to/socket,pid,pane_index
+            socket_path_str = tmux_env.split(",")[0]
+            socket_path = Path(socket_path_str)
+
+            # Get session name
+            result = subprocess.run(
+                ["tmux", "display-message", "-p", "#{session_name}"],
+                capture_output=True,
+                text=True,
+                check=True
+            )
+            session_name = result.stdout.strip()
+
+            # Read the info file
+            info_file = self._get_control_info_file(socket_path, session_name)
+            if not info_file.exists():
+                return None
+
+            with open(info_file, 'r') as f:
+                return json.load(f)
+
+        except Exception as e:
+            print(f"Error reading control info: {e}", file=sys.stderr)
+            return None
+
+    def cmd_next(self, args):
+        """Detach and attach to the next session"""
+        control_info = self._read_control_info()
+
+        if not control_info:
+            print("Not running under tsuez attach", file=sys.stderr)
+            sys.exit(1)
+
+        # Get the current socket path from TMUX env var (works in container)
+        tmux_env = os.environ.get("TMUX")
+        if not tmux_env:
+            print("Not in a tmux session", file=sys.stderr)
+            sys.exit(1)
+
+        socket_path = Path(tmux_env.split(",")[0])
+        session_name = control_info["session"]
+
+        # Compute control file path based on current socket path
+        # This ensures we use the container path inside Docker, not the host path
+        control_file = self._get_control_command_file(socket_path, session_name)
+
+        # Write the control command directly to the file
+        with open(control_file, 'w') as f:
+            f.write("tsuez-control: next\n")
+
+        # Detach from tmux
+        subprocess.run(["tmux", "detach-client"])
+
+    def cmd_previous(self, args):
+        """Detach and attach to the previous session"""
+        control_info = self._read_control_info()
+
+        if not control_info:
+            print("Not running under tsuez attach", file=sys.stderr)
+            sys.exit(1)
+
+        # Get the current socket path from TMUX env var (works in container)
+        tmux_env = os.environ.get("TMUX")
+        if not tmux_env:
+            print("Not in a tmux session", file=sys.stderr)
+            sys.exit(1)
+
+        socket_path = Path(tmux_env.split(",")[0])
+        session_name = control_info["session"]
+
+        # Compute control file path based on current socket path
+        # This ensures we use the container path inside Docker, not the host path
+        control_file = self._get_control_command_file(socket_path, session_name)
+
+        # Write the control command directly to the file
+        with open(control_file, 'w') as f:
+            f.write("tsuez-control: previous\n")
+
+        # Detach from tmux
+        subprocess.run(["tmux", "detach-client"])
+
+    def _create_socket_dir(self) -> Path:
+        """Create a unique temporary socket directory for a new tsuez instance"""
+        base_dir = self.socket_search_paths[0]
+        base_dir.mkdir(parents=True, exist_ok=True)
+
+        # Create a unique temporary directory
+        socket_dir = Path(tempfile.mkdtemp(prefix="tsuez-", dir=base_dir))
+        return socket_dir
+
+    def _get_color_for_session_name(self, session_name: str) -> str:
+        """Get a consistent color for a session name by hashing it"""
+        import hashlib
+
+        # Hash the session name
+        hash_obj = hashlib.md5(session_name.encode())
+        hash_bytes = hash_obj.digest()
+
+        # Convert first 4 bytes to an integer
+        hash_int = int.from_bytes(hash_bytes[:4], byteorder='big')
+
+        # Use modulo to get an index into the color dictionary
+        color_list = list(self.color_dict.values())
+        color_index = hash_int % len(color_list)
+
+        return color_list[color_index]
+
+    def cmd_generate_docsuez_config(self, args):
+        """Generate configuration for docsuez to launch tmux inside docker"""
+        import json
+
+        # Create socket directory
+        socket_dir = self._create_socket_dir()
+
+        # Copy the base tmux config to the socket directory
+        tmux_conf_path = socket_dir / "tmux.conf"
+        if self.tmux_conf.exists():
+            with open(self.tmux_conf, 'r') as src:
+                with open(tmux_conf_path, 'w') as dst:
+                    dst.write(src.read())
+        else:
+            # Create an empty config if base config doesn't exist
+            tmux_conf_path.touch()
+
+        # Generate a session name if not provided
+        session_name = args.session_name
+        if not session_name:
+            # Use base name if provided, otherwise use default "tsuez"
+            base_name = getattr(args, 'base_name', None) or "tsuez"
+            # Find a unique session name
+            existing_sessions = self.list_all_sessions()
+            existing_names = {name for name, _ in existing_sessions}
+
+            # Try the base name without a suffix first
+            if base_name not in existing_names:
+                session_name = base_name
+            else:
+                # Add a numeric suffix to make it unique
+                counter = 1
+                while f"{base_name}-{counter}" in existing_names:
+                    counter += 1
+                session_name = f"{base_name}-{counter}"
+
+        # Handle color selection
+        color = args.color
+        if color:
+            # Map color name to hex value if it exists in the dictionary
+            color = self.color_dict.get(color, color)
+        else:
+            # Select a consistent color based on session name hash
+            color = self._get_color_for_session_name(session_name)
+
+        # Build the configuration
+        config = {
+            "socket_dir": str(socket_dir),
+            "tmux_conf_path": str(tmux_conf_path),
+            "socket_name": "default",
+            "session_name": session_name,
+            "tmux_start_command": [
+                "tmux",
+                "-f", "/tsuez-dir/tmux.conf",
+                "-S", "/tsuez-dir/default",
+                "new-session",
+                "-s", session_name,
+                "-d"
+            ],
+            "color": color
+        }
+
+        # Set TMUX_COLOR and TMUX_FG_COLOR environment variables if color is provided
+        if color:
+            text_color = self._get_text_color_for_bg(color)
+            config["env"] = {
+                "TMUX_COLOR": color,
+                "TMUX_FG_COLOR": text_color
+            }
+
+        # Output JSON
+        print(json.dumps(config, indent=2))
+
+    def cmd_new(self, args):
+        """Create a new tmux session"""
+        # Create a unique socket directory for this instance
+        socket_dir = self._create_socket_dir()
+
+        # Use the default tmux socket name
+        socket_path = socket_dir / "default"
+
+        # Generate a session name if not provided
+        session_name = args.session_name
+        if not session_name:
+            # Find a unique session name
+            existing_sessions = self.list_all_sessions()
+            existing_names = {name for name, _ in existing_sessions}
+            counter = 1
+            while f"tsuez-{counter}" in existing_names:
+                counter += 1
+            session_name = f"tsuez-{counter}"
+
+        # Handle color selection
+        color = args.color
+        if color:
+            # Map color name to hex value if it exists in the dictionary
+            color = self.color_dict.get(color, color)
+        else:
+            # Select a consistent color based on session name hash
+            color = self._get_color_for_session_name(session_name)
+
+        self._session_loop(session_name, socket_path, create_new=True, color=color)
+
+    def run(self):
+        parser = argparse.ArgumentParser(
+            description="Manage tmux sessions across multiple socket directories"
+        )
+        parser.add_argument("-f", "--tmux-conf", type=Path, help="Path to tmux.conf file")
+        parser.add_argument("--list-color-names-and-exit", action="store_true",
+                            help="List available color names and exit")
+        subparsers = parser.add_subparsers(dest="command", help="Commands")
+
+        # list command
+        subparsers.add_parser("list", help="List all tmux sessions")
+
+        # attach command
+        attach_parser = subparsers.add_parser("attach", help="Attach to a session")
+        attach_parser.add_argument("session", help="Session name to attach to")
+        attach_parser.add_argument("--socket-dir", type=Path, help="Specific socket directory to use")
+
+        # next command
+        subparsers.add_parser("next", help="Detach and attach to next session")
+
+        # previous command
+        subparsers.add_parser("previous", help="Detach and attach to previous session")
+
+        # new command
+        new_parser = subparsers.add_parser("new", help="Create a new session")
+        new_parser.add_argument("-s", "--session-name", help="Name for the new session")
+        new_parser.add_argument("-c", "--color", help="Background color (name or hex value)")
+        #new_parser.add_argument("command", nargs="*", help="Command to run in the session")
+
+        # generate-docsuez-config command
+        docsuez_parser = subparsers.add_parser("generate-docsuez-config",
+                                                help="Generate configuration for docsuez")
+        docsuez_parser.add_argument("-s", "--session-name", help="Name for the new session")
+        docsuez_parser.add_argument("-b", "--base-name", help="Base name to generate session name from")
+        docsuez_parser.add_argument("-c", "--color", help="Background color (name or hex value)")
+
+        args = parser.parse_args()
+
+        # Handle --list-color-names-and-exit flag
+        if args.list_color_names_and_exit:
+            for color_name in sorted(self.color_dict.keys()):
+                print(color_name)
+            sys.exit(0)
+
+        if not args.command:
+            parser.print_help()
+            sys.exit(1)
+
+        # Update tmux_conf if specified
+        if args.tmux_conf:
+            self.tmux_conf = args.tmux_conf
+
+        # Dispatch to appropriate handler (convert hyphens to underscores)
+        handler_name = f"cmd_{args.command.replace('-', '_')}"
+        handler = getattr(self, handler_name)
+        handler(args)
+
+
+if __name__ == "__main__":
+    tsuez = Tsuez()
+    tsuez.run()

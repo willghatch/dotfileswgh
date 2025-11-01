@@ -1,0 +1,1001 @@
+#!/usr/bin/env python3
+"""
+docsuez - Build and run Docker containers with tsuez integration
+
+Implementation:
+- tsuez runs OUTSIDE of docker and generates tmux configuration
+- Docker container runs tmux server in background with shared socket directory
+- tsuez attaches to the tmux server inside docker as foreground process
+- Docker exits when inner tmux server exits
+- Socket is accessible both inside and outside docker
+
+Configuration File Examples:
+
+run-docsuez.json - Specifies how to run a container:
+{
+  "image-builder": "my-dev-env",
+  "volumes": {
+    "$HOME/projects": "/workspace",
+    "$HOME/.ssh": "/root/.ssh"
+  },
+  "docker_args": ["--network=host", "--privileged"],
+  "command": ["bash"],
+  "tmux_socket_dir": "/tmp/tmux-sockets",
+  "docker-run-script": ["echo 'Setting up...'", "DOCKER_RUN_EXTRAS+=(--hostname myhost)"],
+  "pre-tmux-script": ["export FOO=bar", "export QUUX=aoeu"],
+  "include": ["base-config"],
+  "tags": {
+    "dev": {
+      "docker_args": ["--cap-add=SYS_PTRACE"],
+      "docker-run-script": ["DOCKER_RUN_EXTRAS+=(-e \"DEV_MODE=1\")"]
+    }
+  }
+}
+
+build-docsuez.json - Specifies how to build an image:
+{
+  "dockerfile": [
+    "Dockerfile.base",
+    {"dockerfile-text": ["RUN apt install cowsay", "RUN apt install fortune"]},
+    {"bash-print-dockerfile-text": "echo 'RUN echo Built on '$(date)"},
+    "Dockerfile.extra"
+  ],
+  "build-context-directory": ".",
+  "image_name": "my-dev-env:latest",
+  "build_args": {
+    "BASE_IMAGE": "ubuntu:22.04"
+  }
+}
+"""
+
+import argparse
+import json
+import os
+import subprocess
+import sys
+from pathlib import Path
+from typing import Dict, List, Optional, Any, Tuple
+
+
+class DocsuezConfig:
+    """Represents a parsed run-docsuez.json configuration"""
+
+    def __init__(self, config_path: Path, searcher: 'DocsuezSearcher',
+                 addons: Optional[List[str]] = None,
+                 default_addons: Optional[List[Tuple[str, Path]]] = None):
+        self.config_path = config_path
+        self.searcher = searcher
+        self.config_dir = config_path.parent
+        self._raw_config = {}
+        self._merged_config = None
+        self.addons = addons or []
+        self.default_addons = default_addons or []
+
+    def load(self):
+        """Load the configuration file"""
+        with open(self.config_path, 'r') as f:
+            self._raw_config = json.load(f)
+
+    def _resolve_tags(self) -> Dict[str, Any]:
+        """Resolve tags from all configs according to precedence rules
+
+        Precedence (lowest to highest):
+        1. Default addons tags
+        2. Main config tags
+        3. User-specified addons tags (error if multiple addons define same tag)
+        """
+        # Dictionary to track which config provides each tag
+        # Format: {tag_name: (source_type, source_name, tag_content)}
+        # source_type: "default_addon", "main", "user_addon"
+        tag_sources = {}
+
+        # 1. Collect tags from default addons (lowest precedence)
+        for addon_name, addon_path in self.default_addons:
+            with open(addon_path, 'r') as f:
+                addon_config = json.load(f)
+
+            addon_tags = addon_config.get("tags", {})
+            for tag_name, tag_content in addon_tags.items():
+                tag_sources[tag_name] = ("default_addon", addon_name, tag_content)
+
+        # 2. Collect tags from main config (overrides default addons)
+        main_tags = self._raw_config.get("tags", {})
+        for tag_name, tag_content in main_tags.items():
+            tag_sources[tag_name] = ("main", self.config_path.name, tag_content)
+
+        # 3. Collect tags from user-specified addons (highest precedence)
+        for addon_name in self.addons:
+            addon_path = self.searcher.find_addon(addon_name)
+            if addon_path:
+                with open(addon_path, 'r') as f:
+                    addon_config = json.load(f)
+
+                addon_tags = addon_config.get("tags", {})
+                for tag_name, tag_content in addon_tags.items():
+                    # Check if another user addon already defined this tag
+                    if tag_name in tag_sources and tag_sources[tag_name][0] == "user_addon":
+                        prev_source = tag_sources[tag_name][1]
+                        print(f"Error: Tag '{tag_name}' is defined in both '{prev_source}' and '{addon_name}'", file=sys.stderr)
+                        sys.exit(1)
+                    tag_sources[tag_name] = ("user_addon", addon_name, tag_content)
+
+        # Merge all selected tag contents into a single config
+        result = {}
+        for tag_name, (source_type, source_name, tag_content) in tag_sources.items():
+            result = self._deep_merge(result, tag_content)
+
+        return result
+
+    def _merge_configs(self) -> Dict[str, Any]:
+        """Merge this config with any included configs and addons"""
+        if self._merged_config is not None:
+            return self._merged_config
+
+        # Resolve tags first, before merging
+        resolved_tags = self._resolve_tags()
+
+        merged = {}
+
+        # First, process includes
+        includes = self._raw_config.get("include", [])
+        for include_path in includes:
+            included_config_path = self.searcher.find_config(include_path)
+            if included_config_path:
+                included = DocsuezConfig(included_config_path, self.searcher)
+                included.load()
+                included_merged = included._merge_configs()
+                # Deep merge the included config
+                merged = self._deep_merge(merged, included_merged)
+
+        # Then overlay this config (without tags)
+        config_without_tags = {k: v for k, v in self._raw_config.items() if k != "tags"}
+        merged = self._deep_merge(merged, config_without_tags)
+
+        # Merge default addons first (without tags)
+        for name, addon_path in self.default_addons:
+            with open(addon_path, 'r') as f:
+                addon_config = json.load(f)
+            addon_without_tags = {k: v for k, v in addon_config.items() if k != "tags"}
+            merged = self._deep_merge(merged, addon_without_tags)
+
+        # Merge user-specified addons in order (without tags)
+        for addon_name in self.addons:
+            addon_path = self.searcher.find_addon(addon_name)
+            if addon_path:
+                with open(addon_path, 'r') as f:
+                    addon_config = json.load(f)
+                addon_without_tags = {k: v for k, v in addon_config.items() if k != "tags"}
+                merged = self._deep_merge(merged, addon_without_tags)
+
+        # Finally, merge resolved tags
+        merged = self._deep_merge(merged, resolved_tags)
+
+        self._merged_config = merged
+        return merged
+
+    def _deep_merge(self, base: Dict, overlay: Dict) -> Dict:
+        """Deep merge two dictionaries"""
+        result = base.copy()
+
+        for key, value in overlay.items():
+            if key == "include":
+                # Don't propagate include directives
+                continue
+
+            if key in result and isinstance(result[key], dict) and isinstance(value, dict):
+                result[key] = self._deep_merge(result[key], value)
+            elif key in result and isinstance(result[key], list) and isinstance(value, list):
+                result[key] = result[key] + value
+            else:
+                result[key] = value
+
+        return result
+
+    def get_image_builder(self) -> Optional[str]:
+        """Get the image builder specification"""
+        config = self._merge_configs()
+        return config.get("image-builder")
+
+    def get_volumes(self) -> Dict[str, str]:
+        """Get volume mounts, with environment variable expansion"""
+        config = self._merge_configs()
+        volumes = config.get("volumes", {})
+
+        # Expand environment variables
+        expanded = {}
+        for external, internal in volumes.items():
+            external_expanded = os.path.expandvars(external)
+            internal_expanded = os.path.expandvars(internal)
+            expanded[external_expanded] = internal_expanded
+
+        return expanded
+
+    def get_docker_args(self) -> List[str]:
+        """Get extra docker run arguments"""
+        config = self._merge_configs()
+        return config.get("docker_args", [])
+
+    def get_command(self) -> Optional[List[str]]:
+        """Get the command to run in the container"""
+        config = self._merge_configs()
+        return config.get("command")
+
+    def get_tmux_socket_dir(self) -> Optional[str]:
+        """Get the tmux socket directory"""
+        config = self._merge_configs()
+        return config.get("tmux_socket_dir")
+
+    def get_docker_run_script(self) -> List[str]:
+        """Get script components to run before docker"""
+        config = self._merge_configs()
+        script = config.get("docker-run-script", [])
+        if isinstance(script, str):
+            return [script]
+        return script
+
+    def get_pre_tmux_script(self) -> List[str]:
+        """Get shell lines to run inside docker container before launching tmux"""
+        config = self._merge_configs()
+        lines = config.get("pre-tmux-script", [])
+        if isinstance(lines, str):
+            return [lines]
+        return lines
+
+
+class BuildConfig:
+    """Represents a parsed build-docsuez.json configuration"""
+
+    def __init__(self, config_path: Path):
+        self.config_path = config_path
+        self.config_dir = config_path.parent
+        self._config = {}
+        self._generated_dockerfile = None
+
+    def load(self):
+        """Load the build configuration file"""
+        with open(self.config_path, 'r') as f:
+            self._config = json.load(f)
+
+    def _generate_dockerfile(self) -> Tuple[str, Path]:
+        """Generate dockerfile content and return (content, temp_path)"""
+        import tempfile
+
+        dockerfile_spec = self._config.get("dockerfile", "Dockerfile")
+
+        # Handle string or list
+        if isinstance(dockerfile_spec, str):
+            dockerfile_spec = [dockerfile_spec]
+
+        content_parts = []
+        for spec in dockerfile_spec:
+            if isinstance(spec, dict) and "dockerfile-text" in spec:
+                # Literal text - handle string or list of strings
+                dockerfile_text = spec["dockerfile-text"]
+                if isinstance(dockerfile_text, list):
+                    dockerfile_text = "\n".join(dockerfile_text)
+                content_parts.append(dockerfile_text)
+            elif isinstance(spec, dict) and "bash-print-dockerfile-text" in spec:
+                # Bash program that outputs dockerfile text
+                bash_program = spec["bash-print-dockerfile-text"]
+                # Handle string or list of strings
+                if isinstance(bash_program, list):
+                    bash_program = "\n".join(bash_program)
+                # Run bash program and capture output
+                result = subprocess.run(
+                    ["bash", "-c", bash_program],
+                    capture_output=True,
+                    text=True,
+                    check=True,
+                    cwd=self.config_dir
+                )
+                content_parts.append(result.stdout)
+            elif isinstance(spec, str):
+                # File path
+                file_path = self.config_dir / spec
+                with open(file_path, 'r') as f:
+                    content_parts.append(f.read())
+            else:
+                raise ValueError(f"Invalid dockerfile spec: {spec}")
+
+        content = "\n".join(content_parts)
+
+        # Write to temporary file
+        fd, temp_path = tempfile.mkstemp(suffix=".Dockerfile", prefix="docsuez-")
+        with os.fdopen(fd, 'w') as f:
+            f.write(content)
+
+        self._generated_dockerfile = Path(temp_path)
+        return content, Path(temp_path)
+
+    def get_dockerfile(self) -> str:
+        """Get the Dockerfile path"""
+        if self._generated_dockerfile:
+            return str(self._generated_dockerfile)
+
+        dockerfile_spec = self._config.get("dockerfile", "Dockerfile")
+
+        # If it's a list or contains literal text, generate it
+        if isinstance(dockerfile_spec, list) or isinstance(dockerfile_spec, dict):
+            _, temp_path = self._generate_dockerfile()
+            return str(temp_path)
+
+        # Simple string path
+        return str(self.config_dir / dockerfile_spec)
+
+    def get_dockerfile_sources(self) -> List[Path]:
+        """Get all source files that contribute to the dockerfile"""
+        dockerfile_spec = self._config.get("dockerfile", "Dockerfile")
+
+        if isinstance(dockerfile_spec, str):
+            return [self.config_dir / dockerfile_spec]
+
+        if isinstance(dockerfile_spec, list):
+            sources = []
+            for spec in dockerfile_spec:
+                if isinstance(spec, str):
+                    sources.append(self.config_dir / spec)
+                # Skip literal text entries
+            return sources
+
+        return [self.config_dir / "Dockerfile"]
+
+    def get_newest_dockerfile_mtime(self) -> float:
+        """Get the newest modification time among all dockerfile sources"""
+        sources = self.get_dockerfile_sources()
+        if not sources:
+            return 0.0
+
+        mtimes = [src.stat().st_mtime for src in sources if src.exists()]
+        return max(mtimes) if mtimes else 0.0
+
+    def get_build_context_directory(self) -> str:
+        """Get the build context path"""
+        context = self._config.get("build-context-directory") or self._config.get("context", ".")
+        return str(self.config_dir / context)
+
+    def get_image_name(self) -> str:
+        """Get the image name to build"""
+        return self._config.get("image_name", f"docsuez-{self.config_dir.name}")
+
+    def get_build_args(self) -> Dict[str, str]:
+        """Get build arguments"""
+        return self._config.get("build_args", {})
+
+    def cleanup(self):
+        """Clean up temporary files"""
+        if self._generated_dockerfile and self._generated_dockerfile.exists():
+            self._generated_dockerfile.unlink()
+
+
+class DocsuezSearcher:
+    """Searches for docsuez configuration files"""
+
+    def __init__(self):
+        # Define search paths from DOCSUEZ_PATH or XDG directories
+        self.search_paths = []
+
+        # Check for DOCSUEZ_PATH environment variable first
+        docsuez_path = os.environ.get("DOCSUEZ_PATH")
+        if docsuez_path:
+            # Split by colon and add each path
+            for path_str in docsuez_path.split(":"):
+                if path_str:  # Skip empty strings
+                    self.search_paths.append(Path(path_str))
+        else:
+            # Fall back to XDG directories
+            home = Path.home()
+
+            # Add XDG_CONFIG_HOME/docsuez (default: ~/.config/docsuez)
+            xdg_config_home = os.environ.get("XDG_CONFIG_HOME", str(home / ".config"))
+            self.search_paths.append(Path(xdg_config_home) / "docsuez")
+
+            # Add PATH/docsuez for each path in XDG_CONFIG_DIRS
+            xdg_config_dirs = os.environ.get("XDG_CONFIG_DIRS", "/etc/xdg")
+            for config_dir in xdg_config_dirs.split(":"):
+                if config_dir:  # Skip empty strings
+                    self.search_paths.append(Path(config_dir) / "docsuez")
+
+        # De-duplicate search paths while preserving order
+        seen = set()
+        deduped_paths = []
+        for path in self.search_paths:
+            # Resolve to absolute path for comparison
+            resolved = path.resolve()
+            if resolved not in seen:
+                seen.add(resolved)
+                deduped_paths.append(path)
+        self.search_paths = deduped_paths
+
+    def find_all_configs(self) -> List[Path]:
+        """Find all run-docsuez.json files in search paths"""
+        configs = []
+
+        for search_path in self.search_paths:
+            if not search_path.exists():
+                continue
+
+            # Recursively find all run-docsuez.json files
+            for config_file in search_path.rglob("run-docsuez.json"):
+                configs.append(config_file)
+
+        return configs
+
+    def find_config(self, name: str) -> Optional[Path]:
+        """Find a specific run-docsuez.json by directory name or path"""
+        # First check if it's a direct path
+        direct_path = Path(name)
+        if direct_path.exists() and direct_path.is_file():
+            return direct_path
+
+        # Check if it's a directory with a run-docsuez.json
+        if direct_path.exists() and direct_path.is_dir():
+            config_file = direct_path / "run-docsuez.json"
+            if config_file.exists():
+                return config_file
+
+        # Search for directory with matching name
+        for search_path in self.search_paths:
+            if not search_path.exists():
+                continue
+
+            # Look for a directory with this name
+            target_dir = search_path / name
+            if target_dir.exists() and target_dir.is_dir():
+                config_file = target_dir / "run-docsuez.json"
+                if config_file.exists():
+                    return config_file
+
+        return None
+
+    def find_build_config(self, image_spec: str) -> Optional[Path]:
+        """Find a build-docsuez.json for the given image spec"""
+        # Similar to find_config, but looking for build-docsuez.json
+        direct_path = Path(image_spec)
+        if direct_path.exists() and direct_path.is_file():
+            return direct_path
+
+        if direct_path.exists() and direct_path.is_dir():
+            build_file = direct_path / "build-docsuez.json"
+            if build_file.exists():
+                return build_file
+
+        for search_path in self.search_paths:
+            if not search_path.exists():
+                continue
+
+            target_dir = search_path / image_spec
+            if target_dir.exists() and target_dir.is_dir():
+                build_file = target_dir / "build-docsuez.json"
+                if build_file.exists():
+                    return build_file
+
+        return None
+
+    def find_addon(self, addon_name: str) -> Optional[Path]:
+        """Find an addon configuration file (NAME.run-docsuez.json)"""
+        addon_filename = f"{addon_name}.run-docsuez.json"
+
+        # Check if it's a direct path
+        direct_path = Path(addon_name)
+        if direct_path.exists() and direct_path.is_file():
+            return direct_path
+
+        # Search in all search paths
+        for search_path in self.search_paths:
+            if not search_path.exists():
+                continue
+
+            # Look for NAME.run-docsuez.json directly in search path
+            addon_file = search_path / addon_filename
+            if addon_file.exists():
+                return addon_file
+
+            # Also check subdirectories
+            for addon_file in search_path.rglob(addon_filename):
+                return addon_file
+
+        return None
+
+    def find_default_addons(self) -> List[Tuple[str, Path]]:
+        """Find all default addon files (*.default.run-docsuez.json)"""
+        default_addons = []
+
+        for search_path in self.search_paths:
+            if not search_path.exists():
+                continue
+
+            # Find all *.default.run-docsuez.json files
+            for addon_file in search_path.rglob("*.default.run-docsuez.json"):
+                # Extract the name (everything before .default.run-docsuez.json)
+                name = addon_file.name.replace(".default.run-docsuez.json", "")
+                default_addons.append((name, addon_file))
+
+        return default_addons
+
+    def get_config_names(self) -> List[str]:
+        """Get list of available config names that can be used with 'docsuez run'"""
+        config_names = set()
+
+        for search_path in self.search_paths:
+            if not search_path.exists():
+                continue
+
+            # Find all run-docsuez.json files
+            for config_file in search_path.rglob("run-docsuez.json"):
+                # Use the parent directory name as the config name
+                config_names.add(config_file.parent.name)
+
+        return sorted(config_names)
+
+    def get_addon_names(self) -> List[str]:
+        """Get list of available addon names that can be used with -a flag"""
+        addon_names = set()
+
+        for search_path in self.search_paths:
+            if not search_path.exists():
+                continue
+
+            # Find all *.run-docsuez.json files (but not run-docsuez.json itself)
+            for addon_file in search_path.rglob("*.run-docsuez.json"):
+                if addon_file.name == "run-docsuez.json":
+                    continue
+
+                # Extract the name (everything before .run-docsuez.json)
+                name = addon_file.name.replace(".run-docsuez.json", "")
+                # Exclude .default addons (they're auto-loaded)
+                if not name.endswith(".default"):
+                    addon_names.add(name)
+
+        return sorted(addon_names)
+
+    def get_build_names(self) -> List[str]:
+        """Get list of available build names that can be used with 'docsuez build'"""
+        build_names = set()
+
+        for search_path in self.search_paths:
+            if not search_path.exists():
+                continue
+
+            # Find all build-docsuez.json files
+            for build_file in search_path.rglob("build-docsuez.json"):
+                # Use the parent directory name as the build name
+                build_names.add(build_file.parent.name)
+
+        return sorted(build_names)
+
+
+class Docsuez:
+    def __init__(self):
+        self.searcher = DocsuezSearcher()
+        self.tsuez_cmd = "tsuez"  # Find tsuez on PATH
+
+    def cmd_list_configurations(self, args):
+        """List available configuration names for use with 'docsuez run'"""
+        config_names = self.searcher.get_config_names()
+        for name in config_names:
+            print(name)
+
+    def cmd_list_addons(self, args):
+        """List available addon names for use with -a flag"""
+        addon_names = self.searcher.get_addon_names()
+        for name in addon_names:
+            print(name)
+
+    def cmd_list_builds(self, args):
+        """List available build names for use with 'docsuez build'"""
+        build_names = self.searcher.get_build_names()
+        for name in build_names:
+            print(name)
+
+    def cmd_build(self, args):
+        """Build a docker image from a build-docsuez.json spec"""
+        build_config_path = self.searcher.find_build_config(args.image_spec)
+
+        if not build_config_path:
+            print(f"Build config not found for '{args.image_spec}'", file=sys.stderr)
+            sys.exit(1)
+
+        build_config = BuildConfig(build_config_path)
+        build_config.load()
+
+        # If dry-show mode, print the assembled dockerfile and exit
+        if getattr(args, 'dry_show', False):
+            content, _ = build_config._generate_dockerfile()
+            print(content)
+            build_config.cleanup()
+            return
+
+        # Build the docker image
+        build_cmd = ["docker", "build"]
+
+        # Add build args
+        for key, value in build_config.get_build_args().items():
+            build_cmd.extend(["--build-arg", f"{key}={value}"])
+
+        # Add tag
+        image_name = build_config.get_image_name()
+        build_cmd.extend(["-t", image_name])
+
+        # Add dockerfile if specified
+        dockerfile = build_config.get_dockerfile()
+        if dockerfile:
+            build_cmd.extend(["-f", dockerfile])
+
+        # Add context
+        build_cmd.append(build_config.get_build_context_directory())
+
+        print(f"Building image: {' '.join(build_cmd)}")
+        try:
+            subprocess.run(build_cmd, check=True)
+        finally:
+            build_config.cleanup()
+
+    def _should_build_image(self, build_mode: str, build_config: BuildConfig, image_name: str) -> bool:
+        """Determine if image should be built based on build mode and modification times"""
+        if build_mode in ["yes", "force", "true"]:
+            return True
+        if build_mode in ["no", "false"]:
+            return False
+
+        # build_mode == "detect" (default)
+        # Check if image exists
+        result = subprocess.run(
+            ["docker", "image", "inspect", image_name],
+            capture_output=True,
+            text=True
+        )
+
+        if result.returncode != 0:
+            # Image doesn't exist, need to build
+            return True
+
+        # Get image creation time
+        import json as json_mod
+        image_info = json_mod.loads(result.stdout)
+        if not image_info:
+            return True
+
+        image_created_str = image_info[0].get("Created", "")
+        from datetime import datetime
+        try:
+            image_created = datetime.fromisoformat(image_created_str.replace("Z", "+00:00"))
+            image_mtime = image_created.timestamp()
+        except:
+            # Can't parse, rebuild to be safe
+            return True
+
+        # Compare with dockerfile mtime
+        dockerfile_mtime = build_config.get_newest_dockerfile_mtime()
+
+        return dockerfile_mtime > image_mtime
+
+    def _call_tsuez_generate_config(self, session_name: str = None, base_name: str = None, color: str = None) -> Dict[str, Any]:
+        """Call tsuez to generate docsuez config and return parsed JSON"""
+        import json as json_mod
+
+        cmd = [self.tsuez_cmd, "generate-docsuez-config"]
+        if session_name:
+            cmd.extend(["-s", session_name])
+        if base_name:
+            cmd.extend(["-b", base_name])
+        if color:
+            cmd.extend(["-c", color])
+
+        result = subprocess.run(
+            cmd,
+            capture_output=True,
+            text=True,
+            check=True
+        )
+        return json_mod.loads(result.stdout)
+
+    def _run_with_tsuez(self, args, config: DocsuezConfig, image_name: str, config_name: str):
+        """Run docker container with tsuez integration"""
+        import tempfile
+        import json as json_mod
+
+        # Get session name and color from args if provided
+        session_name = getattr(args, 'session_name', None)
+        color = getattr(args, 'color', None)
+
+        # Generate base name from config name and addons
+        base_name = None
+        if not session_name:
+            # Start with the config name
+            base_name = config_name
+            # Add user-specified addon names (exclude default addons)
+            if config.addons:
+                base_name = f"{base_name}_{'_'.join(config.addons)}"
+
+        # Generate tsuez config
+        print("Generating tsuez configuration...")
+        sys.stdout.flush()
+        tsuez_config = self._call_tsuez_generate_config(session_name=session_name, base_name=base_name, color=color)
+
+        socket_dir = tsuez_config["socket_dir"]
+        session_name = tsuez_config["session_name"]
+
+        # Process script components
+        script_parts = config.get_docker_run_script()
+
+        # Generate shell script
+        fd, script_path = tempfile.mkstemp(suffix=".sh", prefix="docsuez-tsuez-")
+
+        try:
+            with os.fdopen(fd, 'w') as f:
+                f.write("#!/bin/bash\n")
+                f.write("set -e\n\n")
+                f.write(f"export DOCSUEZ_ENV_NAME={session_name}\n\n")
+                f.write("# Array for extra docker run arguments\n")
+                f.write("DOCKER_RUN_EXTRAS=()\n\n")
+
+                # Add user script parts
+                for script_part in script_parts:
+                    f.write(f"# User script component\n")
+                    f.write(f"{script_part}\n\n")
+
+                # Build docker run command
+                f.write("# Start docker container in background\n")
+                f.write("docker_cmd=(\n")
+                f.write("  docker run --rm -d\n")
+
+                # Add volumes
+                for external, internal in config.get_volumes().items():
+                    f.write(f"  -v {external}:{internal}\n")
+
+                # Mount socket directory
+                f.write(f"  -v {socket_dir}:/tsuez-dir\n")
+
+                # Mount tsuez command so it's available inside the container
+                tsuez_path = subprocess.run(["which", self.tsuez_cmd], capture_output=True, text=True, check=True).stdout.strip()
+                f.write(f"  -v {tsuez_path}:/usr/local/bin/tsuez:ro\n")
+
+                # Add docker args
+                for arg in config.get_docker_args():
+                    f.write(f"  {arg}\n")
+
+                # Add DOCKER_RUN_EXTRAS
+                f.write('  "${DOCKER_RUN_EXTRAS[@]}"\n')
+
+                # Set environment variables from tsuez config
+                if "env" in tsuez_config:
+                    for key, value in tsuez_config["env"].items():
+                        if value:  # Only add non-empty values
+                            f.write(f"  -e {key}={value}\n")
+
+                # Set TMUX_TMPDIR and TSUEZ_MANAGED
+                f.write("  -e TMUX_TMPDIR=/tsuez-dir\n")
+                f.write("  -e TSUEZ_MANAGED=1\n")
+
+                # Add image name
+                f.write(f"  {image_name}\n")
+
+                # Add wrapper script that keeps container alive while tmux runs
+                tmux_cmd = ' '.join(tsuez_config["tmux_start_command"])
+                f.write('  bash -c \'\n')
+                f.write(f'    export DOCSUEZ_ENV_NAME={session_name}\n')
+                f.write('\n')
+
+                # Add shell lines to run before tmux
+                shell_lines = config.get_pre_tmux_script()
+                if shell_lines:
+                    f.write('    # User shell lines to run before tmux\n')
+                    for line in shell_lines:
+                        f.write(f'    {line}\n')
+                    f.write('\n')
+
+                f.write('    # Start tmux session in detached mode\n')
+                f.write(f'    {tmux_cmd}\n')
+                f.write('    # Wait while tmux session exists\n')
+                f.write(f'    while tmux -S /tsuez-dir/default has-session -t {session_name} 2>/dev/null; do\n')
+                f.write('      sleep 1\n')
+                f.write('    done\n')
+                f.write("  '\n")
+
+                f.write(")\n\n")
+
+                # Execute docker command
+                f.write('echo "Running: ${docker_cmd[@]}"\n')
+                f.write('CONTAINER_ID=$("${docker_cmd[@]}")\n')
+                f.write('if [ $? -ne 0 ]; then\n')
+                f.write('  echo "Error starting docker container" >&2\n')
+                f.write('  exit 1\n')
+                f.write('fi\n\n')
+
+                f.write('echo "Container started: ${CONTAINER_ID:0:12}"\n')
+                f.write('echo "Waiting for tmux server to start..."\n')
+                f.write('sleep 1\n\n')
+
+                # Verify container is still running
+                f.write('# Check if container is still running\n')
+                f.write('if ! docker ps -q -f "id=$CONTAINER_ID" | grep -q .; then\n')
+                f.write('  echo "Error: Container exited immediately. Checking logs:" >&2\n')
+                f.write('  docker logs "$CONTAINER_ID" >&2\n')
+                f.write('  exit 1\n')
+                f.write('fi\n\n')
+
+                # Attach via tsuez
+                f.write(f'echo "Attaching to session \'{session_name}\'..."\n')
+                f.write(f'{tsuez_path} attach --socket-dir "{socket_dir}" "{session_name}"\n')
+
+            os.chmod(script_path, 0o755)
+
+            # If dry-show mode, print the config and script
+            if getattr(args, 'dry_show', False):
+                print("Tsuez config:")
+                print(json_mod.dumps(tsuez_config, indent=2))
+                print("\nGenerated script:")
+                with open(script_path, 'r') as f:
+                    print(f.read())
+                return
+
+            # Run the script
+            subprocess.run(["bash", script_path], check=True)
+        finally:
+            if os.path.exists(script_path):
+                os.unlink(script_path)
+
+    def cmd_run(self, args):
+        """Run a docker container from a run-docsuez.json config"""
+        config_path = self.searcher.find_config(args.config)
+
+        if not config_path:
+            print(f"Config not found for '{args.config}'", file=sys.stderr)
+            sys.exit(1)
+
+        # Find default addons unless --no-default-addons is specified
+        default_addons = []
+        if not getattr(args, 'no_default_addons', False):
+            default_addons = self.searcher.find_default_addons()
+            if default_addons:
+                print("Using default addons:")
+                for name, path in default_addons:
+                    print(f"  {name}: {path}")
+                sys.stdout.flush()
+
+        # Get user-specified addons from args
+        addons = getattr(args, 'addon', []) or []
+
+        config = DocsuezConfig(config_path, self.searcher,
+                             addons=addons,
+                             default_addons=default_addons)
+        config.load()
+
+        # Get image builder spec
+        image_builder = config.get_image_builder()
+        if not image_builder:
+            print("No image-builder specified in config", file=sys.stderr)
+            sys.exit(1)
+
+        # Find build config and determine image name
+        build_config_path = self.searcher.find_build_config(image_builder)
+        if not build_config_path:
+            print(f"Build config not found for '{image_builder}'", file=sys.stderr)
+            sys.exit(1)
+
+        build_config = BuildConfig(build_config_path)
+        build_config.load()
+        image_name = build_config.get_image_name()
+
+        # Determine if we should build (skip if --dry-show is set)
+        if not getattr(args, 'dry_show', False) and self._should_build_image(args.build, build_config, image_name):
+            print(f"Building image {image_name}...")
+            sys.stdout.flush()
+            build_args_obj = argparse.Namespace(image_spec=image_builder)
+            self.cmd_build(build_args_obj)
+
+        # Check if we should use tsuez integration or custom command
+        command = config.get_command()
+        if not command:
+            # Use tsuez integration
+            self._run_with_tsuez(args, config, image_name, args.config)
+            return
+
+        # Custom command path - use script wrapper for DOCKER_RUN_EXTRAS support
+        import tempfile
+        fd, script_path = tempfile.mkstemp(suffix=".sh", prefix="docsuez-run-")
+
+        # Process script components
+        script_parts = config.get_docker_run_script()
+
+        try:
+            with os.fdopen(fd, 'w') as f:
+                f.write("#!/bin/bash\n")
+                f.write("set -e\n\n")
+                f.write("# Array for extra docker run arguments\n")
+                f.write("DOCKER_RUN_EXTRAS=()\n\n")
+
+                # Add user script parts
+                for script_part in script_parts:
+                    f.write(f"# User script component\n")
+                    f.write(f"{script_part}\n\n")
+
+                # Build base docker command
+                f.write("# Build docker run command\n")
+                f.write("docker_cmd=(\n")
+                f.write("  docker run --rm -it\n")
+
+                # Add volumes
+                for external, internal in config.get_volumes().items():
+                    f.write(f"  -v {external}:{internal}\n")
+
+                # Add docker args
+                for arg in config.get_docker_args():
+                    f.write(f"  {arg}\n")
+
+                # Add DOCKER_RUN_EXTRAS before image name
+                f.write('  "${DOCKER_RUN_EXTRAS[@]}"\n')
+
+                # Add image and command
+                f.write(f"  {image_name}\n")
+                for cmd_part in command:
+                    f.write(f"  {cmd_part}\n")
+
+                f.write(")\n\n")
+                f.write("# Execute\n")
+                f.write('echo "Running: ${docker_cmd[@]}"\n')
+                f.write('"${docker_cmd[@]}"\n')
+
+            os.chmod(script_path, 0o755)
+
+            # If dry-show mode, print the script instead of running it
+            if getattr(args, 'dry_show', False):
+                with open(script_path, 'r') as f:
+                    print(f.read())
+            else:
+                subprocess.run(["bash", script_path])
+        finally:
+            if os.path.exists(script_path):
+                os.unlink(script_path)
+
+    def run(self):
+        parser = argparse.ArgumentParser(
+            description="Build and run Docker containers with tsuez integration"
+        )
+        subparsers = parser.add_subparsers(dest="command", help="Commands")
+
+        # list-configurations command
+        subparsers.add_parser("list-configurations", help="List available configuration names")
+
+        # list-addons command
+        subparsers.add_parser("list-addons", help="List available addon names")
+
+        # list-builds command
+        subparsers.add_parser("list-builds", help="List available build names")
+
+        # build command
+        build_parser = subparsers.add_parser("build", help="Build a docker image")
+        build_parser.add_argument("image_spec", help="Image spec (directory name or path)")
+        build_parser.add_argument("--dry-show", action="store_true",
+                                  help="Show the assembled Dockerfile without building")
+
+        # run command
+        run_parser = subparsers.add_parser("run", help="Run a docker container")
+        run_parser.add_argument("config", help="Config name or path")
+        run_parser.add_argument("--build", "-b", default="detect",
+                                choices=["detect", "yes", "force", "true", "no", "false"],
+                                help="Build mode: detect (default, build if out of date), yes/force/true (always build), no/false (never build)")
+        run_parser.add_argument("--addon", "-a", action="append", dest="addon",
+                                help="Add configuration addon (can be specified multiple times)")
+        run_parser.add_argument("--no-default-addons", action="store_true",
+                                help="Skip loading default addons (*.default.run-docsuez.json)")
+        run_parser.add_argument("--session-name", "-s", help="Name for the tmux session")
+        run_parser.add_argument("--color", "-c", help="Background color for the tmux session (name or hex value)")
+        run_parser.add_argument("--dry-show", action="store_true",
+                                help="Show the run script without executing it")
+
+        args = parser.parse_args()
+
+        if not args.command:
+            parser.print_help()
+            sys.exit(1)
+
+        # Dispatch to appropriate handler (convert hyphens to underscores)
+        handler_name = f"cmd_{args.command.replace('-', '_')}"
+        handler = getattr(self, handler_name)
+        handler(args)
+
+
+if __name__ == "__main__":
+    docsuez = Docsuez()
+    docsuez.run()
