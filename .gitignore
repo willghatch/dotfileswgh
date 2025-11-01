@@ -1,8 +1,15 @@
-
-# elisp
-*.elc
 pri
 dotlocal
 compiled
+
 # with my ZDOTDIR in here, this will be less effort to ignore than to move
 zsh/.zcompdump
+
+# Elisp
+*.elc
+
+# Python
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[codz]
+*$py.class
