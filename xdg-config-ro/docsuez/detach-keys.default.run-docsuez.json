@@ -1,0 +1,9 @@
+{
+  "tags": {
+    "detach-keys": {
+      "docker_args": [
+        "--detach-keys=ctrl-t,D,D"
+      ]
+    }
+  }
+}

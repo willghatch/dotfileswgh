@@ -1,0 +1,2 @@
+# Set timezone to America/Denver
+RUN ln -s -f /usr/share/zoneinfo/America/Denver /etc/timezone && ln -s -f /etc/timezone /etc/localtime

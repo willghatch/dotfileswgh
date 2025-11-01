@@ -1,0 +1,35 @@
+{
+    "dockerfile": [
+        {
+            "dockerfile-text": [
+                "FROM ubuntu:24.04",
+                "",
+                "ENV DEBIAN_FRONTEND=noninteractive",
+                "",
+                "# Update package lists",
+                "RUN apt-get update",
+                "",
+                "# Language tools specific to dev-misc",
+                "RUN apt-get install -y --no-install-recommends racket",
+                "RUN apt-get install -y --no-install-recommends guile-3.0",
+                ""
+            ]
+        },
+        "../dockerfile-components/dfcomp-apt-core-tools",
+        {
+            "dockerfile-text":
+            "RUN DEBIAN_FRONTEND=noninteractive apt install -y build-essential"
+        },
+        "../dockerfile-components/dfcomp-apt-cpp-libs",
+        "../dockerfile-components/dfcomp-uv-install",
+        "../dockerfile-components/dfcomp-nodejs-install",
+        {
+            "dockerfile-text":
+            "RUN apt-get install -y gcc avr-libc avrdude dfu-programmer dfu-util gcc-arm-none-eabi # For QMK"
+        },
+        {"bash-print-dockerfile-text": "echo 'RUN useradd -u' $UID 'wgh \n RUN chsh -s /bin/zsh wgh'"},
+        "../dockerfile-components/dfcomp-timezone-setup"
+    ],
+    "build-context-directory": ".",
+    "image_name": "dev-misc:latest"
+}

@@ -1,0 +1,7 @@
+# Core development tools
+RUN apt-get install -y --no-install-recommends emacs-nox
+RUN apt-get install -y --no-install-recommends git
+RUN apt-get install -y --no-install-recommends curl ca-certificates
+RUN DEBIAN_FRONTEND=noninteractive apt install -y ripgrep fzf zsh tmux less openssh-client htop
+RUN DEBIAN_FRONTEND=noninteractive apt install -y jq
+RUN apt-get install -y --no-install-recommends racket

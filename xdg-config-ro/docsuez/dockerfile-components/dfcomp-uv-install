@@ -1,0 +1,2 @@
+# Install uv Python package manager by copying from official image
+COPY --from=ghcr.io/astral-sh/uv:latest /uv /uvx /bin/

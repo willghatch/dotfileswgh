@@ -1,0 +1,5 @@
+# Download and install Node.js
+ARG NODE_VERSION=24.4.1
+RUN curl -fsSL https://nodejs.org/dist/v$NODE_VERSION/node-v$NODE_VERSION-linux-x64.tar.gz -o node.tar.gz && \
+    tar -xzf node.tar.gz -C /usr/local --strip-components=1 && \
+    rm node.tar.gz

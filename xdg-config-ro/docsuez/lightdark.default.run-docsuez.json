@@ -1,0 +1,14 @@
+{
+  "tags": {
+    "lightdark": {
+      "docker-run-script": [
+        "# Mount LIGHTDARK_DIR if set",
+        "if [[ -n \"$LIGHTDARK_DIR\" ]]; then",
+        "  mkdir -p \"$LIGHTDARK_DIR\"",
+        "  DOCKER_RUN_EXTRAS+=(-v \"$LIGHTDARK_DIR:/lightdark-dir\")",
+        "  DOCKER_RUN_EXTRAS+=(-e \"LIGHTDARK_DIR=/lightdark-dir\")",
+        "fi"
+      ]
+    }
+  }
+}

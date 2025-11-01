@@ -1,0 +1,33 @@
+{
+  "image-builder": "dev-misc",
+  "tags": {
+    "network": {
+      "docker_args": [
+        "--network=host"
+      ]
+    },
+    "user": {
+      "docker_args": [
+        "--user", "$(id -u):$(id -g)"
+      ]
+    },
+    "homedir": {
+      "volumes": {
+        "$HOME/mk/misc/docker-home": "/home/wgh"
+      },
+      "docker_args": [
+        "--workdir=/home/wgh"
+      ]
+    },
+    "term": {
+      "docker-run-script": [
+        "DOCKER_RUN_EXTRAS+=(-e \"TERM=$TERM\")"
+      ]
+    },
+    "mk": {
+      "volumes": {
+        "$HOME/mk/misc/e-misc-default": "/home/wgh/mk"
+      }
+    }
+  }
+}
