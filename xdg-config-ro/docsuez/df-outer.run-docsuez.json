@@ -1,0 +1,14 @@
+{
+    "tags": {
+        "dotfileswgh": {
+            "volumes": {
+                "$HOME/dotfileswgh": "/home/wgh/dotfileswgh"
+            },
+            "docker-run-script": [
+                "# just set the variable and use whatever dotfileswgh exists in the home dir",
+                "DOCKER_RUN_EXTRAS+=(-e \"DOTFILESWGH=/home/wgh/dotfileswgh\")"
+            ]
+        }
+    }
+}
+
