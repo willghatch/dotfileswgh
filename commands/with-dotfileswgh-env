@@ -1,6 +1,15 @@
 #!/usr/bin/env bash
 
-source $HOME/dotfileswgh/env-basic.sh
-source $HOME/dotfileswgh/env-more.sh
+### detect dotfileswgh snippet
+if [ -z "$DOTFILESWGH" ]; then
+    if [ -d "$HOME/dotfileswgh" ]; then
+        export DOTFILESWGH="$HOME/dotfileswgh"
+    elif [ -d /rootgit/base.rootgit/dotfileswgh ]; then
+        export DOTFILESWGH=/rootgit/base.rootgit/dotfileswgh
+    fi
+fi
+export DOTFILESWGH="${DOTFILESWGH:-$HOME/dotfileswgh}"
+
+source $DOTFILESWGH/env-more-with-mixins.sh
 
 exec "$@"

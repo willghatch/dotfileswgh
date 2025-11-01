@@ -1,4 +1,0 @@
-#!/bin/sh
-source $DOTFILESWGH/env-more-with-mixins.sh
-
-exec "$@"
