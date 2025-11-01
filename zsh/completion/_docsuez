@@ -42,7 +42,7 @@ _docsuez() {
           _arguments \
             '1:config name:->configs' \
             '(-b --build)'{-b,--build}'[Build mode]:build mode:(detect yes force true no false)' \
-            '(-a --addon)'{-a,--addon}'[Add configuration addon]:addon name:->addons' \
+            '*'{-a,--addon}'[Add configuration addon]:addon name:->addons' \
             '--no-default-addons[Skip loading default addons]' \
             '(-s --session-name)'{-s,--session-name}'[Name for the tmux session]:session name:' \
             '(-c --color)'{-c,--color}'[Background color for the tmux session]:color:' \
