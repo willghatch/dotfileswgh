@@ -18,7 +18,7 @@ fi
 
 if [[ -z "$LIGHTDARK_DIR" ]]; then
     export LIGHTDARK_DIR=/tmp/lightdark-dir
-    mkdir -p lightdark-dir
+    mkdir -p $LIGHTDARK_DIR
 fi
 
 export GUIX_PROFILE=$HOME/.guix-profile
