@@ -450,16 +450,16 @@ fi
 MEGAPROMPT_DISPLAY_P[tty]=false
 prompt-dev-environment(){
     if [[ -n "$CURRENT_DEV_MODE" ]]; then
-        echo -n -e "Dev: \033[35m$CURRENT_DEV_MODE\n\033[0m"
+        echo -n -e "Dev: \033[38;5;200m$CURRENT_DEV_MODE\n\033[0m"
     fi
     if [[ -n "$DOCSUEZ_ENV_NAME" ]]; then
-        echo -n -e "Docsuez: \033[35m$DOCSUEZ_ENV_NAME\n\033[0m"
+        echo -n -e "Docsuez: \033[38;5;200m$DOCSUEZ_ENV_NAME\n\033[0m"
     fi
     # if [[ -n "$VIRTUAL_ENV" ]]; then
-    #     echo -n -e "Venv: \033[35m$(basename $VIRTUAL_ENV)\033[0m"
+    #     echo -n -e "Venv: \033[38;5;200m$(basename $VIRTUAL_ENV)\033[0m"
     # fi
     if [[ -n "$VIRTUAL_ENV_PROMPT" ]]; then
-        echo -n -e "Venv: \033[35m$VIRTUAL_ENV_PROMPT\n\033[0m"
+        echo -n -e "Venv: \033[38;5;200m$VIRTUAL_ENV_PROMPT\n\033[0m"
     fi
 }
 MEGAPROMPT_PRE_FUNCTION=prompt-dev-environment

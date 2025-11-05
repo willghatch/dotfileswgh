@@ -55,10 +55,10 @@ PS1_dir="$(pcolor 0)$(pcolor 1)$(pcolor 34)\w"
 PS1_promptchar="$(pcolor 0)\$"
 export PS1="$PS1_time $PS1_userhost $PS1_dir $PS1_promptchar "
 if test -n "$CURRENT_DEV_MODE"; then
-    PS1="\033[42;31mDev\033[0m: \033[35m$CURRENT_DEV_MODE \033[0m\w/\n\$ "
+    PS1="\033[42;31mDev\033[0m: \033[38;5;200m$CURRENT_DEV_MODE \033[0m\w/\n\$ "
 fi
 if test -n "$DOCSUEZ_ENV_NAME"; then
-    PS1="\033[42;31mDocsuez\033[0m: \033[35m$DOCSUEZ_ENV_NAME \033[0m\w/\n\$ "
+    PS1="\033[42;31mDocsuez\033[0m: \033[38;5;200m$DOCSUEZ_ENV_NAME \033[0m\w/\n\$ "
 fi
 
 
