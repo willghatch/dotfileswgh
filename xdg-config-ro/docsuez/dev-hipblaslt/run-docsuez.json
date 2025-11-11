@@ -1,0 +1,56 @@
+{
+  "image-builder": "dev-hipblaslt",
+  "tags": {
+    "network": {
+      "docker_args": [
+        "--network=host"
+      ]
+    },
+    "user": {
+      "docker_args": [
+        "--user", "$(id -u):$(id -g)"
+      ]
+    },
+    "homedir": {
+      "volumes": {
+        "$HOME/mk/amd/docker-home": "/home/wgh"
+      },
+      "docker_args": [
+        "--workdir=/home/wgh"
+      ]
+    },
+    "term": {
+      "docker-run-script": [
+        "DOCKER_RUN_EXTRAS+=(-e \"TERM=$TERM\")"
+      ]
+    },
+    "mk": {
+      "volumes": {
+        "$HOME/mk/amd/e-hipblaslt": "/home/wgh/mk"
+      },
+      "pre-tmux-script": [
+        "source $DOTFILESWGH/env-more-with-mixins.sh",
+        "cd mk",
+        "#source venv/bin/activate",
+        "cd rocm-libraries/projects/hipblaslt",
+        ""
+      ]
+    },
+    "video-groups": {
+      "docker-run-script": [
+        "# Add video and render groups dynamically",
+        "function groupid() { getent group \"$1\" | cut -d : -f 3; }",
+        "DOCKER_RUN_EXTRAS+=(--group-add \"$(groupid render)\")",
+        "DOCKER_RUN_EXTRAS+=(--group-add \"$(groupid video)\")"
+      ],
+      "docker_args": [
+        "--cap-add=SYS_PTRACE",
+        "--security-opt", "seccomp=unconfined",
+        "--ipc=host",
+        "--device=/dev/kfd",
+        "--device=/dev/dri"
+      ]
+
+    }
+  }
+}
