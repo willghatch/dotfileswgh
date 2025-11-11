@@ -23,6 +23,7 @@ run-docsuez.json - Specifies how to run a container:
   "tmux_socket_dir": "/tmp/tmux-sockets",
   "docker-run-script": ["echo 'Setting up...'", "DOCKER_RUN_EXTRAS+=(--hostname myhost)"],
   "pre-tmux-script": ["export FOO=bar", "export QUUX=aoeu"],
+  "post-tmux-script": ["echo 'Tmux started!'", "touch /tmp/setup-complete"],
   "include": ["base-config"],
   "tags": {
     "dev": {
@@ -237,6 +238,14 @@ class DocsuezConfig:
         """Get shell lines to run inside docker container before launching tmux"""
         config = self._merge_configs()
         lines = config.get("pre-tmux-script", [])
+        if isinstance(lines, str):
+            return [lines]
+        return lines
+
+    def get_post_tmux_script(self) -> List[str]:
+        """Get shell lines to run inside docker container after launching tmux"""
+        config = self._merge_configs()
+        lines = config.get("post-tmux-script", [])
         if isinstance(lines, str):
             return [lines]
         return lines
@@ -787,6 +796,16 @@ class Docsuez:
 
                 f.write('    # Start tmux session in detached mode\n')
                 f.write(f'    {tmux_cmd}\n')
+                f.write('\n')
+
+                # Add shell lines to run after tmux starts
+                post_shell_lines = config.get_post_tmux_script()
+                if post_shell_lines:
+                    f.write('    # User shell lines to run after tmux starts\n')
+                    for line in post_shell_lines:
+                        f.write(f'    {line}\n')
+                    f.write('\n')
+
                 f.write('    # Wait while tmux session exists\n')
                 f.write(f'    while tmux -S /tsuez-dir/default has-session -t {session_name} 2>/dev/null; do\n')
                 f.write('      sleep 1\n')

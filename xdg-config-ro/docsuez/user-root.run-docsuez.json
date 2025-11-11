@@ -1,0 +1,19 @@
+{
+    "tags": {
+        "user": {
+            "docker-run-script": [
+                "DOCKER_RUN_EXTRAS+=(-e TSUEZ_UID=\"$(id -u)\" -e TSUEZ_GID=\"$(id -g)\")"
+            ],
+            "docker_args": ["-e", "TSUEZ_UID"],
+            "post-tmux-script": [
+                "# Need to make the tmux socket readable by original user",
+                "# Also tmux has its own access controls besides unix permissions on the socket.",
+                "#tmux -S /tsuez-dir/default server-access -a ${TSUEZ_UID}",
+                "# I think tmux server-access has to be by name, so gotta have a wgh user in the container build with the right UID...",
+                "tmux -S /tsuez-dir/default server-access -a wgh",
+                "chown ${TSUEZ_UID}:${TSUEZ_GID} /tsuez-dir/default",
+                ""
+            ]
+        }
+    }
+}
