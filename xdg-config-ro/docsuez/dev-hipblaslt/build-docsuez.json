@@ -25,6 +25,9 @@
                 "RUN DEBIAN_FRONTEND=noninteractive apt install -y libblis-dev libmsgpack-cxx-dev libgtest-dev libboost-filesystem-dev libgmock-dev",
                 "RUN DEBIAN_FRONTEND=noninteractive apt install -y libboost-program-options-dev",
                 "RUN DEBIAN_FRONTEND=noninteractive apt install -y gfortran liblapack-dev",
+                "RUN DEBIAN_FRONTEND=noninteractive apt install -y llvm-20-dev",
+                "# I would expect this to be installed since this is a rocm image, but without this it can't find librocm_smi.so.7",
+                "RUN DEBIAN_FRONTEND=noninteractive apt install -y librocm-smi-dev",
                 "RUN pip install joblib",
                 ""
             ]
