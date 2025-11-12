@@ -678,6 +678,171 @@ class Docsuez:
 
         return dockerfile_mtime > image_mtime
 
+    def _generate_docker_run_script(self, script_file, config: DocsuezConfig, image_name: str,
+                                     tsuez_mode: bool = False, tsuez_config: Optional[Dict[str, Any]] = None,
+                                     session_name: Optional[str] = None, socket_dir: Optional[str] = None,
+                                     command: Optional[List[str]] = None):
+        """Generate docker run script content
+
+        Args:
+            script_file: File object to write to
+            config: DocsuezConfig object
+            image_name: Name of docker image
+            tsuez_mode: If True, generate tsuez integration script
+            tsuez_config: Tsuez configuration (required if tsuez_mode=True)
+            session_name: Session name (required if tsuez_mode=True)
+            socket_dir: Socket directory (required if tsuez_mode=True)
+            command: Command to run (required if tsuez_mode=False)
+        """
+        f = script_file
+        script_parts = config.get_docker_run_script()
+        volumes = config.get_volumes()
+
+        # Write script header
+        f.write("#!/bin/bash\n")
+        f.write("set -e\n\n")
+
+        if tsuez_mode:
+            f.write(f"export DOCSUEZ_ENV_NAME={session_name}\n\n")
+
+        f.write("# Array for extra docker run arguments\n")
+        f.write("DOCKER_RUN_EXTRAS=()\n\n")
+
+        # Add user script parts
+        for script_part in script_parts:
+            f.write(f"# User script component\n")
+            f.write(f"{script_part}\n\n")
+
+        # Create volume directories to ensure proper ownership
+        f.write("# Create volume directories if they don't exist\n")
+        for external in volumes.keys():
+            f.write(f"mkdir -p \"{external}\"\n")
+        f.write("\n")
+
+        # Build inner script for tsuez mode
+        if tsuez_mode:
+            tmux_cmd = ' '.join(tsuez_config["tmux_start_command"])
+            f.write("# Build inner script for container\n")
+            f.write("INNER_SCRIPT=$(cat <<'DOCSUEZ_INNER_TSUEZ_LAUNCH_SCRIPT'\n")
+            f.write(f'export DOCSUEZ_ENV_NAME={session_name}\n')
+            f.write('\n')
+
+            # Add shell lines to run before tmux
+            shell_lines = config.get_pre_tmux_script()
+            if shell_lines:
+                f.write('# User shell lines to run before tmux\n')
+                for line in shell_lines:
+                    f.write(f'{line}\n')
+                f.write('\n')
+
+            f.write('# Start tmux session in detached mode\n')
+            f.write(f'{tmux_cmd}\n')
+            f.write('\n')
+
+            # Add shell lines to run after tmux starts
+            post_shell_lines = config.get_post_tmux_script()
+            if post_shell_lines:
+                f.write('# User shell lines to run after tmux starts\n')
+                for line in post_shell_lines:
+                    f.write(f'{line}\n')
+                f.write('\n')
+
+            f.write('# Wait while tmux session exists\n')
+            f.write(f'while tmux -S /tsuez-dir/default has-session -t {session_name} 2>/dev/null; do\n')
+            f.write('  sleep 1\n')
+            f.write('done\n')
+            f.write("DOCSUEZ_INNER_TSUEZ_LAUNCH_SCRIPT\n")
+            f.write(")\n\n")
+
+        # Build docker run command
+        if tsuez_mode:
+            f.write("# Start docker container in background\n")
+            f.write("docker_cmd=(\n")
+            f.write("  docker run --rm -d\n")
+            f.write(f"  --name {session_name}\n")
+        else:
+            f.write("# Build docker run command\n")
+            f.write("docker_cmd=(\n")
+            f.write("  docker run --rm -it\n")
+
+        # Add volumes
+        for external, internal in volumes.items():
+            f.write(f"  -v {external}:{internal}\n")
+
+        # Add tsuez-specific volumes and env vars
+        if tsuez_mode:
+            # Mount socket directory
+            f.write(f"  -v {socket_dir}:/tsuez-dir\n")
+
+            # Mount tsuez command so it's available inside the container
+            tsuez_path = subprocess.run(["which", self.tsuez_cmd], capture_output=True, text=True, check=True).stdout.strip()
+            f.write(f"  -v {tsuez_path}:/usr/local/bin/tsuez:ro\n")
+
+        # Add docker args
+        for arg in config.get_docker_args():
+            f.write(f"  {arg}\n")
+
+        # Add DOCKER_RUN_EXTRAS
+        f.write('  "${DOCKER_RUN_EXTRAS[@]}"\n')
+
+        # Add tsuez environment variables
+        if tsuez_mode:
+            # Set environment variables from tsuez config
+            if "env" in tsuez_config:
+                for key, value in tsuez_config["env"].items():
+                    if value:  # Only add non-empty values
+                        f.write(f"  -e {key}={value}\n")
+
+            # Set TMUX_TMPDIR and TSUEZ_MANAGED
+            f.write("  -e TMUX_TMPDIR=/tsuez-dir\n")
+            f.write("  -e TSUEZ_MANAGED=1\n")
+
+        # Add image name
+        f.write(f"  {image_name}\n")
+
+        # Add command or inner script
+        if tsuez_mode:
+            # Add bash command with inner script
+            f.write("  bash -c\n")
+            f.write('  "$INNER_SCRIPT"\n')
+        else:
+            # Add custom command
+            for cmd_part in command:
+                f.write(f"  {cmd_part}\n")
+
+        f.write(")\n\n")
+
+        # Execute docker command
+        f.write('echo "Running: ${docker_cmd[@]}"\n')
+
+        if tsuez_mode:
+            # Execute and monitor
+            f.write('CONTAINER_ID=$("${docker_cmd[@]}")\n')
+            f.write('if [ $? -ne 0 ]; then\n')
+            f.write('  echo "Error starting docker container" >&2\n')
+            f.write('  exit 1\n')
+            f.write('fi\n\n')
+
+            f.write('echo "Container started: ${CONTAINER_ID:0:12}"\n')
+            f.write('echo "Waiting for tmux server to start..."\n')
+            f.write('sleep 1\n\n')
+
+            # Verify container is still running
+            f.write('# Check if container is still running\n')
+            f.write('if ! docker ps -q -f "id=$CONTAINER_ID" | grep -q .; then\n')
+            f.write('  echo "Error: Container exited immediately. Checking logs:" >&2\n')
+            f.write('  docker logs "$CONTAINER_ID" >&2\n')
+            f.write('  exit 1\n')
+            f.write('fi\n\n')
+
+            # Attach via tsuez
+            tsuez_path = subprocess.run(["which", self.tsuez_cmd], capture_output=True, text=True, check=True).stdout.strip()
+            f.write(f'echo "Attaching to session \'{session_name}\'..."\n')
+            f.write(f'{tsuez_path} attach --socket-dir "{socket_dir}" "{session_name}"\n')
+        else:
+            # Simple execution
+            f.write('"${docker_cmd[@]}"\n')
+
     def _call_tsuez_generate_config(self, session_name: str = None, base_name: str = None, color: str = None) -> Dict[str, Any]:
         """Call tsuez to generate docsuez config and return parsed JSON"""
         import json as json_mod
@@ -724,119 +889,18 @@ class Docsuez:
         socket_dir = tsuez_config["socket_dir"]
         session_name = tsuez_config["session_name"]
 
-        # Process script components
-        script_parts = config.get_docker_run_script()
-
         # Generate shell script
         fd, script_path = tempfile.mkstemp(suffix=".sh", prefix="docsuez-tsuez-")
 
         try:
             with os.fdopen(fd, 'w') as f:
-                f.write("#!/bin/bash\n")
-                f.write("set -e\n\n")
-                f.write(f"export DOCSUEZ_ENV_NAME={session_name}\n\n")
-                f.write("# Array for extra docker run arguments\n")
-                f.write("DOCKER_RUN_EXTRAS=()\n\n")
-
-                # Add user script parts
-                for script_part in script_parts:
-                    f.write(f"# User script component\n")
-                    f.write(f"{script_part}\n\n")
-
-                # Build docker run command
-                f.write("# Start docker container in background\n")
-                f.write("docker_cmd=(\n")
-                f.write("  docker run --rm -d\n")
-                f.write(f"  --name {session_name}\n")
-
-                # Add volumes
-                for external, internal in config.get_volumes().items():
-                    f.write(f"  -v {external}:{internal}\n")
-
-                # Mount socket directory
-                f.write(f"  -v {socket_dir}:/tsuez-dir\n")
-
-                # Mount tsuez command so it's available inside the container
-                tsuez_path = subprocess.run(["which", self.tsuez_cmd], capture_output=True, text=True, check=True).stdout.strip()
-                f.write(f"  -v {tsuez_path}:/usr/local/bin/tsuez:ro\n")
-
-                # Add docker args
-                for arg in config.get_docker_args():
-                    f.write(f"  {arg}\n")
-
-                # Add DOCKER_RUN_EXTRAS
-                f.write('  "${DOCKER_RUN_EXTRAS[@]}"\n')
-
-                # Set environment variables from tsuez config
-                if "env" in tsuez_config:
-                    for key, value in tsuez_config["env"].items():
-                        if value:  # Only add non-empty values
-                            f.write(f"  -e {key}={value}\n")
-
-                # Set TMUX_TMPDIR and TSUEZ_MANAGED
-                f.write("  -e TMUX_TMPDIR=/tsuez-dir\n")
-                f.write("  -e TSUEZ_MANAGED=1\n")
-
-                # Add image name
-                f.write(f"  {image_name}\n")
-
-                # Add wrapper script that keeps container alive while tmux runs
-                tmux_cmd = ' '.join(tsuez_config["tmux_start_command"])
-                f.write('  bash -c \'\n')
-                f.write(f'    export DOCSUEZ_ENV_NAME={session_name}\n')
-                f.write('\n')
-
-                # Add shell lines to run before tmux
-                shell_lines = config.get_pre_tmux_script()
-                if shell_lines:
-                    f.write('    # User shell lines to run before tmux\n')
-                    for line in shell_lines:
-                        f.write(f'    {line}\n')
-                    f.write('\n')
-
-                f.write('    # Start tmux session in detached mode\n')
-                f.write(f'    {tmux_cmd}\n')
-                f.write('\n')
-
-                # Add shell lines to run after tmux starts
-                post_shell_lines = config.get_post_tmux_script()
-                if post_shell_lines:
-                    f.write('    # User shell lines to run after tmux starts\n')
-                    for line in post_shell_lines:
-                        f.write(f'    {line}\n')
-                    f.write('\n')
-
-                f.write('    # Wait while tmux session exists\n')
-                f.write(f'    while tmux -S /tsuez-dir/default has-session -t {session_name} 2>/dev/null; do\n')
-                f.write('      sleep 1\n')
-                f.write('    done\n')
-                f.write("  '\n")
-
-                f.write(")\n\n")
-
-                # Execute docker command
-                f.write('echo "Running: ${docker_cmd[@]}"\n')
-                f.write('CONTAINER_ID=$("${docker_cmd[@]}")\n')
-                f.write('if [ $? -ne 0 ]; then\n')
-                f.write('  echo "Error starting docker container" >&2\n')
-                f.write('  exit 1\n')
-                f.write('fi\n\n')
-
-                f.write('echo "Container started: ${CONTAINER_ID:0:12}"\n')
-                f.write('echo "Waiting for tmux server to start..."\n')
-                f.write('sleep 1\n\n')
-
-                # Verify container is still running
-                f.write('# Check if container is still running\n')
-                f.write('if ! docker ps -q -f "id=$CONTAINER_ID" | grep -q .; then\n')
-                f.write('  echo "Error: Container exited immediately. Checking logs:" >&2\n')
-                f.write('  docker logs "$CONTAINER_ID" >&2\n')
-                f.write('  exit 1\n')
-                f.write('fi\n\n')
-
-                # Attach via tsuez
-                f.write(f'echo "Attaching to session \'{session_name}\'..."\n')
-                f.write(f'{tsuez_path} attach --socket-dir "{socket_dir}" "{session_name}"\n')
+                self._generate_docker_run_script(
+                    f, config, image_name,
+                    tsuez_mode=True,
+                    tsuez_config=tsuez_config,
+                    session_name=session_name,
+                    socket_dir=socket_dir
+                )
 
             os.chmod(script_path, 0o755)
 
@@ -915,46 +979,13 @@ class Docsuez:
         import tempfile
         fd, script_path = tempfile.mkstemp(suffix=".sh", prefix="docsuez-run-")
 
-        # Process script components
-        script_parts = config.get_docker_run_script()
-
         try:
             with os.fdopen(fd, 'w') as f:
-                f.write("#!/bin/bash\n")
-                f.write("set -e\n\n")
-                f.write("# Array for extra docker run arguments\n")
-                f.write("DOCKER_RUN_EXTRAS=()\n\n")
-
-                # Add user script parts
-                for script_part in script_parts:
-                    f.write(f"# User script component\n")
-                    f.write(f"{script_part}\n\n")
-
-                # Build base docker command
-                f.write("# Build docker run command\n")
-                f.write("docker_cmd=(\n")
-                f.write("  docker run --rm -it\n")
-
-                # Add volumes
-                for external, internal in config.get_volumes().items():
-                    f.write(f"  -v {external}:{internal}\n")
-
-                # Add docker args
-                for arg in config.get_docker_args():
-                    f.write(f"  {arg}\n")
-
-                # Add DOCKER_RUN_EXTRAS before image name
-                f.write('  "${DOCKER_RUN_EXTRAS[@]}"\n')
-
-                # Add image and command
-                f.write(f"  {image_name}\n")
-                for cmd_part in command:
-                    f.write(f"  {cmd_part}\n")
-
-                f.write(")\n\n")
-                f.write("# Execute\n")
-                f.write('echo "Running: ${docker_cmd[@]}"\n')
-                f.write('"${docker_cmd[@]}"\n')
+                self._generate_docker_run_script(
+                    f, config, image_name,
+                    tsuez_mode=False,
+                    command=command
+                )
 
             os.chmod(script_path, 0o755)
 
