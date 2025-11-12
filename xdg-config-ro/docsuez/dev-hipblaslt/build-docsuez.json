@@ -2,8 +2,7 @@
     "dockerfile": [
         {
             "dockerfile-text": [
-                "# Note: ubuntu:24.04 didn't work for wave builds (cmake error), but this ROCm image does",
-                "FROM rocm/pytorch:rocm6.4.1_ubuntu24.04_py3.12_pytorch_release_2.5.1",
+                "FROM rocm/pytorch:rocm7.1_ubuntu24.04_py3.12_pytorch_release_2.8.0",
                 "# This docker image sets CI=1 which breaks interactive things",
                 "ENV CI=0",
                 "",
@@ -24,6 +23,9 @@
         {
             "dockerfile-text": [
                 "RUN DEBIAN_FRONTEND=noninteractive apt install -y libblis-dev libmsgpack-cxx-dev libgtest-dev libboost-filesystem-dev libgmock-dev",
+                "RUN DEBIAN_FRONTEND=noninteractive apt install -y libboost-program-options-dev",
+                "RUN DEBIAN_FRONTEND=noninteractive apt install -y gfortran liblapack-dev",
+                "RUN pip install joblib",
                 ""
             ]
         },
@@ -31,5 +33,5 @@
         "../dockerfile-components/dfcomp-timezone-setup"
     ],
     "build-context-directory": ".",
-    "image_name": "dev-wave:latest"
+    "image_name": "dev-hipblaslt:latest"
 }
