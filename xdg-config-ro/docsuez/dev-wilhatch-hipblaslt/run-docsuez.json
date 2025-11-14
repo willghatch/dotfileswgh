@@ -1,5 +1,5 @@
 {
-  "image-builder": "dev-hipblaslt",
+  "image-builder": "dev-wilhatch-hipblaslt",
   "tags": {
     "network": {
       "docker_args": [
