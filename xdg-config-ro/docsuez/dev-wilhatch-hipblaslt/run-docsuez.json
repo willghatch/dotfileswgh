@@ -31,7 +31,7 @@
       "pre-tmux-script": [
         "source $DOTFILESWGH/env-more-with-mixins.sh",
         "cd mk",
-        "source venv/bin/activate",
+        "#source venv/bin/activate",
         "cd rocm-libraries/projects/hipblaslt",
         ""
       ]

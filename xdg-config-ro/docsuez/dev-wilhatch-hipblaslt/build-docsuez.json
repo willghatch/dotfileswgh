@@ -1,40 +1,72 @@
 {
-    "dockerfile": [
-        {
-            "dockerfile-text": [
-                "FROM rocm/pytorch:rocm7.1_ubuntu24.04_py3.12_pytorch_release_2.8.0",
-                "# This docker image sets CI=1 which breaks interactive things",
-                "ENV CI=0",
-                "",
-                "ENV DEBIAN_FRONTEND=noninteractive",
-                "",
-                "# Update package lists",
-                "RUN apt update",
-                "",
-                "# Language tools specific to dev-wave",
-                "RUN DEBIAN_FRONTEND=noninteractive apt install -y rustup",
-                ""
-            ]
-        },
-        "../dockerfile-components/dfcomp-apt-core-tools",
-        "../dockerfile-components/dfcomp-apt-cpp-libs",
-        "../dockerfile-components/dfcomp-uv-install",
-        "../dockerfile-components/dfcomp-nodejs-install",
-        {
-            "dockerfile-text": [
-                "RUN DEBIAN_FRONTEND=noninteractive apt install -y libblis-dev libmsgpack-cxx-dev libgtest-dev libboost-filesystem-dev libgmock-dev",
-                "RUN DEBIAN_FRONTEND=noninteractive apt install -y libboost-program-options-dev",
-                "RUN DEBIAN_FRONTEND=noninteractive apt install -y gfortran liblapack-dev",
-                "RUN DEBIAN_FRONTEND=noninteractive apt install -y llvm-20-dev",
-                "# I would expect this to be installed since this is a rocm image, but without this it can't find librocm_smi.so.7",
-                "RUN DEBIAN_FRONTEND=noninteractive apt install -y librocm-smi-dev",
-                "RUN pip install joblib",
-                ""
-            ]
-        },
-        {"bash-print-dockerfile-text": "echo 'RUN useradd -u' $UID 'wgh \n RUN chsh -s /bin/zsh wgh'"},
-        "../dockerfile-components/dfcomp-timezone-setup"
-    ],
-    "build-context-directory": ".",
-    "image_name": "dev-hipblaslt:latest"
+  "dockerfile": [
+    {
+      "dockerfile-text": [
+        "#FROM rocm/pytorch:rocm7.1_ubuntu24.04_py3.12_pytorch_release_2.8.0",
+        "FROM rocm/sgl-dev:v0.5.4.post2-rocm700-mi35x-20251104",
+        "# This docker image sets CI=1 which breaks interactive things",
+        "ENV CI=0",
+        "",
+        "ENV DEBIAN_FRONTEND=noninteractive",
+        "",
+        "# Update package lists",
+        "RUN apt update",
+        "",
+        "# Language tools specific to dev-wave",
+        "#RUN DEBIAN_FRONTEND=noninteractive apt install -y rustup",
+        "#RUN DEBIAN_FRONTEND=noninteractive apt install -y cmake",
+
+
+        "# Install kitware to get a cmake that is neither too old nor too new...",
+        "RUN wget -O - https://apt.kitware.com/keys/kitware-archive-latest.asc 2>/dev/null | gpg --dearmor - | sudo tee /usr/share/keyrings/kitware-archive-keyring.gpg >/dev/null",
+        "# Careful about version here if I change docker image yet again.",
+        "#RUN echo 'deb [signed-by=/usr/share/keyrings/kitware-archive-keyring.gpg] https://apt.kitware.com/ubuntu/ noble main' | sudo tee /etc/apt/sources.list.d/kitware.list >/dev/null",
+        "RUN echo 'deb [signed-by=/usr/share/keyrings/kitware-archive-keyring.gpg] https://apt.kitware.com/ubuntu/ jammy main' | sudo tee /etc/apt/sources.list.d/kitware.list >/dev/null",
+        "RUN sudo apt-get update",
+        "RUN test -f /usr/share/doc/kitware-archive-keyring/copyright || sudo rm /usr/share/keyrings/kitware-archive-keyring.gpg",
+        "RUN sudo apt-get install kitware-archive-keyring",
+		    "RUN apt-get install -y cmake-data=3.31.9-0kitware1ubuntu22.04.1",
+        "RUN sudo apt-get install -y cmake=3.31.9-0kitware1ubuntu22.04.1",
+        ""
+      ]
+    },
+    "../dockerfile-components/dfcomp-apt-core-tools",
+    "../dockerfile-components/dfcomp-uv-install",
+    "../dockerfile-components/dfcomp-nodejs-install",
+    {
+      "dockerfile-text": [
+        "RUN DEBIAN_FRONTEND=noninteractive apt install -y libzstd-dev",
+        "RUN DEBIAN_FRONTEND=noninteractive apt install -y libblis-dev",
+        "#RUN DEBIAN_FRONTEND=noninteractive apt install -y libmsgpack-cxx-dev libgtest-dev libboost-filesystem-dev libgmock-dev libboost-program-options-dev",
+        "RUN DEBIAN_FRONTEND=noninteractive apt install -y gfortran",
+        "RUN DEBIAN_FRONTEND=noninteractive apt install -y liblapack-dev",
+        "#RUN DEBIAN_FRONTEND=noninteractive apt install -y llvm-20-dev",
+        "#RUN DEBIAN_FRONTEND=noninteractive apt install -y libomp-dev",
+        "# this is basically already installed in /opt from the base docker image... but it can't find librocm_smi.so.7",
+        "#RUN DEBIAN_FRONTEND=noninteractive apt install -y rocm7.1.0",
+        "#RUN DEBIAN_FRONTEND=noninteractive apt install -y librocm-smi-dev",
+        "",
+        "#RUN DEBIAN_FRONTEND=noninteractive apt install -y python3-joblib",
+        "#RUN pip install joblib",
+        "#RUN pip install hip-python",
+
+        "# apparently cmake 4.x will throw an error...",
+        "#RUN pip install cmake==3.31",
+        "",
+        "# make kitware cmake be first on path instead of the too-new cmake in /opt...",
+        "RUN mkdir -p /override-bin",
+        "RUN ln -s /usr/bin/cmake /override-bin/",
+        "RUN echo 'PATH=/override-bin/:$PATH' >> /etc/profile.d/99-override-path.sh",
+        ""
+      ]
+    },
+    {"bash-print-dockerfile-text": "echo 'RUN useradd -u' $UID 'wgh \n RUN chsh -s /bin/zsh wgh'"},
+    {"dockerfile-text": [
+      "RUN usermod -aG sudo wgh",
+      "RUN echo '%sudo ALL=(ALL) NOPASSWD:ALL' >> /etc/sudoers"
+    ]},
+    "../dockerfile-components/dfcomp-timezone-setup"
+  ],
+  "build-context-directory": ".",
+  "image_name": "dev-wilhatch-hipblaslt:latest"
 }
