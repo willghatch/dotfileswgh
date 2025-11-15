@@ -48,11 +48,15 @@ build-docsuez.json - Specifies how to build an image:
     "Dockerfile.extra"
   ],
   "build-context-directory": ".",
-  "image_name": "my-dev-env:latest",
+  "base_image_name": "my-dev-env:latest",
   "build_args": {
     "BASE_IMAGE": "ubuntu:22.04"
   }
 }
+
+Note:
+- Unless environment variable $DOCSUEZ_NO_USER_NAME_PREPEND is set, the $USER
+  variable will be prepended to docker image and container names.
 """
 
 import argparse
@@ -203,8 +207,8 @@ class DocsuezConfig:
         config = self._merge_configs()
         return config.get("image-builder")
 
-    def get_image_name(self) -> Optional[str]:
-        """Get the direct image name specification"""
+    def get_runner_image_name(self) -> Optional[str]:
+        """Get the direct image name specification from run config"""
         config = self._merge_configs()
         return config.get("image-name")
 
@@ -377,9 +381,20 @@ class BuildConfig:
         context = self._config.get("build-context-directory") or self._config.get("context", ".")
         return str(self.config_dir / context)
 
-    def get_image_name(self) -> str:
+    def get_builder_image_name(self) -> str:
         """Get the image name to build"""
-        return self._config.get("image_name", f"docsuez-{self.config_dir.name}")
+        # Get base image name from config or auto-generate it
+        if "base_image_name" in self._config:
+            base_name = self._config["base_image_name"]
+        else:
+            base_name = f"docsuez_{self.config_dir.name}:latest"
+
+        # Prepend username unless DOCSUEZ_NO_USER_NAME_PREPEND is set
+        if not os.environ.get("DOCSUEZ_NO_USER_NAME_PREPEND"):
+            username = os.environ.get("USER", "unknown")
+            base_name = f"{username}_{base_name}"
+
+        return base_name
 
     def get_build_args(self) -> Dict[str, str]:
         """Get build arguments"""
@@ -637,7 +652,7 @@ class Docsuez:
             build_cmd.extend(["--build-arg", f"{key}={value}"])
 
         # Add tag
-        image_name = build_config.get_image_name()
+        image_name = build_config.get_builder_image_name()
         build_cmd.extend(["-t", image_name])
 
         # Add dockerfile if specified
@@ -778,7 +793,13 @@ class Docsuez:
             f.write("# Start docker container in background\n")
             f.write("docker_cmd=(\n")
             f.write("  docker run --rm -d\n")
-            f.write(f"  --name {session_name}\n")
+            # Prepend username to container name unless DOCSUEZ_NO_USER_NAME_PREPEND is set
+            if not os.environ.get("DOCSUEZ_NO_USER_NAME_PREPEND"):
+                username = os.environ.get("USER", "unknown")
+                container_name = f"{username}_{session_name}"
+            else:
+                container_name = session_name
+            f.write(f"  --name {container_name}\n")
         else:
             f.write("# Build docker run command\n")
             f.write("docker_cmd=(\n")
@@ -966,7 +987,7 @@ class Docsuez:
 
         # Get image specifications
         image_builder = config.get_image_builder()
-        image_name = config.get_image_name()
+        image_name = config.get_runner_image_name()
 
         # Check for conflicting specifications
         if image_builder and image_name:
@@ -993,7 +1014,7 @@ class Docsuez:
 
             build_config = BuildConfig(build_config_path)
             build_config.load()
-            image_name = build_config.get_image_name()
+            image_name = build_config.get_builder_image_name()
 
             # Determine if we should build (skip if --dry-show is set)
             if not getattr(args, 'dry_show', False) and self._should_build_image(args.build, build_config, image_name):
