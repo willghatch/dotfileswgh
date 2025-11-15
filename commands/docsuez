@@ -269,9 +269,10 @@ class DocsuezConfig:
 class BuildConfig:
     """Represents a parsed build-docsuez.json configuration"""
 
-    def __init__(self, config_path: Path):
+    def __init__(self, config_path: Path, searcher: 'DocsuezSearcher' = None):
         self.config_path = config_path
         self.config_dir = config_path.parent
+        self.searcher = searcher
         self._config = {}
         self._generated_dockerfile = None
 
@@ -279,6 +280,18 @@ class BuildConfig:
         """Load the build configuration file"""
         with open(self.config_path, 'r') as f:
             self._config = json.load(f)
+
+    def _resolve_search_path(self, search_file: str) -> Path:
+        """Search for a file in the docsuez search paths"""
+        if not self.searcher:
+            raise ValueError("Cannot use 'search' without a searcher instance")
+
+        for search_path in self.searcher.search_paths:
+            candidate = search_path / search_file
+            if candidate.exists():
+                return candidate
+
+        raise FileNotFoundError(f"Could not find '{search_file}' in any search path: {self.searcher.search_paths}")
 
     def _generate_dockerfile(self) -> Tuple[str, Path]:
         """Generate dockerfile content and return (content, temp_path)"""
@@ -314,8 +327,13 @@ class BuildConfig:
                 )
                 content_parts.append(result.stdout)
             elif isinstance(spec, dict) and "relative-path" in spec:
-                # File path
+                # File path relative to config directory
                 file_path = self.config_dir / spec["relative-path"]
+                with open(file_path, 'r') as f:
+                    content_parts.append(f.read())
+            elif isinstance(spec, dict) and "search" in spec:
+                # Search for file in search paths
+                file_path = self._resolve_search_path(spec["search"])
                 with open(file_path, 'r') as f:
                     content_parts.append(f.read())
             else:
@@ -358,6 +376,12 @@ class BuildConfig:
             for spec in dockerfile_spec:
                 if isinstance(spec, dict) and "relative-path" in spec:
                     sources.append(self.config_dir / spec["relative-path"])
+                elif isinstance(spec, dict) and "search" in spec:
+                    try:
+                        sources.append(self._resolve_search_path(spec["search"]))
+                    except FileNotFoundError:
+                        # Skip if not found during source collection
+                        pass
                 # Skip literal text entries
             return sources
 
@@ -634,7 +658,7 @@ class Docsuez:
             print(f"Build config not found for '{args.image_spec}'", file=sys.stderr)
             sys.exit(1)
 
-        build_config = BuildConfig(build_config_path)
+        build_config = BuildConfig(build_config_path, self.searcher)
         build_config.load()
 
         # If dry-show mode, print the assembled dockerfile and exit
@@ -1012,7 +1036,7 @@ class Docsuez:
                 print(f"Build config not found for '{image_builder}'", file=sys.stderr)
                 sys.exit(1)
 
-            build_config = BuildConfig(build_config_path)
+            build_config = BuildConfig(build_config_path, self.searcher)
             build_config.load()
             image_name = build_config.get_builder_image_name()
 

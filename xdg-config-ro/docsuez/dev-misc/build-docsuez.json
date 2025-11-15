@@ -15,20 +15,20 @@
                 ""
             ]
         },
-        {"relative-path": "../dockerfile-components/dfcomp-apt-core-tools"},
+        {"search": "dockerfile-components/dfcomp-apt-core-tools"},
         {
             "text":
             "RUN DEBIAN_FRONTEND=noninteractive apt install -y build-essential"
         },
-        {"relative-path": "../dockerfile-components/dfcomp-apt-cpp-libs"},
-        {"relative-path": "../dockerfile-components/dfcomp-uv-install"},
-        {"relative-path": "../dockerfile-components/dfcomp-nodejs-install"},
+        {"search": "dockerfile-components/dfcomp-apt-cpp-libs"},
+        {"search": "dockerfile-components/dfcomp-uv-install"},
+        {"search": "dockerfile-components/dfcomp-nodejs-install"},
         {
             "text":
             "RUN apt-get install -y gcc avr-libc avrdude dfu-programmer dfu-util gcc-arm-none-eabi # For QMK"
         },
         {"bash-print-text": "echo 'RUN useradd -u' $UID 'wgh \n RUN chsh -s /bin/zsh wgh'"},
-        {"relative-path": "../dockerfile-components/dfcomp-timezone-setup"}
+        {"search": "dockerfile-components/dfcomp-timezone-setup"}
     ],
     "build-context-directory": "."
 }

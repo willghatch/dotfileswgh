@@ -30,9 +30,9 @@
         ""
       ]
     },
-    {"relative-path": "../dockerfile-components/dfcomp-apt-core-tools"},
-    {"relative-path": "../dockerfile-components/dfcomp-uv-install"},
-    {"relative-path": "../dockerfile-components/dfcomp-nodejs-install"},
+    {"search": "dockerfile-components/dfcomp-apt-core-tools"},
+    {"search": "dockerfile-components/dfcomp-uv-install"},
+    {"search": "dockerfile-components/dfcomp-nodejs-install"},
     {
       "text": [
         "RUN DEBIAN_FRONTEND=noninteractive apt install -y libzstd-dev",
@@ -65,7 +65,7 @@
       "RUN usermod -aG sudo wgh",
       "RUN echo '%sudo ALL=(ALL) NOPASSWD:ALL' >> /etc/sudoers"
     ]},
-    {"relative-path": "../dockerfile-components/dfcomp-timezone-setup"}
+    {"search": "dockerfile-components/dfcomp-timezone-setup"}
   ],
   "build-context-directory": "."
 }
