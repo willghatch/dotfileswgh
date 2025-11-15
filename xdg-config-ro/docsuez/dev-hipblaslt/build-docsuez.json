@@ -1,7 +1,7 @@
 {
   "dockerfile": [
     {
-      "dockerfile-text": [
+      "text": [
         "#FROM rocm/pytorch:rocm7.1_ubuntu24.04_py3.12_pytorch_release_2.8.0",
         "FROM rocm/sgl-dev:v0.5.4.post2-rocm700-mi35x-20251104",
         "# This docker image sets CI=1 which breaks interactive things",
@@ -30,11 +30,11 @@
         ""
       ]
     },
-    "../dockerfile-components/dfcomp-apt-core-tools",
-    "../dockerfile-components/dfcomp-uv-install",
-    "../dockerfile-components/dfcomp-nodejs-install",
+    {"relative-path": "../dockerfile-components/dfcomp-apt-core-tools"},
+    {"relative-path": "../dockerfile-components/dfcomp-uv-install"},
+    {"relative-path": "../dockerfile-components/dfcomp-nodejs-install"},
     {
-      "dockerfile-text": [
+      "text": [
         "RUN DEBIAN_FRONTEND=noninteractive apt install -y libzstd-dev",
         "RUN DEBIAN_FRONTEND=noninteractive apt install -y libblis-dev",
         "#RUN DEBIAN_FRONTEND=noninteractive apt install -y libmsgpack-cxx-dev libgtest-dev libboost-filesystem-dev libgmock-dev libboost-program-options-dev",
@@ -60,12 +60,12 @@
         ""
       ]
     },
-    {"bash-print-dockerfile-text": "echo 'RUN useradd -u' $UID 'wgh \n RUN chsh -s /bin/zsh wgh'"},
-    {"dockerfile-text": [
+    {"bash-print-text": "echo 'RUN useradd -u' $UID 'wgh \n RUN chsh -s /bin/zsh wgh'"},
+    {"text": [
       "RUN usermod -aG sudo wgh",
       "RUN echo '%sudo ALL=(ALL) NOPASSWD:ALL' >> /etc/sudoers"
     ]},
-    "../dockerfile-components/dfcomp-timezone-setup"
+    {"relative-path": "../dockerfile-components/dfcomp-timezone-setup"}
   ],
   "build-context-directory": "."
 }

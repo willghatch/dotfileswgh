@@ -1,7 +1,7 @@
 {
     "dockerfile": [
         {
-            "dockerfile-text": [
+            "text": [
                 "FROM ubuntu:24.04",
                 "",
                 "ENV DEBIAN_FRONTEND=noninteractive",
@@ -15,20 +15,20 @@
                 ""
             ]
         },
-        "../dockerfile-components/dfcomp-apt-core-tools",
+        {"relative-path": "../dockerfile-components/dfcomp-apt-core-tools"},
         {
-            "dockerfile-text":
+            "text":
             "RUN DEBIAN_FRONTEND=noninteractive apt install -y build-essential"
         },
-        "../dockerfile-components/dfcomp-apt-cpp-libs",
-        "../dockerfile-components/dfcomp-uv-install",
-        "../dockerfile-components/dfcomp-nodejs-install",
+        {"relative-path": "../dockerfile-components/dfcomp-apt-cpp-libs"},
+        {"relative-path": "../dockerfile-components/dfcomp-uv-install"},
+        {"relative-path": "../dockerfile-components/dfcomp-nodejs-install"},
         {
-            "dockerfile-text":
+            "text":
             "RUN apt-get install -y gcc avr-libc avrdude dfu-programmer dfu-util gcc-arm-none-eabi # For QMK"
         },
-        {"bash-print-dockerfile-text": "echo 'RUN useradd -u' $UID 'wgh \n RUN chsh -s /bin/zsh wgh'"},
-        "../dockerfile-components/dfcomp-timezone-setup"
+        {"bash-print-text": "echo 'RUN useradd -u' $UID 'wgh \n RUN chsh -s /bin/zsh wgh'"},
+        {"relative-path": "../dockerfile-components/dfcomp-timezone-setup"}
     ],
     "build-context-directory": "."
 }

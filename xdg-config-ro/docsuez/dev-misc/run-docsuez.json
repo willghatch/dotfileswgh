@@ -2,12 +2,12 @@
   "image-builder": "dev-misc",
   "tags": {
     "network": {
-      "docker_args": [
+      "docker-args": [
         "--network=host"
       ]
     },
     "user": {
-      "docker_args": [
+      "docker-args": [
         "--user", "$(id -u):$(id -g)"
       ]
     },
@@ -15,7 +15,7 @@
       "volumes": {
         "$HOME/mk/misc/docker-home": "/home/wgh"
       },
-      "docker_args": [
+      "docker-args": [
         "--workdir=/home/wgh"
       ]
     },

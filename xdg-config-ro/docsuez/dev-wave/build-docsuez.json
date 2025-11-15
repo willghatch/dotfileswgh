@@ -1,7 +1,7 @@
 {
     "dockerfile": [
         {
-            "dockerfile-text": [
+            "text": [
                 "# Note: ubuntu:24.04 didn't work for wave builds (cmake error), but this ROCm image does",
                 "FROM rocm/pytorch:rocm6.4.1_ubuntu24.04_py3.12_pytorch_release_2.5.1",
                 "# This docker image sets CI=1 which breaks interactive things",
@@ -17,12 +17,12 @@
                 ""
             ]
         },
-        "../dockerfile-components/dfcomp-apt-core-tools",
-        "../dockerfile-components/dfcomp-apt-cpp-libs",
-        "../dockerfile-components/dfcomp-uv-install",
-        "../dockerfile-components/dfcomp-nodejs-install",
-        {"bash-print-dockerfile-text": "echo 'RUN useradd -u' $UID 'wgh \n RUN chsh -s /bin/zsh wgh'"},
-        "../dockerfile-components/dfcomp-timezone-setup"
+        {"relative-path": "../dockerfile-components/dfcomp-apt-core-tools"},
+        {"relative-path": "../dockerfile-components/dfcomp-apt-cpp-libs"},
+        {"relative-path": "../dockerfile-components/dfcomp-uv-install"},
+        {"relative-path": "../dockerfile-components/dfcomp-nodejs-install"},
+        {"bash-print-text": "echo 'RUN useradd -u' $UID 'wgh \n RUN chsh -s /bin/zsh wgh'"},
+        {"relative-path": "../dockerfile-components/dfcomp-timezone-setup"}
     ],
     "build-context-directory": "."
 }

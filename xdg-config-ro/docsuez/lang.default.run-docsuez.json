@@ -1,3 +1,3 @@
 {
-  "tags": {"LANG": {"docker_args": ["-e", "LANG=C.UTF-8"]}}
+  "tags": {"LANG": {"docker-args": ["-e", "LANG=C.UTF-8"]}}
 }

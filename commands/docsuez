@@ -19,16 +19,16 @@ run-docsuez.json - Specifies how to run a container:
     "$HOME/projects": "/workspace",
     "$HOME/.ssh": "/root/.ssh"
   },
-  "docker_args": ["--network=host", "--privileged"],
+  "docker-args": ["--network=host", "--privileged"],
   "command": ["bash"],
-  "tmux_socket_dir": "/tmp/tmux-sockets",
+  "tmux-socket-dir": "/tmp/tmux-sockets",
   "docker-run-script": ["echo 'Setting up...'", "DOCKER_RUN_EXTRAS+=(--hostname myhost)"],
   "pre-tmux-script": ["export FOO=bar", "export QUUX=aoeu"],
   "post-tmux-script": ["echo 'Tmux started!'", "touch /tmp/setup-complete"],
   "include": ["base-config"],
   "tags": {
     "dev": {
-      "docker_args": ["--cap-add=SYS_PTRACE"],
+      "docker-args": ["--cap-add=SYS_PTRACE"],
       "docker-run-script": ["DOCKER_RUN_EXTRAS+=(-e \"DEV_MODE=1\")"]
     }
   }
@@ -42,14 +42,14 @@ Note: Only one of "image-builder" or "image-name" should be specified:
 build-docsuez.json - Specifies how to build an image:
 {
   "dockerfile": [
-    "Dockerfile.base",
-    {"dockerfile-text": ["RUN apt install cowsay", "RUN apt install fortune"]},
-    {"bash-print-dockerfile-text": "echo 'RUN echo Built on '$(date)"},
-    "Dockerfile.extra"
+    {"relative-path": "Dockerfile.base"},
+    {"text": ["RUN apt install cowsay", "RUN apt install fortune"]},
+    {"bash-print-text": "echo 'RUN echo Built on '$(date)"},
+    {"relative-path": "Dockerfile.extra"}
   ],
   "build-context-directory": ".",
-  "base_image_name": "my-dev-env:latest",
-  "build_args": {
+  "image-name-postfix": "my-dev-env:latest",
+  "build-args": {
     "BASE_IMAGE": "ubuntu:22.04"
   }
 }
@@ -229,7 +229,7 @@ class DocsuezConfig:
     def get_docker_args(self) -> List[str]:
         """Get extra docker run arguments"""
         config = self._merge_configs()
-        return config.get("docker_args", [])
+        return config.get("docker-args", [])
 
     def get_command(self) -> Optional[List[str]]:
         """Get the command to run in the container"""
@@ -239,7 +239,7 @@ class DocsuezConfig:
     def get_tmux_socket_dir(self) -> Optional[str]:
         """Get the tmux socket directory"""
         config = self._merge_configs()
-        return config.get("tmux_socket_dir")
+        return config.get("tmux-socket-dir")
 
     def get_docker_run_script(self) -> List[str]:
         """Get script components to run before docker"""
@@ -292,15 +292,15 @@ class BuildConfig:
 
         content_parts = []
         for spec in dockerfile_spec:
-            if isinstance(spec, dict) and "dockerfile-text" in spec:
+            if isinstance(spec, dict) and "text" in spec:
                 # Literal text - handle string or list of strings
-                dockerfile_text = spec["dockerfile-text"]
+                dockerfile_text = spec["text"]
                 if isinstance(dockerfile_text, list):
                     dockerfile_text = "\n".join(dockerfile_text)
                 content_parts.append(dockerfile_text)
-            elif isinstance(spec, dict) and "bash-print-dockerfile-text" in spec:
+            elif isinstance(spec, dict) and "bash-print-text" in spec:
                 # Bash program that outputs dockerfile text
-                bash_program = spec["bash-print-dockerfile-text"]
+                bash_program = spec["bash-print-text"]
                 # Handle string or list of strings
                 if isinstance(bash_program, list):
                     bash_program = "\n".join(bash_program)
@@ -313,9 +313,9 @@ class BuildConfig:
                     cwd=self.config_dir
                 )
                 content_parts.append(result.stdout)
-            elif isinstance(spec, str):
+            elif isinstance(spec, dict) and "relative-path" in spec:
                 # File path
-                file_path = self.config_dir / spec
+                file_path = self.config_dir / spec["relative-path"]
                 with open(file_path, 'r') as f:
                     content_parts.append(f.read())
             else:
@@ -356,8 +356,8 @@ class BuildConfig:
         if isinstance(dockerfile_spec, list):
             sources = []
             for spec in dockerfile_spec:
-                if isinstance(spec, str):
-                    sources.append(self.config_dir / spec)
+                if isinstance(spec, dict) and "relative-path" in spec:
+                    sources.append(self.config_dir / spec["relative-path"])
                 # Skip literal text entries
             return sources
 
@@ -384,8 +384,8 @@ class BuildConfig:
     def get_builder_image_name(self) -> str:
         """Get the image name to build"""
         # Get base image name from config or auto-generate it
-        if "base_image_name" in self._config:
-            base_name = self._config["base_image_name"]
+        if "image-name-postfix" in self._config:
+            base_name = self._config["image-name-postfix"]
         else:
             base_name = f"docsuez_{self.config_dir.name}:latest"
 
@@ -398,7 +398,7 @@ class BuildConfig:
 
     def get_build_args(self) -> Dict[str, str]:
         """Get build arguments"""
-        return self._config.get("build_args", {})
+        return self._config.get("build-args", {})
 
     def cleanup(self):
         """Clean up temporary files"""

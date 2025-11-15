@@ -1,12 +1,12 @@
 {
   "tags": {
     "network": {
-      "docker_args": [
+      "docker-args": [
         "--network=host"
       ]
     },
     "user": {
-      "docker_args": [
+      "docker-args": [
         "--user", "$(id -u):$(id -g)"
       ]
     },
@@ -14,7 +14,7 @@
       "volumes": {
         "$HOME/mk/amd/docker-home": "/home/wgh"
       },
-      "docker_args": [
+      "docker-args": [
         "--workdir=/home/wgh"
       ]
     },
@@ -42,7 +42,7 @@
         "DOCKER_RUN_EXTRAS+=(--group-add \"$(groupid render)\")",
         "DOCKER_RUN_EXTRAS+=(--group-add \"$(groupid video)\")"
       ],
-      "docker_args": [
+      "docker-args": [
         "--cap-add=SYS_PTRACE",
         "--security-opt", "seccomp=unconfined",
         "--ipc=host",
