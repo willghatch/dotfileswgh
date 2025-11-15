@@ -4,4 +4,5 @@ if [[ -z "$CURRENT_DEV_MODE" && -e "$DOTFILESWGH_DOTLOCAL/e-is-premacs" && ! "$(
     exec premacs-use-or-create-t "$@"
 fi
 
-exec em "$@"
+#exec em "$@"
+SHELL=/bin/sh exec emacs --eval '(setq wgh/fast-start t)' -nw -q -l $DOTFILESWGH/emacs/def "$@"
