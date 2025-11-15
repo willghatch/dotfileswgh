@@ -196,7 +196,11 @@ The command also executes the sentence, with region as the object, if the region
 (eimap "\C-t" 'ignore) ;; I use this as a prefix for tmux, so preferably ignore it if it accidentally comes through.
 (eimap "\M-t" 'ignore) ;; M-t -- I think I want to save this for windowing in terminal multiplexer with C-t
 
-(eimap "\C-s" 'backward-kill-word) ;; TODO - this is problematic in two ways.  One, C-s is save in most programs, so maybe I don't want a habit of using something that often means save.  Also, it is a key for terminal flow control that stops printing, which is super annoying when accidentally used.
+(defun wgh/backward-delete-word (arg)
+  "like backward-kill-word, except don't add to kill ring"
+  (interactive "p")
+  (delete-region (point) (progn (backward-word arg) (point))))
+(eimap "\C-s" 'wgh/backward-delete-word) ;; TODO - this is problematic in two ways.  One, C-s is save in most programs, so maybe I don't want a habit of using something that often means save.  Also, it is a key for terminal flow control that stops printing, which is super annoying when accidentally used.
 (eimap "\C-q" 'ignore) ;; C-q - don't use, it is the terminal flow control binding to restart flow.
 (eimap "\C-v" 'quoted-insert)
 ;; C-o -- in readline the default action for this is “operate-and-get-next”, which executes the command, finds the command in the history, and sets the buffer to the next command in history.  So it is useful for those times when you go back in history 5 commands, hit enter, then go up in history 5 commands, hit enter, etc, you can just go back 5 commands, then hit C-o 5 times.
