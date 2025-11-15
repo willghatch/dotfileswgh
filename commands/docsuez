@@ -14,6 +14,7 @@ Configuration File Examples:
 run-docsuez.json - Specifies how to run a container:
 {
   "image-builder": "my-dev-env",
+  "image-name": "ubuntu:22.04",
   "volumes": {
     "$HOME/projects": "/workspace",
     "$HOME/.ssh": "/root/.ssh"
@@ -32,6 +33,11 @@ run-docsuez.json - Specifies how to run a container:
     }
   }
 }
+
+Note: Only one of "image-builder" or "image-name" should be specified:
+- "image-builder": References a build-docsuez.json to build/use an image
+- "image-name": Directly specifies a Docker image name to run (e.g., "ubuntu:22.04")
+- If neither is specified, will look for a builder with the same name as the run config
 
 build-docsuez.json - Specifies how to build an image:
 {
@@ -197,6 +203,11 @@ class DocsuezConfig:
         config = self._merge_configs()
         return config.get("image-builder")
 
+    def get_image_name(self) -> Optional[str]:
+        """Get the direct image name specification"""
+        config = self._merge_configs()
+        return config.get("image-name")
+
     def get_volumes(self) -> Dict[str, str]:
         """Get volume mounts, with environment variable expansion"""
         config = self._merge_configs()
@@ -348,9 +359,13 @@ class BuildConfig:
 
         return [self.config_dir / "Dockerfile"]
 
-    def get_newest_dockerfile_mtime(self) -> float:
-        """Get the newest modification time among all dockerfile sources"""
+    def get_newest_source_mtime(self) -> float:
+        """Get the newest modification time among all build sources (dockerfile + config)"""
         sources = self.get_dockerfile_sources()
+
+        # Also include the build config file itself
+        sources.append(self.config_path)
+
         if not sources:
             return 0.0
 
@@ -635,7 +650,11 @@ class Docsuez:
 
         print(f"Building image: {' '.join(build_cmd)}")
         try:
-            subprocess.run(build_cmd, check=True)
+            result = subprocess.run(build_cmd, check=True)
+        except subprocess.CalledProcessError as e:
+            print(f"\nError: Image build failed with exit code {e.returncode}", file=sys.stderr)
+            build_config.cleanup()
+            sys.exit(1)
         finally:
             build_config.cleanup()
 
@@ -673,10 +692,10 @@ class Docsuez:
             # Can't parse, rebuild to be safe
             return True
 
-        # Compare with dockerfile mtime
-        dockerfile_mtime = build_config.get_newest_dockerfile_mtime()
+        # Compare with build source mtimes (dockerfile + config)
+        source_mtime = build_config.get_newest_source_mtime()
 
-        return dockerfile_mtime > image_mtime
+        return source_mtime > image_mtime
 
     def _generate_docker_run_script(self, script_file, config: DocsuezConfig, image_name: str,
                                      tsuez_mode: bool = False, tsuez_config: Optional[Dict[str, Any]] = None,
@@ -945,28 +964,43 @@ class Docsuez:
                              default_addons=default_addons)
         config.load()
 
-        # Get image builder spec
+        # Get image specifications
         image_builder = config.get_image_builder()
-        if not image_builder:
-            print("No image-builder specified in config", file=sys.stderr)
+        image_name = config.get_image_name()
+
+        # Check for conflicting specifications
+        if image_builder and image_name:
+            print("Error: Cannot specify both 'image-builder' and 'image-name' in config", file=sys.stderr)
             sys.exit(1)
 
-        # Find build config and determine image name
-        build_config_path = self.searcher.find_build_config(image_builder)
-        if not build_config_path:
-            print(f"Build config not found for '{image_builder}'", file=sys.stderr)
-            sys.exit(1)
-
-        build_config = BuildConfig(build_config_path)
-        build_config.load()
-        image_name = build_config.get_image_name()
-
-        # Determine if we should build (skip if --dry-show is set)
-        if not getattr(args, 'dry_show', False) and self._should_build_image(args.build, build_config, image_name):
-            print(f"Building image {image_name}...")
+        # Determine which image to use
+        build_config = None
+        if image_name:
+            # Direct image name specified, use it as-is
+            print(f"Using image: {image_name}")
             sys.stdout.flush()
-            build_args_obj = argparse.Namespace(image_spec=image_builder)
-            self.cmd_build(build_args_obj)
+        else:
+            # Use image builder (either explicit or fallback to config name)
+            if not image_builder:
+                # Fallback to using the config name as the image builder name
+                image_builder = config_path.parent.name
+                print(f"No image-builder or image-name specified, trying builder '{image_builder}'...", file=sys.stderr)
+
+            build_config_path = self.searcher.find_build_config(image_builder)
+            if not build_config_path:
+                print(f"Build config not found for '{image_builder}'", file=sys.stderr)
+                sys.exit(1)
+
+            build_config = BuildConfig(build_config_path)
+            build_config.load()
+            image_name = build_config.get_image_name()
+
+            # Determine if we should build (skip if --dry-show is set)
+            if not getattr(args, 'dry_show', False) and self._should_build_image(args.build, build_config, image_name):
+                print(f"Building image {image_name}...")
+                sys.stdout.flush()
+                build_args_obj = argparse.Namespace(image_spec=image_builder)
+                self.cmd_build(build_args_obj)
 
         # Check if we should use tsuez integration or custom command
         command = config.get_command()
