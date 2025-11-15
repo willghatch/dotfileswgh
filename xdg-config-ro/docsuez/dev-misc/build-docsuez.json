@@ -30,6 +30,5 @@
         {"bash-print-dockerfile-text": "echo 'RUN useradd -u' $UID 'wgh \n RUN chsh -s /bin/zsh wgh'"},
         "../dockerfile-components/dfcomp-timezone-setup"
     ],
-    "build-context-directory": ".",
-    "image_name": "dev-misc:latest"
+    "build-context-directory": "."
 }

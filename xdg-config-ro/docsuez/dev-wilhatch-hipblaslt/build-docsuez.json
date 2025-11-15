@@ -67,6 +67,5 @@
     ]},
     "../dockerfile-components/dfcomp-timezone-setup"
   ],
-  "build-context-directory": ".",
-  "image_name": "dev-wilhatch-hipblaslt:latest"
+  "build-context-directory": "."
 }
