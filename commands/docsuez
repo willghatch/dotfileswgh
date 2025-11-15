@@ -814,7 +814,7 @@ class Docsuez:
 
             # Set TMUX_TMPDIR and TSUEZ_MANAGED
             f.write("  -e TMUX_TMPDIR=/tsuez-dir\n")
-            f.write("  -e TSUEZ_MANAGED=1\n")
+            f.write(f"  -e TSUEZ_MANAGED={session_name}\n")
 
         # Add image name
         f.write(f"  {image_name}\n")
