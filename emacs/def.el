@@ -175,7 +175,7 @@
  (setq hydra-lv nil)
  (require 'vfuncs)
  (load-library "keys")
- ;(load-library "demo-keys")
+ ;;(load-library "demo-keys")
 
  ;; I wanted to try one more time to see if maybe I should just use evil-mode with some configuration changes.  But it's too set in its on-character addressing ways.  The evil-move-cursor-back setting only affects what happens when exiting insert mode.  It doesn't change the fact that evil-forward-word-end puts the cursor ON the last character (IE before it) instead of after the last character, and that it has a bunch of logic for adjusting the ranges used for operations (eg. delete forward word end deletes one character farther than the movement goes).  And I think working my full plans in with evil-mode will be difficult, at best.  And the main parts of evil-mode that I really care about that don't conflict with how evil-mode is set up have been relatively easy to re-implement in a much smaller way.  The remaining parts that I care about I can mostly just keep using from evil-mode as a lazy require.
  ;;(setq evil-move-cursor-back nil)
@@ -207,146 +207,164 @@
 
  )
 
+(nobreak
+ ;; more settings with setq
+
+ ;; don't shrink the line number width
+ (setq display-line-numbers-grow-only t)
+ ;; guide on disabling/enabling lsp-mode features: https://emacs-lsp.github.io/lsp-mode/tutorials/how-to-turn-off/
+ (setq lsp-headerline-breadcrumb-enable nil)
+
+
+ ;;(load-library "yasnippet-conf")
+ (setq wgh/lisp-outline-regexp
+       (rx (or
+            ;; Allow headings to be after comment characters, or anywhere in a blank indented line.
+            (seq (* blank) (* ";") (* blank) (+ "*"))
+            )))
+ (setq wgh/c-outline-regexp
+       (rx (or
+            ;; Allow headings to be after comment characters, or anywhere in a blank indented line.
+            (seq (* blank) (? (seq "//" (* "/"))) (* blank) (+ "*"))
+            )))
+ (setq wgh/bash-outline-regexp
+       (rx (or
+            ;; Allow headings to be after comment characters, or anywhere in a blank indented line.
+            (seq (* blank) (* "#") (* blank) (+ "*"))
+            )))
+ (setq wgh/lua-outline-regexp
+       (rx (or
+            ;; Allow headings to be after comment characters, or anywhere in a blank indented line.
+            (seq (* blank) (? (seq "--" (* "-"))) (* blank) (+ "*"))
+            )))
+ (setq-default fill-column 80)
+ (setq whitespace-style '(face tabs trailing))
+
+ ;; MAKE SCROLLING BE SANE, PLEASE¡
+ (setq scroll-step 1)
+ (setq scroll-conservatively 10000)
+ (setq scroll-margin 5)
+ (setq smooth-scroll-margin 5)
+ (setq scroll-up-aggressively 0.0)
+ (setq-default scroll-up-aggressively 0.0)
+ (setq scroll-down-aggressively 0.0)
+ (setq-default scroll-down-aggressively 0.0)
+
+ (setq frame-resize-pixelwise t)
+
+ (setq highlight-indent-guides-auto-enabled nil)
+ (setq hl-todo-activate-in-modes '(prog-mode))
+ (setq helm-swoop-pre-input-function (lambda () "")) ;; disable symbol-at-point nonsense
+ (setq guide-key/guide-key-sequence '("SPC"))
+ (setq guide-key/recursive-key-sequence-flag t)
+
+ (setq browse-url-browser-function 'browse-url-firefox)
+ (setq browse-url-firefox-program "ffxd")
+
+ ;;(setq eldoc-echo-area-prefer-doc-buffer t) ;; only use echo area if doc buffer is not visible
+ (setq eldoc-documentation-strategy 'eldoc-documentation-compose)
+ (setq lsp-eldoc-render-all t)
+ ;;(setq eldoc-echo-area-use-multiline-p nil) ;; TODO - the default is 'truncate-sym-name-if-fit
+
+ (setq copilot-idle-delay nil) ;; Don't auto-suggest, just complete when requested.
+
+
+ ;; TODO - completion config -- there is a lot of completion config that I've never really used that I should consider.
+ ;;(setq completion-styles '(basic initials substring)) ;; default before editing was (basic partial-completion emacs22)
+ ;; completion-cycle-threshold
+ ;; completions-detailed
+ ;; completion-auto-help
+ ;; completions-max-height
+ ;; completions-format
+ ;; completions-group
+ ;; completion-auto-select
+
+ )
+
+(nobreak
+ (global-display-line-numbers-mode)
+
+ (defun lsp-common-setup ()
+   (require 'lsp)
+   (setq lsp-headerline-breadcrumb-enable nil)
+   (require 'lsp-ui)
+   (require 'lsp-lens)
+   (require 'lsp-modeline)
+
+   ;; Unbind <mouse-movement> from showing documentation pop-ups.
+   ;; It's not that it's a bad idea, but that it catches “movements” spuriously, and makes it so I constantly have to move the mouse cursor to stop getting pop-ups when I'm not using the mouse.
+   (setcdr lsp-ui-mode-map nil)
+   ;; The above isn't working, so let's...
+   (defun lsp-ui-doc--handle-mouse-movement (event)
+     (interactive "e")
+     nil)
+
+   ;; I could enable it here, but let's wait until after requiring mode-specific things.
+   ;;(lsp)
+   ) )
+
+(setq wgh/de-fast-run nil)
+(defun wgh/de-fast ()
+  (interactive)
+  (unless wgh/de-fast-run
+    (setq wgh/de-fast-run t)
+    (nobreak
+     ;; ido-completion-map inherits from ido-buffer-completion-map or ido-common-completion-map
+     (add-hook 'ido-setup-hook
+               (lambda ()
+                 (define-key ido-completion-map (kbd "C-l") 'ignore)
+                 (define-key ido-completion-map (kbd "C-f") 'ido-next-match)
+                 (define-key ido-completion-map (kbd "C-b") 'ido-prev-match)
+                 (define-key ido-completion-map (kbd "M-r") 'evil-paste-from-register)
+                 ))
+
+     ;;(ido-mode 1)
+     ;; (setq ido-enable-flex-matching t
+     ;;       ido-everywhere t)
+     ;;(require 'flx-ido)
+     ;;(flx-ido-mode 1)
+
+     (require 'org-mode-conf)
+
+     (global-display-fill-column-indicator-mode 1)
+
+
+     (require 'mode-hooks-conf)
+     (require 'company-conf)
+     ;;(load-library "popwin-conf")
+     ;;(load-library "projectile-conf")
+     (load-library "scratch-message")
+     (require 'delimiters-conf)
+     ;;(load-library "sexprw-conf")
+     (load-library "borrowed")
+     ;; tty-format provides for coloring based on terminal escape codes.  I should set it to autoload at some point, but for now let's disable it.
+     ;;(load-library "tty-format")
+     ;; highlight literal tab characters and trailing whitespace
+
+     ;;(require 'smooth-scrolling)
+
+     ;; I like the idea of guide-key, but in practice it doesn't show up in most places where I want it, so I rarely get any benefit.  I think I need to set up my keymaps in a different way for it to work well.
+     ;;(require 'guide-key)
+     ;;(guide-key-mode 1)
+     (setq whitespace-final-newline-message "\n<-- No final newline")
+     (require 'whitespace-final-newline)
+     (define-global-minor-mode blacklisted-global-whitespace-final-newline-mode
+       whitespace-final-newline-mode
+       (lambda ()
+         (when (or (buffer-file-name)
+                   (equal (buffer-name) "*scratch*"))
+           (whitespace-final-newline-mode 1))))
+     (blacklisted-global-whitespace-final-newline-mode 1)
+
+     ;; TODO - eldoc - try using display-buffer-alist to have dedicated space for eldoc-doc-buffers, as suggested in https://www.masteringemacs.org/article/seamlessly-merge-multiple-documentation-sources-eldoc
+
+     (savehist-mode 1) ;; Save minibuffer history.
+
+     ;;(load-library "keyfreq-conf")
+     )))
 
 (when (not wgh/fast-start)
-  (nobreak
-   ;; ido-completion-map inherits from ido-buffer-completion-map or ido-common-completion-map
-   (add-hook 'ido-setup-hook
-             (lambda ()
-               (define-key ido-completion-map (kbd "C-l") 'ignore)
-               (define-key ido-completion-map (kbd "C-f") 'ido-next-match)
-               (define-key ido-completion-map (kbd "C-b") 'ido-prev-match)
-               (define-key ido-completion-map (kbd "M-r") 'evil-paste-from-register)
-               ))
-
-   ;;(ido-mode 1)
-   ;; (setq ido-enable-flex-matching t
-   ;;       ido-everywhere t)
-   ;;(require 'flx-ido)
-   ;;(flx-ido-mode 1)
-
-   ;; don't shrink the line number width
-   (setq display-line-numbers-grow-only t)
-   (global-display-line-numbers-mode)
-
-   ;; guide on disabling/enabling lsp-mode features: https://emacs-lsp.github.io/lsp-mode/tutorials/how-to-turn-off/
-   (setq lsp-headerline-breadcrumb-enable nil)
-
-
-   ;;(load-library "yasnippet-conf")
-   (setq wgh/lisp-outline-regexp
-         (rx (or
-              ;; Allow headings to be after comment characters, or anywhere in a blank indented line.
-              (seq (* blank) (* ";") (* blank) (+ "*"))
-              )))
-   (setq wgh/c-outline-regexp
-         (rx (or
-              ;; Allow headings to be after comment characters, or anywhere in a blank indented line.
-              (seq (* blank) (? (seq "//" (* "/"))) (* blank) (+ "*"))
-              )))
-   (setq wgh/bash-outline-regexp
-         (rx (or
-              ;; Allow headings to be after comment characters, or anywhere in a blank indented line.
-              (seq (* blank) (* "#") (* blank) (+ "*"))
-              )))
-   (setq wgh/lua-outline-regexp
-         (rx (or
-              ;; Allow headings to be after comment characters, or anywhere in a blank indented line.
-              (seq (* blank) (? (seq "--" (* "-"))) (* blank) (+ "*"))
-              )))
-   (require 'org-mode-conf)
-
-   (setq-default fill-column 80)
-   (global-display-fill-column-indicator-mode 1)
-
-   (defun lsp-common-setup ()
-     (require 'lsp)
-     (setq lsp-headerline-breadcrumb-enable nil)
-     (require 'lsp-ui)
-     (require 'lsp-lens)
-     (require 'lsp-modeline)
-
-     ;; Unbind <mouse-movement> from showing documentation pop-ups.
-     ;; It's not that it's a bad idea, but that it catches “movements” spuriously, and makes it so I constantly have to move the mouse cursor to stop getting pop-ups when I'm not using the mouse.
-     (setcdr lsp-ui-mode-map nil)
-     ;; The above isn't working, so let's...
-     (defun lsp-ui-doc--handle-mouse-movement (event)
-       (interactive "e")
-       nil)
-
-     ;; I could enable it here, but let's wait until after requiring mode-specific things.
-     ;;(lsp)
-     )
-   (require 'mode-hooks-conf)
-   (require 'company-conf)
-   ;;(load-library "popwin-conf")
-   ;;(load-library "projectile-conf")
-   (load-library "scratch-message")
-   (require 'delimiters-conf)
-   ;;(load-library "sexprw-conf")
-   (load-library "borrowed")
-   ;; tty-format provides for coloring based on terminal escape codes.  I should set it to autoload at some point, but for now let's disable it.
-   ;;(load-library "tty-format")
-   ;; highlight literal tab characters and trailing whitespace
-   (setq whitespace-style '(face tabs trailing))
-
- ;;; MAKE SCROLLING BE SANE, PLEASE¡
-   (setq scroll-step 1)
-   (setq scroll-conservatively 10000)
-   (setq scroll-margin 5)
-   (setq smooth-scroll-margin 5)
-   (setq scroll-up-aggressively 0.0)
-   (setq-default scroll-up-aggressively 0.0)
-   (setq scroll-down-aggressively 0.0)
-   (setq-default scroll-down-aggressively 0.0)
-   ;;(require 'smooth-scrolling)
-
-   (setq frame-resize-pixelwise t)
-
-   (setq highlight-indent-guides-auto-enabled nil)
-   (setq hl-todo-activate-in-modes '(prog-mode))
-   (setq helm-swoop-pre-input-function (lambda () "")) ;; disable symbol-at-point nonsense
-   (setq guide-key/guide-key-sequence '("SPC"))
-   (setq guide-key/recursive-key-sequence-flag t)
-   ;; I like the idea of guide-key, but in practice it doesn't show up in most places where I want it, so I rarely get any benefit.  I think I need to set up my keymaps in a different way for it to work well.
-   ;;(require 'guide-key)
-   ;;(guide-key-mode 1)
-   (setq whitespace-final-newline-message "\n<-- No final newline")
-   (require 'whitespace-final-newline)
-   (define-global-minor-mode blacklisted-global-whitespace-final-newline-mode
-     whitespace-final-newline-mode
-     (lambda ()
-       (when (or (buffer-file-name)
-                 (equal (buffer-name) "*scratch*"))
-         (whitespace-final-newline-mode 1))))
-   (blacklisted-global-whitespace-final-newline-mode 1)
-
-   (setq browse-url-browser-function 'browse-url-firefox)
-   (setq browse-url-firefox-program "ffxd")
-
-   ;;(setq eldoc-echo-area-prefer-doc-buffer t) ;; only use echo area if doc buffer is not visible
-   (setq eldoc-documentation-strategy 'eldoc-documentation-compose)
-   (setq lsp-eldoc-render-all t)
-   ;;(setq eldoc-echo-area-use-multiline-p nil) ;; TODO - the default is 'truncate-sym-name-if-fit
-   ;; TODO - eldoc - try using display-buffer-alist to have dedicated space for eldoc-doc-buffers, as suggested in https://www.masteringemacs.org/article/seamlessly-merge-multiple-documentation-sources-eldoc
-
-   (savehist-mode 1) ;; Save minibuffer history.
-
-   (setq copilot-idle-delay nil) ;; Don't auto-suggest, just complete when requested.
-
-
-   ;; TODO - completion config -- there is a lot of completion config that I've never really used that I should consider.
-   ;;(setq completion-styles '(basic initials substring)) ;; default before editing was (basic partial-completion emacs22)
-   ;; completion-cycle-threshold
-   ;; completions-detailed
-   ;; completion-auto-help
-   ;; completions-max-height
-   ;; completions-format
-   ;; completions-group
-   ;; completion-auto-select
-
-   ;;(load-library "keyfreq-conf")
-   ))
+  (wgh/de-fast))
 
 (nobreak
  (let ((file (concat dotfileswgh-ghp "emacs/def.el")))
