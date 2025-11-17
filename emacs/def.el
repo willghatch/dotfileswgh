@@ -283,6 +283,7 @@
 
 (nobreak
  (global-display-line-numbers-mode)
+ (load-library "borrowed")
 
  (defun lsp-common-setup ()
    (require 'lsp)
@@ -336,7 +337,6 @@
      (load-library "scratch-message")
      (require 'delimiters-conf)
      ;;(load-library "sexprw-conf")
-     (load-library "borrowed")
      ;; tty-format provides for coloring based on terminal escape codes.  I should set it to autoload at some point, but for now let's disable it.
      ;;(load-library "tty-format")
      ;; highlight literal tab characters and trailing whitespace
