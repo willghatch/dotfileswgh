@@ -30,4 +30,4 @@
                        end-of-week))
 
 
-(apply execv (find-executable-path "e") filenames)
+(apply execv (find-executable-path "em") filenames)

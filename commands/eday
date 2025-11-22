@@ -21,4 +21,4 @@
 
 (define filenames (map (λ (date) (format "~a.org" (date->str date))) dates))
 
-(apply execv (find-executable-path "e") filenames)
+(apply execv (find-executable-path "em") filenames)
