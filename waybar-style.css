@@ -106,6 +106,7 @@ button:hover {
 #tray,
 #mode,
 #idle_inhibitor,
+#custom-wayland-idle-inhibit,
 #scratchpad,
 #power-profiles-daemon,
 #mpd,
@@ -254,6 +255,15 @@ label:focus {
 }
 
 #idle_inhibitor.activated {
+    background-color: #ecf0f1;
+    color: #2d3436;
+}
+
+#custom-wayland-idle-inhibit {
+    background-color: #2d3436;
+}
+
+#custom-wayland-idle-inhibit.inhibited {
     background-color: #ecf0f1;
     color: #2d3436;
 }

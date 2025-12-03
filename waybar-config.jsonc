@@ -37,7 +37,8 @@
   "modules-right": [
     //"mpd",
     "mpris",
-    "idle_inhibitor",
+    //"idle_inhibitor",
+    "custom/wayland-idle-inhibit",
     "custom/hmcounts",
     // TODO - this systemd unit is in the docs but not on my local install, maybe it's in a newer release.
     //"systemd-failed-units",
@@ -157,14 +158,22 @@
     },
     // "ignored-players": ["firefox"]
   },
-  "idle_inhibitor": {
-    "format": "{icon}",
-    "format-icons": {
-      //"activated": "",
-      //"deactivated": ""
-      "activated": "NOSS",
-      "deactivated": "SCS"
-    }
+  //"idle_inhibitor": {
+  //  "format": "{icon}",
+  //  "format-icons": {
+  //    //"activated": "",
+  //    //"deactivated": ""
+  //    "activated": "NOSS",
+  //    "deactivated": "SCS"
+  //  }
+  //},
+  "custom/wayland-idle-inhibit": {
+    "format": "{}",
+    "return-type": "json",
+    "exec": "status=$(wayland-idle-inhibit status); if [[ $status == 'inhibited' ]]; then echo '{\"text\":\"NOSS\",\"class\":\"inhibited\"}'; else echo '{\"text\":\"SCS\",\"class\":\"no-inhibit\"}'; fi",
+    "on-click": "wayland-idle-inhibit toggle",
+    "interval": 5,
+    "tooltip": false
   },
   "systemd-failed-units": {
 	  "hide-on-ok": false,

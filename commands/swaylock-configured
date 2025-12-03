@@ -3,4 +3,4 @@
 if pidof swaylock; then
     exit 0
 fi
-exec swaylock --ignore-empty-password --indicator-caps-lock --show-failed-attempts --show-keyboard-layout --color 012323
+exec swaylock --ignore-empty-password --indicator-caps-lock --show-failed-attempts --show-keyboard-layout --color 012323 --daemonize

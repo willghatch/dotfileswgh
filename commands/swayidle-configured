@@ -8,8 +8,8 @@ if [[ -n "$HYPRLAND_INSTANCE_SIGNATURE" ]]; then
 fi
 
 # don't actually use monitorOff for now... it seems to be causing problems
-monitorOff='true'
-monitorOn='true'
+# monitorOff='true'
+# monitorOn='true'
 
 lockTimeout=600
 lockWarn=$(( $lockTimeout - 10 ))
