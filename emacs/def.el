@@ -302,7 +302,9 @@
 
    ;; I could enable it here, but let's wait until after requiring mode-specific things.
    ;;(lsp)
-   ) )
+   )
+ (require 'org-mode-conf)
+ )
 
 (setq wgh/de-fast-run nil)
 (defun wgh/de-fast ()
@@ -325,7 +327,6 @@
      ;;(require 'flx-ido)
      ;;(flx-ido-mode 1)
 
-     (require 'org-mode-conf)
 
      (global-display-fill-column-indicator-mode 1)
 
