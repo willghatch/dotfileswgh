@@ -1,0 +1,22 @@
+#compdef tsa
+#autoload
+
+# Pass-through completion for 'tsa' which is shorthand for 'tsuez attach'
+_tsa() {
+  local curcontext="$curcontext" state line
+  typeset -A opt_args
+
+  _arguments \
+    '1:session name:->sessions' \
+    '--socket-dir[Specific socket directory to use]:socket directory:_directories'
+
+  case $state in
+    sessions)
+      local -a sessions
+      sessions=(${(f)"$(tsuez list 2>/dev/null | awk '{print $1}')"})
+      _describe 'session name' sessions
+      ;;
+  esac
+}
+
+_tsa "$@"
