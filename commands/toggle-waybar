@@ -1,0 +1,8 @@
+#!/usr/bin/env bash
+
+if pidof waybar >/dev/null 2>/dev/null ; then
+    pkill waybar
+else
+    waybar-configured >/dev/null 2>&1 &
+    disown
+fi

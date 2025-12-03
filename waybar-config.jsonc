@@ -261,6 +261,8 @@
       "phone": "",
       "portable": "",
       "car": "",
+      // This is probably brittle, but oh well
+      "alsa_output.usb-Focusrite_Scarlett_2i2_USB_Y8JRKG723DEF0B-00.HiFi__Line1__sink": "℗",
       "default": ["", "", ""]
     },
     "on-click": "pavucontrol"
