@@ -1,0 +1,3 @@
+#!/usr/bin/env bash
+# This one-liner shows what torch devices are detected, so I can debug whether it is seeing the right GPU.
+python3 -c "import torch;print(torch.cuda.get_device_properties())"
