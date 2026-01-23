@@ -56,6 +56,7 @@ export BROWSER=ffxd
 export XDG_DOWNLOAD_DIR="$HOME/dl"
 export VLAUNCHRC="$DOTFILESWGH/vlaunchrc"
 
+export COLORTERM=truecolor
 export GREP_COLOR="1;32"
 
 export TODOMAN_CONFIG=$DOTFILESWGH_PRI/todoman.conf
