@@ -583,4 +583,28 @@ This works in most graphical terminals, I think, as DECSCUSR CSI code.
 (autoload 'magit-status "magit" "magit-status" t)
 (defalias 'mgs 'magit-status)
 
+(defun whisper-record-and-transcribe ()
+  "Record audio and transcribe it using the whisper-record-and-transcribe script.
+Wait for the user to press Enter or for the script to timeout, then insert
+the transcription at point."
+  (interactive)
+  (let* ((output-buffer (generate-new-buffer " *whisper-record-and-transcribe*"))
+         (process (start-process "whisper-record-and-transcribe"
+                                output-buffer
+                                "whisper-record-and-transcribe"
+                                "--quiet")))
+    ;; Set a no-op sentinel to prevent "Process finished" messages
+    (set-process-sentinel process 'ignore)
+    (message "Recording... Press ENTER to stop.")
+    (read-event)  ; Wait for user to press a key
+    (process-send-string process "\n")  ; Send Enter to the process
+    ;; Wait for the process to finish
+    (while (process-live-p process)
+      (accept-process-output process 0.1))
+    ;; Get the output and insert it
+    (let ((output (with-current-buffer output-buffer
+                    (buffer-string))))
+      (kill-buffer output-buffer)
+      (insert output))))
+
 (provide 'vfuncs)

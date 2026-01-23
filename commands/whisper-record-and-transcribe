@@ -1,0 +1,176 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+# Parse command line arguments
+MICROPHONE=""
+QUIET=0
+TIMEOUT_SECONDS=600
+CHANNELS=2  # Default to stereo
+
+show_help() {
+    cat << EOF
+Usage: $(basename "$0") [OPTIONS]
+
+Record audio and transcribe it using whisper-cli.
+
+Options:
+    --list-microphones      List available microphones and exit
+    --microphone DEVICE     Select a specific microphone device
+    --timeout-seconds N     Stop recording after N seconds (default: 600)
+    --stereo               Record in stereo (2 channels, default)
+    --mono                 Record in mono (1 channel)
+    -q, --quiet            Only output the final transcription (no progress messages)
+    -h, --help             Show this help message
+
+Examples:
+    # List available microphones
+    $(basename "$0") --list-microphones
+
+    # Record using a specific microphone
+    $(basename "$0") --microphone hw:1,0
+
+    # Use default microphone
+    $(basename "$0")
+
+Environment Variables:
+    WHISPER_MODEL_DIR      Directory containing whisper models (default: $XDG_CACHE_DIR/whisper-models)
+    WHISPER_MODEL          Whisper model filename or path (default: ggml-base.bin)
+EOF
+}
+
+while [[ $# -gt 0 ]]; do
+    case "$1" in
+        --list-microphones)
+            echo "Available microphones:" >&2
+            echo "" >&2
+            echo "=== Hardware devices (card, device) ===" >&2
+            arecord -l
+            echo "" >&2
+            echo "=== PCM devices (use with --microphone) ===" >&2
+            arecord -L
+            exit 0
+            ;;
+        --microphone)
+            if [[ $# -lt 2 ]]; then
+                echo "Error: --microphone requires a device argument" >&2
+                exit 1
+            fi
+            MICROPHONE="$2"
+            shift 2
+            ;;
+        --timeout-seconds)
+            if [[ $# -lt 2 ]]; then
+                echo "Error: --timeout-seconds requires a numeric argument" >&2
+                exit 1
+            fi
+            TIMEOUT_SECONDS="$2"
+            shift 2
+            ;;
+        --stereo)
+            CHANNELS=2
+            shift
+            ;;
+        --mono)
+            CHANNELS=1
+            shift
+            ;;
+        -q|--quiet)
+            QUIET=1
+            shift
+            ;;
+        -h|--help)
+            show_help
+            exit 0
+            ;;
+        *)
+            echo "Error: Unknown option '$1'" >&2
+            echo "Use --help for usage information" >&2
+            exit 1
+            ;;
+    esac
+done
+
+# Create temporary directory for audio recording and transcription
+TEMP_BASE="${XDG_RUNTIME_DIR:-/tmp}"
+TEMP_DIR=$(mktemp -d --tmpdir="$TEMP_BASE" record-and-transcribe_XXXXX)
+trap "rm -rf '$TEMP_DIR'" EXIT
+
+TEMP_AUDIO="$TEMP_DIR/audio.wav"
+TEMP_OUTPUT="${TEMP_AUDIO}.txt"
+
+# Set up whisper model path with fallback logic
+WHISPER_MODEL_DIR="${WHISPER_MODEL_DIR:-${XDG_CACHE_DIR:-$HOME/.cache}/whisper-models}"
+WHISPER_MODEL="${WHISPER_MODEL:-ggml-base.bin}"
+
+# Find the model file with the following priority:
+# 1. If it's an absolute path to a file, use it
+# 2. If it's a path from WHISPER_MODEL_DIR to a file, use it
+# 3. If it's a relative path from $PWD to a file, use it
+# 4. Otherwise raise an error
+if [[ "$WHISPER_MODEL" = /* ]] && [[ -f "$WHISPER_MODEL" ]]; then
+    # Already an absolute path and exists
+    WHISPER_MODEL_PATH="$WHISPER_MODEL"
+elif [[ -f "$WHISPER_MODEL_DIR/$WHISPER_MODEL" ]]; then
+    # Found in model directory
+    WHISPER_MODEL_PATH="$WHISPER_MODEL_DIR/$WHISPER_MODEL"
+elif [[ -f "$WHISPER_MODEL" ]]; then
+    # Found as relative path from current directory
+    WHISPER_MODEL_PATH="$WHISPER_MODEL"
+else
+    echo "Error: Could not find whisper model '$WHISPER_MODEL'" >&2
+    echo "Searched in:" >&2
+    echo "  - Absolute path: $WHISPER_MODEL" >&2
+    echo "  - Model directory: $WHISPER_MODEL_DIR/$WHISPER_MODEL" >&2
+    echo "  - Current directory: $(pwd)/$WHISPER_MODEL" >&2
+    exit 1
+fi
+
+# Check if whisper-cli is available
+if ! command -v whisper-cli &> /dev/null; then
+    echo "Error: whisper-cli not found in PATH" >&2
+    echo "Please install whisper.cpp and ensure whisper-cli is in your PATH" >&2
+    exit 1
+fi
+
+if [[ "$QUIET" -eq 0 ]]; then
+    echo "Recording audio... Press ENTER to stop recording (or wait ${TIMEOUT_SECONDS}s for timeout)." >&2
+    if [[ -n "$MICROPHONE" ]]; then
+        echo "Using microphone: $MICROPHONE" >&2
+    fi
+    echo "Audio will be saved temporarily to: $TEMP_AUDIO" >&2
+fi
+
+# Start arecord in the background
+# -f S16_LE: 16-bit signed little-endian (CD quality)
+# -r 16000: 16kHz sample rate (optimal for Whisper)
+# -c N: number of channels (1=mono, 2=stereo)
+# -t wav: WAV format
+# -D device: select specific microphone (if specified)
+ARECORD_ARGS=(-f S16_LE -r 16000 -c "$CHANNELS" -t wav)
+if [[ -n "$MICROPHONE" ]]; then
+    ARECORD_ARGS+=(-D "$MICROPHONE")
+fi
+arecord "${ARECORD_ARGS[@]}" "$TEMP_AUDIO" >/dev/null 2>&1 &
+ARECORD_PID=$!
+
+# Wait for user to press Enter or timeout
+read -r -t "$TIMEOUT_SECONDS" || true
+
+# Stop recording by killing arecord
+kill "$ARECORD_PID" 2>/dev/null || true
+wait "$ARECORD_PID" 2>/dev/null || true
+
+if [[ "$QUIET" -eq 0 ]]; then
+    echo "" >&2
+    echo "Recording stopped. Transcribing..." >&2
+    echo "" >&2
+fi
+
+# Transcribe with whisper-cli and save as JSON
+# Redirect stderr to suppress verbose output
+whisper-cli -m "$WHISPER_MODEL_PATH" -f "$TEMP_AUDIO" --output-txt >/dev/null 2>&1
+
+# Print the JSON output
+cat "${TEMP_OUTPUT}"
+
+rm -rf "$TEMP_DIR"
