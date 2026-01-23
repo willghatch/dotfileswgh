@@ -12,13 +12,116 @@
 # This will always run me with zsh, and needs sudo access, not just su.  For
 # when I don't have sudo, there is a similar be-su wrapper script.
 
-if [[ "$1" = "--keep" ]]; then
-    keep=true
-    shift
-fi
+show_help() {
+    cat <<EOF
+Usage: be [OPTIONS] <user> [command...]
+       runas [OPTIONS] <user> <command> [args...]
+
+Switch to another user with dotfileswgh environment.
+
+When called as 'be', starts an interactive zsh shell.
+When called as 'runas', executes the specified command.
+
+OPTIONS:
+    --keep                 Keep all environment variables (use -E with sudo)
+    --preserve VAR         Preserve specific environment variable VAR
+    --env VAR=val          Set environment variable VAR to val
+    --help                 Show this help message
+    --                     End option parsing
+
+EXAMPLES:
+    # Switch to root with preserved PATH
+    be --preserve PATH root
+
+    # Run command as user with multiple preserved variables
+    be --preserve PATH --preserve LD_LIBRARY_PATH user python script.py
+
+    # Set custom environment variables
+    be --env MYVAR=value --preserve PATH root ./benchmark.sh
+
+    # Keep entire dotfileswgh environment
+    be --keep root
+
+NOTE:
+    Variables set with --preserve and --env are applied using 'env' after
+    sudo switches users, which allows overriding sudoers' secure_path.
+EOF
+}
+
+keep=false
+preserve_vars=()
+env_vars=()
+
+# Parse command-line arguments
+while [[ $# -gt 0 ]]; do
+    case "$1" in
+        --help)
+            show_help
+            exit 0
+            ;;
+        --keep)
+            keep=true
+            shift
+            ;;
+        --preserve)
+            if [[ -z "$2" ]]; then
+                echo "Error: --preserve requires an argument" >&2
+                exit 1
+            fi
+            preserve_vars+=("$2")
+            shift 2
+            ;;
+        --env)
+            if [[ -z "$2" ]]; then
+                echo "Error: --env requires an argument" >&2
+                exit 1
+            fi
+            env_vars+=("$2")
+            shift 2
+            ;;
+        --)
+            shift
+            break
+            ;;
+        -*)
+            echo "Error: Unknown option: $1" >&2
+            echo "" >&2
+            show_help >&2
+            exit 1
+            ;;
+        *)
+            # First non-option argument is the user
+            break
+            ;;
+    esac
+done
 
 user="$1"
+if [[ -z "$user" ]]; then
+    echo "Error: No user specified" >&2
+    echo "" >&2
+    show_help >&2
+    exit 1
+fi
 shift
+
+# Build env command with preserved and set variables
+env_cmd=()
+if [[ ${#preserve_vars[@]} -gt 0 ]] || [[ ${#env_vars[@]} -gt 0 ]]; then
+    env_cmd=(env)
+
+    # Add preserved variables
+    for var in "${preserve_vars[@]}"; do
+        if [[ -n "${!var}" ]]; then
+            env_cmd+=("${var}=${!var}")
+        fi
+    done
+
+    # Add explicitly set variables
+    for var_assignment in "${env_vars[@]}"; do
+        env_cmd+=("$var_assignment")
+    done
+fi
 
 HOME=$( getent passwd "$user" | cut -d: -f6 )
 USER="$user"
@@ -29,19 +132,37 @@ unset XDG_RUNTIME_DIR
 unset MAIL
 
 if [[ "${0:$((${#0} - 2)):2}" = "be" ]]; then
+    # Running as 'be' - start an interactive shell
     if [[ "$keep" = true ]]; then
         # keep zdotdir by going through bash... somehow that works.
-        exec sudo -E -u $user bash --rcfile $DOTFILESWGH/bashrc -i -c zsh
+        if [[ ${#env_cmd[@]} -gt 0 ]]; then
+            exec sudo -E -u $user "${env_cmd[@]}" bash --rcfile $DOTFILESWGH/bashrc -i -c zsh
+        else
+            exec sudo -E -u $user bash --rcfile $DOTFILESWGH/bashrc -i -c zsh
+        fi
     else
         DOTFILESWGH="$(detect-dotfileswgh)"
-        exec sudo --preserve-env=DOTFILESWGH -u $user bash --rcfile $DOTFILESWGH/bashrc -i -c zsh
+        if [[ ${#env_cmd[@]} -gt 0 ]]; then
+            exec sudo --preserve-env=DOTFILESWGH -u $user "${env_cmd[@]}" bash --rcfile $DOTFILESWGH/bashrc -i -c zsh
+        else
+            exec sudo --preserve-env=DOTFILESWGH -u $user bash --rcfile $DOTFILESWGH/bashrc -i -c zsh
+        fi
     fi
 else
+    # Running as 'runas' - execute command
     if [[ "$keep" = true ]]; then
-        exec sudo -E -u $user "$@"
+        if [[ ${#env_cmd[@]} -gt 0 ]]; then
+            exec sudo -E -u $user "${env_cmd[@]}" "$@"
+        else
+            exec sudo -E -u $user "$@"
+        fi
     else
         DOTFILESWGH="$(detect-dotfileswgh)"
-        exec sudo --preserve-env=DOTFILESWGH -u $user "$@"
+        if [[ ${#env_cmd[@]} -gt 0 ]]; then
+            exec sudo --preserve-env=DOTFILESWGH -u $user "${env_cmd[@]}" "$@"
+        else
+            exec sudo --preserve-env=DOTFILESWGH -u $user "$@"
+        fi
     fi
 fi
 
