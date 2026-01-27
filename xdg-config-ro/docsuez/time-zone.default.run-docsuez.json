@@ -1,0 +1,3 @@
+{
+  "tags": {"TZ": {"docker-args": ["-e", "TZ=America/Boise"]}}
+}

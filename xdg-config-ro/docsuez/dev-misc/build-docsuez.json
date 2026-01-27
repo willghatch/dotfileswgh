@@ -25,7 +25,7 @@
             "RUN apt-get install -y gcc avr-libc avrdude dfu-programmer dfu-util gcc-arm-none-eabi # For QMK"
         },
         {"bash-print-text": "echo 'RUN useradd -u' $UID 'wgh \n RUN chsh -s /bin/zsh wgh'"},
-        {"search": "dockerfile-components/dfcomp-timezone-setup"}
+        {"text": ""}
     ],
     "build-context-directory": "."
 }

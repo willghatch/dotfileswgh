@@ -745,7 +745,7 @@ class Docsuez:
     def _generate_docker_run_script(self, script_file, config: DocsuezConfig, image_name: str,
                                      tsuez_mode: bool = False, tsuez_config: Optional[Dict[str, Any]] = None,
                                      session_name: Optional[str] = None, socket_dir: Optional[str] = None,
-                                     command: Optional[List[str]] = None):
+                                     command: Optional[List[str]] = None, extra_docker_args: Optional[List[str]] = None):
         """Generate docker run script content
 
         Args:
@@ -757,6 +757,7 @@ class Docsuez:
             session_name: Session name (required if tsuez_mode=True)
             socket_dir: Socket directory (required if tsuez_mode=True)
             command: Command to run (required if tsuez_mode=False)
+            extra_docker_args: Extra arguments to pass to docker run (from -- separator)
         """
         f = script_file
         script_parts = config.get_docker_run_script()
@@ -855,6 +856,15 @@ class Docsuez:
         # Add DOCKER_RUN_EXTRAS
         f.write('  "${DOCKER_RUN_EXTRAS[@]}"\n')
 
+        # Add extra docker args from command line (-- separator)
+        if extra_docker_args:
+            for arg in extra_docker_args:
+                # Quote arguments that contain spaces
+                if ' ' in arg:
+                    f.write(f"  '{arg}'\n")
+                else:
+                    f.write(f"  {arg}\n")
+
         # Add tsuez environment variables
         if tsuez_mode:
             # Set environment variables from tsuez config
@@ -933,7 +943,7 @@ class Docsuez:
         )
         return json_mod.loads(result.stdout)
 
-    def _run_with_tsuez(self, args, config: DocsuezConfig, image_name: str, config_name: str):
+    def _run_with_tsuez(self, args, config: DocsuezConfig, image_name: str, config_name: str, extra_docker_args: Optional[List[str]] = None):
         """Run docker container with tsuez integration"""
         import tempfile
         import json as json_mod
@@ -969,7 +979,8 @@ class Docsuez:
                     tsuez_mode=True,
                     tsuez_config=tsuez_config,
                     session_name=session_name,
-                    socket_dir=socket_dir
+                    socket_dir=socket_dir,
+                    extra_docker_args=extra_docker_args
                 )
 
             os.chmod(script_path, 0o755)
@@ -1053,11 +1064,14 @@ class Docsuez:
                 build_args_obj = argparse.Namespace(image_spec=image_builder)
                 self.cmd_build(build_args_obj)
 
+        # Get extra docker args from command line
+        extra_docker_args = getattr(args, 'extra_docker_args', None)
+
         # Check if we should use tsuez integration or custom command
         command = config.get_command()
         if not command:
             # Use tsuez integration
-            self._run_with_tsuez(args, config, image_name, args.config)
+            self._run_with_tsuez(args, config, image_name, args.config, extra_docker_args)
             return
 
         # Custom command path - use script wrapper for DOCKER_RUN_EXTRAS support
@@ -1069,7 +1083,8 @@ class Docsuez:
                 self._generate_docker_run_script(
                     f, config, image_name,
                     tsuez_mode=False,
-                    command=command
+                    command=command,
+                    extra_docker_args=extra_docker_args
                 )
 
             os.chmod(script_path, 0o755)
@@ -1106,7 +1121,9 @@ class Docsuez:
                                   help="Show the assembled Dockerfile without building")
 
         # run command
-        run_parser = subparsers.add_parser("run", help="Run a docker container")
+        run_parser = subparsers.add_parser("run",
+            help="Run a docker container",
+            epilog="Use -- to pass additional arguments to docker run, e.g.: docsuez run my-env -- -v /host/path:/container/path")
         run_parser.add_argument("config", help="Config name or path")
         run_parser.add_argument("--build", "-b", default="detect",
                                 choices=["detect", "yes", "force", "true", "no", "false"],
@@ -1120,7 +1137,22 @@ class Docsuez:
         run_parser.add_argument("--dry-show", action="store_true",
                                 help="Show the run script without executing it")
 
-        args = parser.parse_args()
+        # Handle -- separator for passing extra args to docker run
+        extra_docker_args = None
+        argv = sys.argv[1:]  # Skip program name
+        if '--' in argv:
+            separator_idx = argv.index('--')
+            extra_docker_args = argv[separator_idx + 1:]
+            argv = argv[:separator_idx]
+            args = parser.parse_args(argv)
+        else:
+            args = parser.parse_args()
+
+        # Store extra docker args in args object for cmd_run to use
+        if extra_docker_args is not None:
+            args.extra_docker_args = extra_docker_args
+        else:
+            args.extra_docker_args = None
 
         if not args.command:
             parser.print_help()

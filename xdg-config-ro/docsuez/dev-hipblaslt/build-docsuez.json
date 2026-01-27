@@ -65,7 +65,7 @@
       "RUN usermod -aG sudo wgh",
       "RUN echo '%sudo ALL=(ALL) NOPASSWD:ALL' >> /etc/sudoers"
     ]},
-    {"search": "dockerfile-components/dfcomp-timezone-setup"}
+    {"text": ""}
   ],
   "build-context-directory": "."
 }

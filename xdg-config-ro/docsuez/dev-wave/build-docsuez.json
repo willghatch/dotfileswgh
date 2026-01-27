@@ -23,7 +23,7 @@
         {"search": "dockerfile-components/dfcomp-uv-install"},
         {"search": "dockerfile-components/dfcomp-nodejs-install"},
         {"bash-print-text": "echo 'RUN useradd -u' $UID 'wgh \n RUN chsh -s /bin/zsh wgh'"},
-        {"search": "dockerfile-components/dfcomp-timezone-setup"}
+        {"text": ""}
     ],
     "build-context-directory": "."
 }
