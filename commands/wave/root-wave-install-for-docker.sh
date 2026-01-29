@@ -22,7 +22,7 @@ PATH="/root/.cargo/bin:/opt/venv/bin:/opt/rocm/bin:/bin:usr/bin"
 source /opt/venv/bin/activate
 pip install --upgrade pip
 pip install -r requirements-iree-pinned.txt
-pip install -r requirements.txt
+#pip install -r requirements.txt
 
 # the rust part of the install can fail if there are already old build things in here
 rm -rf wave_lang/kernel/wave/scheduling/aplp/target/
