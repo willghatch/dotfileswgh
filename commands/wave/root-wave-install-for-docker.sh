@@ -22,11 +22,12 @@ PATH="/root/.cargo/bin:/opt/venv/bin:/opt/rocm/bin:/bin:usr/bin"
 source /opt/venv/bin/activate
 pip install --upgrade pip
 pip install -r requirements-iree-pinned.txt
+# explicitly not installing the pytorch requirements, assuming they are in the root virtualenv that we are mutating here, and thus the root install script.
 #pip install -r requirements.txt
 
 # the rust part of the install can fail if there are already old build things in here
 rm -rf wave_lang/kernel/wave/scheduling/aplp/target/
-pip install -e .
+pip install -e ".[dev]"
 # try to avoid root ownership of files...
 chown --recursive $OUTER_UID:$OUTER_GID wave_lang/kernel/wave/scheduling/aplp/target
 
