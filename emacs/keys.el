@@ -332,6 +332,7 @@ The command also executes the sentence, with region as the object, if the region
 (emmap " yfg" (cp/ae (cp/verb 'copy-file-name-git-relative)))
 (emmap " yfb" (cp/ae (cp/verb 'copy-file-name-basename)))
 (emmap " yfz" (cp/ae (cp/verb 'copy-git-fzf-file-name)))
+(emmap " yfa" (cp/ae (cp/verb 'copy-agent-working-directory-fzf-name)))
 (emmap " yT" (cp/ae (cp/verb 'paste-to-terminal-osc)))
 (enmap "p" (cp/ae (cp/verb 'paste-to-region-from-move)
                   (cp/obj 'region)))
@@ -773,6 +774,7 @@ The command also executes the sentence, with region as the object, if the region
 (emmap "tfg" (lambda () (interactive) (require 'helm-projectile) (helm-projectile)))
 (autoload 'fzf-git-files "fzf" "" t)
 (emmap "tfz" 'fzf-git-files)
+(emmap "tfa" 'wgh/agent-working-dir-fzf-open)
 
 (emmap "th" 'my-window-map/body)
 (autoload 'projectile-command-map "projectile-conf" "" t 'keymap)
@@ -1134,6 +1136,7 @@ The command also executes the sentence, with region as the object, if the region
            (copy-file-name-git-relative (register . ,(lambda () cpo-copy-default-register))  (default-object . dummy-object))
            (copy-file-name-basename     (register . ,(lambda () cpo-copy-default-register))  (default-object . dummy-object))
            (copy-git-fzf-file-name      (register . ,(lambda () cpo-copy-default-register))  (default-object . dummy-object))
+           (copy-agent-working-directory-fzf-name     (register . ,(lambda () cpo-copy-default-register))  (default-object . dummy-object))
            (paste-to-terminal-osc       (register . ,(lambda () cpo-paste-default-register)) (default-object . dummy-object))
            )
          (cdr (assq 'verbs composiphrase-current-configuration))))
@@ -1189,6 +1192,19 @@ The command also executes the sentence, with region as the object, if the region
                                         path)
                     (user-error "Not inside a Git repository"))))
              (register)))
+           (copy-agent-working-directory-fzf-name
+            ,(lambda (x) t) ()
+            (,(lambda (register)
+                (require 'fzf)
+                (let ((base (wgh/agent-working-dir-base))
+                      (fzf--target-validator #'fzf--pass-through))
+                  (if (file-directory-p base)
+                      (fzf-with-command "find . | sort -r"
+                                        (lambda (x) (wgh/cpo-copy-string (expand-file-name x base) register))
+                                        base)
+                    (user-error "No agent working directories at: %s" base))))
+             (register)))
+
            (paste-to-terminal-osc
             ,(lambda (x) t) ()
             (,(lambda (register)

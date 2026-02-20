@@ -630,4 +630,71 @@ Also syncs to kill ring if REGISTER matches cpo-copy-sync-with-kill-ring-registe
          (git-root (string-trim (shell-command-to-string "git rev-parse --show-toplevel"))))
     (file-relative-name path git-root)))
 
+;;; Agent working directory helpers
+
+(defun wgh/agent-working-dir-base ()
+  "Return the base path for agent-working-directories.
+Uses GIT_COMMON_DIR/agent-files/work/ if in a git repo, or agent-files/work/
+relative to `default-directory' otherwise.
+When git-common-dir falls inside .git/modules/... or .git/worktrees/...,
+walks back up to the top-level .git directory."
+  (let* ((git-common-dir (string-trim
+                          (shell-command-to-string
+                           "git rev-parse --git-common-dir 2>/dev/null")))
+         (git-dir
+          (when (and (not (string-empty-p git-common-dir))
+                     (not (string-prefix-p "fatal:" git-common-dir)))
+            (let ((abs-dir (expand-file-name git-common-dir)))
+              ;; If inside .git/modules/... or .git/worktrees/..., strip back
+              ;; to the .git directory itself.
+              (if (string-match "\\(.*\\.git\\)/\\(?:modules\\|worktrees\\)" abs-dir)
+                  (match-string 1 abs-dir)
+                abs-dir)))))
+    (if git-dir
+        (concat git-dir "/agent-files/work/")
+      (concat (expand-file-name default-directory) "agent-files/work/"))))
+
+(defun wgh/agent-working-dir-fzf-open ()
+  "Open a file in the agent-working-directories base path using fzf."
+  (interactive)
+  (require 'fzf)
+  (let ((base (wgh/agent-working-dir-base)))
+    (unless (file-directory-p base)
+      (user-error "No agent working directories at: %s" base))
+    (fzf-with-command "find . -type f | sort -r"
+                      (lambda (x) (find-file (expand-file-name x base)))
+                      base)))
+
+(defun wgh/agent-make-working-dir (topic)
+  "Create and return a fresh agent-working-directory path for TOPIC."
+  (let* ((base (wgh/agent-working-dir-base))
+         (timestamp (format-time-string "%Y-%m-%dT%H-%M"))
+         (agentid (string-trim
+                   (shell-command-to-string
+                    "head -c 10 /dev/random | md5sum | head -c 6")))
+         (dir (concat base timestamp "_" topic "_" agentid "/")))
+    (make-directory dir t)
+    dir))
+
+(defun wgh/agent-prompt-org (topic)
+  "Prompt for TOPIC, create an agent-working-directory, and open prompt.org."
+  (interactive "sTopic (hyphenated words): ")
+  (let* ((dir (wgh/agent-make-working-dir topic))
+         (file (concat dir "prompt.org")))
+    (find-file file)))
+
+(defun wgh/agent-prompt-from-region (beg end topic)
+  "Create an agent-working-directory, write region to prompt.txt, and copy a message.
+The copied message contains the directory path and prompt file path."
+  (interactive "r\nsTopic (hyphenated words): ")
+  (let* ((text (buffer-substring-no-properties beg end))
+         (dir (wgh/agent-make-working-dir topic))
+         (prompt-file (concat dir "prompt.txt")))
+    (with-temp-file prompt-file
+      (insert text))
+    (let ((msg (format "Your agent-working-directory path is %s.  Read %s for instructions."
+                       dir prompt-file)))
+      (wgh/terminal-copy-osc-string msg)
+      (message "Copied: %s" msg))))
+
 (provide 'vfuncs)
