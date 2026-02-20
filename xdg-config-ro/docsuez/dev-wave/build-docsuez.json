@@ -3,7 +3,8 @@
         {
             "text": [
                 "# Note: ubuntu:24.04 didn't work for wave builds (cmake error), but this ROCm image does",
-                "FROM rocm/pytorch:rocm6.4.1_ubuntu24.04_py3.12_pytorch_release_2.5.1",
+                "#FROM rocm/pytorch:rocm6.4.1_ubuntu24.04_py3.12_pytorch_release_2.5.1",
+                "FROM rocm/pytorch:latest",
                 "# This docker image sets CI=1 which breaks interactive things",
                 "ENV CI=0",
                 "",
@@ -15,6 +16,7 @@
                 "# Language tools specific to dev-wave",
                 "RUN DEBIAN_FRONTEND=noninteractive apt install -y rustup",
                 "RUN apt-get install -y dwarfdump",
+                "RUN apt-get install -y cmake ninja-build clang",
                 ""
             ]
         },

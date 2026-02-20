@@ -29,6 +29,7 @@
       },
       "pre-tmux-script": [
         "source $DOTFILESWGH/env-more-with-mixins.sh",
+        "PATH=$DOTFILESWGH/commands/wave/:$PATH",
         "cd mk",
         "source venv/bin/activate",
         "cd wave"
