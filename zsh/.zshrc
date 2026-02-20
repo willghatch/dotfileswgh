@@ -592,6 +592,7 @@ fi
 #alias mv="echo training wheels: use muv wrapper"
 #alias rm="echo training wheels: use rb wrapper"
 
+zstyle ':zaw:git-files' default zaw-callback-append-to-buffer
 
 sourceFromDotfileswghAlts env.sh
 sourceFromDotfileswghAlts zshrc
