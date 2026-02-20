@@ -328,6 +328,11 @@ The command also executes the sentence, with region as the object, if the region
 (emmap " yc" 'xcopy)
 (emmap " yt" 'wgh/tmux-copy)
 (emmap " yo" 'wgh/terminal-copy-osc)
+(emmap " yff" (cp/ae (cp/verb 'copy-file-name-full-path)))
+(emmap " yfg" (cp/ae (cp/verb 'copy-file-name-git-relative)))
+(emmap " yfb" (cp/ae (cp/verb 'copy-file-name-basename)))
+(emmap " yfz" (cp/ae (cp/verb 'copy-git-fzf-file-name)))
+(emmap " yT" (cp/ae (cp/verb 'paste-to-terminal-osc)))
 (enmap "p" (cp/ae (cp/verb 'paste-to-region-from-move)
                   (cp/obj 'region)))
 (enmap " pc" 'xpaste)
@@ -1125,11 +1130,17 @@ The command also executes the sentence, with region as the object, if the region
 (let* ((verbs
         (append
          `(
+           (copy-file-name-full-path    (register . ,(lambda () cpo-copy-default-register))  (default-object . dummy-object))
+           (copy-file-name-git-relative (register . ,(lambda () cpo-copy-default-register))  (default-object . dummy-object))
+           (copy-file-name-basename     (register . ,(lambda () cpo-copy-default-register))  (default-object . dummy-object))
+           (copy-git-fzf-file-name      (register . ,(lambda () cpo-copy-default-register))  (default-object . dummy-object))
+           (paste-to-terminal-osc       (register . ,(lambda () cpo-paste-default-register)) (default-object . dummy-object))
            )
          (cdr (assq 'verbs composiphrase-current-configuration))))
        (objects
         (append
          `(
+           (dummy-object) ;; dummy object for verbs that operate without a buffer text object
            (tempel-snippet-hole (default-verb . move) (location-within . beginning))
            (yasnippet-snippet-hole (default-verb . move) (location-within . beginning))
            ;; TODO - yafold doesn't have motions to go to folded regions.  Anyway, I never use folding, why am I bothering with this?
@@ -1152,6 +1163,44 @@ The command also executes the sentence, with region as the object, if the region
            (action yafold ((alternate alternate)) (yafolding-show-all ()))
 
            ;; TODO - add yasnippet matchers
+
+           ;; These are kind of dummy verbs.  I want them to take registers, but for the moment I just want to bind keys for these.  Maybe later I'll think more and work them in as proper objects and such.  But for now, expedience to get something that I want working.
+           (copy-file-name-full-path
+            ,(lambda (x) t) ()
+            (,(lambda (register) (wgh/cpo-copy-string (wgh/file-name-full-path) register))
+             (register)))
+           (copy-file-name-git-relative
+            ,(lambda (x) t) ()
+            (,(lambda (register) (wgh/cpo-copy-string (wgh/file-name-git-relative) register))
+             (register)))
+           (copy-file-name-basename
+            ,(lambda (x) t) ()
+            (,(lambda (register) (wgh/cpo-copy-string (wgh/file-name-basename) register))
+             (register)))
+           (copy-git-fzf-file-name
+            ,(lambda (x) t) ()
+            (,(lambda (register)
+                (require 'fzf)
+                (let ((fzf--target-validator #'fzf--pass-through)
+                      (path (locate-dominating-file (file-truename default-directory) ".git")))
+                  (if path
+                      (fzf-with-command "git ls-files"
+                                        (lambda (x) (wgh/cpo-copy-string (file-relative-name x path) register))
+                                        path)
+                    (user-error "Not inside a Git repository"))))
+             (register)))
+           (paste-to-terminal-osc
+            ,(lambda (x) t) ()
+            (,(lambda (register)
+                (require 'xclip-conf)
+                (let* ((reg (if (functionp register) (funcall register) register))
+                       (str (get-register reg)))
+                  (if (stringp str)
+                      (wgh/terminal-copy-osc-string str)
+                    (user-error "Register %c does not contain a string" reg))))
+             (register)))
+
+
            )
          (cdr (assq 'match-table composiphrase-current-configuration)))))
   (setq composiphrase-current-configuration

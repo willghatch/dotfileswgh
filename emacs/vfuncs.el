@@ -607,4 +607,27 @@ the transcription at point."
       (kill-buffer output-buffer)
       (insert output))))
 
+(defun wgh/cpo-copy-string (str register)
+  "Store STR to REGISTER following cpo-copy conventions.
+Also syncs to kill ring if REGISTER matches cpo-copy-sync-with-kill-ring-register."
+  (let ((reg (if (functionp register) (funcall register) register)))
+    (set-register reg str)
+    (when (equal reg cpo-copy-sync-with-kill-ring-register)
+      (kill-new str))
+    (message "Copied: %s" str)))
+
+(defun wgh/file-name-full-path ()
+  "Return the full absolute path of the current buffer's file, or signal an error."
+  (or (buffer-file-name) (user-error "Buffer has no file")))
+
+(defun wgh/file-name-basename ()
+  "Return the basename of the current buffer's file, or signal an error."
+  (file-name-nondirectory (wgh/file-name-full-path)))
+
+(defun wgh/file-name-git-relative ()
+  "Return the path of the current buffer's file relative to its git root, or signal an error."
+  (let* ((path (wgh/file-name-full-path))
+         (git-root (string-trim (shell-command-to-string "git rev-parse --show-toplevel"))))
+    (file-relative-name path git-root)))
+
 (provide 'vfuncs)
