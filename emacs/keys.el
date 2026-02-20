@@ -432,6 +432,7 @@ The command also executes the sentence, with region as the object, if the region
 (autoload 'helm-multi-swoop "helm-swoop" "" t)
 (emmap " /"
        (myhydradef search-hydra
+                   ("C-g" nil "quit")
                    ("s" helm-swoop "swoop")
                    ("a" helm-multi-swoop-all "multi-swoop all")
                    ("m" helm-multi-swoop "multi-swoop")
@@ -778,6 +779,7 @@ The command also executes the sentence, with region as the object, if the region
 ;; "ts" will stand for "toggle setting"
 (emmap "ts"
        (defhydra settings-toggle (:foreign-keys warn :exit t) "Toggle:"
+         ("C-g" nil "quit")
          ("p" (lambda () (interactive) (require 'smartparens) (smartparens-mode)) "smartparens")
          ("b" (lambda () (interactive) (require 'blamer (blamer-mode))) "git blame")
          ("B" (lambda () (interactive) (if (equal browse-url-browser-function 'browse-url-firefox)
@@ -809,6 +811,7 @@ The command also executes the sentence, with region as the object, if the region
 
 (emmap "tl"
        (defhydra list-stuff-map (:foreign-keys warn :exit t) "List:"
+         ("C-g" nil "quit")
          ("b" list-buffers "buffers")
          ("m" (with-evil 'evil-show-marks) "marks")
          ("M" bookmark-bmenu-list "bookmarks")
@@ -927,6 +930,7 @@ The command also executes the sentence, with region as the object, if the region
 
 
 (defhydra my-window-map (:foreign-keys warn) "WM:"
+  ("C-g" nil "quit")
   ("v" split-window-horizontally nil)
   ("s" split-window-vertically nil)
   ("j" (lambda (&optional n) (interactive "p") (other-window n)) nil)
