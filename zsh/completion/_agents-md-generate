@@ -1,0 +1,48 @@
+#compdef agents-md-generate
+
+# Zsh completion for agents-md-generate
+#
+# Installation: place this file somewhere in your $fpath, e.g.:
+#   cp _agents-md-generate ~/.config/zsh/completions/
+# and ensure that directory is in $fpath before compinit is called.
+
+_agents_md_generate() {
+    local context state state_descr line
+    typeset -A opt_args
+
+    _arguments -C -s \
+        '(- :)--help[Show help and exit]' \
+        '(- :)--list-default[List default segment names]' \
+        '(- :)--list-non-default[List non-default segment names]' \
+        '(- :)--list-all[List all segment names with type]' \
+        '(- :)--show-paths[Show search paths and exit]' \
+        '--no-preamble[Suppress the command preamble on stderr]' \
+        '*--add=[Add a non-default segment]:non-default segment:->non_default_segments' \
+        '*-a=[Add a non-default segment]:non-default segment:->non_default_segments' \
+        '*--omit=[Omit a default segment]:default segment:->default_segments' \
+        '*-o=[Omit a default segment]:default segment:->default_segments' \
+        && return 0
+
+    case $state in
+        default_segments)
+            local segments
+            segments=("${(@f)$(agents-md-generate --list-default 2>/dev/null)}")
+            if (( ${#segments} )); then
+                _describe 'default segment' segments
+            else
+                _message 'no default segments found'
+            fi
+            ;;
+        non_default_segments)
+            local segments
+            segments=("${(@f)$(agents-md-generate --list-non-default 2>/dev/null)}")
+            if (( ${#segments} )); then
+                _describe 'non-default segment' segments
+            else
+                _message 'no non-default segments found'
+            fi
+            ;;
+    esac
+}
+
+_agents_md_generate "$@"

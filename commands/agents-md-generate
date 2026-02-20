@@ -1,0 +1,236 @@
+#!/usr/bin/env python3
+"""
+agents-md-generate - Generate AGENTS.md by concatenating segments
+
+Segments are .md files found in (per location, dev-type paths precede base path):
+  1. <git-root>/.git/agent-files/agents-md-generate/<dev-type>/{default,non-default}/
+  2. <git-root>/.git/agent-files/agents-md-generate/{default,non-default}/
+  3. XDG_CONFIG_HOME/agents-md-generate/<dev-type>/{default,non-default}/
+  4. XDG_CONFIG_HOME/agents-md-generate/{default,non-default}/
+  5. Each XDG_CONFIG_DIRS entry (same pattern)
+
+Dev types come from --dev-type flags (repeatable, higher priority) and the
+DEV_TYPE environment variable.  Multiple dev types are searched in the order
+given, so the first --dev-type has the highest priority.
+
+Earlier search paths take priority (first found wins for a given segment name).
+"""
+
+import argparse
+import os
+import sys
+from pathlib import Path
+
+
+def find_git_root():
+    """Find the root of the current git repository, or None."""
+    cwd = Path.cwd()
+    for candidate in [cwd] + list(cwd.parents):
+        if (candidate / ".git").exists():
+            return candidate
+    return None
+
+
+def get_base_search_paths(dev_types=()):
+    """Return ordered list of base paths that each contain default/ and non-default/ subdirs.
+
+    Priority: git root > XDG_CONFIG_HOME > XDG_CONFIG_DIRS.
+    Within each location, dev-type-specific paths precede the base path.
+    """
+    paths = []
+
+    def add_location(base):
+        for dt in dev_types:
+            paths.append(base / dt)
+        paths.append(base)
+
+    # Git repo path (most specific to current project)
+    git_root = find_git_root()
+    if git_root:
+        add_location(git_root / ".git" / "agent-files" / "agents-md-generate")
+
+    home = Path.home()
+
+    # XDG_CONFIG_HOME (user-personal)
+    xdg_config_home = os.environ.get("XDG_CONFIG_HOME", str(home / ".config"))
+    add_location(Path(xdg_config_home) / "agents-md-generate")
+
+    # XDG_CONFIG_DIRS (system/shared)
+    xdg_config_dirs = os.environ.get("XDG_CONFIG_DIRS", "/etc/xdg")
+    for config_dir in xdg_config_dirs.split(":"):
+        if config_dir:
+            add_location(Path(config_dir) / "agents-md-generate")
+
+    # De-duplicate while preserving order
+    seen = set()
+    deduped = []
+    for path in paths:
+        resolved = path.resolve()
+        if resolved not in seen:
+            seen.add(resolved)
+            deduped.append(path)
+
+    return deduped
+
+
+def find_segments(base_paths, subdir):
+    """Find all segments in the given subdirectory across all base paths.
+
+    Returns an ordered dict of name -> Path, with earlier paths taking priority.
+    Segments within a single directory are sorted alphabetically by name.
+    """
+    segments = {}
+    for base_path in base_paths:
+        segment_dir = base_path / subdir
+        if not segment_dir.is_dir():
+            continue
+        for segment_file in sorted(segment_dir.glob("*.md")):
+            name = segment_file.stem
+            if name not in segments:  # earlier paths take priority
+                segments[name] = segment_file
+    return segments
+
+
+def main():
+    parser = argparse.ArgumentParser(
+        description="Generate AGENTS.md by concatenating segment files.",
+        formatter_class=argparse.RawDescriptionHelpFormatter,
+        epilog=__doc__,
+    )
+    parser.add_argument(
+        "--add", "-a",
+        action="append",
+        metavar="SEGMENT",
+        default=[],
+        dest="add",
+        help="Add a non-default segment by name (can be repeated)",
+    )
+    parser.add_argument(
+        "--omit", "-o",
+        action="append",
+        metavar="SEGMENT",
+        default=[],
+        dest="omit",
+        help="Omit a default segment by name (can be repeated)",
+    )
+    parser.add_argument(
+        "--list-default",
+        action="store_true",
+        help="List available default segment names (for shell completion)",
+    )
+    parser.add_argument(
+        "--list-non-default",
+        action="store_true",
+        help="List available non-default segment names (for shell completion)",
+    )
+    parser.add_argument(
+        "--list-all",
+        action="store_true",
+        help="List all segment names with type annotation (for shell completion)",
+    )
+    parser.add_argument(
+        "--no-preamble",
+        action="store_true",
+        help="Suppress the command preamble written to stderr",
+    )
+    parser.add_argument(
+        "--dev-type", "-d",
+        action="append",
+        metavar="TYPE",
+        default=[],
+        dest="dev_types",
+        help="Add a dev-type search layer (can be repeated; overrides $DEV_TYPE)",
+    )
+    parser.add_argument(
+        "--show-paths",
+        action="store_true",
+        help="Show the search paths being used and exit",
+    )
+
+    args = parser.parse_args()
+
+    # Combine --dev-type flags with $DEV_TYPE env var (flags take priority, deduped)
+    dev_types = list(args.dev_types)
+    env_dev_type = os.environ.get("DEV_TYPE", "").strip()
+    if env_dev_type and env_dev_type not in dev_types:
+        dev_types.append(env_dev_type)
+
+    base_paths = get_base_search_paths(dev_types)
+
+    if args.show_paths:
+        for p in base_paths:
+            exists = " (exists)" if p.exists() else ""
+            print(f"  {p}{exists}")
+        return
+
+    default_segments = find_segments(base_paths, "default")
+    non_default_segments = find_segments(base_paths, "non-default")
+
+    # Completion / listing modes — output to stdout and exit
+    if args.list_default:
+        for name in sorted(default_segments):
+            print(name)
+        return
+
+    if args.list_non_default:
+        for name in sorted(non_default_segments):
+            print(name)
+        return
+
+    if args.list_all:
+        for name in sorted(default_segments):
+            print(f"{name}\tdefault")
+        for name in sorted(non_default_segments):
+            print(f"{name}\tnon-default")
+        return
+
+    # Validate --add segment names
+    errors = False
+    for name in args.add:
+        if name not in non_default_segments:
+            print(
+                f"agents-md-generate: error: non-default segment '{name}' not found",
+                file=sys.stderr,
+            )
+            errors = True
+    if errors:
+        sys.exit(1)
+
+    # Warn about unknown --omit segment names
+    for name in args.omit:
+        if name not in default_segments:
+            print(
+                f"agents-md-generate: warning: default segment '{name}' not found (nothing to omit)",
+                file=sys.stderr,
+            )
+
+    # Write the reproducing command to stderr
+    if not args.no_preamble:
+        cmd_parts = ["agents-md-generate"]
+        for name in args.omit:
+            cmd_parts.extend(["--omit", name])
+        for name in args.add:
+            cmd_parts.extend(["--add", name])
+        #print(f"# Regenerate with: {' '.join(cmd_parts)}", file=sys.stderr)
+
+    # Collect segments to emit: defaults (minus omitted) then explicitly added non-defaults
+    omit_set = set(args.omit)
+    to_emit = []
+    for name in sorted(default_segments):
+        if name not in omit_set:
+            to_emit.append(default_segments[name])
+    for name in args.add:
+        to_emit.append(non_default_segments[name])
+
+    # Concatenate and write to stdout
+    for i, path in enumerate(to_emit):
+        content = path.read_text()
+        if i > 0:
+            sys.stdout.write("\n")
+        sys.stdout.write(content)
+        if not content.endswith("\n"):
+            sys.stdout.write("\n")
+
+
+if __name__ == "__main__":
+    main()
