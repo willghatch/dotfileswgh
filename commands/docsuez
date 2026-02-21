@@ -677,6 +677,10 @@ class Docsuez:
         # Build the docker image
         build_cmd = ["docker", "build"]
 
+        # Add --no-cache if requested
+        if getattr(args, 'no_cache', False):
+            build_cmd.append("--no-cache")
+
         # Add build args
         for key, value in build_config.get_build_args().items():
             build_cmd.extend(["--build-arg", f"{key}={value}"])
@@ -1061,7 +1065,8 @@ class Docsuez:
             if not getattr(args, 'dry_show', False) and self._should_build_image(args.build, build_config, image_name):
                 print(f"Building image {image_name}...")
                 sys.stdout.flush()
-                build_args_obj = argparse.Namespace(image_spec=image_builder)
+                build_args_obj = argparse.Namespace(image_spec=image_builder,
+                                                   no_cache=getattr(args, 'no_cache', False))
                 self.cmd_build(build_args_obj)
 
         # Get extra docker args from command line
@@ -1119,6 +1124,8 @@ class Docsuez:
         build_parser.add_argument("image_spec", help="Image spec (directory name or path)")
         build_parser.add_argument("--dry-show", action="store_true",
                                   help="Show the assembled Dockerfile without building")
+        build_parser.add_argument("--no-cache", action="store_true",
+                                  help="Pass --no-cache to docker build")
 
         # run command
         run_parser = subparsers.add_parser("run",
@@ -1136,6 +1143,8 @@ class Docsuez:
         run_parser.add_argument("--color", "-c", help="Background color for the tmux session (name or hex value)")
         run_parser.add_argument("--dry-show", action="store_true",
                                 help="Show the run script without executing it")
+        run_parser.add_argument("--no-cache", action="store_true",
+                                help="Pass --no-cache to docker build")
 
         # Handle -- separator for passing extra args to docker run
         extra_docker_args = None
