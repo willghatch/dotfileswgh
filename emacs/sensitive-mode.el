@@ -6,12 +6,9 @@ It disables backup creation and auto saving.
 With no argument, this command toggles the mode.
 Non-null prefix argument turns on the mode.
 Null prefix argument turns off the mode."
-  ;; The initial value.
-  nil
-  ;; The indicator for the mode line.
-  " Sensitive"
-  ;; The minor mode bindings.
-  nil
+  :init-value nil
+  :lighter " Sensitive"
+  :keymap nil
   (if (symbol-value sensitive-mode)
       (progn
         ;; disable backups
