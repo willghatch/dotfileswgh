@@ -2,7 +2,8 @@
     "dockerfile": [
         {
             "text": [
-                "FROM ubuntu:24.04",
+                "#FROM ubuntu:24.04",
+                "FROM ubuntu:25.10",
                 "",
                 "ENV DEBIAN_FRONTEND=noninteractive",
                 "",
@@ -23,6 +24,14 @@
         {
             "text":
             "RUN apt-get install -y gcc avr-libc avrdude dfu-programmer dfu-util gcc-arm-none-eabi # For QMK"
+        },
+        {
+            "text":
+            [
+                "# tools for 3d model viewing",
+                "RUN apt-get install -y openscad xvfb numpy-stl python3-numpy python3-matplotlib ",
+                ""
+            ]
         },
         {"bash-print-text": "echo 'RUN useradd -u' $UID 'wgh \n RUN chsh -s /bin/zsh wgh'"},
         {"text": ""}
