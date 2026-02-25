@@ -665,6 +665,70 @@ walks back up to the top-level .git directory."
                       (lambda (x) (find-file (expand-file-name x base)))
                       base)))
 
+(defun wgh/fzf-all-files ()
+  "Open a file from the current git repo using fzf, including untracked files.
+Lists both tracked and untracked (but not ignored) files."
+  (interactive)
+  (require 'fzf)
+  (let* ((path (locate-dominating-file (file-truename default-directory) ".git")))
+    (if path
+        (fzf-with-command "{ git ls-files; git ls-files --others --exclude-standard; } | sort -u"
+                          #'fzf--action-find-file
+                          path)
+      (user-error "Not inside a Git repository"))))
+
+(defun wgh/fzf-untracked-files ()
+  "Open an untracked file from the current git repo using fzf.
+Lists only untracked (but not ignored) files."
+  (interactive)
+  (require 'fzf)
+  (let* ((path (locate-dominating-file (file-truename default-directory) ".git")))
+    (if path
+        (fzf-with-command "git ls-files --others --exclude-standard"
+                          #'fzf--action-find-file
+                          path)
+      (user-error "Not inside a Git repository"))))
+
+(defun wgh/git-root-superproject ()
+  "Find the outermost git superproject working tree.
+Returns the root directory path, or nil if not inside a git repo.
+Note: `git rev-parse --show-superproject-working-tree' returns empty
+with exit code 0 when already at the root (not inside a submodule),
+so we must check its output rather than relying on exit codes."
+  (let* ((super (string-trim
+                 (shell-command-to-string
+                  "git rev-parse --show-superproject-working-tree 2>/dev/null")))
+         (root (if (string-empty-p super)
+                   (string-trim
+                    (shell-command-to-string
+                     "git rev-parse --show-toplevel 2>/dev/null"))
+                 super)))
+    (if (string-empty-p root)
+        nil
+      ;; Walk up to the outermost superproject.
+      (let ((dir root))
+        (while (let ((parent (string-trim
+                              (shell-command-to-string
+                               (format "git -C %s rev-parse --show-superproject-working-tree 2>/dev/null"
+                                       (shell-quote-argument dir))))))
+                 (unless (string-empty-p parent)
+                   (setq dir parent)))
+          )
+        dir))))
+
+(defun wgh/fzf-submodule-files ()
+  "Open a file using fzf, recursing into submodules from the root repo.
+Walks up to find the outermost git repo (the root superproject) and
+lists all tracked files including those in submodules."
+  (interactive)
+  (require 'fzf)
+  (let* ((root (wgh/git-root-superproject)))
+    (if root
+        (fzf-with-command "git ls-files --recurse-submodules"
+                          #'fzf--action-find-file
+                          root)
+      (user-error "Not inside a Git repository"))))
+
 (defun wgh/agent-make-working-dir (topic)
   "Create and return a fresh agent-working-directory path for TOPIC."
   (let* ((base (wgh/agent-working-dir-base))

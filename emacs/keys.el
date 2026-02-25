@@ -332,6 +332,9 @@ The command also executes the sentence, with region as the object, if the region
 (emmap " yfg" (cp/ae (cp/verb 'copy-file-name-git-relative)))
 (emmap " yfb" (cp/ae (cp/verb 'copy-file-name-basename)))
 (emmap " yfz" (cp/ae (cp/verb 'copy-git-fzf-file-name)))
+(emmap " yfZ" (cp/ae (cp/verb 'copy-all-fzf-file-name)))
+(emmap " yfu" (cp/ae (cp/verb 'copy-untracked-fzf-file-name)))
+(emmap " yfS" (cp/ae (cp/verb 'copy-submodule-fzf-file-name)))
 (emmap " yfa" (cp/ae (cp/verb 'copy-agent-working-directory-fzf-name)))
 (emmap " yT" (cp/ae (cp/verb 'paste-to-terminal-osc)))
 (enmap "p" (cp/ae (cp/verb 'paste-to-region-from-move)
@@ -774,6 +777,9 @@ The command also executes the sentence, with region as the object, if the region
 (emmap "tfg" (lambda () (interactive) (require 'helm-projectile) (helm-projectile)))
 (autoload 'fzf-git-files "fzf" "" t)
 (emmap "tfz" 'fzf-git-files)
+(emmap "tfZ" 'wgh/fzf-all-files)
+(emmap "tfu" 'wgh/fzf-untracked-files)
+(emmap "tfS" 'wgh/fzf-submodule-files)
 (emmap "tfa" 'wgh/agent-working-dir-fzf-open)
 
 (emmap "th" 'my-window-map/body)
@@ -1136,6 +1142,9 @@ The command also executes the sentence, with region as the object, if the region
            (copy-file-name-git-relative (register . ,(lambda () cpo-copy-default-register))  (default-object . dummy-object))
            (copy-file-name-basename     (register . ,(lambda () cpo-copy-default-register))  (default-object . dummy-object))
            (copy-git-fzf-file-name      (register . ,(lambda () cpo-copy-default-register))  (default-object . dummy-object))
+           (copy-all-fzf-file-name      (register . ,(lambda () cpo-copy-default-register))  (default-object . dummy-object))
+           (copy-untracked-fzf-file-name (register . ,(lambda () cpo-copy-default-register))  (default-object . dummy-object))
+           (copy-submodule-fzf-file-name (register . ,(lambda () cpo-copy-default-register))  (default-object . dummy-object))
            (copy-agent-working-directory-fzf-name     (register . ,(lambda () cpo-copy-default-register))  (default-object . dummy-object))
            (paste-to-terminal-osc       (register . ,(lambda () cpo-paste-default-register)) (default-object . dummy-object))
            )
@@ -1190,6 +1199,42 @@ The command also executes the sentence, with region as the object, if the region
                       (fzf-with-command "git ls-files"
                                         (lambda (x) (wgh/cpo-copy-string (file-relative-name x path) register))
                                         path)
+                    (user-error "Not inside a Git repository"))))
+             (register)))
+           (copy-all-fzf-file-name
+            ,(lambda (x) t) ()
+            (,(lambda (register)
+                (require 'fzf)
+                (let ((fzf--target-validator #'fzf--pass-through)
+                      (path (locate-dominating-file (file-truename default-directory) ".git")))
+                  (if path
+                      (fzf-with-command "{ git ls-files; git ls-files --others --exclude-standard; } | sort -u"
+                                        (lambda (x) (wgh/cpo-copy-string (file-relative-name x path) register))
+                                        path)
+                    (user-error "Not inside a Git repository"))))
+             (register)))
+           (copy-untracked-fzf-file-name
+            ,(lambda (x) t) ()
+            (,(lambda (register)
+                (require 'fzf)
+                (let ((fzf--target-validator #'fzf--pass-through)
+                      (path (locate-dominating-file (file-truename default-directory) ".git")))
+                  (if path
+                      (fzf-with-command "git ls-files --others --exclude-standard"
+                                        (lambda (x) (wgh/cpo-copy-string (file-relative-name x path) register))
+                                        path)
+                    (user-error "Not inside a Git repository"))))
+             (register)))
+           (copy-submodule-fzf-file-name
+            ,(lambda (x) t) ()
+            (,(lambda (register)
+                (require 'fzf)
+                (let* ((fzf--target-validator #'fzf--pass-through)
+                       (root-dir (wgh/git-root-superproject)))
+                  (if root-dir
+                      (fzf-with-command "git ls-files --recurse-submodules"
+                                        (lambda (x) (wgh/cpo-copy-string (file-relative-name x root-dir) register))
+                                        root-dir)
                     (user-error "Not inside a Git repository"))))
              (register)))
            (copy-agent-working-directory-fzf-name
