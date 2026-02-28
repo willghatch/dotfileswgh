@@ -5,7 +5,7 @@ Write scratch files, notes, and intermediate artifacts to `REPO/.git/agent-files
 - **TIMESTAMP**: output of `date "+%Y-%m-%dT%H-%M"`.
 - **TOPIC**: 1–3 hyphenated words from the branch name or task.
 - **AGENTID**: use an ID from the prompt, or generate one: `head -c 10 /dev/random | md5sum | head -c 6`.
-- **REPO**: the root of the git repo you started in. If `.git` is a file (submodule/worktree), read it to find the host repo's `.git` directory—do not place the agent-work-directory under `.git/modules/` or `.git/worktrees/`.
+- **REPO**: the root of the git repo you started in. If `.git` is a file (submodule/worktree), read it to find the host repo's `.git` directory.
 - **Not in a git repo**: use `agent-files/work/TIMESTAMP_TOPIC_AGENTID/` relative to your starting directory.
 - **Explicit agent-work-directory path given**: use that instead.
 
@@ -18,3 +18,6 @@ When launching subagents, pass them an explicit agent-work-directory path (neste
 You may share files between agents via these paths.
 
 Do not read or write another agent's agent-work-directory unless requested.
+
+Do do not place the agent-work-directory under `.git/modules/.../agent-files/` or `.git/worktrees/.../agent-files/`.
+When in a worktree or submodule, always use the `.git/agent-files/` directory of the (recursive) parent git repo.
