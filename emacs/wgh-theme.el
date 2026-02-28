@@ -165,6 +165,8 @@
  '(tool-bar ((((background dark)) (:foreground "#00ff00" :box (:line-width 1 :style released-button)))))
  '(warning ((((background dark light)) (:underline t))))
  '(web-mode-html-tag-bracket-face ((((background dark)) (:foreground "#c5a535"))))
+ '(fill-column-indicator ((((background dark)) (:background "#1a1a1a" :foreground "#1a1a1a"))
+                          (((background light)) (:background "#ede6d3" :foreground "#ede6d3"))))
  '(whitespace-tab ((((background dark)) (:background "#000019"))))
  '(whitespace-final-newline ((((background dark)) (:background "#252595" :foreground "#c5a3c5"))))
  '(whitespace-trailing ((((background dark)) (:background "#252525"))))

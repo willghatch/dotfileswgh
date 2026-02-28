@@ -238,6 +238,7 @@
             (seq (* blank) (? (seq "--" (* "-"))) (* blank) (+ "*"))
             )))
  (setq-default fill-column 80)
+ (setq display-fill-column-indicator-character ?\s)
  (setq whitespace-style '(face tabs trailing))
 
  ;; MAKE SCROLLING BE SANE, PLEASE¡
