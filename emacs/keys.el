@@ -35,6 +35,8 @@
 
 (require 'cpo-search-movements)
 (require 'cpo-helpers)
+(require 'cpo-location-history)
+(cpo-location-history-mode 1)
 
 ;; TODO - I don't know whether I want to require this up-front, but for the advice it adds, it needs to be loaded before creating all of the lambdas that modify the current command sentence.
 (require 'estate-visual-modifier-composiphrase-integration)
@@ -602,6 +604,9 @@ The command also executes the sentence, with region as the object, if the region
   ("w" (lambda (n) (interactive "p")
          (funcall (cp/add (cp/verb 'demote)) n))
    "demote" :exit t)
+  ("R" (lambda (n) (interactive "p")
+        (funcall (cp/add (cp/verb 'tree-raise)) n))
+   "raise" :exit t)
   ("hw" (lambda (n) (interactive "p")
           (funcall (cp/add (cp/verb 'change-delimiter)) n))
    "change-delimiter" :exit t)
@@ -667,6 +672,9 @@ The command also executes the sentence, with region as the object, if the region
   ("hX" (lambda (n) (interactive "p") (funcall (cp/ae (cp/obj 'test)) n)) "test" :exit t)
   ("hc" (lambda (n) (interactive "p") (funcall (cp/ae (cp/obj 'buffer-change)) n)) "buffer-change" :exit t)
   ("hg" (lambda (n) (interactive "p") (funcall (cp/ae (cp/obj 'vcs-change)) n)) "vcs-change" :exit t)
+  ("H" (lambda (n) (interactive "p")
+         (funcall (cp/ae (cp/obj 'location-history)) n))
+   "location-history" :exit t)
   ("h SPC" (lambda (n) (interactive "p") (funcall (cp/ae (cp/obj 'whitespace)) n)) "whitespace" :exit t)
   ("hu" (lambda (n) (interactive "p") (funcall (cp/ae (progn (require 'cpo-url-object) (cp/obj 'url))) n)) "url" :exit t)
   ("hd" (lambda (n) (interactive "p") (funcall (cp/ae (progn (require 'cpo-date-object) (cp/obj 'date-yyyy-mm-dd))) n)) "date" :exit t)
@@ -676,6 +684,9 @@ The command also executes the sentence, with region as the object, if the region
   ("ht" (lambda (n) (interactive "p") (funcall (cp/ae (progn (require 'tempel-conf) (cp/obj 'tempel-snippet-hole))) n)) "tempel" :exit t)
   ("hT" (lambda (n) (interactive "p") (funcall (cp/ae (progn (require 'yasnippet-conf) (cp/obj 'yasnippet-snippet-hole))) n)) "yasnippet" :exit t)
   ("hF" (lambda (n) (interactive "p") (funcall (cp/ae (progn (require 'yafolding) (cp/obj 'yafold))) n)) "yafolding" :exit t)
+  ("," (lambda (n) (interactive "p")
+         (funcall (cp/ae (progn (require 'cpo-comma-list) (cp/obj 'cpo-comma-list))) n))
+   "comma-list" :exit t)
 
 
   ;; Specific delimiters, use smartparens for them.
