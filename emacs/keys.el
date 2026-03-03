@@ -357,6 +357,23 @@ The command also executes the sentence, with region as the object, if the region
      (require 'evil)
      (call-interactively ,func)))
 
+(defun wgh/exclude-trailing-newline (func)
+  "Return a wrapper around FUNC that excludes a trailing empty line from the region.
+When the region ends at the very start of a line (only the
+preceding newline is included, nothing from the line itself),
+move the region end backward so the line is not affected.
+FUNC should be a function whose first two arguments are BEG and END."
+  (lambda (beg end &rest args)
+    (interactive (list (region-beginning) (region-end)))
+    (let ((adjusted-end
+           (if (and end beg (> end beg)
+                    (save-excursion
+                      (goto-char end)
+                      (bolp)))
+               (1- end)
+             end)))
+      (apply func beg adjusted-end args))))
+
 (enmap "<" (with-evil 'evil-shift-left))
 (enmap ">" (with-evil 'evil-shift-right))
 (emmap "%" 'cpo-smartparens-move-to-other-end-of-sexp) ;; TODO - maybe just stop using this?  I can accomplish it with forward/backward beg/end.  Turn it into training wheels message binding.
@@ -749,7 +766,10 @@ The command also executes the sentence, with region as the object, if the region
 (emmap "gdr" 'xref-find-references)
 (emmap "gdi" 'lsp-describe-thing-at-point)
 (emmap "gdp" 'pop-tag-mark)
-(enmap "gq" (with-evil 'evil-fill-and-move))
+(enmap "gq" (lambda ()
+               (interactive)
+               (require 'evil)
+               (call-interactively (wgh/exclude-trailing-newline 'evil-fill-and-move))))
 (enmap "gw" (with-evil 'evil-fill))
 (emmap "gv" 'estate-restore-region)
 ;; TODO - avy can be customized with different targets.  Maybe add it as a composiphrase verb.
