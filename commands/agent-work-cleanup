@@ -1,0 +1,338 @@
+#!/usr/bin/env python3
+"""agent-work-cleanup - Find and delete old agent work directories.
+
+Agent work directories accumulate at .git/agent-files/work/ and sometimes
+in incorrect locations like .git/modules/.../agent-files/work/ or
+.git/worktrees/.../agent-files/work/.  This script finds them all and
+can delete those older than a specified age or date.
+
+Without --older-than or --before, lists all agent work directories found.
+"""
+
+import argparse
+import os
+import re
+import shutil
+import sys
+import time
+from datetime import datetime
+from pathlib import Path
+
+
+def die(msg):
+    print(f"agent-work-cleanup: error: {msg}", file=sys.stderr)
+    sys.exit(1)
+
+
+def duration_to_seconds(dur):
+    """Parse a duration like 7d, 2w, 30d into seconds."""
+    m = re.fullmatch(r"(\d+)([dwDW])", dur)
+    if not m:
+        die(f"unsupported duration format '{dur}' (use e.g. 7d, 2w)")
+    num = int(m.group(1))
+    unit = m.group(2).lower()
+    if unit == "d":
+        return num * 86400
+    elif unit == "w":
+        return num * 86400 * 7
+    else:
+        die(f"unsupported duration unit in '{dur}' (use d for days, w for weeks)")
+
+
+def parse_dir_timestamp(dirname):
+    """Parse a timestamp prefix from a directory name.
+
+    Handles both formats:
+      2026-01-01T10-10_topic_id  (full timestamp with hours and minutes)
+      2026-03-02T-topic          (date only, with T separator)
+      2026-03-02-topic          (date only, with dash or underscore separator)
+    Returns None if no parseable timestamp found.
+    """
+    # Try full format: YYYY-MM-DDTHH-MM
+    m = re.match(r"^(\d{4})-(\d{2})-(\d{2})T(\d{2})-(\d{2})", dirname)
+    if m:
+        return f"{m.group(1)}-{m.group(2)}-{m.group(3)}T{m.group(4)}:{m.group(5)}"
+    # Try date-only format: YYYY-MM-DDT (followed by non-digit or end)
+    m = re.match(r"^(\d{4})-(\d{2})-(\d{2})T", dirname)
+    if m:
+        return f"{m.group(1)}-{m.group(2)}-{m.group(3)}T00:00"
+    m = re.match(r"^(\d{4})-(\d{2})-(\d{2})(-|_)", dirname)
+    if m:
+        return f"{m.group(1)}-{m.group(2)}-{m.group(3)}T00:00"
+    return None
+
+
+def timestamp_to_epoch(ts):
+    """Convert a parsed timestamp string like '2026-01-01T10:10' to epoch seconds."""
+    try:
+        dt = datetime.strptime(ts, "%Y-%m-%dT%H:%M")
+        return int(dt.timestamp())
+    except ValueError:
+        return None
+
+
+def find_repo_root(start_dir):
+    """Find the git repo root from a directory by walking up."""
+    d = Path(start_dir).resolve()
+    while True:
+        if (d / ".git").exists():
+            return str(d)
+        parent = d.parent
+        if parent == d:
+            return None
+        d = parent
+
+
+def resolve_git_dir(repo):
+    """Resolve a .git entry to the actual .git directory path.
+
+    If .git is a file (worktree/submodule), follow the gitdir pointer.
+    """
+    git_path = Path(repo) / ".git"
+    if git_path.is_dir():
+        return str(git_path)
+    elif git_path.is_file():
+        content = git_path.read_text().strip()
+        prefix = "gitdir: "
+        if content.startswith(prefix):
+            gitdir = content[len(prefix):]
+            if not os.path.isabs(gitdir):
+                gitdir = os.path.join(repo, gitdir)
+            return str(Path(gitdir).resolve())
+    return None
+
+
+def human_size(nbytes):
+    """Return a human-readable size string."""
+    kb = 1024
+    mb = 1024 * kb
+    gb = 1024 * mb
+    if nbytes >= gb:
+        return f"{nbytes // gb}G"
+    elif nbytes >= mb:
+        return f"{nbytes // mb}M"
+    elif nbytes >= kb:
+        return f"{nbytes // kb}K"
+    else:
+        return f"{nbytes}B"
+
+
+def dir_size_bytes(path):
+    """Return total size in bytes of a directory tree."""
+    total = 0
+    try:
+        for dirpath, _dirnames, filenames in os.walk(path):
+            for f in filenames:
+                fp = os.path.join(dirpath, f)
+                try:
+                    total += os.path.getsize(fp)
+                except OSError:
+                    pass
+    except OSError:
+        pass
+    return total
+
+
+def collect_work_dirs(git_dir, location_label):
+    """Collect all agent-files/work directories under a .git dir.
+
+    Yields (location_label, full_path) tuples for individual work directories
+    (the TIMESTAMP_TOPIC_ID dirs).
+    """
+    git_dir = Path(git_dir)
+
+    # Main agent-files/work/
+    main_work = git_dir / "agent-files" / "work"
+    if main_work.is_dir():
+        for entry in sorted(main_work.iterdir()):
+            if entry.is_dir():
+                yield location_label, str(entry)
+
+    # Submodule git dirs: .git/modules/**/agent-files/work/
+    modules_dir = git_dir / "modules"
+    if modules_dir.is_dir():
+        for work_dir in modules_dir.rglob("agent-files/work"):
+            if not work_dir.is_dir():
+                continue
+            for entry in sorted(work_dir.iterdir()):
+                if not entry.is_dir():
+                    continue
+                # Derive a label showing the submodule path
+                rel = str(work_dir.relative_to(modules_dir))
+                # Remove trailing /agent-files/work
+                rel = re.sub(r"/agent-files/work$", "", rel)
+                yield f"modules/{rel} (misplaced)", str(entry)
+
+    # Worktree git dirs: .git/worktrees/*/agent-files/work/
+    worktrees_dir = git_dir / "worktrees"
+    if worktrees_dir.is_dir():
+        for wt_dir in sorted(worktrees_dir.iterdir()):
+            if not wt_dir.is_dir():
+                continue
+            wt_work = wt_dir / "agent-files" / "work"
+            if wt_work.is_dir():
+                for entry in sorted(wt_work.iterdir()):
+                    if not entry.is_dir():
+                        continue
+                    wt_name = wt_dir.name
+                    yield f"worktrees/{wt_name} (misplaced)", str(entry)
+
+
+def main():
+    parser = argparse.ArgumentParser(
+        prog="agent-work-cleanup",
+        description=__doc__,
+        formatter_class=argparse.RawDescriptionHelpFormatter,
+    )
+    parser.add_argument(
+        "--older-than",
+        metavar="DURATION",
+        help="Delete dirs older than DURATION (e.g. 7d, 2w, 30d)",
+    )
+    parser.add_argument(
+        "--before",
+        metavar="DATE",
+        help="Delete dirs with timestamps before DATE (YYYY-MM-DD)",
+    )
+    parser.add_argument(
+        "--repo",
+        metavar="DIR",
+        help="Git repo root (default: auto-detect from cwd)",
+    )
+    parser.add_argument(
+        "--delete",
+        action="store_true",
+        help="Actually delete (default is dry run / list only)",
+    )
+    parser.add_argument(
+        "--location-label",
+        action="store_true",
+        help="Show the location label column (main, modules/... (misplaced), etc.)",
+    )
+    parser.add_argument(
+        "--misplaced",
+        action="store_true",
+        help="Only target agent-work-directories in misplaced locations (not main)",
+    )
+    args = parser.parse_args()
+
+    # Determine cutoff epoch (if any)
+    cutoff_epoch = None
+    if args.older_than and args.before:
+        die("use --older-than or --before, not both")
+    if args.older_than:
+        dur_secs = duration_to_seconds(args.older_than)
+        cutoff_epoch = int(time.time()) - dur_secs
+    if args.before:
+        try:
+            dt = datetime.strptime(args.before, "%Y-%m-%d")
+            cutoff_epoch = int(dt.timestamp())
+        except ValueError:
+            die(f"cannot parse date: {args.before}")
+
+    # Find repo root
+    if args.repo:
+        repo_root = str(Path(args.repo).resolve())
+    else:
+        repo_root = find_repo_root(os.getcwd())
+        if repo_root is None:
+            die("not in a git repository (use --repo to specify)")
+
+    git_dir = resolve_git_dir(repo_root)
+    if git_dir is None:
+        die(f"cannot resolve .git directory for {repo_root}")
+
+    # Collect all work directories
+    total_count = 0
+    match_count = 0
+    total_match_bytes = 0
+
+    if cutoff_epoch is None:
+        if args.delete:
+            die("--delete requires --older-than or --before to specify what to delete")
+        print(f"Listing all agent work directories in {repo_root}")
+        print()
+
+    # Collect all directory entries with their computed fields
+    all_entries = []
+    # location_label: describes where this work dir lives, e.g. "main",
+    # "modules/foo (misplaced)", or "worktrees/bar (misplaced)".
+    for location_label, dir_path in collect_work_dirs(git_dir, "main"):
+        dirname = os.path.basename(dir_path)
+        total_count += 1
+
+        ts = parse_dir_timestamp(dirname)
+        dir_epoch = None
+        if ts is not None:
+            dir_epoch = timestamp_to_epoch(ts)
+
+        # Get directory size
+        d_bytes = dir_size_bytes(dir_path)
+        d_size = human_size(d_bytes)
+
+        all_entries.append({
+            "location_label": location_label,
+            "dir_path": dir_path,
+            "dirname": dirname,
+            "ts": ts,
+            "dir_epoch": dir_epoch,
+            "d_bytes": d_bytes,
+            "d_size": d_size,
+        })
+
+    if args.misplaced:
+        all_entries = [e for e in all_entries if e["location_label"] != "main"]
+
+    if cutoff_epoch is not None:
+        # Filtering mode
+        for entry in all_entries:
+            loc_suffix = f"  [{entry['location_label']}]" if args.location_label else ""
+            if entry["dir_epoch"] is None:
+                print(f"  SKIP (no timestamp): {entry['dirname']}{loc_suffix}")
+                continue
+            if entry["dir_epoch"] >= cutoff_epoch:
+                continue
+            match_count += 1
+            total_match_bytes += entry["d_bytes"]
+            if args.delete:
+                shutil.rmtree(entry["dir_path"], ignore_errors=True)
+                print(f"  DELETED: {entry['dirname']}  ({entry['d_size']}){loc_suffix}")
+            else:
+                print(f"  {entry['dirname']}  ({entry['d_size']}){loc_suffix}")
+    else:
+        # Listing mode -- align output into columns
+        rows = []
+        for entry in all_entries:
+            if entry["ts"] is not None:
+                local_label = entry["ts"]
+            else:
+                local_label = "(no timestamp)"
+            row = [entry["dirname"], f"({entry['d_size']})"]
+            if args.location_label:
+                row.append(f"[{entry['location_label']}]")
+            row.append(local_label)
+            rows.append(tuple(row))
+
+        if rows:
+            col_widths = [max(len(row[c]) for row in rows) for c in range(len(rows[0]))]
+            for row in rows:
+                parts = [row[c].ljust(col_widths[c]) for c in range(len(row))]
+                print(f"  {'  '.join(parts)}")
+
+    print()
+    if cutoff_epoch is not None:
+        cutoff_date = datetime.fromtimestamp(cutoff_epoch).strftime("%Y-%m-%d")
+        total_match_size = human_size(total_match_bytes)
+        if args.delete:
+            print(f"Deleted {match_count} of {total_count} directories (before {cutoff_date}), freeing {total_match_size}.")
+        else:
+            print(f"Would delete {match_count} of {total_count} directories (before {cutoff_date}), freeing {total_match_size}.")
+            if match_count > 0:
+                print("Run with --delete to remove them.")
+    else:
+        print(f"Found {total_count} agent work directories.")
+        print("Use --older-than or --before to filter, and --delete to remove.")
+
+
+if __name__ == "__main__":
+    main()
