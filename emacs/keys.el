@@ -38,9 +38,6 @@
 (require 'cpo-location-history)
 (cpo-location-history-mode 1)
 
-;; TODO - I don't know whether I want to require this up-front, but for the advice it adds, it needs to be loaded before creating all of the lambdas that modify the current command sentence.
-(require 'estate-visual-modifier-composiphrase-integration)
-
 (setq cpo-paste-default-register ?P)
 (setq cpo-copy-default-register ?P)
 (setq cpo-copy-sync-with-kill-ring-register ?P)
@@ -724,7 +721,9 @@ The command also executes the sentence, with region as the object, if the region
   ("b" (lambda (n) (interactive "p") (funcall (cp/add (cp/mod 'absolute 'absolute)) n)) "absolute" :exit nil) ;; For absolute numbering (within tree if respect tree is on).  Ignore forward/backward direction.
   ("m" (lambda (n) (interactive "p") (funcall (cp/add (cp/mod 'matching 'matching)) n)) "matching" :exit nil) ;; Eg. for finding the next matching word, symbol, whatever.
   ("a" (lambda (n) (interactive "p") (funcall (cp/add (cp/mod 'alternate 'alternate)) n)) "alternate" :exit nil) ;; For object-specific alternate behavior...
-  ("A" (lambda (n) (interactive "p") (funcall (cp/add (cp/mod 'alternate 2)) n)) "alternate-2" :exit nil)
+  ("A" (lambda (n) (interactive "p") (funcall (cp/add (cp/mod 'alternate-2 'alternate-2)) n)) "alternate-2" :exit nil)
+  ("v" (lambda (n) (interactive "p") (funcall (cp/add (cp/mod 'verb-alternate 'verb-alternate)) n)) "verb-alternate" :exit nil) ;; For object-specific alternate behavior...
+  ("V" (lambda (n) (interactive "p") (funcall (cp/add (cp/mod 'verb-alternate-2 'verb-alternate-2)) n)) "verb-alternate-2" :exit nil)
 
   ("hR" (lambda (n) (interactive "p") (funcall (cp/add (cp/mod 'respect-tree 'respect-tree)) n)) "respect-tree" :exit nil)
   ("hr" (lambda (n) (interactive "p") (funcall (cp/add (cp/mod 'respect-tree nil)) n)) "DISrespect-tree" :exit nil)
