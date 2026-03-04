@@ -636,7 +636,8 @@ The command also executes the sentence, with region as the object, if the region
   ("g" (lambda (n) (interactive "p") (funcall (cp/ae (cp/obj 'line)) n)) "line" :exit t)
   ;; TODO - consider whether to keep using this vi-like word, or the emacs word, or something else.  Also how to deal with sub-words in symbols.
   ("w" (lambda (n) (interactive "p") (funcall (cp/ae (cp/obj 'cpo-vi-like-word)) n)) "vi-like-word" :exit t)
-  ("W" (lambda (n) (interactive "p") (funcall (cp/ae (cp/obj 'word)) n)) "word" :exit t)
+  ("W" (lambda (n) (interactive "p") (funcall (cp/ae (progn (require 'cpo-camel-case-sub-word) (cp/obj 'cpo-camel-case-sub-word))) n)) "camelSub" :exit t)
+  ;;("W" (lambda (n) (interactive "p") (funcall (cp/ae (cp/obj 'word)) n)) "word" :exit t)
   ("y" (lambda (n) (interactive "p") (funcall (cp/ae (cp/obj 'symbol)) n)) "symbol" :exit t)
   ("Y" (lambda (n) (interactive "p") (funcall (cp/ae (cp/obj 'sexp)) n)) "sexp" :exit t)
   ("P" (lambda (n) (interactive "p") (funcall (cp/ae (cp/obj 'paragraph)) n)) "paragraph" :exit t)
