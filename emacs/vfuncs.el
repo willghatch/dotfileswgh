@@ -761,4 +761,63 @@ The copied message contains the directory path and prompt file path."
       (wgh/terminal-copy-osc-string msg)
       (message "Copied: %s" msg))))
 
+;;; Outline tree spine helpers
+
+(defun wgh/outline-heading-body-text ()
+  "Return the body text of the current outline heading (not including the heading line).
+Point can be anywhere within a heading's body or on the heading line itself.
+Returns the text between the end of the heading line and the start of the next
+heading (or end of buffer), with leading and trailing whitespace trimmed."
+  (save-excursion
+    (outline-back-to-heading t)
+    (let ((body-start (progn (forward-line 1) (point)))
+          (body-end (progn
+                      (if (re-search-forward (concat "^\\(?:" outline-regexp "\\)")
+                                             nil t)
+                          (progn (beginning-of-line) (point))
+                        (point-max)))))
+      (string-trim (buffer-substring-no-properties body-start body-end)))))
+
+(defun wgh/outline-tree-spine-body-text ()
+  "Return the concatenated body text from the spine of the outline tree at point.
+Walks from the current heading up through all ancestor headings to the root,
+collecting only the body text of each ancestor (not siblings), then returns
+them concatenated in root-to-current order separated by blank lines."
+  (save-excursion
+    (let ((texts '()))
+      ;; Move to the current heading if not already on one.
+      (unless (outline-on-heading-p t)
+        (outline-back-to-heading t))
+      ;; Collect body text of the current heading.
+      (push (wgh/outline-heading-body-text) texts)
+      ;; Walk up to each parent heading and collect its body text.
+      (let ((keep-going t))
+        (while keep-going
+          (condition-case nil
+              (progn
+                (outline-up-heading 1 t)
+                (push (wgh/outline-heading-body-text) texts))
+            (error (setq keep-going nil)))))
+      ;; Filter out empty strings and join with blank lines.
+      (concat
+       (mapconcat #'identity
+                  (cl-remove-if #'string-empty-p texts)
+                  "\n\n")
+       "\n"))))
+
+(defun wgh/agent-prompt-from-outline-spine (topic)
+  "Create an agent-working-directory from the outline tree spine body text at point.
+Extracts the spine body text (ancestor body text from root to current heading),
+writes it to prompt.txt, and copies a message with the directory and file paths."
+  (interactive "sTopic (hyphenated words): ")
+  (let* ((text (wgh/outline-tree-spine-body-text))
+         (dir (wgh/agent-make-working-dir topic))
+         (prompt-file (concat dir "prompt.txt")))
+    (with-temp-file prompt-file
+      (insert text))
+    (let ((msg (format "Your agent-working-directory path is %s.  Read %s for instructions."
+                       dir prompt-file)))
+      (wgh/terminal-copy-osc-string msg)
+      (message "Copied: %s" msg))))
+
 (provide 'vfuncs)
