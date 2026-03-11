@@ -1,0 +1,330 @@
+#!/usr/bin/env bash
+# wnb -- Wave Native Build
+#
+# Build LLVM/MLIR, Water, and WaveASM for the Wave project.
+# Run with --help for usage.
+#
+# Environment variables:
+#   WAVE_LLVM_REPO              LLVM repo URL (default: upstream llvm-project)
+#   WAVE_LLVM_BUILD_SHARED_LIBS ON or OFF (default: OFF)
+#   WAVE_BUILD_TYPE             CMake build type (default: Release)
+#   WAVE_LLVM_JOBS              Parallel build jobs (default: nproc)
+
+set -euo pipefail
+
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+LLVM_SHA_FILE="$SCRIPT_DIR/water/llvm-sha.txt"
+LLVM_SRC="$HOME/mk/llvm-wave/llvm-project"
+LLVM_BUILD="$HOME/mk/llvm-wave/build"
+LLVM_INSTALL="$HOME/mk/llvm-wave/install"
+WATER_SRC="$SCRIPT_DIR/water"
+WATER_BUILD="$SCRIPT_DIR/water/build"
+WAVEASM_SRC="$SCRIPT_DIR/waveasm"
+WAVEASM_BUILD="$SCRIPT_DIR/waveasm/build"
+
+LLVM_REPO="${WAVE_LLVM_REPO:-https://github.com/llvm/llvm-project.git}"
+BUILD_SHARED_LIBS="${WAVE_LLVM_BUILD_SHARED_LIBS:-OFF}"
+BUILD_TYPE="${WAVE_BUILD_TYPE:-Release}"
+JOBS="${WAVE_LLVM_JOBS:-$(nproc)}"
+
+LLVM_DIR="$LLVM_INSTALL/lib/cmake/llvm"
+MLIR_DIR="$LLVM_INSTALL/lib/cmake/mlir"
+LLD_DIR="$LLVM_INSTALL/lib/cmake/lld"
+
+usage() {
+    cat <<EOF
+wnb - wave native build
+
+Usage:
+  wnb --build-llvm        Clone (if needed), configure, and build LLVM/MLIR.
+  wnb --build-water       Configure and build the Water MLIR dialect.
+  wnb --build-waveasm     Configure and build the WaveASM backend.
+  wnb --build-all         Build LLVM, Water, and WaveASM (in order).
+  wnb --update-sha        Check out the SHA from water/llvm-sha.txt in the
+                           existing LLVM clone, then exit.
+  wnb --test-waveasm-lit  Run WaveASM lit tests (ninja check-waveasm).
+  wnb --test-waveasm-e2e  Run WaveASM Python e2e tests (pytest).
+  wnb --print-wave-env    Print shell exports for Wave development.
+  wnb --help              Show this help message.
+
+Arguments after -- are passed to pytest (for --test-waveasm-e2e):
+  wnb --test-waveasm-e2e -- -k test_copy_kernel
+  wnb --test-waveasm-e2e -- --backend python -x
+
+Multiple flags can be combined, e.g.:
+  wnb --build-water --test-waveasm-lit
+
+Re-running build commands skips already-completed steps (clone, cmake configure).
+
+Directories:
+  LLVM source:    $LLVM_SRC
+  LLVM build:     $LLVM_BUILD
+  LLVM install:   $LLVM_INSTALL
+  Water source:   $WATER_SRC
+  Water build:    $WATER_BUILD
+  WaveASM source: $WAVEASM_SRC
+  WaveASM build:  $WAVEASM_BUILD
+
+Environment variables:
+  WAVE_LLVM_REPO                LLVM git repo URL
+                                (default: https://github.com/llvm/llvm-project.git)
+  WAVE_LLVM_BUILD_SHARED_LIBS   ON or OFF (default: OFF)
+  WAVE_BUILD_TYPE               CMake build type (default: Release)
+  WAVE_LLVM_JOBS                Parallel build jobs (default: $(nproc))
+
+After building, source the environment with:
+  eval \$(wnb --print-wave-env)
+EOF
+}
+
+git_clone_depth=10
+
+read_pinned_sha() {
+    if [[ ! -f "$LLVM_SHA_FILE" ]]; then
+        echo "error: $LLVM_SHA_FILE not found" >&2
+        exit 1
+    fi
+    cat "$LLVM_SHA_FILE" | tr -d '[:space:]'
+}
+
+# Check out the pinned SHA in an existing clone.
+do_checkout() {
+    local sha="$1"
+    echo "Checking out LLVM commit $sha ..."
+    git -C "$LLVM_SRC" fetch --depth "$git_clone_depth" origin "$sha"
+    git -C "$LLVM_SRC" checkout "$sha"
+}
+
+require_llvm_install() {
+    if [[ ! -d "$LLVM_INSTALL/lib/cmake/mlir" ]]; then
+        echo "error: LLVM install not found at $LLVM_INSTALL" >&2
+        echo "Run --build-llvm first." >&2
+        exit 1
+    fi
+}
+
+do_update_sha() {
+    local sha
+    sha="$(read_pinned_sha)"
+    if [[ ! -d "$LLVM_SRC/.git" ]]; then
+        echo "error: no existing clone at $LLVM_SRC" >&2
+        echo "Run --build-llvm first to create the clone." >&2
+        exit 1
+    fi
+    do_checkout "$sha"
+    echo "Done.  LLVM source is now at $sha"
+}
+
+do_build_llvm() {
+    local sha
+    sha="$(read_pinned_sha)"
+
+    # --- Clone if needed ---
+    if [[ ! -d "$LLVM_SRC/.git" ]]; then
+        echo "Cloning LLVM to $LLVM_SRC ..."
+        mkdir -p "$LLVM_SRC"
+        git clone --depth "$git_clone_depth" --no-checkout "$LLVM_REPO" "$LLVM_SRC"
+        do_checkout "$sha"
+    fi
+
+    # --- Configure if needed ---
+    if [[ ! -f "$LLVM_BUILD/build.ninja" ]]; then
+        echo "Configuring LLVM (build type: $BUILD_TYPE) ..."
+        mkdir -p "$LLVM_BUILD"
+        cmake -G Ninja \
+            -S "$LLVM_SRC/llvm" \
+            -B "$LLVM_BUILD" \
+            -DLLVM_TARGETS_TO_BUILD="host;AMDGPU" \
+            -DLLVM_ENABLE_PROJECTS="llvm;mlir;lld;clang" \
+            -DMLIR_ENABLE_BINDINGS_PYTHON=ON \
+            -DBUILD_SHARED_LIBS="$BUILD_SHARED_LIBS" \
+            -DLLVM_ENABLE_ASSERTIONS=ON \
+            -DLLVM_ENABLE_ZSTD=OFF \
+            -DLLVM_INSTALL_UTILS=ON \
+            -DCMAKE_PLATFORM_NO_VERSIONED_SONAME=ON \
+            -DCMAKE_INSTALL_PREFIX="$LLVM_INSTALL" \
+            -DCMAKE_BUILD_TYPE="$BUILD_TYPE" \
+            -DPython3_EXECUTABLE="$(which python3)"
+    else
+        echo "LLVM build directory already configured, skipping cmake."
+    fi
+
+    # --- Build and install ---
+    echo "Building LLVM with $JOBS parallel jobs ..."
+    cmake --build "$LLVM_BUILD" --target install -- -j"$JOBS"
+
+    echo ""
+    echo "LLVM installed to: $LLVM_INSTALL"
+}
+
+do_build_water() {
+    require_llvm_install
+
+    # --- Configure if needed ---
+    if [[ ! -f "$WATER_BUILD/build.ninja" ]]; then
+        echo "Configuring Water (build type: $BUILD_TYPE) ..."
+        mkdir -p "$WATER_BUILD"
+        cmake -G Ninja \
+            -S "$WATER_SRC" \
+            -B "$WATER_BUILD" \
+            -DLLVM_DIR="$LLVM_DIR" \
+            -DMLIR_DIR="$MLIR_DIR" \
+            -DLLD_DIR="$LLD_DIR" \
+            -DBUILD_SHARED_LIBS="$BUILD_SHARED_LIBS" \
+            -DCMAKE_PLATFORM_NO_VERSIONED_SONAME=ON \
+            -DMLIR_ENABLE_BINDINGS_PYTHON=ON \
+            -DWATER_ENABLE_PYTHON=ON \
+            -DCMAKE_BUILD_TYPE="$BUILD_TYPE" \
+            -DPython3_EXECUTABLE="$(which python3)"
+    else
+        echo "Water build directory already configured, skipping cmake."
+    fi
+
+    # --- Build ---
+    echo "Building Water with $JOBS parallel jobs ..."
+    cmake --build "$WATER_BUILD" -- -j"$JOBS"
+
+    echo ""
+    echo "Water built in: $WATER_BUILD"
+}
+
+do_build_waveasm() {
+    require_llvm_install
+
+    # --- Configure if needed ---
+    if [[ ! -f "$WAVEASM_BUILD/build.ninja" ]]; then
+        echo "Configuring WaveASM (build type: $BUILD_TYPE) ..."
+        mkdir -p "$WAVEASM_BUILD"
+        cmake -G Ninja \
+            -S "$WAVEASM_SRC" \
+            -B "$WAVEASM_BUILD" \
+            -DLLVM_DIR="$LLVM_DIR" \
+            -DMLIR_DIR="$MLIR_DIR" \
+            -DLLD_DIR="$LLD_DIR" \
+            -DBUILD_SHARED_LIBS="$BUILD_SHARED_LIBS" \
+            -DCMAKE_PLATFORM_NO_VERSIONED_SONAME=ON \
+            -DCMAKE_BUILD_TYPE="$BUILD_TYPE" \
+            -DPython3_EXECUTABLE="$(which python3)"
+    else
+        echo "WaveASM build directory already configured, skipping cmake."
+    fi
+
+    # --- Build ---
+    echo "Building WaveASM with $JOBS parallel jobs ..."
+    cmake --build "$WAVEASM_BUILD" -- -j"$JOBS"
+
+    echo ""
+    echo "WaveASM built in: $WAVEASM_BUILD"
+}
+
+do_test_waveasm_lit() {
+    if [[ ! -f "$WAVEASM_BUILD/build.ninja" ]]; then
+        echo "error: WaveASM not built.  Run --build-waveasm first." >&2
+        exit 1
+    fi
+    echo "Running WaveASM lit tests ..."
+    cmake --build "$WAVEASM_BUILD" --target check-waveasm
+}
+
+do_test_waveasm_e2e() {
+    echo "Running WaveASM Python e2e tests ..."
+    WAVE_CACHE_ON=0 \
+    PYTHONPATH="$SCRIPT_DIR" \
+        python3 -m pytest --run-e2e "$SCRIPT_DIR/tests/kernel/asm_backend_test.py" -v \
+        "${PASSTHROUGH_ARGS[@]}"
+}
+
+do_print_wave_env() {
+    cat <<EOF
+export WAVE_LLVM_DIR="$LLVM_INSTALL"
+export WAVE_WATER_DIR="$WATER_BUILD"
+export WAVE_WAVEASM_DIR="$WAVEASM_BUILD"
+export WAVE_BUILD_WATER=1
+export WAVE_BUILD_WAVEASM=1
+export WAVE_CACHE_ON=0
+export PYTHONPATH="$SCRIPT_DIR"
+EOF
+}
+
+# --- Argument parsing ---
+if [[ $# -eq 0 ]]; then
+    usage
+    exit 0
+fi
+
+error=0
+ACTIONS=()
+PASSTHROUGH_ARGS=()
+while [[ $# -gt 0 ]]; do
+    case "$1" in
+        --)
+            shift
+            PASSTHROUGH_ARGS=("$@")
+            break
+            ;;
+        --build-llvm)
+            ACTIONS+=(build-llvm)
+            shift
+            ;;
+        --build-water)
+            ACTIONS+=(build-water)
+            shift
+            ;;
+        --build-waveasm)
+            ACTIONS+=(build-waveasm)
+            shift
+            ;;
+        --build-all)
+            ACTIONS+=(build-llvm build-water build-waveasm)
+            shift
+            ;;
+        --update-sha)
+            ACTIONS+=(update-sha)
+            shift
+            ;;
+        --test-waveasm-lit)
+            ACTIONS+=(test-waveasm-lit)
+            shift
+            ;;
+        --test-waveasm-e2e)
+            ACTIONS+=(test-waveasm-e2e)
+            shift
+            ;;
+        --print-wave-env)
+            ACTIONS+=(print-wave-env)
+            shift
+            ;;
+        --help|-h)
+            usage
+            exit 0
+            ;;
+        *)
+            echo "error: unknown option: $1" >&2
+            echo "Run with --help for usage." >&2
+            # Don't exit until after arg parsing so we can detect `--help` after bad flags
+            error=1
+            shift
+            ;;
+    esac
+done
+
+if [[ "$error" -eq 1 ]]; then
+    exit 1
+fi
+
+if [[ ${#ACTIONS[@]} -eq 0 ]]; then
+    usage
+    exit 0
+fi
+
+for action in "${ACTIONS[@]}"; do
+    case "$action" in
+        build-llvm)       do_build_llvm ;;
+        build-water)      do_build_water ;;
+        build-waveasm)    do_build_waveasm ;;
+        update-sha)       do_update_sha ;;
+        test-waveasm-lit) do_test_waveasm_lit ;;
+        test-waveasm-e2e) do_test_waveasm_e2e ;;
+        print-wave-env)   do_print_wave_env ;;
+    esac
+done
