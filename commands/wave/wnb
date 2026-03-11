@@ -13,14 +13,15 @@
 set -euo pipefail
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-LLVM_SHA_FILE="$SCRIPT_DIR/water/llvm-sha.txt"
+WAVE_DIR="${WAVE_DIR:-$HOME/mk/wave}"
 LLVM_SRC="$HOME/mk/llvm-wave/llvm-project"
 LLVM_BUILD="$HOME/mk/llvm-wave/build"
 LLVM_INSTALL="$HOME/mk/llvm-wave/install"
-WATER_SRC="$SCRIPT_DIR/water"
-WATER_BUILD="$SCRIPT_DIR/water/build"
-WAVEASM_SRC="$SCRIPT_DIR/waveasm"
-WAVEASM_BUILD="$SCRIPT_DIR/waveasm/build"
+WATER_SRC="$WAVE_DIR/water"
+WATER_BUILD="$WAVE_DIR/water/build"
+WAVEASM_SRC="$WAVE_DIR/waveasm"
+WAVEASM_BUILD="$WAVE_DIR/waveasm/build"
+LLVM_SHA_FILE="$WAVE_DIR/water/llvm-sha.txt"
 
 LLVM_REPO="${WAVE_LLVM_REPO:-https://github.com/llvm/llvm-project.git}"
 BUILD_SHARED_LIBS="${WAVE_LLVM_BUILD_SHARED_LIBS:-OFF}"
