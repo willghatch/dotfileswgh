@@ -28,25 +28,29 @@ BUILD_SHARED_LIBS="${WAVE_LLVM_BUILD_SHARED_LIBS:-OFF}"
 BUILD_TYPE="${WAVE_BUILD_TYPE:-Release}"
 JOBS="${WAVE_LLVM_JOBS:-$(nproc)}"
 
-LLVM_DIR="$LLVM_INSTALL/lib/cmake/llvm"
-MLIR_DIR="$LLVM_INSTALL/lib/cmake/mlir"
-LLD_DIR="$LLVM_INSTALL/lib/cmake/lld"
+LLVM_DIR="$LLVM_BUILD/lib/cmake/llvm"
+MLIR_DIR="$LLVM_BUILD/lib/cmake/mlir"
+LLD_DIR="$LLVM_BUILD/lib/cmake/lld"
+
+WAVE_LLVM_DIR="$LLVM_BUILD"
+
+
 
 usage() {
     cat <<EOF
 wnb - wave native build
 
 Usage:
-  wnb --build-llvm        Clone (if needed), configure, and build LLVM/MLIR.
-  wnb --build-water       Configure and build the Water MLIR dialect.
-  wnb --build-waveasm     Configure and build the WaveASM backend.
-  wnb --build-all         Build LLVM, Water, and WaveASM (in order).
-  wnb --update-sha        Check out the SHA from water/llvm-sha.txt in the
+  --build-llvm        Clone (if needed), configure, and build LLVM/MLIR.
+  --build-water       Configure and build the Water MLIR dialect.
+  --build-waveasm     Configure and build the WaveASM backend.
+  --build-all         Build LLVM, Water, and WaveASM (in order).
+  --update-sha        Check out the SHA from water/llvm-sha.txt in the
                            existing LLVM clone, then exit.
-  wnb --test-waveasm-lit  Run WaveASM lit tests (ninja check-waveasm).
-  wnb --test-waveasm-e2e  Run WaveASM Python e2e tests (pytest).
-  wnb --print-wave-env    Print shell exports for Wave development.
-  wnb --help              Show this help message.
+  --test-waveasm-lit  Run WaveASM lit tests (ninja check-waveasm).
+  --test-waveasm-e2e  Run WaveASM Python e2e tests (pytest).
+  --print-wave-env    Print shell exports for Wave development.
+  --help              Show this help message.
 
 Arguments after -- are passed to pytest (for --test-waveasm-e2e):
   wnb --test-waveasm-e2e -- -k test_copy_kernel
@@ -237,7 +241,7 @@ do_test_waveasm_e2e() {
 
 do_print_wave_env() {
     cat <<EOF
-export WAVE_LLVM_DIR="$LLVM_INSTALL"
+export WAVE_LLVM_DIR="$WAVE_LLVM_DIR"
 export WAVE_WATER_DIR="$WATER_BUILD"
 export WAVE_WAVEASM_DIR="$WAVEASM_BUILD"
 export WAVE_BUILD_WATER=1
