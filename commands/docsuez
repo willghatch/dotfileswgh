@@ -1106,7 +1106,16 @@ class Docsuez:
 
     def run(self):
         parser = argparse.ArgumentParser(
-            description="Build and run Docker containers with tsuez integration"
+            description="Build and run Docker containers with tsuez integration",
+            epilog="environment variables:\n"
+                   "  DOCSUEZ_PATH    Colon-separated list of directories to search for\n"
+                   "                  configuration files (overrides XDG directories)\n"
+                   "  DOCSUEZ_NO_USER_NAME_PREPEND\n"
+                   "                  If set, do not prepend $USER to docker image and\n"
+                   "                  container names\n"
+                   "  TMPDIR          Directory for temporary files such as generated\n"
+                   "                  Dockerfiles and run scripts (default: /tmp)\n",
+            formatter_class=argparse.RawDescriptionHelpFormatter,
         )
         subparsers = parser.add_subparsers(dest="command", help="Commands")
 
