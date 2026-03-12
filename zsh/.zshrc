@@ -597,6 +597,9 @@ zstyle ':zaw:git-files' default zaw-callback-append-to-buffer
 sourceFromDotfileswghAlts env.sh
 sourceFromDotfileswghAlts zshrc
 
+# compdef for commands that use the generic _help-completer that parses `--help` output.
+# I wanted to have a key binding to do it automatically for any command, but it wasn't working.  But this is still reasonably convenient.
+compdef _help-completer wnb
 
 if [ -x ~/vscripts/motd.sh ]
 then

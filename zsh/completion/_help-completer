@@ -1,0 +1,58 @@
+#autoload
+
+# Generic completer: calls COMMAND --help and parses the output to offer
+# flag/option completions.
+#
+# Register it for commands with:
+#   compdef _help-completer cmd1 cmd2 cmd3
+#
+# The command name is derived from $service (set by the completion system).
+
+local cmd="$service"
+local -a completions
+local help_text
+
+help_text="$($cmd --help 2>&1)"
+
+# Parse lines that look like option descriptions.
+# Matches patterns like:
+#   -f, --flag         Description text
+#   --long-flag        Description text
+#   -s                 Description text
+#   --option=VALUE     Description text
+#   --option <value>   Description text
+local line flag flags_part desc
+while IFS= read -r line; do
+  # Skip lines that don't start with optional whitespace then a dash
+  [[ "$line" =~ ^[[:space:]]*- ]] || continue
+
+  # Split into flags portion and description.
+  # The description starts after two or more spaces following the flags,
+  # or after a tab.
+  if [[ "$line" =~ ^[[:space:]]*((-[^[:space:],]+([[:space:]]*,[[:space:]]*)?)+([[:space:]][A-Z_\<\[]+[A-Z_\>\]]*|=[^[:space:]]*)?)([[:space:]][[:space:]]+(.*)|[[:space:]]*$) ]]; then
+    flags_part="${match[1]}"
+    desc="${match[6]}"
+  else
+    continue
+  fi
+
+  # Trim leading/trailing whitespace from desc
+  desc="${desc#"${desc%%[! ]*}"}"
+  desc="${desc%" ${desc##*[! ]}"}"
+  # Escape colons in desc for _describe
+  desc="${desc//:/\\:}"
+
+  # Extract each flag from the flags portion (may be "-f, --foo")
+  while [[ "$flags_part" =~ (-[^[:space:],=]+) ]]; do
+    flag="${match[1]}"
+    if [[ -n "$desc" ]]; then
+      completions+=("${flag}:${desc}")
+    else
+      completions+=("${flag}")
+    fi
+    # Remove the matched flag and continue
+    flags_part="${flags_part#*${match[1]}}"
+  done
+done <<< "$help_text"
+
+_describe "option" completions
