@@ -3,7 +3,7 @@
 # rsync wrapper because rsync has weird behavior with the trailing 
 # slash of the source argument
 
-if [[ $# < 2 || "$1" == --help ]]; then
+if [[ "$@" =~ "--help" || $# < 2 ]]; then
   echo "usage: $0 <src> <dest>"
   echo 'acts like `cp $src/* $dest/`'
   exit 1

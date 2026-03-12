@@ -1,8 +1,8 @@
 #!/usr/bin/env bash
 
-if [[ "$#" -lt "2" ]]; then
+if [[ "$@" =~ "--help" || "$#" -lt "2" ]]; then
     echo "usage: $0 <file.ogg> <file.jpg>"
-    echo "Add "
+    echo "Add a JPEG cover image to an OGG file using vorbiscomment."
     exit 1
 fi
 

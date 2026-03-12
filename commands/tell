@@ -1,5 +1,13 @@
 #!/usr/bin/env bash
 
+if [[ "$@" =~ "--help" ]]; then
+    echo "Usage: $0 <recipient> <message...>"
+    echo "Send a Jabber message via gajim-remote. Also invokable as 'etell' (compose"
+    echo "in editor) or 'ctell' (read from stdin). Recipients can be aliased via"
+    echo "the TELL_ALIAS_FILE."
+    exit 0
+fi
+
 declare -A TELL_ALIASES
 if [[ -f "$TELL_ALIAS_FILE" ]]; then
   # this should fill the associative array TELL_ALIASES

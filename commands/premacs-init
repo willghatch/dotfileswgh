@@ -1,6 +1,13 @@
 #!/usr/bin/env bash
 
 # script to pre-launch emacs daemons to speed up start time
+
+if [[ "$@" =~ "--help" ]]; then
+    echo "Usage: $0"
+    echo "Initialize the premacs daemon pool if no daemons are currently available."
+    exit 0
+fi
+
 if [[ "none" = $(premacs-get-next-daemon) ]]; then
     premacs-init-force
 fi

@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-if [[ 0 = "$#" ]]; then
+if [[ 0 = "$#" || "$@" =~ "--help" ]]; then
     echo "Usage: mp [--new] name"
     exit 1
 fi

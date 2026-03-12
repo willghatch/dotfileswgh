@@ -1,5 +1,11 @@
 #!/usr/bin/env bash
 
+if [[ "$@" =~ "--help" ]]; then
+    echo "Usage: $0"
+    echo "Kill all unused premacs daemons and re-initialize the pool."
+    exit 0
+fi
+
 premacs-kill-unused
 premacs-init
 

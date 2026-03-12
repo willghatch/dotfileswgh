@@ -4,7 +4,13 @@
 
 usage(){
     echo "usage: $0 <xml|json>"
+    echo "Pretty-print JSON or XML from stdin."
 }
+
+case "$*" in *--help*)
+    usage
+    exit 0
+    ;; esac
 
 if [ "$1" = "json" ]; then
     python -m json.tool <&0

@@ -1,5 +1,11 @@
 #!/usr/bin/env bash
 
+if [[ "$@" =~ "--help" ]]; then
+    echo "Usage: $0 [files...]"
+    echo "Use a premacs emacs daemon as a pager, reading stdin into a temporary file."
+    exit 0
+fi
+
 export ALTERNATE_EDITOR=less
 dir="${XDG_RUNTIME_DIR:-/tmp/$(whoami)}/premacs-pages"
 mkdir -p "$dir"

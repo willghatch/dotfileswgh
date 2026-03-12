@@ -1,5 +1,11 @@
 #!/usr/bin/env bash
 
+if [[ "$@" =~ "--help" ]]; then
+    echo "Usage: $0 <elisp-expression>"
+    echo "Evaluate an elisp expression using a premacs daemon, or batch emacs if none available."
+    exit 0
+fi
+
 echo premacs-use-for-script got: $@
 script="$1"
 

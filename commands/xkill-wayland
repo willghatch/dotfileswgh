@@ -2,6 +2,12 @@
 
 # I know the name xkill, so let's use that name for this wrapper...
 
+if [[ "$@" =~ "--help" ]]; then
+    echo "Usage: $0"
+    echo "Kill a window by clicking on it."
+    exit 0
+fi
+
 if [[ "$XDG_SESSION_DESKTOP" = "hyprland" ]]; then
     # esc to escape kill mode
     hyprctl kill

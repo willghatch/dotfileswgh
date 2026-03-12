@@ -1,5 +1,11 @@
 #!/usr/bin/env bash
 
+if [[ "$@" =~ "--help" ]]; then
+    echo "Usage: $0"
+    echo "Print the socket path of the next available premacs daemon, or 'none' if unavailable."
+    exit 0
+fi
+
 premaxf=${XDG_RUNTIME_DIR:-/tmp/$(whoami)}/premacs-list
 
 if [ -f $premaxf ]

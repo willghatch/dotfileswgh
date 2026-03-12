@@ -1,5 +1,11 @@
 #!/usr/bin/env bash
 
+if [[ "$@" =~ "--help" ]]; then
+    echo "Usage: $0"
+    echo "Kill all unused premacs daemons listed in the premacs pool."
+    exit 0
+fi
+
 premaxf=${XDG_RUNTIME_DIR:-/tmp/$(whoami)}/premacs-list
 
 while read daemon

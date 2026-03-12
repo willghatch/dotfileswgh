@@ -1,5 +1,11 @@
 #!/usr/bin/env bash
 
+if [[ "$@" =~ "--help" ]]; then
+    echo "Usage: $0"
+    echo "Pop the next available premacs daemon from the pool and spawn a replacement."
+    exit 0
+fi
+
 daemon="$(premacs-get-next-daemon)"
 
 if [[ "none" = "$daemon" ]]; then

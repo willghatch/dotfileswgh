@@ -1,5 +1,11 @@
 #!/usr/bin/env bash
 
+if [[ "$@" =~ "--help" ]]; then
+    echo "Usage: $0"
+    echo "Display terminal capability tests"
+    exit 0
+fi
+
 echo Testing unicode combining characters:
 echo Here are two “o”s with an combining acute accent between them.
 echo The accent should appear above the first “o”.

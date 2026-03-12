@@ -1,5 +1,11 @@
 #!/usr/bin/env bash
 
+if [[ "$@" =~ "--help" ]]; then
+    echo "Usage: $0 <image-file>"
+    echo "Rename an image file to its EXIF creation date (YYYY-MM-DD_HH-MM-SS.jpg)."
+    exit 0
+fi
+
 imgfile="$1"
 
 date=$(exiftool $imgfile -EXIF:CreateDate | awk '{print $4,$5}' | sed "s/ /_/" | sed s/:/-/g)

@@ -1,5 +1,11 @@
 #!/usr/bin/env bash
 
+if [[ "$@" =~ "--help" ]]; then
+    echo "Usage: $0 [emacsclient-args...]"
+    echo "Consume a premacs daemon from the pool and open emacsclient with it."
+    exit 0
+fi
+
 daemon="$(premacs-use-next-daemon)"
 
 if [[ "none" = "$daemon" ]]; then

@@ -1,6 +1,10 @@
 #!/bin/sh
 
-# Rename files with spaces to underscores.  Recurse into directories.
+case "$*" in *--help*)
+    echo "Usage: $0"
+    echo "Rename files with spaces to underscores, recursing into directories."
+    exit 0
+    ;; esac
 
 ls | while read -r FILE
 do

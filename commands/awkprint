@@ -3,6 +3,12 @@
 # wrapper for my most common usage of awk, because I always
 # forget its syntax.
 
+if [[ "$@" =~ "--help" ]]; then
+    echo "Usage: $0 <field_num> [field_num ...]"
+    echo "Reads from stdin"
+    exit 0
+fi
+
 awkcmd='{print $'"$1"
 shift
 

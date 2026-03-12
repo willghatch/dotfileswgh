@@ -2,6 +2,12 @@
 
 # script to pre-launch emacs daemons to speed up start time
 
+if [[ "$@" =~ "--help" ]]; then
+    echo "Usage: $0"
+    echo "Force-start new premacs emacs daemons regardless of current pool state."
+    exit 0
+fi
+
 premacs-new &
 premacs-new &
 premacs-new

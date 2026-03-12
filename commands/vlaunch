@@ -1,5 +1,10 @@
 #!/usr/bin/env bash
 
+if [[ "$1" = "--help" ]]; then
+    echo "Usage: $0 <command> [args...]"
+    exit 0
+fi
+
 # It's nice to set keys on eg. window managers to launch programs.  But sometimes
 # you want to launch different programs for the same purpose on different machines.
 # You don't want to muck about with your WM config for each of these, though, especially

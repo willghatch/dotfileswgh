@@ -1,4 +1,11 @@
 #!/bin/sh
+
+case "$*" in *--help*)
+    echo "Usage: $0"
+    echo "List all executable names found in PATH directories."
+    exit 0
+    ;; esac
+
 for dir in `echo $PATH | sed 's/:/\n/g' | xargs readlink -f | uniq`; do
   ls -1 "$dir" 2>/dev/null
 done

@@ -1,5 +1,11 @@
 #!/usr/bin/env bash
 
+if [[ "$@" =~ "--help" ]]; then
+    echo "Usage: $0"
+    echo "Read text from stdin and speak it aloud using pico2wave text-to-speech."
+    exit 0
+fi
+
 text=$(cat -)
 tfile=$(mktemp /tmp/pico-XXXXXX.wav)
 

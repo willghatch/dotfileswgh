@@ -1,7 +1,11 @@
 #!/usr/bin/env bash
 
-# Takes input text from stdin.
-# Use OSC-52 terminal sequence to send text through terminal to be copied into system clipboard, which works through ssh by going through the terminal.
+if [[ "$@" =~ "--help" ]]; then
+    echo "Usage: $0 < text"
+    echo "Copy stdin to the system clipboard via OSC-52 terminal escape sequence."
+    echo "Works through SSH by sending the copy command through the terminal."
+    exit 0
+fi
 
 # set up the OSC sequence beginning, plus first argument "c" meaning to use clipboard.  Switch to p to use primary selection, or some other arguments, see https://invisible-island.net/xterm/ctlseqs/ctlseqs.html#h3-Operating-System-Commands
 echo -n -e "\e]52;c;"

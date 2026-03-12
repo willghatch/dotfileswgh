@@ -28,6 +28,12 @@
 #     link: https://gist.github.com/bobthecow/757788
 #
 
+if [[ "$@" =~ "--help" ]]; then
+    echo "Usage: $0 [PATH] [CMD] ..."
+    echo "Open a new iTerm2 window, optionally at PATH and/or running CMD."
+    exit 0
+fi
+
 # OSX only
 [ `uname -s` != "Darwin" ] && echo 'OS X Only' &&return
 

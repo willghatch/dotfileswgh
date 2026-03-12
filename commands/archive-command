@@ -122,5 +122,9 @@ archive-command(){
     fi
 }
 
+if [[ "$@" =~ "--help" ]]; then
+    _archive_command_help
+    exit 1
+fi
 archive-command "$@"
 

@@ -2,6 +2,12 @@
 
 # print true/false for whether in wsl
 
+if [[ "$@" =~ "--help" ]]; then
+    echo "Usage: $0"
+    echo "Print 'true' if running inside Windows Subsystem for Linux, 'false' otherwise."
+    exit 0
+fi
+
 if [[ -f /proc/sys/fs/binfmt_misc/WSLInterop && -d /mnt/c && -n "$WSL_DISTRO_NAME" ]]; then
   echo true
   exit 0

@@ -1,5 +1,11 @@
 #!/usr/bin/env bash
 
+if [[ "$@" =~ "--help" ]]; then
+    echo "Usage: $0"
+    echo "Rotate through random wallpapers from ~/wallpapers."
+    exit 0
+fi
+
 delay=$(( 5 * 60 ))
 
 file=/dev/null

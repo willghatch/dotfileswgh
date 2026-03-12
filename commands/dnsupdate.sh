@@ -1,10 +1,12 @@
 #!/usr/bin/env bash
 
-# needs environment variables:
-# DNSSERVER
-# DNSZONE
-# DNSHOST
-# KEYFILE
+if [[ "$@" =~ "--help" ]]; then
+    echo "Usage: $0"
+    echo "Update DNS A and AAAA records for the current host's IP addresses via nsupdate."
+    echo "Requires environment variables: DNSSERVER, DNSZONE, DNSHOST, KEYFILE."
+    exit 0
+fi
+
 if [[ -z "$DNSSERVER" || -z "$DNSZONE" || -z "$DNSHOST" || -z "$KEYFILE" ]]; then
     echo "variables DNSSERVER DNSZONE DNSHOST KEYFILE are required"
     exit 1

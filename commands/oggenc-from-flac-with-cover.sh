@@ -1,7 +1,8 @@
 #!/usr/bin/env bash
 
-if [[ "$#" -lt 2 ]]; then
+if [[ "$@" =~ "--help" || "$#" -lt 2 ]]; then
   echo "usage: $0 <flacfile> <outfile>"
+  echo "Encode a FLAC file to OGG and copy the embedded cover art."
   exit 1
 fi
 

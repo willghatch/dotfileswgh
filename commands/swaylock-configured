@@ -1,4 +1,11 @@
 #!/bin/sh
+
+case "$*" in *--help*)
+    echo "Usage: $0"
+    echo "Lock the screen with swaylock using preconfigured options, avoiding duplicate instances."
+    exit 0
+    ;; esac
+
 # Check for running swaylock first, to not double lock
 if pidof swaylock; then
     exit 0

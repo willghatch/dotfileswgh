@@ -1,10 +1,9 @@
 #!/usr/bin/env bash
 
-# Shows uptime in a format easy to parse
-# days hours minutes seconds
-# separated by spaces
-
-# Author: William Hatch
+if [[ "$@" =~ "--help" ]]; then
+    cat $(readlink -f "$0")
+    exit 0
+fi
 
 upTime=$(cat /proc/uptime | awk -F. '{print $1}')
 

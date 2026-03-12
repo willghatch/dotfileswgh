@@ -1,7 +1,10 @@
 #!/usr/bin/env bash
-#
-# battery status script
-#
+
+if [[ "$@" =~ "--help" ]]; then
+    echo "Usage: $0 (no args)"
+    echo "Display battery status."
+    exit 0
+fi
 
 # BATTERY=/proc/acpi/battery/BAT0
 BATTERY=/sys/class/power_supply/BAT0

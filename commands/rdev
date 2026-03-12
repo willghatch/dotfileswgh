@@ -1,4 +1,10 @@
 #!/bin/sh
+
+case "$*" in *--help*)
+    cat $(readlink -f "$0")
+    exit 0
+    ;; esac
+
 export CURRENT_DEV_PATH=""
 export CURRENT_DEV_MODE=racket-misc
 exec racket-dev-environment.sh

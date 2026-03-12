@@ -1,4 +1,10 @@
 #!/usr/bin/env bash
 
+if [[ "$@" =~ "--help" || "$#" -ne 2 ]]; then
+    echo "Usage: $0 <key> <value>"
+    echo "Call set-xkb-key with the X primary selection as the third argument."
+    exit 0
+fi
+
 set-xkb-key "$1" "$2" "$(xclip -o -primary)"
 

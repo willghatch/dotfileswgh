@@ -2,10 +2,15 @@
 
 # This is mostly copied from https://github.com/technomancy/dotfiles/blob/master/bin/music-choose
 
+if [[ "$@" =~ "--help" ]]; then
+    echo "Usage: $0 [--append]"
+    exit 0
+fi
+
 append=false
 if [[ "$1" = "--append" ]]; then
     append=true
-elif [[ "$1" = "--help" || -n "$1" ]]; then
+elif [[ -n "$1" ]]; then
     echo "Usage: $0 [--append]"
     exit 1
 fi

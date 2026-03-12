@@ -1,5 +1,10 @@
-#!/bin/sh
+#!/usr/bin/env bash
 
+if [[ "$@" =~ "--help" || "$#" = 0 ]]; then
+    echo "Usage: $0 <file> [file ...]"
+    echo "Convert document files to PDF using LibreOffice in headless mode."
+    exit 0
+fi
 
 if [ -n "$(ps -e | grep soffice)" ]
 then

@@ -3,7 +3,7 @@
 # The >> operator is great for appending, but sometimes what you really
 # need to do is prepend.
 
-if [ -z "$1" ]; then
+if [[ "$@" =~ "--help" || -z "$1" ]]; then
     echo "usage, taking prepended text from stdin:  prepend <file>"
     exit
 fi

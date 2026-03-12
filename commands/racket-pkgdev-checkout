@@ -2,11 +2,17 @@
 
 # use bourne shell because I need to do this *in* the environment where I'm checking out packages, where I don't yet have rash.
 
-if test "$1" = "--help" -o -z "$1"; then
-  #echo "Usage: $0 <raco-path> <release-number>"
+usage() {
   echo "Usage: $0 <raco-path>"
   echo "Sets the catalog path for the given raco to be pinned to the given release."
   echo "Then clones all my repos in the current directory."
+}
+case "$*" in *--help*)
+  usage
+  exit 0
+  ;; esac
+if test -z "$1"; then
+  usage
   exit 1
 fi
 

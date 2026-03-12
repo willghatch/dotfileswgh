@@ -11,7 +11,16 @@
 #
 # ---------------------------------------------------------------------
 
-GEOM=${1:-60x18}
+DEFAULT_GEOMETRY=60x18
+
+if [[ "$@" =~ "--help" ]]; then
+    echo "Usage: $0 [geometry]"
+    echo "Open a minimal bash run dialog in a terminal window."
+    echo "Default geometry is $DEFAULT_GEOMETRY."
+    exit 0
+fi
+
+GEOM=${1:-$DEFAULT_GEOMETRY}
 
 BASHRUNRC=$DOTFILESWGH/minimal-bashrunrc
 export HISTFILE=$HOME/.cache/minimal-bashrun-history

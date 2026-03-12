@@ -2,6 +2,12 @@
 
 # start up new emacs daemon
 
+if [[ "$@" =~ "--help" ]]; then
+    echo "Usage: $0"
+    echo "Start a new premacs emacs daemon and add it to the daemon pool."
+    exit 0
+fi
+
 export SHELL=/bin/sh
 premaxd=${XDG_RUNTIME_DIR:-/tmp/$(whoami)}
 newId=$RANDOM

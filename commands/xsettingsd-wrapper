@@ -1,5 +1,13 @@
 #!/usr/bin/env bash
 
+if [[ "$@" =~ "--help" ]]; then
+    echo "Usage: $0 [--start]"
+    echo "Generate xsettingsd config from dotfileswgh and reload or start xsettingsd."
+    echo "With --start, exec xsettingsd with the generated config."
+    echo "Without --start, send SIGHUP to a running xsettingsd to reload settings."
+    exit 0
+fi
+
 configdir=${XDG_RUNTIME_DIR:-/tmp/$USER/xsettingsd}
 
 themeconfig=$DOTFILESWGH/xsettingsd-$(lightdark-status)

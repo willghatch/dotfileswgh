@@ -5,7 +5,7 @@
 # duplicates header crap -- but that probably shouldn't change
 # anyway...
 
-if [[ -z "$1" || "$1" = "--help" ]]; then
+if [[ "$@" =~ "--help" || -z "$1" ]]; then
     echo "usage: $0 <at job id> <new time spec>" 1>&2
     exit 1
 fi

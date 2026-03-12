@@ -1,5 +1,11 @@
 #!/usr/bin/env bash
 
+if [[ "$@" =~ "--help" ]]; then
+    echo "Usage: $0"
+    echo "Kill all premacs emacs daemons and clean up the premacs socket and list files."
+    exit 0
+fi
+
 rdir=${XDG_RUNTIME_DIR:-/tmp/$(whoami)}
 for daemon in `ls $rdir/premacs-socket*`
 do

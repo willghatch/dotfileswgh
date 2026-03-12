@@ -3,8 +3,10 @@
 # launch a command in the background, disowned
 # with alias support
 
-if [ "$#" -eq 0 ]; then
-    echo "usage: $0 <cmd> [args ...]"
+if [[ "$@" =~ "--help" || "$#" -eq 0 ]]; then
+    echo "Usage: $0 <cmd> [args ...]"
+    echo "Launch a command in the background, disowned, with alias support."
+    exit 0
 fi
 
 shopt -s expand_aliases

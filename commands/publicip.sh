@@ -2,6 +2,12 @@
 
 # get my public IP address
 
+if [[ "$@" =~ "--help" ]]; then
+    echo "Usage: $0 [-6]"
+    echo "Get your public IP address. Use -6 for IPv6."
+    exit 0
+fi
+
 if [[ "$1" = -6 ]]; then
     ip6=true
 fi

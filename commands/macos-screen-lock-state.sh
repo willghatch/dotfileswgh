@@ -1,6 +1,11 @@
 #!/bin/sh
 # Adapted from https://stackoverflow.com/questions/11505255/osx-check-if-the-screen-is-locked
 
+case "$*" in *--help*)
+    cat $(readlink -f "$0")
+    exit 0
+    ;; esac
+
 function screenIsLocked { [ "$(/usr/libexec/PlistBuddy -c "print :IOConsoleUsers:0:CGSSessionScreenIsLocked" /dev/stdin 2>/dev/null <<< "$(ioreg -n Root -d1 -a)")" = "true" ]; }
 
 if screenIsLocked; then

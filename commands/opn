@@ -1,6 +1,10 @@
 #!/usr/bin/env bash
 
-# script for opening things, like xdg-open, but with different configuration...
+if [[ "$@" =~ "--help" ]]; then
+    echo "Usage: $0 <file>"
+    echo "Open a file with the appropriate application, like xdg-open but with different configuration."
+    exit 0
+fi
 
 source "$DOTFILESWGH/bazsh-lib"
 

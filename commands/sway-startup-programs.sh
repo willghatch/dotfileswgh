@@ -1,5 +1,11 @@
 #!/usr/bin/env bash
 
+if [[ "$@" =~ "--help" ]]; then
+    echo "Usage: $0"
+    echo "Launch startup programs for a sway session (swayidle, waybar, wallpaper, etc.)."
+    echo "Sourced at the end of sway configuration."
+    exit 0
+fi
 
 # This is executed at the end of sway configuration.
 # Sway should be launched in some way such that it already has env-more sourced before launch.
