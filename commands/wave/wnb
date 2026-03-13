@@ -234,7 +234,7 @@ do_test_waveasm_lit() {
 do_test_waveasm_e2e() {
     echo "Running WaveASM Python e2e tests ..."
     WAVE_CACHE_ON=0 \
-    PYTHONPATH="$SCRIPT_DIR" \
+    PYTHONPATH="$WAVE_DIR" \
         python3 -m pytest --run-e2e "$SCRIPT_DIR/tests/kernel/asm_backend_test.py" -v \
         "${PASSTHROUGH_ARGS[@]}"
 }
@@ -244,10 +244,11 @@ do_print_wave_env() {
 export WAVE_LLVM_DIR="$WAVE_LLVM_DIR"
 export WAVE_WATER_DIR="$WATER_BUILD"
 export WAVE_WAVEASM_DIR="$WAVEASM_BUILD"
-export WAVE_BUILD_WATER=1
-export WAVE_BUILD_WAVEASM=1
 export WAVE_CACHE_ON=0
-export PYTHONPATH="$SCRIPT_DIR"
+export PYTHONPATH="$WAVE_DIR"
+# These are mutually exclusive with giving a built directory
+#export WAVE_BUILD_WATER=1
+#export WAVE_BUILD_WAVEASM=1
 EOF
 }
 
