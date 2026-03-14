@@ -688,7 +688,7 @@ FUNC should be a function whose first two arguments are BEG and END."
   ("hC" (lambda (n) (interactive "p") (funcall (cp/ae (cp/obj 'class)) n)) "class" :exit t)
   ("hX" (lambda (n) (interactive "p") (funcall (cp/ae (cp/obj 'test)) n)) "test" :exit t)
   ("hc" (lambda (n) (interactive "p") (funcall (cp/ae (cp/obj 'buffer-change)) n)) "buffer-change" :exit t)
-  ("hg" (lambda (n) (interactive "p") (funcall (cp/ae (cp/obj 'vcs-change)) n)) "vcs-change" :exit t)
+  ("hg" (lambda (n) (interactive "p") (funcall (cp/ae (progn (require 'cpo-git-gutter) (cp/obj 'vcs-change))) n)) "vcs-change" :exit t)
   ("H" (lambda (n) (interactive "p")
          (funcall (cp/ae (cp/obj 'location-history)) n))
    "location-history" :exit t)
