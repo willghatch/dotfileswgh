@@ -1,0 +1,190 @@
+#!/usr/bin/env python3
+"""
+wrapper for agent commands
+"""
+
+import argparse
+import os
+import subprocess
+import sys
+
+# Configuration for each supported agent
+# Each entry is a dictionary containing:
+#   env_if_unset    : vars to set if they are not already defined in the environment
+#   env_force_set   : vars that should override any existing value
+#   default_flags   : flags automatically appended to the command
+#   dang_flags      : list of flags added when the ``--dang`` option is supplied
+#   dang_env        : env vars to set (override) when ``--dang`` is used
+#   cli_command_base: list of executable name plus default flags... which is redundant with default flags.
+AGENT_CONFIG = {
+    "claude": {
+        "env_if_unset": {
+            "FORCE_COLOR": "1",
+            "CLAUDE_CODE_MAX_OUTPUT_TOKENS": "64000",
+        },
+        "env_force_set": {},
+        "default_flags": [],
+        "dang_flags": [
+            "--dangerously-skip-permissions",
+        ],
+        "dang_env": {},
+        "cli_command_base": ["claude"],
+    },
+    "cursor": {
+        "env_if_unset": {
+            "FORCE_COLOR": "1",
+        },
+        "env_force_set": {},
+        "default_flags": [],
+        "dang_flags": ["-f"],
+        "dang_env": {},
+        "cli_command_base": ["agent"],
+    },
+    "codex": {
+        "env_if_unset": {},
+        "env_force_set": {},
+        "default_flags": [],
+        "dang_flags": [
+            "--dangerously-bypass-approvals-and-sandbox",
+        ],
+        "dang_env": {},
+        "cli_command_base": ["codex"],
+    },
+    "opencode": {
+        "env_if_unset": {},
+        "env_force_set": {},
+        "default_flags": [],
+        "dang_flags": [],
+        "dang_env": {},
+        "cli_command_base": ["opencode"],
+    },
+    "gemini": {
+        "env_if_unset": {},
+        "env_force_set": {},
+        "default_flags": [],
+        "dang_flags": [
+            "--approval-mode=yolo",
+        ],
+        "dang_env": {},
+        "cli_command_base": ["gemini"],
+    },
+}
+
+AVAILABLE_AGENTS = list(AGENT_CONFIG.keys())
+
+
+def get_env_changes(config, dang_enabled=False):
+    """Return a dict of environment variables that will be set."""
+    env = {}
+    for var, default in config.get("env_if_unset", {}).items():
+        if var not in os.environ:
+            env[var] = default
+    for var, value in config.get("env_force_set", {}).items():
+        env[var] = value
+    if dang_enabled:
+        for var, value in config.get("dang_env", {}).items():
+            env[var] = value
+    return env
+
+
+def apply_env_config(config, dang_enabled=False):
+    """Apply environment variable configuration for the selected agent.
+
+    This mutates os.environ in place.
+    """
+    env = os.environ
+    for var, default in config.get("env_if_unset", {}).items():
+        if var not in env:
+            env[var] = default
+    for var, value in config.get("env_force_set", {}).items():
+        env[var] = value
+    if dang_enabled:
+        for var, value in config.get("dang_env", {}).items():
+            env[var] = value
+
+
+
+def parse_arguments():
+    parser = argparse.ArgumentParser(description="Unified CLI for LLM agent tools.")
+    parser.add_argument(
+        "--dang",
+        action="store_true",
+        help="Enable dangerously skip permissions flag for underlying agent.",
+    )
+    parser.add_argument(
+        "-v", "--verbose",
+        action="store_true",
+        help="Print the command being run before executing.",
+    )
+    parser.add_argument(
+        "agent",
+        choices=AVAILABLE_AGENTS,
+        help="Agent to run.",
+    )
+    parser.add_argument(
+        "remaining",
+        nargs="*",
+        help="Arguments to forward to the underlying agent.",
+    )
+
+    args = parser.parse_args()
+
+
+    return args
+
+
+def build_command(agent_name, config, remaining_args, dang_enabled):
+    """Construct the command to execute.
+
+    Returns a list suitable for subprocess.run.
+    """
+    cmd = []
+    cmd.extend(config.get("cli_command_base", []))
+    cmd.extend(config.get("default_flags", []))
+    if dang_enabled:
+        for flag in config.get("dang_flags", []):
+            if flag:
+                cmd.append(flag)
+    # Remaining arguments after the optional '--'
+    cmd.extend(remaining_args)
+    return cmd
+
+
+def main():
+    args = parse_arguments()
+
+    agent_name = args.agent
+    if agent_name not in AGENT_CONFIG:
+        print(
+            f"Error: unknown agent '{agent_name}'. Available agents: {', '.join(AVAILABLE_AGENTS)}",
+            file=sys.stderr,
+        )
+        sys.exit(1)
+
+    config = AGENT_CONFIG[agent_name]
+
+    env_changes = get_env_changes(config, args.dang)
+    apply_env_config(config, args.dang)
+
+    cmd = build_command(agent_name, config, args.remaining, args.dang)
+
+    if args.verbose:
+        if env_changes:
+            print(f"Environment: {env_changes}")
+        print(f"Running command: {cmd}")
+
+    try:
+        result = subprocess.run(cmd, check=True, env=os.environ.copy())
+    except FileNotFoundError:
+        print(f"Error: command '{agent_name}' not found in PATH.", file=sys.stderr)
+        sys.exit(1)
+    except subprocess.CalledProcessError as e:
+        print(
+            f"Error: command '{agent_name}' exited with status {e.returncode}.",
+            file=sys.stderr,
+        )
+        sys.exit(e.returncode)
+
+
+if __name__ == "__main__":
+    main()
