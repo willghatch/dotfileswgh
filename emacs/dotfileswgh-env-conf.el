@@ -21,6 +21,14 @@
             dotfileswgh-dotlocal
             dotfileswgh-pri-dotlocal
             ))
+(setq dotfileswgh-labeled-list
+      (list (list "dotfileswgh" dotfileswgh)
+            (list "ghp" dotfileswgh-ghp)
+            (list "pri" dotfileswgh-pri)
+            (list "rootgit" dotfileswgh-rootgit)
+            (list "dotlocal" dotfileswgh-dotlocal)
+            (list "pri-dotlocal" dotfileswgh-pri-dotlocal)
+            ))
 
 
 (setq local-emacs.d-path

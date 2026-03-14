@@ -174,6 +174,7 @@
  (require 'mwheel)
  (setq hydra-lv nil)
  (require 'vfuncs)
+ (require 'fzf-conf)
  (load-library "keys")
  ;;(load-library "demo-keys")
 

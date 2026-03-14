@@ -809,11 +809,15 @@ FUNC should be a function whose first two arguments are BEG and END."
 ;;(emmap "tfd" 'ido-find-file-from-pwd)
 (emmap "tfg" (lambda () (interactive) (require 'helm-projectile) (helm-projectile)))
 (autoload 'fzf-git-files "fzf" "" t)
-(emmap "tfz" 'fzf-git-files)
+(emmap "tfz" 'wgh/fzf-git-files)
 (emmap "tfZ" 'wgh/fzf-all-files)
 (emmap "tfu" 'wgh/fzf-untracked-files)
 (emmap "tfS" 'wgh/fzf-submodule-files)
 (emmap "tfa" 'wgh/agent-working-dir-fzf-open)
+(emmap "tfdd" 'wgh/fzf-dotfileswgh-mixin)
+(emmap "tfde" 'wgh/fzf-dotfileswgh-mixin-emacs)
+(emmap "tfdc" 'wgh/fzf-dotfileswgh-mixin-commands)
+(emmap "tfdx" 'wgh/fzf-dotfileswgh-mixin-xdg-config-ro)
 
 (emmap "th" 'my-window-map/body)
 (autoload 'projectile-command-map "projectile-conf" "" t 'keymap)
@@ -1229,9 +1233,11 @@ FUNC should be a function whose first two arguments are BEG and END."
                 (let ((fzf--target-validator #'fzf--pass-through)
                       (path (locate-dominating-file (file-truename default-directory) ".git")))
                   (if path
-                      (fzf-with-command "git ls-files"
-                                        (lambda (x) (wgh/cpo-copy-string (file-relative-name x path) register))
-                                        path)
+                      (wgh/fzf-with-command-and-alt-actions
+                       "git ls-files"
+                       (lambda (x) (wgh/cpo-copy-string (file-relative-name x path) register))
+                       wgh/fzf-file-alt-actions
+                       path)
                     (user-error "Not inside a Git repository"))))
              (register)))
            (copy-all-fzf-file-name
@@ -1241,9 +1247,11 @@ FUNC should be a function whose first two arguments are BEG and END."
                 (let ((fzf--target-validator #'fzf--pass-through)
                       (path (locate-dominating-file (file-truename default-directory) ".git")))
                   (if path
-                      (fzf-with-command "{ git ls-files; git ls-files --others --exclude-standard; } | sort -u"
-                                        (lambda (x) (wgh/cpo-copy-string (file-relative-name x path) register))
-                                        path)
+                      (wgh/fzf-with-command-and-alt-actions
+                       "{ git ls-files; git ls-files --others --exclude-standard; } | sort -u"
+                       (lambda (x) (wgh/cpo-copy-string (file-relative-name x path) register))
+                       wgh/fzf-file-alt-actions
+                       path)
                     (user-error "Not inside a Git repository"))))
              (register)))
            (copy-untracked-fzf-file-name
@@ -1253,9 +1261,11 @@ FUNC should be a function whose first two arguments are BEG and END."
                 (let ((fzf--target-validator #'fzf--pass-through)
                       (path (locate-dominating-file (file-truename default-directory) ".git")))
                   (if path
-                      (fzf-with-command "git ls-files --others --exclude-standard"
-                                        (lambda (x) (wgh/cpo-copy-string (file-relative-name x path) register))
-                                        path)
+                      (wgh/fzf-with-command-and-alt-actions
+                       "git ls-files --others --exclude-standard"
+                       (lambda (x) (wgh/cpo-copy-string (file-relative-name x path) register))
+                       wgh/fzf-file-alt-actions
+                       path)
                     (user-error "Not inside a Git repository"))))
              (register)))
            (copy-submodule-fzf-file-name
@@ -1265,9 +1275,11 @@ FUNC should be a function whose first two arguments are BEG and END."
                 (let* ((fzf--target-validator #'fzf--pass-through)
                        (root-dir (wgh/git-root-superproject)))
                   (if root-dir
-                      (fzf-with-command "git ls-files --recurse-submodules"
-                                        (lambda (x) (wgh/cpo-copy-string (file-relative-name x root-dir) register))
-                                        root-dir)
+                      (wgh/fzf-with-command-and-alt-actions
+                       "git ls-files --recurse-submodules"
+                       (lambda (x) (wgh/cpo-copy-string (file-relative-name x root-dir) register))
+                       wgh/fzf-file-alt-actions
+                       root-dir)
                     (user-error "Not inside a Git repository"))))
              (register)))
            (copy-agent-working-directory-fzf-name
@@ -1277,9 +1289,11 @@ FUNC should be a function whose first two arguments are BEG and END."
                 (let ((base (wgh/agent-working-dir-base))
                       (fzf--target-validator #'fzf--pass-through))
                   (if (file-directory-p base)
-                      (fzf-with-command "find . | sort -r"
-                                        (lambda (x) (wgh/cpo-copy-string (expand-file-name x base) register))
-                                        base)
+                      (wgh/fzf-with-command-and-alt-actions
+                       "find . | sort -r"
+                       (lambda (x) (wgh/cpo-copy-string (expand-file-name x base) register))
+                       wgh/fzf-file-alt-actions
+                       base)
                     (user-error "No agent working directories at: %s" base))))
              (register)))
 
