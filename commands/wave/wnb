@@ -1,27 +1,17 @@
 #!/usr/bin/env bash
 # wnb -- Wave Native Build
-#
-# Build LLVM/MLIR, Water, and WaveASM for the Wave project.
-# Run with --help for usage.
-#
-# Environment variables:
-#   WAVE_LLVM_REPO              LLVM repo URL (default: upstream llvm-project)
-#   WAVE_LLVM_BUILD_SHARED_LIBS ON or OFF (default: OFF)
-#   WAVE_BUILD_TYPE             CMake build type (default: Release)
-#   WAVE_LLVM_JOBS              Parallel build jobs (default: nproc)
 
 set -euo pipefail
 
-SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 WAVE_DIR="${WAVE_DIR:-$HOME/mk/wave}"
-LLVM_SRC="$HOME/mk/llvm-wave/llvm-project"
-LLVM_BUILD="$HOME/mk/llvm-wave/build"
-LLVM_INSTALL="$HOME/mk/llvm-wave/install"
-WATER_SRC="$WAVE_DIR/water"
-WATER_BUILD="$WAVE_DIR/water/build"
-WAVEASM_SRC="$WAVE_DIR/waveasm"
-WAVEASM_BUILD="$WAVE_DIR/waveasm/build"
-LLVM_SHA_FILE="$WAVE_DIR/water/llvm-sha.txt"
+LLVM_SRC="${LLVM_SRC:-$HOME/mk/llvm-wave/llvm-project}"
+LLVM_BUILD="${LLVM_BUILD:-$HOME/mk/llvm-wave/build}"
+LLVM_INSTALL="${LLVM_INSTALL:-$HOME/mk/llvm-wave/install}"
+WATER_SRC="${WATER_SRC:-$WAVE_DIR/water}"
+WATER_BUILD="${WATER_BUILD:-$WAVE_DIR/water/build}"
+WAVEASM_SRC="${WAVEASM_SRC:-$WAVE_DIR/waveasm}"
+WAVEASM_BUILD="${WAVEASM_BUILD:-$WAVE_DIR/waveasm/build}"
+LLVM_SHA_FILE="${LLVM_SHA_FILE:-$WAVE_DIR/water/llvm-sha.txt}"
 
 LLVM_REPO="${WAVE_LLVM_REPO:-https://github.com/llvm/llvm-project.git}"
 BUILD_SHARED_LIBS="${WAVE_LLVM_BUILD_SHARED_LIBS:-OFF}"
@@ -70,7 +60,18 @@ Directories:
   WaveASM source: $WAVEASM_SRC
   WaveASM build:  $WAVEASM_BUILD
 
-Environment variables:
+Environment variables (paths):
+  WAVE_DIR                      Wave repo root (default: \$HOME/mk/wave)
+  LLVM_SRC                      LLVM source dir (default: \$HOME/mk/llvm-wave/llvm-project)
+  LLVM_BUILD                    LLVM build dir (default: \$HOME/mk/llvm-wave/build)
+  LLVM_INSTALL                  LLVM install dir (default: \$HOME/mk/llvm-wave/install)
+  WATER_SRC                     Water source dir (default: \$WAVE_DIR/water)
+  WATER_BUILD                   Water build dir (default: \$WAVE_DIR/water/build)
+  WAVEASM_SRC                   WaveASM source dir (default: \$WAVE_DIR/waveasm)
+  WAVEASM_BUILD                 WaveASM build dir (default: \$WAVE_DIR/waveasm/build)
+  LLVM_SHA_FILE                 LLVM pinned SHA file (default: \$WAVE_DIR/water/llvm-sha.txt)
+
+Environment variables (build options):
   WAVE_LLVM_REPO                LLVM git repo URL
                                 (default: https://github.com/llvm/llvm-project.git)
   WAVE_LLVM_BUILD_SHARED_LIBS   ON or OFF (default: OFF)
@@ -235,7 +236,7 @@ do_test_waveasm_e2e() {
     echo "Running WaveASM Python e2e tests ..."
     WAVE_CACHE_ON=0 \
     PYTHONPATH="$WAVE_DIR" \
-        python3 -m pytest --run-e2e "$SCRIPT_DIR/tests/kernel/asm_backend_test.py" -v \
+        python3 -m pytest --run-e2e "$WAVE_DIR/tests/kernel/wave/asm/test_waveasm_e2e.py" -v \
         "${PASSTHROUGH_ARGS[@]}"
 }
 
