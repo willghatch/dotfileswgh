@@ -1,0 +1,3 @@
+{
+  "tags": {"uv-cache": {"docker-args": ["-e", "UV_CACHE_DIR=/home/wgh/mk/uv-cache"]}}
+}
