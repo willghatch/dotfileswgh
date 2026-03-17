@@ -15,6 +15,29 @@ export RACKET_CORE_DEV_PATH=$HOME/s/mk/racket-coredev/racket/bin
 
 DOTFILESWGH_COMMAND_PATH=$DOTFILESWGH_PRI_DOTLOCAL/commands:$DOTFILESWGH_DOTLOCAL/commands:$DOTFILESWGH_ROOTGIT/commands:/rootgit/bin.rootgit:/rootgit/base.rootgit/commands:/rootgit/tools.rootgit:$DOTFILESWGH_PRI/commands:$DOTFILESWGH_PRI/commands/aliases:$DOTFILESWGH_GHP/commands:$DOTFILESWGH/commands:$DOTFILESWGH/commands/aliases:$DOTFILESWGH/commands/iree
 
+# DEV_TYPES: comma-separated list of dev-type namespaces to activate.
+# For each type, prepend $MIXIN/commands/$type for every mixin.
+if [ -n "$DEV_TYPES" ]; then
+    _dfw_dt_path=""
+    _dfw_remaining="$DEV_TYPES"
+    while [ -n "$_dfw_remaining" ]; do
+        _dfw_dt="${_dfw_remaining%%,*}"
+        if [ "$_dfw_dt" = "$_dfw_remaining" ]; then
+            _dfw_remaining=""
+        else
+            _dfw_remaining="${_dfw_remaining#*,}"
+        fi
+        _dfw_dt_path="$_dfw_dt_path:$DOTFILESWGH_PRI_DOTLOCAL/commands/$_dfw_dt"
+        _dfw_dt_path="$_dfw_dt_path:$DOTFILESWGH_DOTLOCAL/commands/$_dfw_dt"
+        _dfw_dt_path="$_dfw_dt_path:$DOTFILESWGH_ROOTGIT/commands/$_dfw_dt"
+        _dfw_dt_path="$_dfw_dt_path:$DOTFILESWGH_PRI/commands/$_dfw_dt"
+        _dfw_dt_path="$_dfw_dt_path:$DOTFILESWGH_GHP/commands/$_dfw_dt"
+        _dfw_dt_path="$_dfw_dt_path:$DOTFILESWGH/commands/$_dfw_dt"
+    done
+    DOTFILESWGH_COMMAND_PATH="${_dfw_dt_path#:}:$DOTFILESWGH_COMMAND_PATH"
+    unset _dfw_dt_path _dfw_remaining _dfw_dt
+fi
+
 HROOT_PATH=$HROOT/bin:$HROOT/usr/bin:$HROOT/usr/local/bin
 COMMON_PATHS=/usr/bin:/bin:/usr/local/bin:/sbin:/usr/sbin:/usr/local/sbin
 COMMON_HOME_PATHS=$HOME/.local/bin:$DOTFILESWGH_DOTLOCAL/npm/bin
