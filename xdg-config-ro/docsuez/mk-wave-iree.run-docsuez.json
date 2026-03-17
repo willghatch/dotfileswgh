@@ -1,12 +1,16 @@
 {
     "tags": {
+        "dev-types": {
+            "docker-args": [
+                "-e", "DEV_TYPES=wave,iree"
+            ]
+        },
         "mk": {
             "volumes": {
                 "$HOME/mk/amd/e-wave-iree": "/home/wgh/mk"
             },
             "pre-tmux-script": [
                 "source $DOTFILESWGH/env-more-with-mixins.sh",
-                "PATH=$PATH:$DOTFILESWGH/commands/iree",
                 "cd mk",
                 "source venv/bin/activate",
                 "source iree-build/.env && export PYTHONPATH",
