@@ -1,5 +1,10 @@
 {
   "tags": {
+    "_dev-type": {
+      "docker-args": [
+        "-e", "DEV_TYPE=wave"
+      ]
+    },
     "network": {
       "docker-args": [
         "--network=host"

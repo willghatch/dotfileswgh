@@ -31,16 +31,17 @@ usage() {
 wnb - wave native build
 
 Usage:
-  --build-llvm        Clone (if needed), configure, and build LLVM/MLIR.
-  --build-water       Configure and build the Water MLIR dialect.
-  --build-waveasm     Configure and build the WaveASM backend.
-  --build-all         Build LLVM, Water, and WaveASM (in order).
-  --update-sha        Check out the SHA from water/llvm-sha.txt in the
-                           existing LLVM clone, then exit.
-  --test-waveasm-lit  Run WaveASM lit tests (ninja check-waveasm).
-  --test-waveasm-e2e  Run WaveASM Python e2e tests (pytest).
-  --print-wave-env    Print shell exports for Wave development.
-  --help              Show this help message.
+  --worktree-initialize  Set up a Wave dev virtualenv in \$WAVE_DIR/.venv.
+  --build-llvm           Clone (if needed), configure, and build LLVM/MLIR.
+  --build-water          Configure and build the Water MLIR dialect.
+  --build-waveasm        Configure and build the WaveASM backend.
+  --build-all            Build LLVM, Water, and WaveASM (in order).
+  --update-sha           Check out the SHA from water/llvm-sha.txt in the
+                              existing LLVM clone, then exit.
+  --test-waveasm-lit     Run WaveASM lit tests (ninja check-waveasm).
+  --test-waveasm-e2e     Run WaveASM Python e2e tests (pytest).
+  --print-wave-env       Print shell exports for Wave development.
+  --help                 Show this help message.
 
 Arguments after -- are passed to pytest (for --test-waveasm-e2e):
   wnb --test-waveasm-e2e -- -k test_copy_kernel
@@ -253,6 +254,32 @@ export PYTHONPATH="$WAVE_DIR"
 EOF
 }
 
+do_worktree_initialize() {
+    local venv_dir="$WAVE_DIR/.venv"
+    local log_file
+    log_file="$(mktemp)"
+
+    if ! (
+        set -euo pipefail
+        uv venv "$venv_dir"
+        source "$venv_dir/bin/activate"
+        uv pip install -r "<($WAVE_DIR/gen-pytorch-rocm-requirements.py)"
+        uv pip install -r "$WAVE_DIR/requirements-iree-pinned.txt"
+        uv pip install -e "$WAVE_DIR[dev]"
+    ) > "$log_file" 2>&1; then
+        echo "error: worktree initialization failed. Output:" >&2
+        cat "$log_file" >&2
+        rm -f "$log_file"
+        exit 1
+    fi
+
+    rm -f "$log_file"
+    echo "# Remember to enable virtualenv and WAVE_DIR"
+    echo "source $venv_dir/bin/activate"
+    echo ""
+    do_print_wave_env
+}
+
 # --- Argument parsing ---
 if [[ $# -eq 0 ]]; then
     usage
@@ -268,6 +295,10 @@ while [[ $# -gt 0 ]]; do
             shift
             PASSTHROUGH_ARGS=("$@")
             break
+            ;;
+        --worktree-initialize)
+            ACTIONS+=(worktree-initialize)
+            shift
             ;;
         --build-llvm)
             ACTIONS+=(build-llvm)
@@ -326,12 +357,13 @@ fi
 
 for action in "${ACTIONS[@]}"; do
     case "$action" in
-        build-llvm)       do_build_llvm ;;
-        build-water)      do_build_water ;;
-        build-waveasm)    do_build_waveasm ;;
-        update-sha)       do_update_sha ;;
-        test-waveasm-lit) do_test_waveasm_lit ;;
-        test-waveasm-e2e) do_test_waveasm_e2e ;;
-        print-wave-env)   do_print_wave_env ;;
+        worktree-initialize) do_worktree_initialize ;;
+        build-llvm)          do_build_llvm ;;
+        build-water)         do_build_water ;;
+        build-waveasm)       do_build_waveasm ;;
+        update-sha)          do_update_sha ;;
+        test-waveasm-lit)    do_test_waveasm_lit ;;
+        test-waveasm-e2e)    do_test_waveasm_e2e ;;
+        print-wave-env)      do_print_wave_env ;;
     esac
 done
