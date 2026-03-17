@@ -10,8 +10,8 @@ Segments are .md files found in (per location, dev-type paths precede base path)
   5. Each XDG_CONFIG_DIRS entry (same pattern)
 
 Dev types come from --dev-type flags (repeatable, higher priority) and the
-DEV_TYPE environment variable.  Multiple dev types are searched in the order
-given, so the first --dev-type has the highest priority.
+DEV_TYPES environment variable (comma-separated).  Multiple dev types are
+searched in the order given, so the first --dev-type has the highest priority.
 
 Earlier search paths take priority (first found wins for a given segment name).
 """
@@ -139,7 +139,7 @@ def main():
         metavar="TYPE",
         default=[],
         dest="dev_types",
-        help="Add a dev-type search layer (can be repeated; overrides $DEV_TYPE)",
+        help="Add a dev-type search layer (can be repeated; overrides $DEV_TYPES)",
     )
     parser.add_argument(
         "--show-paths",
@@ -149,11 +149,12 @@ def main():
 
     args = parser.parse_args()
 
-    # Combine --dev-type flags with $DEV_TYPE env var (flags take priority, deduped)
+    # Combine --dev-type flags with $DEV_TYPES env var (flags take priority, deduped)
     dev_types = list(args.dev_types)
-    env_dev_type = os.environ.get("DEV_TYPE", "").strip()
-    if env_dev_type and env_dev_type not in dev_types:
-        dev_types.append(env_dev_type)
+    for env_dt in os.environ.get("DEV_TYPES", "").split(","):
+        env_dt = env_dt.strip()
+        if env_dt and env_dt not in dev_types:
+            dev_types.append(env_dt)
 
     base_paths = get_base_search_paths(dev_types)
 
