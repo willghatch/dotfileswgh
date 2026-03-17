@@ -261,9 +261,12 @@ do_worktree_initialize() {
 
     if ! (
         set -euo pipefail
+        pytorch_req="$(mktemp)"
+        trap "rm -f '$pytorch_req'" EXIT
         uv venv "$venv_dir"
         source "$venv_dir/bin/activate"
-        uv pip install -r "<($WAVE_DIR/gen-pytorch-rocm-requirements.py)"
+        "$WAVE_DIR/gen-pytorch-rocm-requirements.py" -o "$pytorch_req"
+        uv pip install -r "$pytorch_req"
         uv pip install -r "$WAVE_DIR/requirements-iree-pinned.txt"
         uv pip install -e "$WAVE_DIR[dev]"
     ) > "$log_file" 2>&1; then
