@@ -1,0 +1,425 @@
+#!/usr/bin/env python3
+"""Modify git commit metadata (author, committer, dates) without creating a new commit.
+
+Amends metadata on an existing commit (typically HEAD) in place, providing an
+ergonomic CLI so you don't have to remember GIT_AUTHOR_DATE, GIT_COMMITTER_DATE,
+GIT_AUTHOR_NAME, GIT_AUTHOR_EMAIL, GIT_COMMITTER_NAME, GIT_COMMITTER_EMAIL.
+
+Common use case: after squashing commits for a PR, the squashed commit gets
+the datetime of the earliest commit.  This tool lets you set it to e.g. the
+latest pre-squash commit's datetime, the current time, or an arbitrary datetime.
+"""
+
+import argparse
+import os
+import re
+import subprocess
+import sys
+from datetime import datetime, timezone
+
+
+def run_git(*args, check=True, capture=True):
+    """Run a git command and return stdout, stripped."""
+    cmd = ["git"] + list(args)
+    result = subprocess.run(
+        cmd,
+        capture_output=capture,
+        text=True,
+        check=check,
+    )
+    if capture:
+        return result.stdout.strip()
+    return ""
+
+
+def run_git_rc(*args):
+    """Run a git command and return (returncode, stdout)."""
+    cmd = ["git"] + list(args)
+    result = subprocess.run(cmd, capture_output=True, text=True)
+    return result.returncode, result.stdout.strip()
+
+
+def is_git_ref(value):
+    """Check if a string looks like it could be a git ref."""
+    if value.lower() == "now":
+        return False
+    # Try to resolve it as a git ref
+    rc, _ = run_git_rc("rev-parse", "--verify", f"{value}^{{commit}}")
+    return rc == 0
+
+
+def resolve_date(value):
+    """Resolve a date argument to a date string.
+
+    If value is a git ref, extract the author date from that commit.
+    If value is 'now', return the current time.
+    Otherwise, return the value as-is (assumed to be a parseable date string).
+    """
+    if value.lower() == "now":
+        return datetime.now(timezone.utc).astimezone().isoformat()
+
+    if is_git_ref(value):
+        return run_git("log", "-1", "--format=%aI", value)
+
+    # Assume it's a date string; let git validate it later
+    return value
+
+
+def parse_author_string(value):
+    """Parse 'Name <email>' into (name, email).
+
+    Returns (name, email) or raises ValueError.
+    """
+    match = re.match(r"^(.+?)\s*<([^>]+)>$", value.strip())
+    if not match:
+        raise ValueError(
+            f"Invalid author/committer format: {value!r}\n"
+            f"Expected: \"Name <email>\""
+        )
+    return match.group(1).strip(), match.group(2).strip()
+
+
+def resolve_author(value):
+    """Resolve an --author argument to (name, email).
+
+    If value is a git ref, extract the author identity from that commit.
+    Otherwise, parse it as a 'Name <email>' string.
+    """
+    if is_git_ref(value):
+        identity = run_git("log", "-1", "--format=%an <%ae>", value)
+        return parse_author_string(identity)
+    return parse_author_string(value)
+
+
+def resolve_committer(value):
+    """Resolve a --committer argument to (name, email).
+
+    If value is a git ref, extract the committer identity from that commit.
+    Otherwise, parse it as a 'Name <email>' string.
+    """
+    if is_git_ref(value):
+        identity = run_git("log", "-1", "--format=%cn <%ce>", value)
+        return parse_author_string(identity)
+    return parse_author_string(value)
+
+
+def get_commit_meta(commit_ref):
+    """Get metadata for a commit.
+
+    Returns dict with keys: hash, author_name, author_email, author_date,
+    committer_name, committer_email, committer_date, subject.
+    """
+    fmt = "%H%n%an%n%ae%n%aI%n%cn%n%ce%n%cI%n%s"
+    output = run_git("log", "-1", f"--format={fmt}", commit_ref)
+    lines = output.split("\n")
+    return {
+        "hash": lines[0],
+        "author_name": lines[1],
+        "author_email": lines[2],
+        "author_date": lines[3],
+        "committer_name": lines[4],
+        "committer_email": lines[5],
+        "committer_date": lines[6],
+        "subject": lines[7],
+    }
+
+
+def show_commit_meta(meta):
+    """Display commit metadata."""
+    short_hash = meta["hash"][:7]
+    print(f"Commit:     {short_hash} {meta['subject']}")
+    print(f"Author:     {meta['author_name']} <{meta['author_email']}>")
+    print(f"AuthorDate: {meta['author_date']}")
+    print(f"Commit:     {meta['committer_name']} <{meta['committer_email']}>")
+    print(f"CommitDate: {meta['committer_date']}")
+
+
+def check_staged_changes():
+    """Warn if there are staged changes that would be included in the amend."""
+    rc, output = run_git_rc("diff", "--cached", "--quiet")
+    if rc != 0:
+        print(
+            "WARNING: You have staged changes. git commit --amend will include "
+            "them in the amended commit.",
+            file=sys.stderr,
+        )
+        print(
+            "Unstage them first with 'git reset HEAD' if this is not intended.",
+            file=sys.stderr,
+        )
+        print(file=sys.stderr)
+        response = input("Continue anyway? [y/N] ")
+        if response.lower() not in ("y", "yes"):
+            print("Aborted.", file=sys.stderr)
+            sys.exit(1)
+
+
+def resolve_commit(commit_ref):
+    """Resolve a commit ref and verify it exists. Returns the full hash."""
+    rc, full_hash = run_git_rc("rev-parse", "--verify", f"{commit_ref}^{{commit}}")
+    if rc != 0:
+        print(f"Error: '{commit_ref}' is not a valid commit.", file=sys.stderr)
+        sys.exit(1)
+    return full_hash
+
+
+def is_head(commit_hash):
+    """Check if a commit hash is the current HEAD."""
+    head_hash = run_git("rev-parse", "HEAD")
+    return commit_hash == head_hash
+
+
+def build_parser():
+    parser = argparse.ArgumentParser(
+        prog="git-commit-meta",
+        description="View or modify git commit metadata (author, committer, dates).",
+        epilog=(
+            "DATE can be: a git commit ref (copies author date from that commit), "
+            "'now' (current time), or an ISO 8601 / git-parseable date string.\n\n"
+            "AUTHOR/COMMITTER can be: a git ref (copies identity from that commit) "
+            "or a 'Name <email>' string.\n\n"
+            "Examples:\n"
+            "  git-commit-meta --date now\n"
+            "  git-commit-meta --date HEAD~1\n"
+            "  git-commit-meta --date '2026-03-17T15:30:00-07:00'\n"
+            "  git-commit-meta --author 'Jane Doe <jane@example.com>'\n"
+            "  git-commit-meta --author HEAD~3\n"
+            "  git-commit-meta --committer HEAD~3\n"
+            "  git-commit-meta --show --commit HEAD~2\n"
+        ),
+        formatter_class=argparse.RawDescriptionHelpFormatter,
+    )
+
+    parser.add_argument(
+        "--commit",
+        default="HEAD",
+        metavar="COMMIT",
+        help="Commit to modify (default: HEAD)",
+    )
+
+    date_group = parser.add_argument_group("date options")
+    date_group.add_argument(
+        "-D", "--date",
+        metavar="DATE",
+        help="Set both author and committer date",
+    )
+    date_group.add_argument(
+        "--author-date",
+        metavar="DATE",
+        help="Set only the author date",
+    )
+    date_group.add_argument(
+        "--committer-date",
+        metavar="DATE",
+        help="Set only the committer date",
+    )
+
+    identity_group = parser.add_argument_group("identity options")
+    identity_group.add_argument(
+        "--author",
+        metavar="AUTHOR",
+        help='Set the author: "Name <email>" or a git ref to copy from',
+    )
+    identity_group.add_argument(
+        "--committer",
+        metavar="COMMITTER",
+        help='Set the committer: "Name <email>" or a git ref to copy from',
+    )
+
+    parser.add_argument(
+        "--show",
+        action="store_true",
+        help="Show current metadata (default if no modification flags given)",
+    )
+    parser.add_argument(
+        "-n", "--dry-run",
+        action="store_true",
+        help="Show what would change without doing it",
+    )
+
+    return parser
+
+
+def main():
+    parser = build_parser()
+    args = parser.parse_args()
+
+    # Check we're in a git repo
+    rc, _ = run_git_rc("rev-parse", "--git-dir")
+    if rc != 0:
+        print("Error: not in a git repository.", file=sys.stderr)
+        sys.exit(1)
+
+    # Resolve the target commit
+    commit_hash = resolve_commit(args.commit)
+
+    # Determine if any modifications were requested
+    has_modifications = any([
+        args.date,
+        args.author_date,
+        args.committer_date,
+        args.author,
+        args.committer,
+    ])
+
+    # If --show or no modifications, just display metadata
+    if args.show or not has_modifications:
+        meta = get_commit_meta(commit_hash)
+        show_commit_meta(meta)
+        return
+
+    # For modifications, currently only support HEAD
+    if not is_head(commit_hash):
+        print(
+            f"Error: modifying non-HEAD commits is not supported.\n"
+            f"The commit {commit_hash[:7]} is not HEAD.\n"
+            f"Rebase it to HEAD first, then modify, then rebase back.\n"
+            f"  git rebase -i {commit_hash[:7]}~1",
+            file=sys.stderr,
+        )
+        sys.exit(1)
+
+    # Warn about staged changes
+    check_staged_changes()
+
+    # Get current metadata for comparison
+    old_meta = get_commit_meta("HEAD")
+
+    # Build up the environment and arguments for git commit --amend
+    env = os.environ.copy()
+    amend_args = ["commit", "--amend", "--no-edit", "--allow-empty"]
+
+    # --- Resolve dates ---
+
+    new_author_date = None
+    new_committer_date = None
+
+    if args.date:
+        resolved = resolve_date(args.date)
+        new_author_date = resolved
+        new_committer_date = resolved
+
+    if args.author_date:
+        new_author_date = resolve_date(args.author_date)
+
+    if args.committer_date:
+        new_committer_date = resolve_date(args.committer_date)
+
+    if new_author_date:
+        # GIT_AUTHOR_DATE env var is ignored by git commit --amend;
+        # must use the --date flag instead.
+        amend_args.extend(["--date", new_author_date])
+
+    if new_committer_date:
+        env["GIT_COMMITTER_DATE"] = new_committer_date
+
+    # --- Resolve author ---
+
+    new_author_name = None
+    new_author_email = None
+
+    if args.author:
+        new_author_name, new_author_email = resolve_author(args.author)
+
+    if new_author_name and new_author_email:
+        amend_args.extend(["--author", f"{new_author_name} <{new_author_email}>"])
+
+    # --- Resolve committer ---
+
+    new_committer_name = None
+    new_committer_email = None
+
+    if args.committer:
+        new_committer_name, new_committer_email = resolve_committer(args.committer)
+
+    if new_committer_name:
+        env["GIT_COMMITTER_NAME"] = new_committer_name
+
+    if new_committer_email:
+        env["GIT_COMMITTER_EMAIL"] = new_committer_email
+
+    # When changing author date but not committer date, we still need to
+    # preserve the original committer date, because git commit --amend
+    # resets committer date to now by default.
+    if new_author_date and not new_committer_date:
+        env["GIT_COMMITTER_DATE"] = old_meta["committer_date"]
+
+    # When changing committer identity but not committer date, preserve
+    # the original committer date.
+    if (new_committer_name or new_committer_email) and not new_committer_date and not new_author_date:
+        env["GIT_COMMITTER_DATE"] = old_meta["committer_date"]
+
+    # When changing only the author (not committer), also preserve
+    # committer date.
+    if (new_author_name and not new_committer_name and not new_committer_email
+            and not new_committer_date and not new_author_date):
+        env["GIT_COMMITTER_DATE"] = old_meta["committer_date"]
+
+    # --- Dry run ---
+
+    if args.dry_run:
+        print("Dry run -- would make the following changes:\n")
+        print("Before:")
+        show_commit_meta(old_meta)
+        print()
+        print("After (projected):")
+        projected = dict(old_meta)
+        if new_author_date:
+            projected["author_date"] = new_author_date
+        if new_committer_date:
+            projected["committer_date"] = new_committer_date
+        if new_author_name:
+            projected["author_name"] = new_author_name
+        if new_author_email:
+            projected["author_email"] = new_author_email
+        if new_committer_name:
+            projected["committer_name"] = new_committer_name
+        if new_committer_email:
+            projected["committer_email"] = new_committer_email
+        show_commit_meta(projected)
+        return
+
+    # --- Execute the amend ---
+
+    result = subprocess.run(
+        ["git"] + amend_args,
+        env=env,
+        capture_output=True,
+        text=True,
+    )
+
+    if result.returncode != 0:
+        print("Error: git commit --amend failed:", file=sys.stderr)
+        print(result.stderr, file=sys.stderr)
+        sys.exit(1)
+
+    # --- Show summary ---
+
+    new_meta = get_commit_meta("HEAD")
+
+    print("Modified commit metadata:\n")
+    print("Before:")
+    show_commit_meta(old_meta)
+    print()
+    print("After:")
+    show_commit_meta(new_meta)
+
+    # Highlight what changed
+    changes = []
+    if old_meta["author_date"] != new_meta["author_date"]:
+        changes.append("author date")
+    if old_meta["committer_date"] != new_meta["committer_date"]:
+        changes.append("committer date")
+    if old_meta["author_name"] != new_meta["author_name"] or old_meta["author_email"] != new_meta["author_email"]:
+        changes.append("author")
+    if old_meta["committer_name"] != new_meta["committer_name"] or old_meta["committer_email"] != new_meta["committer_email"]:
+        changes.append("committer")
+
+    if changes:
+        print(f"\nChanged: {', '.join(changes)}")
+    else:
+        print("\nNo metadata was changed.")
+
+
+if __name__ == "__main__":
+    main()
