@@ -1,0 +1,4 @@
+#!/bin/sh
+# agents-md-generate .prog segment: emit df-skills snippet
+# Uses --from-state which falls back to defaults if no state file exists.
+exec df-skills agents-md-snippet --from-state

@@ -1,0 +1,641 @@
+#!/usr/bin/env python3
+"""
+df-skills - Manage reusable skill documents for AI agents
+
+Skills are directories containing frontmatter.md and one of skill.md, skill.org,
+or skill.prog, found in (per location, dev-type paths precede base path):
+  1. <git-root>/.git/agent-files/config/df-skills/<dev-type>/{default,non-default}/
+  2. <git-root>/.git/agent-files/config/df-skills/{default,non-default}/
+  3. XDG_CONFIG_HOME/df-skills/<dev-type>/{default,non-default}/
+  4. XDG_CONFIG_HOME/df-skills/{default,non-default}/
+  5. Each XDG_CONFIG_DIRS entry (same pattern)
+
+Dev types come from --dev-type flags (repeatable, higher priority) and the
+DEV_TYPES environment variable (comma-separated).
+
+Subcommands:
+  agents-md-snippet  Generate AGENTS.md snippet with skill frontmatter
+  disclose SKILL     Show full content of a skill
+  list               List available skills
+  save-state         Save skill configuration to state file
+"""
+
+import argparse
+import json
+import os
+import subprocess
+import sys
+from pathlib import Path
+
+
+def find_git_root():
+    """Find the root of the current git repository, or None.
+
+    When AGENT_WORK_GIT_ROOT is set, uses that directly.
+    Otherwise walks up from cwd looking for .git.  If .git is a file
+    (worktree or submodule), follows the gitdir reference to find the
+    real .git directory and returns its parent.
+    """
+    env_root = os.environ.get("AGENT_WORK_GIT_ROOT")
+    if env_root:
+        return Path(env_root)
+    cwd = Path.cwd()
+    for candidate in [cwd] + list(cwd.parents):
+        dot_git = candidate / ".git"
+        if dot_git.is_dir():
+            return candidate
+        if dot_git.is_file():
+            # Worktree or submodule: .git is a file containing "gitdir: <path>"
+            text = dot_git.read_text().strip()
+            if text.startswith("gitdir:"):
+                gitdir = Path(text.split(":", 1)[1].strip())
+                if not gitdir.is_absolute():
+                    gitdir = (candidate / gitdir).resolve()
+                # gitdir points to e.g. /repo/.git/worktrees/NAME
+                # Walk up to find the actual .git directory
+                real_git_dir = gitdir
+                while real_git_dir.name != ".git" and real_git_dir.parent != real_git_dir:
+                    real_git_dir = real_git_dir.parent
+                if real_git_dir.name == ".git":
+                    return real_git_dir.parent
+            return candidate
+    return None
+
+
+def get_base_search_paths(dev_types=(), git_root=None):
+    """Return ordered list of base paths that each contain default/ and non-default/ subdirs.
+
+    Priority: git root > XDG_CONFIG_HOME > XDG_CONFIG_DIRS.
+    Within each location, dev-type-specific paths precede the base path.
+    """
+    paths = []
+
+    def add_location(base):
+        for dt in dev_types:
+            paths.append(base / dt)
+        paths.append(base)
+
+    # Git repo path (most specific to current project)
+    if git_root:
+        add_location(git_root / ".git" / "agent-files" / "config" / "df-skills")
+
+    home = Path.home()
+
+    # XDG_CONFIG_HOME (user-personal)
+    xdg_config_home = os.environ.get("XDG_CONFIG_HOME", str(home / ".config"))
+    add_location(Path(xdg_config_home) / "df-skills")
+
+    # XDG_CONFIG_DIRS (system/shared)
+    xdg_config_dirs = os.environ.get("XDG_CONFIG_DIRS", "/etc/xdg")
+    for config_dir in xdg_config_dirs.split(":"):
+        if config_dir:
+            add_location(Path(config_dir) / "df-skills")
+
+    # De-duplicate while preserving order
+    seen = set()
+    deduped = []
+    for path in paths:
+        resolved = path.resolve()
+        if resolved not in seen:
+            seen.add(resolved)
+            deduped.append(path)
+
+    return deduped
+
+
+def find_skills(base_paths, subdir):
+    """Find all skills in the given subdirectory across all base paths.
+
+    Returns an ordered dict of name -> Path (skill directory), with earlier
+    paths taking priority.  Skills within a single directory are sorted
+    alphabetically by name.
+    """
+    skills = {}
+    for base_path in base_paths:
+        skill_parent = base_path / subdir
+        if not skill_parent.is_dir():
+            continue
+        for entry in sorted(skill_parent.iterdir()):
+            if entry.is_dir() and entry.name not in skills:
+                skills[entry.name] = entry
+    return skills
+
+
+def get_skill_content_path(skill_dir):
+    """Return the highest-priority skill content file path, or None.
+
+    Priority: skill.prog > skill.md > skill.org
+    """
+    for filename in ("skill.prog", "skill.md", "skill.org"):
+        path = skill_dir / filename
+        if path.exists():
+            return path
+    return None
+
+
+def get_skill_content_label(content_path):
+    """Return the label for the skill content source."""
+    if content_path is None:
+        return "skill text:"
+    if content_path.name == "skill.prog":
+        return "skill text:"
+    return f"{content_path.name}:"
+
+
+def read_skill_content(content_path, skill_name, skill_dir, dev_types, git_root):
+    """Read skill content from a file or execute a .prog file.
+
+    Returns (content_string, error_string_or_None).
+    On .prog failure, returns (None, error_description).
+    """
+    if content_path.suffix == ".prog":
+        env = os.environ.copy()
+        env["DEV_TYPES"] = ",".join(dev_types)
+        env["SKILL_NAME"] = skill_name
+        env["SKILL_DIR"] = str(skill_dir)
+        if git_root:
+            env["AGENT_WORK_GIT_ROOT"] = str(git_root)
+        try:
+            result = subprocess.run(
+                [str(content_path)],
+                capture_output=True,
+                text=True,
+                check=False,
+                env=env,
+            )
+        except OSError as e:
+            return None, f"failed to execute '{content_path}': {e}"
+        if result.returncode != 0:
+            error_msg = f"skill.prog failed with exit code {result.returncode}"
+            if result.stderr:
+                error_msg += "\n" + result.stderr.rstrip()
+            return None, error_msg
+        return result.stdout, None
+    else:
+        return content_path.read_text(), None
+
+
+def get_state_file_path(git_root):
+    """Return the path to the state file, or None if not in a git repo."""
+    if not git_root:
+        return None
+    return git_root / ".git" / "agent-files" / "config" / "df-skills" / "state.json"
+
+
+def load_state(state_path):
+    """Load state from JSON file.  Returns dict or None if file doesn't exist."""
+    if state_path and state_path.is_file():
+        with open(state_path) as f:
+            return json.load(f)
+    return None
+
+
+def save_state_file(state_path, dev_types, added, omitted):
+    """Save state to JSON file, creating directories as needed."""
+    state_path.parent.mkdir(parents=True, exist_ok=True)
+    state = {
+        "version": 1,
+        "dev_types": list(dev_types),
+        "added": list(added),
+        "omitted": list(omitted),
+    }
+    with open(state_path, "w") as f:
+        json.dump(state, f, indent=2)
+        f.write("\n")
+
+
+def get_active_skills(default_skills, non_default_skills, added_names, omitted_names):
+    """Compute the active skill set: defaults minus omitted, plus added.
+
+    Returns a list of (name, skill_dir, category) tuples, sorted by name.
+    """
+    active = []
+    omit_set = set(omitted_names)
+    add_set = set(added_names)
+
+    for name in sorted(default_skills):
+        if name not in omit_set:
+            active.append((name, default_skills[name], "default"))
+
+    for name in sorted(non_default_skills):
+        if name in add_set:
+            active.append((name, non_default_skills[name], "non-default"))
+
+    return active
+
+
+def cmd_agents_md_snippet(args, dev_types, git_root, base_paths):
+    """Generate AGENTS.md snippet with skill frontmatter."""
+    default_skills = find_skills(base_paths, "default")
+    non_default_skills = find_skills(base_paths, "non-default")
+
+    added = []
+    omitted = []
+
+    # Handle --from-state / --from-state-strict
+    if args.from_state or args.from_state_strict:
+        state_path = get_state_file_path(git_root)
+        state = load_state(state_path)
+        if state is None:
+            if args.from_state_strict:
+                print(
+                    "df-skills: error: no state file found (use save-state to create one)",
+                    file=sys.stderr,
+                )
+                sys.exit(1)
+            # --from-state: fall back to defaults silently
+        else:
+            added = state.get("added", [])
+            omitted = state.get("omitted", [])
+            # Merge state dev_types with current dev_types
+            state_dev_types = state.get("dev_types", [])
+            for dt in state_dev_types:
+                if dt not in dev_types:
+                    dev_types.append(dt)
+            # Recompute paths and skills with merged dev_types
+            base_paths = get_base_search_paths(dev_types, git_root)
+            default_skills = find_skills(base_paths, "default")
+            non_default_skills = find_skills(base_paths, "non-default")
+
+    active = get_active_skills(default_skills, non_default_skills, added, omitted)
+
+    # Generate snippet output
+    print("# df-skills")
+    print()
+    print("Skills are detailed instruction documents available on demand.")
+    print("To see the full content of a df-skills skill, run: `df-skills disclose SKILL_NAME`")
+    print("Only disclose skills when you need them for the current task.")
+    print()
+    print("## Available df-skills")
+
+    for name, skill_dir, category in active:
+        frontmatter_path = skill_dir / "frontmatter.md"
+        if not frontmatter_path.exists():
+            print(
+                f"df-skills: warning: skill '{name}' has no frontmatter.md, skipping",
+                file=sys.stderr,
+            )
+            continue
+
+        # Check if skill has content (for .prog skills, don't execute here,
+        # just check existence)
+        content_path = get_skill_content_path(skill_dir)
+        if content_path is None:
+            print(
+                f"df-skills: warning: skill '{name}' has no content file (skill.md/skill.org/skill.prog)",
+                file=sys.stderr,
+            )
+
+        # If it's a .prog skill, we need to verify it works for snippet inclusion
+        # But per spec, for agents-md-snippet we just include frontmatter
+        # We don't execute .prog here -- frontmatter is always static
+
+        frontmatter = frontmatter_path.read_text()
+        print()
+        print(f"### {name}")
+        print()
+        sys.stdout.write(frontmatter)
+        if not frontmatter.endswith("\n"):
+            sys.stdout.write("\n")
+
+
+def cmd_disclose(args, dev_types, git_root, base_paths):
+    """Print the full content of a skill."""
+    skill_name = args.skill_name
+    default_skills = find_skills(base_paths, "default")
+    non_default_skills = find_skills(base_paths, "non-default")
+
+    # Find the skill in either default or non-default
+    skill_dir = default_skills.get(skill_name) or non_default_skills.get(skill_name)
+    if skill_dir is None:
+        print(
+            f"df-skills: error: skill '{skill_name}' not found. "
+            f"Run 'df-skills list' to see available skills.",
+            file=sys.stderr,
+        )
+        sys.exit(1)
+
+    content_path = get_skill_content_path(skill_dir)
+
+    print(f"Skill: {skill_name}")
+    print(f"Source: {skill_dir}")
+
+    if content_path is None:
+        print(
+            f"\ndf-skills: error: skill '{skill_name}' has no content file "
+            f"(skill.md/skill.org/skill.prog)",
+            file=sys.stderr,
+        )
+        sys.exit(1)
+
+    label = get_skill_content_label(content_path)
+    print()
+    print(label)
+
+    content, error = read_skill_content(
+        content_path, skill_name, skill_dir, dev_types, git_root
+    )
+    if error:
+        print(f"[{error}]")
+        print(
+            f"df-skills: warning: skill.prog failed for '{skill_name}'",
+            file=sys.stderr,
+        )
+        sys.exit(1)
+
+    sys.stdout.write(content)
+    if not content.endswith("\n"):
+        sys.stdout.write("\n")
+
+
+def cmd_list(args, dev_types, git_root, base_paths):
+    """List available skills."""
+    default_skills = find_skills(base_paths, "default")
+    non_default_skills = find_skills(base_paths, "non-default")
+
+    # Handle --from-state / --from-state-strict
+    if args.from_state or args.from_state_strict:
+        state_path = get_state_file_path(git_root)
+        state = load_state(state_path)
+        if state is None:
+            if args.from_state_strict:
+                print(
+                    "df-skills: error: no state file found (use save-state to create one)",
+                    file=sys.stderr,
+                )
+                sys.exit(1)
+            # --from-state: fall back to defaults silently
+        else:
+            added = state.get("added", [])
+            omitted = state.get("omitted", [])
+            state_dev_types = state.get("dev_types", [])
+            for dt in state_dev_types:
+                if dt not in dev_types:
+                    dev_types.append(dt)
+            base_paths = get_base_search_paths(dev_types, git_root)
+            default_skills = find_skills(base_paths, "default")
+            non_default_skills = find_skills(base_paths, "non-default")
+
+            active = get_active_skills(default_skills, non_default_skills, added, omitted)
+            if args.names_only:
+                for name, skill_dir, category in active:
+                    print(name)
+            else:
+                for name, skill_dir, category in active:
+                    print(f"{name}\t{category}\t{skill_dir}")
+            return
+
+    # Filter by category if requested
+    show_default = not args.non_default or args.default_only
+    show_non_default = not args.default_only or args.non_default
+
+    # If neither filter flag is set, show both
+    if not args.default_only and not args.non_default:
+        show_default = True
+        show_non_default = True
+
+    if args.names_only:
+        if show_default:
+            for name in sorted(default_skills):
+                print(name)
+        if show_non_default:
+            for name in sorted(non_default_skills):
+                print(name)
+    else:
+        if show_default:
+            for name in sorted(default_skills):
+                print(f"{name}\tdefault\t{default_skills[name]}")
+        if show_non_default:
+            for name in sorted(non_default_skills):
+                print(f"{name}\tnon-default\t{non_default_skills[name]}")
+
+
+def cmd_save_state(args, dev_types, git_root, base_paths):
+    """Save skill configuration to state file."""
+    # Handle --delete-state
+    if args.delete_state:
+        state_path = get_state_file_path(git_root)
+        if state_path and state_path.is_file():
+            state_path.unlink()
+        return
+
+    state_path = get_state_file_path(git_root)
+    if state_path is None:
+        print(
+            "df-skills: error: cannot save state (not in a git repo)",
+            file=sys.stderr,
+        )
+        sys.exit(1)
+
+    default_skills = find_skills(base_paths, "default")
+    non_default_skills = find_skills(base_paths, "non-default")
+    all_skills = dict(default_skills)
+    all_skills.update(non_default_skills)
+
+    # Validate skill names
+    unknown = []
+    for name in (args.add_skills or []) + (args.omit_skills or []) + (args.reset_skills or []):
+        if name not in all_skills:
+            unknown.append(name)
+    if unknown:
+        print(
+            f"df-skills: error: unknown skill(s): {', '.join(unknown)}",
+            file=sys.stderr,
+        )
+        sys.exit(1)
+
+    added = set(args.add_skills or [])
+    omitted = set(args.omit_skills or [])
+
+    if args.update:
+        # Load existing state and apply modifications
+        state = load_state(state_path)
+        if state is not None:
+            existing_added = set(state.get("added", []))
+            existing_omitted = set(state.get("omitted", []))
+            existing_dev_types = list(state.get("dev_types", []))
+
+            # Apply --reset: remove from both added and omitted
+            for name in (args.reset_skills or []):
+                existing_added.discard(name)
+                existing_omitted.discard(name)
+
+            # Apply --add: add non-default or re-include previously omitted default
+            for name in (args.add_skills or []):
+                existing_omitted.discard(name)
+                if name in non_default_skills:
+                    existing_added.add(name)
+
+            # Apply --omit: omit default or remove previously added non-default
+            for name in (args.omit_skills or []):
+                existing_added.discard(name)
+                if name in default_skills:
+                    existing_omitted.add(name)
+
+            added = existing_added
+            omitted = existing_omitted
+
+            # Merge dev types
+            merged_dev_types = list(dev_types)
+            for dt in existing_dev_types:
+                if dt not in merged_dev_types:
+                    merged_dev_types.append(dt)
+            dev_types = merged_dev_types
+
+    save_state_file(state_path, dev_types, sorted(added), sorted(omitted))
+
+
+def main():
+    parser = argparse.ArgumentParser(
+        description="Manage reusable skill documents for AI agents.",
+        formatter_class=argparse.RawDescriptionHelpFormatter,
+        epilog=__doc__,
+    )
+    parser.add_argument(
+        "--dev-type", "-d",
+        action="append",
+        metavar="TYPE",
+        default=[],
+        dest="dev_types",
+        help="Add a dev-type layer (can be repeated; prepends to $DEV_TYPES)",
+    )
+    parser.add_argument(
+        "--show-paths",
+        action="store_true",
+        help="Print search paths and exit",
+    )
+
+    subparsers = parser.add_subparsers(dest="subcommand")
+
+    # agents-md-snippet subcommand
+    snippet_parser = subparsers.add_parser(
+        "agents-md-snippet",
+        help="Generate AGENTS.md snippet with skill frontmatter",
+    )
+    snippet_parser.add_argument(
+        "--from-state",
+        action="store_true",
+        help="Use saved state (falls back to defaults if no state)",
+    )
+    snippet_parser.add_argument(
+        "--from-state-strict",
+        action="store_true",
+        help="Use saved state (error if no state file exists)",
+    )
+
+    # disclose subcommand
+    disclose_parser = subparsers.add_parser(
+        "disclose",
+        help="Show full content of a skill",
+    )
+    disclose_parser.add_argument(
+        "skill_name",
+        help="Name of the skill to disclose",
+    )
+
+    # list subcommand
+    list_parser = subparsers.add_parser(
+        "list",
+        help="List available skills",
+    )
+    list_parser.add_argument(
+        "--default",
+        action="store_true",
+        dest="default_only",
+        help="List only default skills",
+    )
+    list_parser.add_argument(
+        "--non-default",
+        action="store_true",
+        help="List only non-default skills",
+    )
+    list_parser.add_argument(
+        "--names-only",
+        action="store_true",
+        help="Print only skill names, one per line",
+    )
+    list_parser.add_argument(
+        "--from-state",
+        action="store_true",
+        help="Display skills according to saved state",
+    )
+    list_parser.add_argument(
+        "--from-state-strict",
+        action="store_true",
+        help="Display according to saved state (error if no state)",
+    )
+
+    # save-state subcommand
+    save_parser = subparsers.add_parser(
+        "save-state",
+        help="Save skill configuration to state file",
+    )
+    save_parser.add_argument(
+        "--add", "-a",
+        action="append",
+        metavar="SKILL",
+        default=[],
+        dest="add_skills",
+        help="Mark a non-default skill as added (can be repeated)",
+    )
+    save_parser.add_argument(
+        "--omit", "-o",
+        action="append",
+        metavar="SKILL",
+        default=[],
+        dest="omit_skills",
+        help="Mark a default skill as omitted (can be repeated)",
+    )
+    save_parser.add_argument(
+        "--update",
+        action="store_true",
+        help="Modify existing state incrementally",
+    )
+    save_parser.add_argument(
+        "--reset",
+        action="append",
+        metavar="SKILL",
+        default=[],
+        dest="reset_skills",
+        help="Return a skill to its category default (can be repeated)",
+    )
+    save_parser.add_argument(
+        "--delete-state",
+        action="store_true",
+        help="Delete the state file and exit",
+    )
+
+    args = parser.parse_args()
+
+    # Combine --dev-type flags with $DEV_TYPES env var (flags take priority, deduped)
+    dev_types = list(args.dev_types)
+    for env_dt in os.environ.get("DEV_TYPES", "").split(","):
+        env_dt = env_dt.strip()
+        if env_dt and env_dt not in dev_types:
+            dev_types.append(env_dt)
+
+    git_root = find_git_root()
+    base_paths = get_base_search_paths(dev_types, git_root)
+
+    if args.show_paths:
+        for p in base_paths:
+            exists = " (exists)" if p.exists() else ""
+            print(f"  {p}{exists}")
+        return
+
+    if args.subcommand is None:
+        parser.print_help()
+        sys.exit(1)
+
+    if args.subcommand == "agents-md-snippet":
+        cmd_agents_md_snippet(args, dev_types, git_root, base_paths)
+    elif args.subcommand == "disclose":
+        cmd_disclose(args, dev_types, git_root, base_paths)
+    elif args.subcommand == "list":
+        cmd_list(args, dev_types, git_root, base_paths)
+    elif args.subcommand == "save-state":
+        cmd_save_state(args, dev_types, git_root, base_paths)
+
+
+if __name__ == "__main__":
+    main()

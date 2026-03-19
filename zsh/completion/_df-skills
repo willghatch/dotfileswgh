@@ -1,0 +1,80 @@
+#compdef df-skills
+
+_df_skills() {
+    local context state state_descr line
+    typeset -A opt_args
+
+    _arguments -C \
+        '(- :)--help[Show help and exit]' \
+        '(- :)--show-paths[Show search paths and exit]' \
+        '*--dev-type=[Add dev-type layer]:dev type:->dev_types' \
+        '*-d=[Add dev-type layer]:dev type:->dev_types' \
+        '1:subcommand:->subcommands' \
+        '*::arg:->subcommand_args' \
+        && return 0
+
+    case $state in
+        subcommands)
+            local -a subcommands
+            subcommands=(
+                'agents-md-snippet:Generate AGENTS.md snippet with skill frontmatter'
+                'disclose:Show full content of a skill'
+                'list:List available skills'
+                'save-state:Save skill configuration to state file'
+            )
+            _describe 'subcommand' subcommands
+            ;;
+        subcommand_args)
+            case $words[1] in
+                agents-md-snippet)
+                    _arguments \
+                        '--from-state[Use saved state (falls back to defaults)]' \
+                        '--from-state-strict[Use saved state (error if no state)]'
+                    ;;
+                disclose)
+                    local skills
+                    skills=("${(@f)$(df-skills list --names-only 2>/dev/null)}")
+                    if (( ${#skills} )); then
+                        _describe 'skill' skills
+                    else
+                        _message 'no skills found'
+                    fi
+                    ;;
+                list)
+                    _arguments \
+                        '--default[List only default skills]' \
+                        '--non-default[List only non-default skills]' \
+                        '--names-only[Print only skill names]' \
+                        '--from-state[Display according to saved state]' \
+                        '--from-state-strict[Display according to saved state (error if no state)]'
+                    ;;
+                save-state)
+                    _arguments \
+                        '*--add=[Add a non-default skill]:skill:->all_skills' \
+                        '*-a=[Add a non-default skill]:skill:->all_skills' \
+                        '*--omit=[Omit a default skill]:skill:->all_skills' \
+                        '*-o=[Omit a default skill]:skill:->all_skills' \
+                        '--update[Modify existing state incrementally]' \
+                        '*--reset=[Reset a skill to default]:skill:->all_skills' \
+                        '(--add -a --omit -o --update --reset)--delete-state[Delete state file and exit]'
+                    ;;
+            esac
+            case $state in
+                all_skills)
+                    local skills
+                    skills=("${(@f)$(df-skills list --names-only 2>/dev/null)}")
+                    if (( ${#skills} )); then
+                        _describe 'skill' skills
+                    else
+                        _message 'no skills found'
+                    fi
+                    ;;
+            esac
+            ;;
+        dev_types)
+            _message 'dev type name'
+            ;;
+    esac
+}
+
+_df_skills "$@"
