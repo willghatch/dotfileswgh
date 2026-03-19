@@ -2,9 +2,9 @@
 """
 agents-md-generate - Generate AGENTS.md by concatenating segments
 
-Segments are .md files found in (per location, dev-type paths precede base path):
-  1. <git-root>/.git/agent-files/agents-md-generate/<dev-type>/{default,non-default}/
-  2. <git-root>/.git/agent-files/agents-md-generate/{default,non-default}/
+Segments are .md or .prog files found in (per location, dev-type paths precede base path):
+  1. <git-root>/.git/agent-files/config/agents-md-generate/<dev-type>/{default,non-default}/
+  2. <git-root>/.git/agent-files/config/agents-md-generate/{default,non-default}/
   3. XDG_CONFIG_HOME/agents-md-generate/<dev-type>/{default,non-default}/
   4. XDG_CONFIG_HOME/agents-md-generate/{default,non-default}/
   5. Each XDG_CONFIG_DIRS entry (same pattern)
@@ -14,24 +14,53 @@ DEV_TYPES environment variable (comma-separated).  Multiple dev types are
 searched in the order given, so the first --dev-type has the highest priority.
 
 Earlier search paths take priority (first found wins for a given segment name).
+When the same segment name exists as both .md and .prog in the same directory,
+.prog takes priority.
 """
 
 import argparse
+import json
 import os
+import subprocess
 import sys
 from pathlib import Path
 
 
 def find_git_root():
-    """Find the root of the current git repository, or None."""
+    """Find the root of the current git repository, or None.
+
+    When AGENT_WORK_GIT_ROOT is set, uses that directly.
+    Otherwise walks up from cwd looking for .git.  If .git is a file
+    (worktree or submodule), follows the gitdir reference to find the
+    real .git directory and returns its parent.
+    """
+    env_root = os.environ.get("AGENT_WORK_GIT_ROOT")
+    if env_root:
+        return Path(env_root)
     cwd = Path.cwd()
     for candidate in [cwd] + list(cwd.parents):
-        if (candidate / ".git").exists():
+        dot_git = candidate / ".git"
+        if dot_git.is_dir():
+            return candidate
+        if dot_git.is_file():
+            # Worktree or submodule: .git is a file containing "gitdir: <path>"
+            text = dot_git.read_text().strip()
+            if text.startswith("gitdir:"):
+                gitdir = Path(text.split(":", 1)[1].strip())
+                if not gitdir.is_absolute():
+                    gitdir = (candidate / gitdir).resolve()
+                # gitdir points to e.g. /repo/.git/worktrees/NAME
+                # Walk up to find the actual .git directory
+                real_git_dir = gitdir
+                while real_git_dir.name != ".git" and real_git_dir.parent != real_git_dir:
+                    real_git_dir = real_git_dir.parent
+                if real_git_dir.name == ".git":
+                    return real_git_dir.parent
             return candidate
     return None
 
 
-def get_base_search_paths(dev_types=()):
+def get_base_search_paths(dev_types=(), git_root=None):
     """Return ordered list of base paths that each contain default/ and non-default/ subdirs.
 
     Priority: git root > XDG_CONFIG_HOME > XDG_CONFIG_DIRS.
@@ -45,9 +74,8 @@ def get_base_search_paths(dev_types=()):
         paths.append(base)
 
     # Git repo path (most specific to current project)
-    git_root = find_git_root()
     if git_root:
-        add_location(git_root / ".git" / "agent-files" / "agents-md-generate")
+        add_location(git_root / ".git" / "agent-files" / "config" / "agents-md-generate")
 
     home = Path.home()
 
@@ -73,22 +101,135 @@ def get_base_search_paths(dev_types=()):
     return deduped
 
 
+def get_raw_location_bases(git_root=None):
+    """Return ordered list of raw location bases (without dev-type expansion).
+
+    Used by --list-dev-types to discover available dev-type directory names.
+    """
+    bases = []
+
+    if git_root:
+        bases.append(git_root / ".git" / "agent-files" / "config" / "agents-md-generate")
+
+    home = Path.home()
+    xdg_config_home = os.environ.get("XDG_CONFIG_HOME", str(home / ".config"))
+    bases.append(Path(xdg_config_home) / "agents-md-generate")
+
+    xdg_config_dirs = os.environ.get("XDG_CONFIG_DIRS", "/etc/xdg")
+    for config_dir in xdg_config_dirs.split(":"):
+        if config_dir:
+            bases.append(Path(config_dir) / "agents-md-generate")
+
+    return bases
+
+
 def find_segments(base_paths, subdir):
     """Find all segments in the given subdirectory across all base paths.
 
     Returns an ordered dict of name -> Path, with earlier paths taking priority.
     Segments within a single directory are sorted alphabetically by name.
+    When both .md and .prog exist for the same name in the same directory,
+    .prog takes priority.
     """
     segments = {}
     for base_path in base_paths:
         segment_dir = base_path / subdir
         if not segment_dir.is_dir():
             continue
+        # Collect both .md and .prog files in this directory
+        dir_segments = {}
         for segment_file in sorted(segment_dir.glob("*.md")):
             name = segment_file.stem
-            if name not in segments:  # earlier paths take priority
-                segments[name] = segment_file
+            dir_segments[name] = segment_file
+        for segment_file in sorted(segment_dir.glob("*.prog")):
+            name = segment_file.stem
+            # .prog wins over .md in the same directory
+            dir_segments[name] = segment_file
+        # Merge into overall segments (first-found-wins across directories)
+        for name in sorted(dir_segments):
+            if name not in segments:
+                segments[name] = dir_segments[name]
     return segments
+
+
+def read_segment(path, dev_types, git_root):
+    """Read a segment's content.  For .md files, read text; for .prog files, execute.
+
+    Returns the content string, or None if execution failed.
+    """
+    if path.suffix == ".prog":
+        env = os.environ.copy()
+        env["DEV_TYPES"] = ",".join(dev_types)
+        if git_root:
+            env["AGENT_WORK_GIT_ROOT"] = str(git_root)
+        try:
+            result = subprocess.run(
+                [str(path)],
+                capture_output=True,
+                text=True,
+                check=False,
+                env=env,
+            )
+        except OSError as e:
+            print(
+                f"agents-md-generate: error: failed to execute '{path}': {e}",
+                file=sys.stderr,
+            )
+            return None
+        if result.returncode != 0:
+            print(
+                f"agents-md-generate: error: '{path}' exited with code {result.returncode}",
+                file=sys.stderr,
+            )
+            if result.stderr:
+                print(result.stderr, file=sys.stderr, end="")
+            return None
+        return result.stdout
+    else:
+        return path.read_text()
+
+
+def get_state_file_path(git_root):
+    """Return the path to the state file, or None if not in a git repo."""
+    if not git_root:
+        return None
+    return git_root / ".git" / "agent-files" / "config" / "agents-md-generate" / "state.json"
+
+
+def load_state(state_path):
+    """Load state from JSON file.  Returns dict or None if file doesn't exist."""
+    if state_path and state_path.is_file():
+        with open(state_path) as f:
+            return json.load(f)
+    return None
+
+
+def save_state(state_path, dev_types, added, omitted):
+    """Save state to JSON file, creating directories as needed."""
+    state_path.parent.mkdir(parents=True, exist_ok=True)
+    state = {
+        "version": 1,
+        "dev_types": list(dev_types),
+        "added": list(added),
+        "omitted": list(omitted),
+    }
+    with open(state_path, "w") as f:
+        json.dump(state, f, indent=2)
+        f.write("\n")
+
+
+def list_dev_types(git_root):
+    """List available dev-type directory names from all base search paths."""
+    bases = get_raw_location_bases(git_root)
+    dev_types = set()
+    skip_names = {"default", "non-default"}
+    for base in bases:
+        if not base.is_dir():
+            continue
+        for entry in base.iterdir():
+            if entry.is_dir() and entry.name not in skip_names:
+                dev_types.add(entry.name)
+    return sorted(dev_types)
 
 
 def main():
@@ -129,6 +270,16 @@ def main():
         help="List all segment names with type annotation (for shell completion)",
     )
     parser.add_argument(
+        "--list-segments",
+        action="store_true",
+        help="List all segment names (for shell completion with --reset)",
+    )
+    parser.add_argument(
+        "--list-dev-types",
+        action="store_true",
+        help="List available dev-type names",
+    )
+    parser.add_argument(
         "--no-preamble",
         action="store_true",
         help="Suppress the command preamble written to stderr",
@@ -146,8 +297,49 @@ def main():
         action="store_true",
         help="Show the search paths being used and exit",
     )
+    parser.add_argument(
+        "--save-state",
+        action="store_true",
+        help="Save current config to state file for later regeneration",
+    )
+    parser.add_argument(
+        "--from-state",
+        action="store_true",
+        help="Load state from state file (falls back to defaults if no state)",
+    )
+    parser.add_argument(
+        "--from-state-strict",
+        action="store_true",
+        help="Load state from state file (error if no state file exists)",
+    )
+    parser.add_argument(
+        "--update",
+        action="store_true",
+        help="With --save-state, modify existing state incrementally",
+    )
+    parser.add_argument(
+        "--reset",
+        action="append",
+        metavar="SEGMENT",
+        default=[],
+        help="With --update, return a segment to its category default (can be repeated)",
+    )
+    parser.add_argument(
+        "--delete-state",
+        action="store_true",
+        help="Delete the state file and exit",
+    )
 
     args = parser.parse_args()
+
+    git_root = find_git_root()
+
+    # Handle --delete-state: delete and exit immediately
+    if args.delete_state:
+        state_path = get_state_file_path(git_root)
+        if state_path and state_path.is_file():
+            state_path.unlink()
+        return
 
     # Combine --dev-type flags with $DEV_TYPES env var (flags take priority, deduped)
     dev_types = list(args.dev_types)
@@ -156,7 +348,50 @@ def main():
         if env_dt and env_dt not in dev_types:
             dev_types.append(env_dt)
 
-    base_paths = get_base_search_paths(dev_types)
+    # Handle --list-dev-types before search path expansion
+    if args.list_dev_types:
+        for dt in list_dev_types(git_root):
+            print(dt)
+        return
+
+    # Handle --from-state / --from-state-strict: load state and merge with CLI flags
+    if args.from_state or args.from_state_strict:
+        state_path = get_state_file_path(git_root)
+        state = load_state(state_path)
+        if state is None:
+            if args.from_state_strict:
+                print(
+                    "agents-md-generate: error: no state file found (use --save-state to create one)",
+                    file=sys.stderr,
+                )
+                sys.exit(1)
+            # --from-state: fall back to defaults silently
+        else:
+            # Merge state dev_types: CLI --dev-type prepends, then state, then env
+            state_dev_types = state.get("dev_types", [])
+            # dev_types already has CLI flags + env; prepend state between them
+            # Actually: CLI flags first, then state, then env (deduped)
+            merged_dev_types = list(args.dev_types)
+            for dt in state_dev_types:
+                if dt not in merged_dev_types:
+                    merged_dev_types.append(dt)
+            for env_dt in os.environ.get("DEV_TYPES", "").split(","):
+                env_dt = env_dt.strip()
+                if env_dt and env_dt not in merged_dev_types:
+                    merged_dev_types.append(env_dt)
+            dev_types = merged_dev_types
+
+            # Merge added/omitted: CLI extends state
+            state_added = state.get("added", [])
+            state_omitted = state.get("omitted", [])
+            for name in state_added:
+                if name not in args.add:
+                    args.add.append(name)
+            for name in state_omitted:
+                if name not in args.omit:
+                    args.omit.append(name)
+
+    base_paths = get_base_search_paths(dev_types, git_root)
 
     if args.show_paths:
         for p in base_paths:
@@ -167,7 +402,7 @@ def main():
     default_segments = find_segments(base_paths, "default")
     non_default_segments = find_segments(base_paths, "non-default")
 
-    # Completion / listing modes — output to stdout and exit
+    # Completion / listing modes -- output to stdout and exit
     if args.list_default:
         for name in sorted(default_segments):
             print(name)
@@ -184,6 +419,58 @@ def main():
         for name in sorted(non_default_segments):
             print(f"{name}\tnon-default")
         return
+
+    if args.list_segments:
+        all_names = sorted(set(list(default_segments.keys()) + list(non_default_segments.keys())))
+        for name in all_names:
+            print(name)
+        return
+
+    # Handle --save-state with --update: load existing state and apply modifications
+    if args.save_state and args.update:
+        state_path = get_state_file_path(git_root)
+        state = load_state(state_path)
+        if state is not None:
+            existing_added = set(state.get("added", []))
+            existing_omitted = set(state.get("omitted", []))
+            existing_dev_types = list(state.get("dev_types", []))
+
+            # Apply --reset: remove from both added and omitted
+            for name in args.reset:
+                existing_added.discard(name)
+                existing_omitted.discard(name)
+
+            # Apply --add: add non-default or re-include previously omitted default
+            for name in args.add:
+                existing_omitted.discard(name)
+                if name in non_default_segments:
+                    existing_added.add(name)
+
+            # Apply --omit: omit default or remove previously added non-default
+            for name in args.omit:
+                existing_added.discard(name)
+                if name in default_segments:
+                    existing_omitted.add(name)
+
+            # Merge dev types: CLI flags prepend to existing
+            merged_dev_types = list(args.dev_types)
+            for dt in existing_dev_types:
+                if dt not in merged_dev_types:
+                    merged_dev_types.append(dt)
+            for env_dt in os.environ.get("DEV_TYPES", "").split(","):
+                env_dt = env_dt.strip()
+                if env_dt and env_dt not in merged_dev_types:
+                    merged_dev_types.append(env_dt)
+            dev_types = merged_dev_types
+
+            # Replace args for the rest of processing
+            args.add = sorted(existing_added)
+            args.omit = sorted(existing_omitted)
+
+            # Recompute base_paths and segments with updated dev_types
+            base_paths = get_base_search_paths(dev_types, git_root)
+            default_segments = find_segments(base_paths, "default")
+            non_default_segments = find_segments(base_paths, "non-default")
 
     # Validate --add segment names
     errors = False
@@ -219,18 +506,32 @@ def main():
     to_emit = []
     for name in sorted(default_segments):
         if name not in omit_set:
-            to_emit.append(default_segments[name])
+            to_emit.append((name, default_segments[name]))
     for name in args.add:
-        to_emit.append(non_default_segments[name])
+        to_emit.append((name, non_default_segments[name]))
 
     # Concatenate and write to stdout
-    for i, path in enumerate(to_emit):
-        content = path.read_text()
+    for i, (name, path) in enumerate(to_emit):
+        content = read_segment(path, dev_types, git_root)
+        if content is None:
+            # .prog execution failed, skip this segment
+            continue
         if i > 0:
             sys.stdout.write("\n")
         sys.stdout.write(content)
         if not content.endswith("\n"):
             sys.stdout.write("\n")
+
+    # Save state if requested
+    if args.save_state:
+        state_path = get_state_file_path(git_root)
+        if state_path is None:
+            print(
+                "agents-md-generate: error: cannot save state (not in a git repo)",
+                file=sys.stderr,
+            )
+            sys.exit(1)
+        save_state(state_path, dev_types, args.add, args.omit)
 
 
 if __name__ == "__main__":

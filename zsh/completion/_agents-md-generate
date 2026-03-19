@@ -15,12 +15,22 @@ _agents_md_generate() {
         '(- :)--list-default[List default segment names]' \
         '(- :)--list-non-default[List non-default segment names]' \
         '(- :)--list-all[List all segment names with type]' \
+        '(- :)--list-segments[List all segment names]' \
+        '(- :)--list-dev-types[List available dev-type names]' \
         '(- :)--show-paths[Show search paths and exit]' \
         '--no-preamble[Suppress the command preamble on stderr]' \
+        '--save-state[Save current config for later regeneration]' \
+        '--from-state[Generate from saved state (falls back to defaults)]' \
+        '--from-state-strict[Generate from saved state (error if no state)]' \
+        '--update[With --save-state, modify existing state incrementally]' \
+        '(--save-state --from-state --from-state-strict --update)--delete-state[Delete state file and exit]' \
+        '*--reset=[With --update, reset segment to default]:segment:->segments' \
         '*--add=[Add a non-default segment]:non-default segment:->non_default_segments' \
         '*-a=[Add a non-default segment]:non-default segment:->non_default_segments' \
         '*--omit=[Omit a default segment]:default segment:->default_segments' \
         '*-o=[Omit a default segment]:default segment:->default_segments' \
+        '*--dev-type=[Add dev-type layer]:dev type:->dev_types' \
+        '*-d=[Add dev-type layer]:dev type:->dev_types' \
         && return 0
 
     case $state in
@@ -40,6 +50,24 @@ _agents_md_generate() {
                 _describe 'non-default segment' segments
             else
                 _message 'no non-default segments found'
+            fi
+            ;;
+        segments)
+            local segs
+            segs=("${(@f)$(agents-md-generate --list-segments 2>/dev/null)}")
+            if (( ${#segs} )); then
+                _describe 'segment' segs
+            else
+                _message 'no segments found'
+            fi
+            ;;
+        dev_types)
+            local types
+            types=("${(@f)$(agents-md-generate --list-dev-types 2>/dev/null)}")
+            if (( ${#types} )); then
+                _describe 'dev type' types
+            else
+                _message 'no dev types found'
             fi
             ;;
     esac
