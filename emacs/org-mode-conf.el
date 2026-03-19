@@ -31,11 +31,9 @@
             (lnkmap "mk" 'wgh/org-training-wheels-message)
             (lnkmap "mj" 'wgh/org-training-wheels-message)
 
-            ;; TODO - I need to add metaright/metaleft (IE promote single heading with no tree) as alternates of promote/demote, or as the disrespect-tree variant
-            (lnkmap "ml" 'org-metaright)
-            (lnkmap "mh" 'org-metaleft)
-            ;; TODO - is there some verb that this could fit in to?  Eg. some generic action verb that can do different things for different objects?  Or is that just trying to kludge more composability in where it doesn't make sense?  This is a key action that I use and want for outline headings.
-            (lnkmap "mtt" 'org-todo)
+            (lnkmap "ml" 'wgh/org-training-wheels-message)
+            (lnkmap "mh" 'wgh/org-training-wheels-message)
+            (lnkmap "mtt" 'wgh/org-training-wheels-message)
 
 
             ;; org-mark-element highlights the current-line and its subtree

@@ -665,6 +665,9 @@ FUNC should be a function whose first two arguments are BEG and END."
   ;; TODO - I want this one, but I keep using this accidentally due to my old key bindings, and it is so frustrating.  So I'll leave it as a no-op for now.
   ;;("o" (lambda (n) (interactive "p") (funcall (cp/ae (cp/obj 'NOOP-STOP-USING-THIS-BINDING-FOR-OLD-PURPOSE)) n)) "break habit!" :exit t)
   ("o" (lambda (n) (interactive "p") (funcall (cp/ae (progn (require 'cpo-outline) (cp/obj 'outline))) n)) "outline" :exit t)
+  ("O" (lambda (n) (interactive "p")
+         (funcall (cp/ae (progn (require 'cpo-outline-heading) (cp/obj 'cpo-outline-heading))) n))
+   "heading" :exit t)
   ("t" (lambda (n) (interactive "p") (funcall (cp/ae (progn (require 'cpo-treesitter-qd)
                                                             (wgh/initialize-treesit-for-buffer)
                                                             ;; TODO - also need to initialize treesitter in the buffer before first use...
