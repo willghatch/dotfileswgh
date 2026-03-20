@@ -91,6 +91,9 @@
 [commit]
   verbose = true # show diff in commit message below --- >8 --- scissors line
 
+[worktree]
+  useRelativePaths = true # use relative paths for worktree links, both from the main repo to the worktree, and from the worktree back to the main repo.
+
 [rerere]
   # REuse REcorded REsolutions
   # IE record before and after states of rebase conflicts and, with autoupdate, automatically re-apply the resolutions if they are seen again
