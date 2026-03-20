@@ -657,6 +657,10 @@ walks back up to the top-level .git directory."
 (defun wgh/agent-make-working-dir (topic)
   "Create and return a fresh agent-working-directory path for TOPIC."
   (let* ((base (wgh/agent-working-dir-base))
+         (topic (replace-regexp-in-string
+                 ;; Sanitize topic, primarily to remove spaces but let's also remove others.
+                 "[^a-zA-Z0-9_-]" ""
+                 (replace-regexp-in-string " " "_" topic)))
          (timestamp (format-time-string "%Y-%m-%dT%H-%M"))
          (agentid (string-trim
                    (shell-command-to-string
