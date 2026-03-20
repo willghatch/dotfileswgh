@@ -10,8 +10,10 @@ or skill.prog, found in (per location, dev-type paths precede base path):
   4. XDG_CONFIG_HOME/df-skills/{default,non-default}/
   5. Each XDG_CONFIG_DIRS entry (same pattern)
 
-Dev types come from --dev-type flags (repeatable, higher priority) and the
-DEV_TYPES environment variable (comma-separated).
+Dev types come from --dev-type flags (repeatable, highest priority), the
+DEV_TYPES environment variable (comma-separated), and
+.git/agent-files/dev-types.json (a JSON list of strings, lowest priority).
+All sources are merged and deduplicated.
 
 Subcommands:
   agents-md-snippet  Generate AGENTS.md snippet with skill frontmatter
@@ -21,86 +23,23 @@ Subcommands:
 """
 
 import argparse
-import json
 import os
 import subprocess
 import sys
 from pathlib import Path
 
+sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), 'agent-files-pylib'))
+from agent_files_common import (
+    find_git_root,
+    gather_dev_types,
+    get_base_search_paths,
+    get_state_file_path,
+    load_state,
+    save_state,
+)
 
-def find_git_root():
-    """Find the root of the current git repository, or None.
-
-    When AGENT_WORK_GIT_ROOT is set, uses that directly.
-    Otherwise walks up from cwd looking for .git.  If .git is a file
-    (worktree or submodule), follows the gitdir reference to find the
-    real .git directory and returns its parent.
-    """
-    env_root = os.environ.get("AGENT_WORK_GIT_ROOT")
-    if env_root:
-        return Path(env_root)
-    cwd = Path.cwd()
-    for candidate in [cwd] + list(cwd.parents):
-        dot_git = candidate / ".git"
-        if dot_git.is_dir():
-            return candidate
-        if dot_git.is_file():
-            # Worktree or submodule: .git is a file containing "gitdir: <path>"
-            text = dot_git.read_text().strip()
-            if text.startswith("gitdir:"):
-                gitdir = Path(text.split(":", 1)[1].strip())
-                if not gitdir.is_absolute():
-                    gitdir = (candidate / gitdir).resolve()
-                # gitdir points to e.g. /repo/.git/worktrees/NAME
-                # Walk up to find the actual .git directory
-                real_git_dir = gitdir
-                while real_git_dir.name != ".git" and real_git_dir.parent != real_git_dir:
-                    real_git_dir = real_git_dir.parent
-                if real_git_dir.name == ".git":
-                    return real_git_dir.parent
-            return candidate
-    return None
-
-
-def get_base_search_paths(dev_types=(), git_root=None):
-    """Return ordered list of base paths that each contain default/ and non-default/ subdirs.
-
-    Priority: git root > XDG_CONFIG_HOME > XDG_CONFIG_DIRS.
-    Within each location, dev-type-specific paths precede the base path.
-    """
-    paths = []
-
-    def add_location(base):
-        for dt in dev_types:
-            paths.append(base / dt)
-        paths.append(base)
-
-    # Git repo path (most specific to current project)
-    if git_root:
-        add_location(git_root / ".git" / "agent-files" / "config" / "df-skills")
-
-    home = Path.home()
-
-    # XDG_CONFIG_HOME (user-personal)
-    xdg_config_home = os.environ.get("XDG_CONFIG_HOME", str(home / ".config"))
-    add_location(Path(xdg_config_home) / "df-skills")
-
-    # XDG_CONFIG_DIRS (system/shared)
-    xdg_config_dirs = os.environ.get("XDG_CONFIG_DIRS", "/etc/xdg")
-    for config_dir in xdg_config_dirs.split(":"):
-        if config_dir:
-            add_location(Path(config_dir) / "df-skills")
-
-    # De-duplicate while preserving order
-    seen = set()
-    deduped = []
-    for path in paths:
-        resolved = path.resolve()
-        if resolved not in seen:
-            seen.add(resolved)
-            deduped.append(path)
-
-    return deduped
+PROG_NAME = "df-skills"
+CONFIG_NAME = "df-skills"
 
 
 def find_skills(base_paths, subdir):
@@ -175,35 +114,6 @@ def read_skill_content(content_path, skill_name, skill_dir, dev_types, git_root)
         return content_path.read_text(), None
 
 
-def get_state_file_path(git_root):
-    """Return the path to the state file, or None if not in a git repo."""
-    if not git_root:
-        return None
-    return git_root / ".git" / "agent-files" / "config" / "df-skills" / "state.json"
-
-
-def load_state(state_path):
-    """Load state from JSON file.  Returns dict or None if file doesn't exist."""
-    if state_path and state_path.is_file():
-        with open(state_path) as f:
-            return json.load(f)
-    return None
-
-
-def save_state_file(state_path, dev_types, added, omitted):
-    """Save state to JSON file, creating directories as needed."""
-    state_path.parent.mkdir(parents=True, exist_ok=True)
-    state = {
-        "version": 1,
-        "dev_types": list(dev_types),
-        "added": list(added),
-        "omitted": list(omitted),
-    }
-    with open(state_path, "w") as f:
-        json.dump(state, f, indent=2)
-        f.write("\n")
-
-
 def get_active_skills(default_skills, non_default_skills, added_names, omitted_names):
     """Compute the active skill set: defaults minus omitted, plus added.
 
@@ -234,12 +144,12 @@ def cmd_agents_md_snippet(args, dev_types, git_root, base_paths):
 
     # Handle --from-state / --from-state-strict
     if args.from_state or args.from_state_strict:
-        state_path = get_state_file_path(git_root)
+        state_path = get_state_file_path(CONFIG_NAME, git_root)
         state = load_state(state_path)
         if state is None:
             if args.from_state_strict:
                 print(
-                    "df-skills: error: no state file found (use save-state to create one)",
+                    f"{PROG_NAME}: error: no state file found (use save-state to create one)",
                     file=sys.stderr,
                 )
                 sys.exit(1)
@@ -253,7 +163,7 @@ def cmd_agents_md_snippet(args, dev_types, git_root, base_paths):
                 if dt not in dev_types:
                     dev_types.append(dt)
             # Recompute paths and skills with merged dev_types
-            base_paths = get_base_search_paths(dev_types, git_root)
+            base_paths = get_base_search_paths(CONFIG_NAME, dev_types, git_root)
             default_skills = find_skills(base_paths, "default")
             non_default_skills = find_skills(base_paths, "non-default")
 
@@ -272,7 +182,7 @@ def cmd_agents_md_snippet(args, dev_types, git_root, base_paths):
         frontmatter_path = skill_dir / "frontmatter.md"
         if not frontmatter_path.exists():
             print(
-                f"df-skills: warning: skill '{name}' has no frontmatter.md, skipping",
+                f"{PROG_NAME}: warning: skill '{name}' has no frontmatter.md, skipping",
                 file=sys.stderr,
             )
             continue
@@ -282,7 +192,7 @@ def cmd_agents_md_snippet(args, dev_types, git_root, base_paths):
         content_path = get_skill_content_path(skill_dir)
         if content_path is None:
             print(
-                f"df-skills: warning: skill '{name}' has no content file (skill.md/skill.org/skill.prog)",
+                f"{PROG_NAME}: warning: skill '{name}' has no content file (skill.md/skill.org/skill.prog)",
                 file=sys.stderr,
             )
 
@@ -309,7 +219,7 @@ def cmd_disclose(args, dev_types, git_root, base_paths):
     skill_dir = default_skills.get(skill_name) or non_default_skills.get(skill_name)
     if skill_dir is None:
         print(
-            f"df-skills: error: skill '{skill_name}' not found. "
+            f"{PROG_NAME}: error: skill '{skill_name}' not found. "
             f"Run 'df-skills list' to see available skills.",
             file=sys.stderr,
         )
@@ -322,7 +232,7 @@ def cmd_disclose(args, dev_types, git_root, base_paths):
 
     if content_path is None:
         print(
-            f"\ndf-skills: error: skill '{skill_name}' has no content file "
+            f"\n{PROG_NAME}: error: skill '{skill_name}' has no content file "
             f"(skill.md/skill.org/skill.prog)",
             file=sys.stderr,
         )
@@ -338,7 +248,7 @@ def cmd_disclose(args, dev_types, git_root, base_paths):
     if error:
         print(f"[{error}]")
         print(
-            f"df-skills: warning: skill.prog failed for '{skill_name}'",
+            f"{PROG_NAME}: warning: skill.prog failed for '{skill_name}'",
             file=sys.stderr,
         )
         sys.exit(1)
@@ -355,12 +265,12 @@ def cmd_list(args, dev_types, git_root, base_paths):
 
     # Handle --from-state / --from-state-strict
     if args.from_state or args.from_state_strict:
-        state_path = get_state_file_path(git_root)
+        state_path = get_state_file_path(CONFIG_NAME, git_root)
         state = load_state(state_path)
         if state is None:
             if args.from_state_strict:
                 print(
-                    "df-skills: error: no state file found (use save-state to create one)",
+                    f"{PROG_NAME}: error: no state file found (use save-state to create one)",
                     file=sys.stderr,
                 )
                 sys.exit(1)
@@ -372,7 +282,7 @@ def cmd_list(args, dev_types, git_root, base_paths):
             for dt in state_dev_types:
                 if dt not in dev_types:
                     dev_types.append(dt)
-            base_paths = get_base_search_paths(dev_types, git_root)
+            base_paths = get_base_search_paths(CONFIG_NAME, dev_types, git_root)
             default_skills = find_skills(base_paths, "default")
             non_default_skills = find_skills(base_paths, "non-default")
 
@@ -414,15 +324,15 @@ def cmd_save_state(args, dev_types, git_root, base_paths):
     """Save skill configuration to state file."""
     # Handle --delete-state
     if args.delete_state:
-        state_path = get_state_file_path(git_root)
+        state_path = get_state_file_path(CONFIG_NAME, git_root)
         if state_path and state_path.is_file():
             state_path.unlink()
         return
 
-    state_path = get_state_file_path(git_root)
+    state_path = get_state_file_path(CONFIG_NAME, git_root)
     if state_path is None:
         print(
-            "df-skills: error: cannot save state (not in a git repo)",
+            f"{PROG_NAME}: error: cannot save state (not in a git repo)",
             file=sys.stderr,
         )
         sys.exit(1)
@@ -439,7 +349,7 @@ def cmd_save_state(args, dev_types, git_root, base_paths):
             unknown.append(name)
     if unknown:
         print(
-            f"df-skills: error: unknown skill(s): {', '.join(unknown)}",
+            f"{PROG_NAME}: error: unknown skill(s): {', '.join(unknown)}",
             file=sys.stderr,
         )
         sys.exit(1)
@@ -482,7 +392,7 @@ def cmd_save_state(args, dev_types, git_root, base_paths):
                     merged_dev_types.append(dt)
             dev_types = merged_dev_types
 
-    save_state_file(state_path, dev_types, sorted(added), sorted(omitted))
+    save_state(state_path, dev_types, sorted(added), sorted(omitted))
 
 
 def main():
@@ -607,15 +517,11 @@ def main():
 
     args = parser.parse_args()
 
-    # Combine --dev-type flags with $DEV_TYPES env var (flags take priority, deduped)
-    dev_types = list(args.dev_types)
-    for env_dt in os.environ.get("DEV_TYPES", "").split(","):
-        env_dt = env_dt.strip()
-        if env_dt and env_dt not in dev_types:
-            dev_types.append(env_dt)
-
     git_root = find_git_root()
-    base_paths = get_base_search_paths(dev_types, git_root)
+
+    # Combine --dev-type flags, $DEV_TYPES env var, and dev-types.json
+    dev_types = gather_dev_types(args.dev_types, git_root, PROG_NAME)
+    base_paths = get_base_search_paths(CONFIG_NAME, dev_types, git_root)
 
     if args.show_paths:
         for p in base_paths:
