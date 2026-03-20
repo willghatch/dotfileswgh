@@ -261,13 +261,16 @@ do_worktree_initialize() {
 
     if ! (
         set -euo pipefail
-        pytorch_req="$(mktemp)"
+        pytorch_req="$(mktemp /tmp/pytorch-rocm-requirements.XXXXXX.txt)"
         trap "rm -f '$pytorch_req'" EXIT
         uv venv "$venv_dir"
         source "$venv_dir/bin/activate"
         "$WAVE_DIR/gen-pytorch-rocm-requirements.py" -o "$pytorch_req"
         uv pip install -r "$pytorch_req"
         uv pip install -r "$WAVE_DIR/requirements-iree-pinned.txt"
+        uv pip install nanobind
+        do_build_waveasm
+        do_build_water
         uv pip install -e "$WAVE_DIR[dev]"
     ) > "$log_file" 2>&1; then
         echo "error: worktree initialization failed. Output:" >&2
