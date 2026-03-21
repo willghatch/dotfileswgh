@@ -27,7 +27,8 @@ _docsuez() {
         build)
           _arguments \
             '1:image spec:->builds' \
-            '--dry-show[Show the assembled Dockerfile without building]'
+            '--dry-show[Show the assembled Dockerfile without building]' \
+            '--no-cache[Pass --no-cache to docker build]'
 
           case $state in
             builds)
@@ -46,7 +47,8 @@ _docsuez() {
             '--no-default-addons[Skip loading default addons]' \
             '(-s --session-name)'{-s,--session-name}'[Name for the tmux session]:session name:' \
             '(-c --color)'{-c,--color}'[Background color for the tmux session]:color:' \
-            '--dry-show[Show the run script without executing it]'
+            '--dry-show[Show the run script without executing it]' \
+            '--no-cache[Pass --no-cache to docker build]'
 
           case $state in
             configs)
