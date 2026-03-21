@@ -1,0 +1,2 @@
+# Core Rust tools
+RUN apt-get install -y --no-install-recommends rustc cargo rustfmt rust-clippy
