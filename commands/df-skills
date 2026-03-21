@@ -2,8 +2,13 @@
 """
 df-skills - Manage reusable skill documents for AI agents
 
-Skills are directories containing frontmatter.md and one of skill.md, skill.org,
-or skill.prog, found in (per location, dev-type paths precede base path):
+Skills are directories containing one of skill.md, skill.org, or skill.prog,
+with frontmatter provided either as a separate frontmatter.md file or embedded
+at the start of skill.md in standard YAML-like format (delimited by --- lines).
+If frontmatter.md exists it takes priority; otherwise embedded frontmatter is
+extracted from skill.md.
+
+Skill directories are found in (per location, dev-type paths precede base path):
   1. <git-root>/.git/agent-files/config/df-skills/<dev-type>/{default,non-default}/
   2. <git-root>/.git/agent-files/config/df-skills/{default,non-default}/
   3. XDG_CONFIG_HOME/df-skills/<dev-type>/{default,non-default}/
@@ -134,6 +139,176 @@ def get_active_skills(default_skills, non_default_skills, added_names, omitted_n
     return active
 
 
+def parse_standard_frontmatter(text):
+    """Parse standard YAML-like frontmatter from the start of a file's text.
+
+    Expects the text to begin with a line containing only '---', followed by
+    'key: value' lines, terminated by another '---' line.
+
+    Multi-line values are supported:
+    - Continuation lines: indented lines following a key are appended to that
+      key's value (leading whitespace is collapsed to a single space).
+    - Block scalar indicators (``|`` or ``>``): the value on the key line is
+      one of these characters, and subsequent indented lines form the value.
+    - Blank lines inside the frontmatter block are treated as continuation
+      of the current key (they become a newline in the value).
+
+    Returns (fields_dict, content_after_frontmatter) on success, where
+    fields_dict maps field names to string values and content_after_frontmatter
+    is the remaining text with leading blank lines stripped.
+
+    Returns (None, text) if no valid frontmatter is found.
+    """
+    lines = text.split("\n")
+    if not lines or lines[0].rstrip() != "---":
+        return None, text
+
+    fields = {}
+    end_index = None
+    current_key = None
+    block_scalar = False  # True when value was '|' or '>'
+
+    for i in range(1, len(lines)):
+        raw_line = lines[i]
+        stripped = raw_line.rstrip()
+
+        if stripped == "---":
+            end_index = i
+            break
+
+        # Blank line: treat as continuation of the current key (newline in value)
+        if stripped == "":
+            if current_key is not None:
+                fields[current_key] += "\n"
+            continue
+
+        # Continuation line: starts with whitespace and doesn't look like a
+        # new key (no leading-non-space text before a colon)
+        if raw_line[0] in (" ", "\t"):
+            if current_key is not None:
+                continuation = stripped.strip()
+                if block_scalar:
+                    # Literal/folded block: preserve lines separated by newlines
+                    if fields[current_key]:
+                        fields[current_key] += "\n" + continuation
+                    else:
+                        fields[current_key] = continuation
+                else:
+                    # Folded continuation: join with a space
+                    if fields[current_key]:
+                        fields[current_key] += " " + continuation
+                    else:
+                        fields[current_key] = continuation
+                continue
+            else:
+                # Indented line with no preceding key -- malformed
+                return None, text
+
+        # Try to parse as 'key: value'
+        colon_pos = stripped.find(":")
+        if colon_pos < 1:
+            # Non-indented line that isn't a key: value pair -- malformed
+            return None, text
+
+        key = stripped[:colon_pos].strip()
+        value = stripped[colon_pos + 1:].strip()
+        current_key = key
+
+        # Check for block scalar indicators
+        if value in ("|", ">"):
+            block_scalar = True
+            fields[key] = ""
+        else:
+            block_scalar = False
+            fields[key] = value
+
+    if end_index is None:
+        # No closing delimiter found
+        return None, text
+
+    # Strip trailing newlines from values that accumulated blank-line continuations
+    for key in fields:
+        fields[key] = fields[key].strip()
+
+    # Content is everything after the closing '---', with leading blank lines
+    # stripped but preserving the rest exactly
+    content_lines = lines[end_index + 1:]
+    # Strip leading empty lines
+    while content_lines and content_lines[0].strip() == "":
+        content_lines = content_lines[1:]
+    content = "\n".join(content_lines)
+
+    return fields, content
+
+
+def get_skill_frontmatter(skill_dir):
+    """Get frontmatter text and metadata for a skill.
+
+    Checks for frontmatter.md first (current behavior), then falls back to
+    parsing embedded frontmatter from skill.md.
+
+    Returns a dict with keys:
+      - 'text': the frontmatter/description text for snippet display
+      - 'fields': dict of all parsed fields (empty for frontmatter.md)
+      - 'source': 'frontmatter.md', 'embedded', or None
+      - 'name': display name override if 'name' field exists, else None
+      - 'has_embedded_frontmatter': True if skill.md has embedded frontmatter
+
+    Returns None if no frontmatter is available.
+    """
+    frontmatter_path = skill_dir / "frontmatter.md"
+    if frontmatter_path.exists():
+        text = frontmatter_path.read_text()
+        return {
+            "text": text,
+            "fields": {},
+            "source": "frontmatter.md",
+            "name": None,
+            "has_embedded_frontmatter": False,
+        }
+
+    # Try embedded frontmatter in skill.md
+    skill_md_path = skill_dir / "skill.md"
+    if not skill_md_path.exists():
+        return None
+
+    raw_text = skill_md_path.read_text()
+    fields, _content = parse_standard_frontmatter(raw_text)
+    if fields is None:
+        return None
+
+    description = fields.get("description", "")
+    display_name = fields.get("name") or None
+
+    return {
+        "text": description,
+        "fields": fields,
+        "source": "embedded",
+        "name": display_name,
+        "has_embedded_frontmatter": True,
+    }
+
+
+def read_skill_content_stripped(content_path, skill_name, skill_dir, dev_types, git_root, strip_frontmatter):
+    """Read skill content, optionally stripping embedded frontmatter.
+
+    Wraps read_skill_content and, when strip_frontmatter is True and the
+    content file is skill.md, removes the leading frontmatter block.
+    """
+    content, error = read_skill_content(
+        content_path, skill_name, skill_dir, dev_types, git_root
+    )
+    if error or not strip_frontmatter:
+        return content, error
+
+    if content_path.name == "skill.md":
+        _fields, stripped = parse_standard_frontmatter(content)
+        if _fields is not None:
+            return stripped, None
+
+    return content, error
+
+
 def cmd_agents_md_snippet(args, dev_types, git_root, base_paths):
     """Generate AGENTS.md snippet with skill frontmatter."""
     default_skills = find_skills(base_paths, "default")
@@ -179,10 +354,10 @@ def cmd_agents_md_snippet(args, dev_types, git_root, base_paths):
     print("## Available df-skills")
 
     for name, skill_dir, category in active:
-        frontmatter_path = skill_dir / "frontmatter.md"
-        if not frontmatter_path.exists():
+        fm = get_skill_frontmatter(skill_dir)
+        if fm is None:
             print(
-                f"{PROG_NAME}: warning: skill '{name}' has no frontmatter.md, skipping",
+                f"{PROG_NAME}: warning: skill '{name}' has no frontmatter, skipping",
                 file=sys.stderr,
             )
             continue
@@ -200,9 +375,10 @@ def cmd_agents_md_snippet(args, dev_types, git_root, base_paths):
         # But per spec, for agents-md-snippet we just include frontmatter
         # We don't execute .prog here -- frontmatter is always static
 
-        frontmatter = frontmatter_path.read_text()
+        display_name = fm["name"] if fm["name"] else name
+        frontmatter = fm["text"]
         print()
-        print(f"### {name}")
+        print(f"### {display_name}")
         print()
         sys.stdout.write(frontmatter)
         if not frontmatter.endswith("\n"):
@@ -227,6 +403,10 @@ def cmd_disclose(args, dev_types, git_root, base_paths):
 
     content_path = get_skill_content_path(skill_dir)
 
+    # Check if this skill uses embedded frontmatter (no frontmatter.md)
+    fm = get_skill_frontmatter(skill_dir)
+    strip_frontmatter = fm is not None and fm["has_embedded_frontmatter"]
+
     print(f"Skill: {skill_name}")
     print(f"Source: {skill_dir}")
 
@@ -242,8 +422,8 @@ def cmd_disclose(args, dev_types, git_root, base_paths):
     print()
     print(label)
 
-    content, error = read_skill_content(
-        content_path, skill_name, skill_dir, dev_types, git_root
+    content, error = read_skill_content_stripped(
+        content_path, skill_name, skill_dir, dev_types, git_root, strip_frontmatter
     )
     if error:
         print(f"[{error}]")
