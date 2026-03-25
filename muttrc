@@ -177,6 +177,7 @@ bind index sc copy-message
 macro index sm "ss\Ca\Ck=misc<enter>y"
 macro index sl "ss\Ca\Ck=lists<enter>y"
 macro index sr "ss\Ca\Ck=pre-sort-post-process<enter>y"
+macro index sp "ss\Ca\Ck=spam-confirmed<enter>y"
 bind index G last-entry
 bind index gg first-entry
 bind index \Chb help
