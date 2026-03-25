@@ -169,6 +169,227 @@ def is_head(commit_hash):
     return commit_hash == head_hash
 
 
+def ensure_clean_worktree_for_history_rewrite():
+    """Require a clean index and working tree before rewriting non-HEAD history."""
+    rc, _ = run_git_rc("diff", "--quiet")
+    if rc != 0:
+        print(
+            "Error: you have unstaged changes.\n"
+            "Editing a non-HEAD commit rewrites history and requires a clean "
+            "working tree.",
+            file=sys.stderr,
+        )
+        sys.exit(1)
+
+    rc, _ = run_git_rc("diff", "--cached", "--quiet")
+    if rc != 0:
+        print(
+            "Error: you have staged changes.\n"
+            "Editing a non-HEAD commit rewrites history and requires a clean "
+            "index.",
+            file=sys.stderr,
+        )
+        sys.exit(1)
+
+
+def ensure_commit_is_ancestor_of_head(commit_hash):
+    """Require the target commit to be an ancestor of the current HEAD."""
+    rc, current_ref = run_git_rc("symbolic-ref", "--quiet", "--short", "HEAD")
+    current_target = current_ref if rc == 0 else "detached HEAD"
+
+    rc, _ = run_git_rc("merge-base", "--is-ancestor", commit_hash, "HEAD")
+    if rc == 0:
+        return
+
+    if current_target == "detached HEAD":
+        print(
+            f"Error: commit {commit_hash[:7]} is not an ancestor of the "
+            "current detached HEAD.",
+            file=sys.stderr,
+        )
+    else:
+        print(
+            f"Error: commit {commit_hash[:7]} is not in the current branch "
+            f"'{current_target}'.",
+            file=sys.stderr,
+        )
+    sys.exit(1)
+
+
+def build_amend_plan(args, old_meta):
+    """Resolve requested changes into amend arguments, environment, and projection."""
+    env = os.environ.copy()
+    amend_args = ["commit", "--amend", "--no-edit", "--allow-empty"]
+    projected = dict(old_meta)
+
+    new_author_date = None
+    new_committer_date = None
+
+    if args.date:
+        resolved = resolve_date(args.date)
+        new_author_date = resolved
+        new_committer_date = resolved
+
+    if args.author_date:
+        new_author_date = resolve_date(args.author_date)
+
+    if args.committer_date:
+        new_committer_date = resolve_date(args.committer_date)
+
+    if new_author_date:
+        # GIT_AUTHOR_DATE env var is ignored by git commit --amend;
+        # must use the --date flag instead.
+        amend_args.extend(["--date", new_author_date])
+        projected["author_date"] = new_author_date
+
+    if new_committer_date:
+        env["GIT_COMMITTER_DATE"] = new_committer_date
+        projected["committer_date"] = new_committer_date
+
+    new_author_name = None
+    new_author_email = None
+
+    if args.author:
+        new_author_name, new_author_email = resolve_author(args.author)
+
+    if new_author_name and new_author_email:
+        amend_args.extend(["--author", f"{new_author_name} <{new_author_email}>"])
+        projected["author_name"] = new_author_name
+        projected["author_email"] = new_author_email
+
+    new_committer_name = None
+    new_committer_email = None
+
+    if args.committer:
+        new_committer_name, new_committer_email = resolve_committer(args.committer)
+
+    if new_committer_name:
+        env["GIT_COMMITTER_NAME"] = new_committer_name
+        projected["committer_name"] = new_committer_name
+
+    if new_committer_email:
+        env["GIT_COMMITTER_EMAIL"] = new_committer_email
+        projected["committer_email"] = new_committer_email
+
+    # When changing author date but not committer date, we still need to
+    # preserve the original committer date, because git commit --amend
+    # resets committer date to now by default.
+    if new_author_date and not new_committer_date:
+        env["GIT_COMMITTER_DATE"] = old_meta["committer_date"]
+
+    # When changing committer identity but not committer date, preserve
+    # the original committer date.
+    if (
+        (new_committer_name or new_committer_email)
+        and not new_committer_date
+        and not new_author_date
+    ):
+        env["GIT_COMMITTER_DATE"] = old_meta["committer_date"]
+
+    # When changing only the author (not committer), also preserve
+    # committer date.
+    if (
+        new_author_name
+        and not new_committer_name
+        and not new_committer_email
+        and not new_committer_date
+        and not new_author_date
+    ):
+        env["GIT_COMMITTER_DATE"] = old_meta["committer_date"]
+
+    return amend_args, env, projected
+
+
+def show_changes(old_meta, new_meta):
+    """Print a summary of which metadata fields changed."""
+    changes = []
+    if old_meta["author_date"] != new_meta["author_date"]:
+        changes.append("author date")
+    if old_meta["committer_date"] != new_meta["committer_date"]:
+        changes.append("committer date")
+    if old_meta["author_name"] != new_meta["author_name"] or old_meta["author_email"] != new_meta["author_email"]:
+        changes.append("author")
+    if old_meta["committer_name"] != new_meta["committer_name"] or old_meta["committer_email"] != new_meta["committer_email"]:
+        changes.append("committer")
+
+    if changes:
+        print(f"\nChanged: {', '.join(changes)}")
+    else:
+        print("\nNo metadata was changed.")
+
+
+def amend_head_with_plan(amend_args, env):
+    """Amend HEAD using the provided git arguments and environment."""
+    result = subprocess.run(
+        ["git"] + amend_args,
+        env=env,
+        capture_output=True,
+        text=True,
+    )
+    if result.returncode != 0:
+        print("Error: git commit --amend failed:", file=sys.stderr)
+        print(result.stderr, file=sys.stderr)
+        sys.exit(1)
+
+
+def rewrite_non_head_commit(commit_hash, amend_args, env):
+    """Rewrite a non-HEAD commit, then rebase descendants onto the new commit."""
+    original_head = run_git("rev-parse", "HEAD")
+    rc, original_branch = run_git_rc("symbolic-ref", "--quiet", "--short", "HEAD")
+    original_target = original_branch if rc == 0 else original_head
+
+    checkout_target = subprocess.run(
+        ["git", "checkout", "--detach", commit_hash],
+        capture_output=True,
+        text=True,
+    )
+    if checkout_target.returncode != 0:
+        print("Error: failed to check out target commit:", file=sys.stderr)
+        print(checkout_target.stderr, file=sys.stderr)
+        sys.exit(1)
+
+    amend_head_with_plan(amend_args, env)
+    new_commit_hash = run_git("rev-parse", "HEAD")
+
+    restore_original = subprocess.run(
+        ["git", "checkout", original_target],
+        capture_output=True,
+        text=True,
+    )
+    if restore_original.returncode != 0:
+        print(
+            "Error: amended the target commit, but failed to restore the "
+            "original checkout state.",
+            file=sys.stderr,
+        )
+        print(restore_original.stderr, file=sys.stderr)
+        print(
+            f"The rewritten commit is {new_commit_hash[:7]}.",
+            file=sys.stderr,
+        )
+        sys.exit(1)
+
+    rebase_result = subprocess.run(
+        ["git", "rebase", "--onto", new_commit_hash, commit_hash],
+        capture_output=True,
+        text=True,
+    )
+    if rebase_result.returncode != 0:
+        print(
+            "Error: amended the target commit, but replaying descendant "
+            "commits failed.",
+            file=sys.stderr,
+        )
+        print(rebase_result.stderr, file=sys.stderr)
+        print(
+            "Resolve the rebase or abort it with 'git rebase --abort'.",
+            file=sys.stderr,
+        )
+        sys.exit(1)
+
+    return new_commit_hash
+
+
 def build_parser():
     parser = argparse.ArgumentParser(
         prog="git-commit-meta",
@@ -268,92 +489,9 @@ def main():
         show_commit_meta(meta)
         return
 
-    # For modifications, currently only support HEAD
-    if not is_head(commit_hash):
-        print(
-            f"Error: modifying non-HEAD commits is not supported.\n"
-            f"The commit {commit_hash[:7]} is not HEAD.\n"
-            f"Rebase it to HEAD first, then modify, then rebase back.\n"
-            f"  git rebase -i {commit_hash[:7]}~1",
-            file=sys.stderr,
-        )
-        sys.exit(1)
-
-    # Warn about staged changes
-    check_staged_changes()
-
-    # Get current metadata for comparison
-    old_meta = get_commit_meta("HEAD")
-
-    # Build up the environment and arguments for git commit --amend
-    env = os.environ.copy()
-    amend_args = ["commit", "--amend", "--no-edit", "--allow-empty"]
-
-    # --- Resolve dates ---
-
-    new_author_date = None
-    new_committer_date = None
-
-    if args.date:
-        resolved = resolve_date(args.date)
-        new_author_date = resolved
-        new_committer_date = resolved
-
-    if args.author_date:
-        new_author_date = resolve_date(args.author_date)
-
-    if args.committer_date:
-        new_committer_date = resolve_date(args.committer_date)
-
-    if new_author_date:
-        # GIT_AUTHOR_DATE env var is ignored by git commit --amend;
-        # must use the --date flag instead.
-        amend_args.extend(["--date", new_author_date])
-
-    if new_committer_date:
-        env["GIT_COMMITTER_DATE"] = new_committer_date
-
-    # --- Resolve author ---
-
-    new_author_name = None
-    new_author_email = None
-
-    if args.author:
-        new_author_name, new_author_email = resolve_author(args.author)
-
-    if new_author_name and new_author_email:
-        amend_args.extend(["--author", f"{new_author_name} <{new_author_email}>"])
-
-    # --- Resolve committer ---
-
-    new_committer_name = None
-    new_committer_email = None
-
-    if args.committer:
-        new_committer_name, new_committer_email = resolve_committer(args.committer)
-
-    if new_committer_name:
-        env["GIT_COMMITTER_NAME"] = new_committer_name
-
-    if new_committer_email:
-        env["GIT_COMMITTER_EMAIL"] = new_committer_email
-
-    # When changing author date but not committer date, we still need to
-    # preserve the original committer date, because git commit --amend
-    # resets committer date to now by default.
-    if new_author_date and not new_committer_date:
-        env["GIT_COMMITTER_DATE"] = old_meta["committer_date"]
-
-    # When changing committer identity but not committer date, preserve
-    # the original committer date.
-    if (new_committer_name or new_committer_email) and not new_committer_date and not new_author_date:
-        env["GIT_COMMITTER_DATE"] = old_meta["committer_date"]
-
-    # When changing only the author (not committer), also preserve
-    # committer date.
-    if (new_author_name and not new_committer_name and not new_committer_email
-            and not new_committer_date and not new_author_date):
-        env["GIT_COMMITTER_DATE"] = old_meta["committer_date"]
+    # Get current metadata for comparison and build the amend plan once.
+    old_meta = get_commit_meta(commit_hash)
+    amend_args, env, projected = build_amend_plan(args, old_meta)
 
     # --- Dry run ---
 
@@ -363,39 +501,22 @@ def main():
         show_commit_meta(old_meta)
         print()
         print("After (projected):")
-        projected = dict(old_meta)
-        if new_author_date:
-            projected["author_date"] = new_author_date
-        if new_committer_date:
-            projected["committer_date"] = new_committer_date
-        if new_author_name:
-            projected["author_name"] = new_author_name
-        if new_author_email:
-            projected["author_email"] = new_author_email
-        if new_committer_name:
-            projected["committer_name"] = new_committer_name
-        if new_committer_email:
-            projected["committer_email"] = new_committer_email
         show_commit_meta(projected)
         return
 
-    # --- Execute the amend ---
+    # --- Execute the amend / rewrite ---
 
-    result = subprocess.run(
-        ["git"] + amend_args,
-        env=env,
-        capture_output=True,
-        text=True,
-    )
-
-    if result.returncode != 0:
-        print("Error: git commit --amend failed:", file=sys.stderr)
-        print(result.stderr, file=sys.stderr)
-        sys.exit(1)
+    if is_head(commit_hash):
+        check_staged_changes()
+        amend_head_with_plan(amend_args, env)
+        new_meta = get_commit_meta("HEAD")
+    else:
+        ensure_clean_worktree_for_history_rewrite()
+        ensure_commit_is_ancestor_of_head(commit_hash)
+        new_commit_hash = rewrite_non_head_commit(commit_hash, amend_args, env)
+        new_meta = get_commit_meta(new_commit_hash)
 
     # --- Show summary ---
-
-    new_meta = get_commit_meta("HEAD")
 
     print("Modified commit metadata:\n")
     print("Before:")
@@ -403,22 +524,7 @@ def main():
     print()
     print("After:")
     show_commit_meta(new_meta)
-
-    # Highlight what changed
-    changes = []
-    if old_meta["author_date"] != new_meta["author_date"]:
-        changes.append("author date")
-    if old_meta["committer_date"] != new_meta["committer_date"]:
-        changes.append("committer date")
-    if old_meta["author_name"] != new_meta["author_name"] or old_meta["author_email"] != new_meta["author_email"]:
-        changes.append("author")
-    if old_meta["committer_name"] != new_meta["committer_name"] or old_meta["committer_email"] != new_meta["committer_email"]:
-        changes.append("committer")
-
-    if changes:
-        print(f"\nChanged: {', '.join(changes)}")
-    else:
-        print("\nNo metadata was changed.")
+    show_changes(old_meta, new_meta)
 
 
 if __name__ == "__main__":
