@@ -12,3 +12,11 @@ Before sending ANY reply that contains findings, a list, a summary, or a direct 
   3. Reference the file path in your chat reply.
 
 There are NO exceptions for "simple" or "short" answers, requests for clarification, etc.
+Do not even give a final answer in chat unless explicitly requested, merely tell where the key result file is.
+
+## Task Lists
+
+When working on a to-do list, you MUST write the to-do list to an org-mode file in your agent-work-directory.
+The list should be very brief -- just TODO/IN-PROGRESS/DONE, and a task title in few words.
+Where applicable, also add a git branch name for the task and/or a subagent agent-work-directory path.
+You MUST update this list every time the status changes (IE a task is started or finished) so another agent can resume the task if it is interrupted.
