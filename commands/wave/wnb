@@ -36,6 +36,10 @@ Usage:
   --build-water          Configure and build the Water MLIR dialect.
   --build-waveasm        Configure and build the WaveASM backend.
   --build-all            Build LLVM, Water, and WaveASM (in order).
+  --clean-llvm           Remove LLVM build and install directories.
+  --clean-water          Remove Water build directory.
+  --clean-waveasm        Remove WaveASM build directory.
+  --clean-all            Remove all build directories (LLVM, Water, WaveASM).
   --update-sha           Check out the SHA from water/llvm-sha.txt in the
                               existing LLVM clone, then exit.
   --test-waveasm-lit     Run WaveASM lit tests (ninja check-waveasm).
@@ -120,6 +124,23 @@ do_update_sha() {
     fi
     do_checkout "$sha"
     echo "Done.  LLVM source is now at $sha"
+}
+
+do_clean_llvm() {
+    echo "Removing LLVM build directory: $LLVM_BUILD"
+    rm -rf "$LLVM_BUILD"
+    echo "Removing LLVM install directory: $LLVM_INSTALL"
+    rm -rf "$LLVM_INSTALL"
+}
+
+do_clean_water() {
+    echo "Removing Water build directory: $WATER_BUILD"
+    rm -rf "$WATER_BUILD"
+}
+
+do_clean_waveasm() {
+    echo "Removing WaveASM build directory: $WAVEASM_BUILD"
+    rm -rf "$WAVEASM_BUILD"
 }
 
 do_build_llvm() {
@@ -322,6 +343,22 @@ while [[ $# -gt 0 ]]; do
             ACTIONS+=(build-llvm build-water build-waveasm)
             shift
             ;;
+        --clean-llvm)
+            ACTIONS+=(clean-llvm)
+            shift
+            ;;
+        --clean-water)
+            ACTIONS+=(clean-water)
+            shift
+            ;;
+        --clean-waveasm)
+            ACTIONS+=(clean-waveasm)
+            shift
+            ;;
+        --clean-all)
+            ACTIONS+=(clean-llvm clean-water clean-waveasm)
+            shift
+            ;;
         --update-sha)
             ACTIONS+=(update-sha)
             shift
@@ -364,6 +401,9 @@ fi
 for action in "${ACTIONS[@]}"; do
     case "$action" in
         worktree-initialize) do_worktree_initialize ;;
+        clean-llvm)          do_clean_llvm ;;
+        clean-water)         do_clean_water ;;
+        clean-waveasm)       do_clean_waveasm ;;
         build-llvm)          do_build_llvm ;;
         build-water)         do_build_water ;;
         build-waveasm)       do_build_waveasm ;;

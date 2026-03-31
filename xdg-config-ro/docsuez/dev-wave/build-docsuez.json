@@ -17,6 +17,7 @@
                 "RUN DEBIAN_FRONTEND=noninteractive apt install -y rustup",
                 "RUN apt-get install -y dwarfdump",
                 "RUN apt-get install -y cmake ninja-build clang",
+                "RUN apt-get install -y lld",
                 ""
             ]
         },
