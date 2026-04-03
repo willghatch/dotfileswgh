@@ -85,4 +85,15 @@
   (wgh/init-corfu)
   (call-interactively 'completion-at-point))
 
+(defun wgh/cape-file (&optional interactive)
+  "Complete file name at point, including without a leading path prefix.
+Unlike `cape-file', this works even when the file name has no leading
+`/', `./', or `../' prefix, as long as there is no whitespace in the name.
+If INTERACTIVE is nil the function acts like a Capf."
+  (interactive (list t))
+  (if interactive
+      (cape-interactive '(cape-file-directory-must-exist) #'wgh/cape-file)
+    (let ((cape-file-directory-must-exist nil))
+      (cape-file nil))))
+
 (provide 'minad-stack-conf)

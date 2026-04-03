@@ -960,7 +960,7 @@ FUNC should be a function whose first two arguments are BEG and END."
             ;;("f" he-expand-file-name "file")
             ;;("F" (progn (company-conf-init) (require 'company-files) (call-interactively 'company-files)) "file (company)")
             ;;("l" he-expand-lisp-symbol "lisp")
-            ("f" (cape-interactive 'cape-file) "file")
+            ("f" (cape-interactive 'wgh/cape-file) "file")
             ("l" (cape-interactive 'elisp-completion-at-point) "elisp")
             ("y" (cape-interactive 'cape-elisp-symbol) "cape-elisp")
             ("d" (cape-interactive 'cape-dabbrev) "dabbrev -- text-in-buffer")
