@@ -30,7 +30,7 @@
     },
     "mk": {
       "volumes": {
-        "$HOME/mk/amd/e-wave-default": "/home/wgh/mk"
+        "$HOME/mk/amd/mk-wave-default": "/home/wgh/mk"
       },
       "pre-tmux-script": [
         "source $DOTFILESWGH/env-more-with-mixins.sh",

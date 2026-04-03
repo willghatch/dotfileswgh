@@ -34,6 +34,7 @@
                 ""
             ]
         },
+        {"text": "RUN apt-get install -y bubblewrap"},
         {"bash-print-text": "echo 'RUN useradd -u' $UID 'wgh \n RUN chsh -s /bin/zsh wgh'"},
         {"text": ""}
     ],

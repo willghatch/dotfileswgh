@@ -25,7 +25,7 @@
     },
     "mk": {
       "volumes": {
-        "$HOME/mk/amd/e-hipblaslt": "/home/wgh/mk"
+        "$HOME/mk/amd/mk-hipblaslt": "/home/wgh/mk"
       },
       "pre-tmux-script": [
         "source $DOTFILESWGH/env-more-with-mixins.sh",

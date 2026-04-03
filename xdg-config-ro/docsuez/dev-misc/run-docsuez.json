@@ -26,7 +26,7 @@
     },
     "mk": {
       "volumes": {
-        "$HOME/mk/misc/e-misc-default": "/home/wgh/mk"
+        "$HOME/mk/misc/mk-misc-default": "/home/wgh/mk"
       }
     }
   }

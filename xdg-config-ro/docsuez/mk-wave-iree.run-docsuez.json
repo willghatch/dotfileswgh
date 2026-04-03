@@ -7,7 +7,7 @@
         },
         "mk": {
             "volumes": {
-                "$HOME/mk/amd/e-wave-iree": "/home/wgh/mk"
+                "$HOME/mk/amd/mk-wave-iree": "/home/wgh/mk"
             },
             "pre-tmux-script": [
                 "source $DOTFILESWGH/env-more-with-mixins.sh",
