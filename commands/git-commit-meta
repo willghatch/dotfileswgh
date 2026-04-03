@@ -216,10 +216,110 @@ def ensure_commit_is_ancestor_of_head(commit_hash):
     sys.exit(1)
 
 
-def build_amend_plan(args, old_meta):
-    """Resolve requested changes into amend arguments, environment, and projection."""
+def get_distance_from_head(commit_hash):
+    """Return the number of commits between commit_hash and HEAD (exclusive).
+
+    HEAD itself returns 0.  HEAD~1 returns 1.  Errors if commit_hash is not
+    an ancestor of HEAD (or HEAD itself).
+    """
+    head_hash = run_git("rev-parse", "HEAD")
+    if commit_hash == head_hash:
+        return 0
+    rc, count_str = run_git_rc("rev-list", "--count", f"{commit_hash}..HEAD")
+    if rc != 0:
+        print(
+            f"Error: could not compute distance from HEAD for {commit_hash[:7]}.",
+            file=sys.stderr,
+        )
+        sys.exit(1)
+    return int(count_str)
+
+
+def get_sign_off_line(name, email):
+    """Return the canonical Signed-off-by trailer line."""
+    return f"Signed-off-by: {name} <{email}>"
+
+
+def get_git_user():
+    """Get the current git user name and email from config.
+
+    Returns (name, email).  Exits with an error if either is not configured.
+    """
+    rc_name, name = run_git_rc("config", "user.name")
+    rc_email, email = run_git_rc("config", "user.email")
+    if rc_name != 0 or not name:
+        print(
+            "Error: git user.name is not configured.\n"
+            "Set it with: git config --global user.name 'Your Name'",
+            file=sys.stderr,
+        )
+        sys.exit(1)
+    if rc_email != 0 or not email:
+        print(
+            "Error: git user.email is not configured.\n"
+            "Set it with: git config --global user.email 'you@example.com'",
+            file=sys.stderr,
+        )
+        sys.exit(1)
+    return name, email
+
+
+def get_commit_body(commit_ref):
+    """Return the full commit message body (subject + body), unstripped."""
+    result = subprocess.run(
+        ["git", "log", "-1", "--format=%B", commit_ref],
+        capture_output=True,
+        text=True,
+        check=True,
+    )
+    # %B includes a trailing newline added by git; preserve internal content
+    return result.stdout
+
+
+def commit_has_sign_off(commit_ref, sign_off_line):
+    """Return True if the commit message already contains the sign-off line."""
+    body = get_commit_body(commit_ref)
+    # Match the sign-off line on a line by itself (case-insensitive for the trailer key)
+    pattern = re.compile(
+        r"^" + re.escape(sign_off_line) + r"\s*$",
+        re.MULTILINE | re.IGNORECASE,
+    )
+    return bool(pattern.search(body))
+
+
+def add_sign_off_to_message(body, sign_off_line):
+    """Return the commit message with the sign-off line added at the end.
+
+    Ensures exactly one blank line separates the last paragraph from the
+    trailer block, matching the git convention.
+    """
+    # Strip trailing whitespace/newlines from the body
+    stripped = body.rstrip()
+    return stripped + "\n\n" + sign_off_line + "\n"
+
+
+def remove_sign_off_from_message(body, sign_off_line):
+    """Return the commit message with the sign-off line removed."""
+    pattern = re.compile(
+        r"^" + re.escape(sign_off_line) + r"\s*\n?",
+        re.MULTILINE | re.IGNORECASE,
+    )
+    new_body = pattern.sub("", body)
+    # Clean up any trailing blank lines left behind
+    new_body = new_body.rstrip() + "\n"
+    return new_body
+
+
+def build_amend_plan(args, old_meta, new_message=None):
+    """Resolve requested changes into amend arguments, environment, and projection.
+
+    If new_message is provided, the commit message is replaced with it.
+    """
     env = os.environ.copy()
-    amend_args = ["commit", "--amend", "--no-edit", "--allow-empty"]
+    if new_message is not None:
+        amend_args = ["commit", "--amend", "--allow-empty", "--message", new_message]
+    else:
+        amend_args = ["commit", "--amend", "--no-edit", "--allow-empty"]
     projected = dict(old_meta)
 
     new_author_date = None
@@ -294,6 +394,17 @@ def build_amend_plan(args, old_meta):
         and not new_committer_email
         and not new_committer_date
         and not new_author_date
+    ):
+        env["GIT_COMMITTER_DATE"] = old_meta["committer_date"]
+
+    # When only the message changes (sign-off), preserve committer date.
+    if (
+        new_message is not None
+        and not new_author_date
+        and not new_committer_date
+        and not new_author_name
+        and not new_committer_name
+        and not new_committer_email
     ):
         env["GIT_COMMITTER_DATE"] = old_meta["committer_date"]
 
@@ -390,10 +501,88 @@ def rewrite_non_head_commit(commit_hash, amend_args, env):
     return new_commit_hash
 
 
+def compute_new_message_for_sign_off(args, commit_ref, sign_off_line):
+    """Compute the new commit message for a sign-off operation.
+
+    Returns the new message string if the message should change, or None if
+    the commit already has the correct sign-off state and no change is needed.
+    """
+    body = get_commit_body(commit_ref)
+    has_sign_off = commit_has_sign_off(commit_ref, sign_off_line)
+
+    if args.sign_off and not has_sign_off:
+        return add_sign_off_to_message(body, sign_off_line)
+    elif args.remove_sign_off and has_sign_off:
+        return remove_sign_off_from_message(body, sign_off_line)
+    return None
+
+
+def resolve_range_distances(start_ref, end_ref):
+    """Resolve a commit range into (start_distance, end_distance) from HEAD.
+
+    Both start_ref and end_ref must be ancestors of HEAD (or HEAD itself).
+    start_distance >= end_distance (start is further back in history).
+    The range is inclusive of both ends.
+
+    Returns (start_distance, end_distance) where start_distance is the
+    distance of the further-back commit and end_distance is the closer one.
+    """
+    start_hash = resolve_commit(start_ref)
+    end_hash = resolve_commit(end_ref)
+
+    ensure_commit_is_ancestor_of_head(start_hash)
+    ensure_commit_is_ancestor_of_head(end_hash)
+
+    start_dist = get_distance_from_head(start_hash)
+    end_dist = get_distance_from_head(end_hash)
+
+    # Normalize so that start_dist >= end_dist (start is further back)
+    if start_dist < end_dist:
+        start_dist, end_dist = end_dist, start_dist
+
+    return start_dist, end_dist
+
+
+def process_single_commit(args, commit_ref, sign_off_line, dry_run=False):
+    """Process metadata changes for a single commit.
+
+    Returns a dict with keys 'skipped' (bool), 'old_meta', 'new_meta'.
+    For dry_run, new_meta is the projected meta and no writes are performed.
+    """
+    commit_hash = resolve_commit(commit_ref)
+    old_meta = get_commit_meta(commit_hash)
+
+    # Determine new message for sign-off operations
+    new_message = None
+    if args.sign_off or args.remove_sign_off:
+        new_message = compute_new_message_for_sign_off(args, commit_hash, sign_off_line)
+        # If no message change needed and no other modifications, skip this commit
+        has_other_mods = any([
+            args.date, args.author_date, args.committer_date,
+            args.author, args.committer,
+        ])
+        if new_message is None and not has_other_mods:
+            return {"skipped": True, "old_meta": old_meta, "new_meta": old_meta}
+
+    amend_args, env, projected = build_amend_plan(args, old_meta, new_message=new_message)
+
+    if dry_run:
+        return {"skipped": False, "old_meta": old_meta, "new_meta": projected}
+
+    if is_head(commit_hash):
+        amend_head_with_plan(amend_args, env)
+        new_meta = get_commit_meta("HEAD")
+    else:
+        new_commit_hash = rewrite_non_head_commit(commit_hash, amend_args, env)
+        new_meta = get_commit_meta(new_commit_hash)
+
+    return {"skipped": False, "old_meta": old_meta, "new_meta": new_meta}
+
+
 def build_parser():
     parser = argparse.ArgumentParser(
         prog="git-commit-meta",
-        description="View or modify git commit metadata (author, committer, dates).",
+        description="View or modify git commit metadata (author, committer, dates, sign-off).",
         epilog=(
             "DATE can be: a git commit ref (copies author date from that commit), "
             "'now' (current time), or an ISO 8601 / git-parseable date string.\n\n"
@@ -407,6 +596,10 @@ def build_parser():
             "  git-commit-meta --author HEAD~3\n"
             "  git-commit-meta --committer HEAD~3\n"
             "  git-commit-meta --show --commit HEAD~2\n"
+            "  git-commit-meta --sign-off\n"
+            "  git-commit-meta --remove-sign-off --commit HEAD~1\n"
+            "  git-commit-meta --sign-off --range HEAD~3 HEAD\n"
+            "  git-commit-meta --date now --range HEAD~4 HEAD~1\n"
         ),
         formatter_class=argparse.RawDescriptionHelpFormatter,
     )
@@ -415,7 +608,19 @@ def build_parser():
         "--commit",
         default="HEAD",
         metavar="COMMIT",
-        help="Commit to modify (default: HEAD)",
+        help="Commit to modify (default: HEAD); ignored when --range is used",
+    )
+
+    range_group = parser.add_argument_group("range options")
+    range_group.add_argument(
+        "--range",
+        nargs=2,
+        metavar=("START", "END"),
+        help=(
+            "Apply changes to all commits in the inclusive range [START, END]. "
+            "Both refs must be ancestors of HEAD (or HEAD itself) on the current branch. "
+            "Cannot be combined with --show."
+        ),
     )
 
     date_group = parser.add_argument_group("date options")
@@ -447,6 +652,24 @@ def build_parser():
         help='Set the committer: "Name <email>" or a git ref to copy from',
     )
 
+    signoff_group = parser.add_argument_group("sign-off options")
+    signoff_group.add_argument(
+        "--sign-off",
+        action="store_true",
+        help=(
+            "Add a Signed-off-by trailer using the current git user.name and user.email. "
+            "Skips commits that already have the sign-off."
+        ),
+    )
+    signoff_group.add_argument(
+        "--remove-sign-off",
+        action="store_true",
+        help=(
+            "Remove the Signed-off-by trailer for the current git user. "
+            "Skips commits that do not have the sign-off."
+        ),
+    )
+
     parser.add_argument(
         "--show",
         action="store_true",
@@ -465,14 +688,23 @@ def main():
     parser = build_parser()
     args = parser.parse_args()
 
+    # Validate mutually exclusive sign-off options
+    if args.sign_off and args.remove_sign_off:
+        print(
+            "Error: --sign-off and --remove-sign-off cannot be used together.",
+            file=sys.stderr,
+        )
+        sys.exit(1)
+
+    if args.range and args.show:
+        print("Error: --range cannot be combined with --show.", file=sys.stderr)
+        sys.exit(1)
+
     # Check we're in a git repo
     rc, _ = run_git_rc("rev-parse", "--git-dir")
     if rc != 0:
         print("Error: not in a git repository.", file=sys.stderr)
         sys.exit(1)
-
-    # Resolve the target commit
-    commit_hash = resolve_commit(args.commit)
 
     # Determine if any modifications were requested
     has_modifications = any([
@@ -481,7 +713,99 @@ def main():
         args.committer_date,
         args.author,
         args.committer,
+        args.sign_off,
+        args.remove_sign_off,
     ])
+
+    # Resolve sign-off line early (needed for show, range, and single commit)
+    sign_off_line = None
+    if args.sign_off or args.remove_sign_off:
+        user_name, user_email = get_git_user()
+        sign_off_line = get_sign_off_line(user_name, user_email)
+
+    # --- Range mode ---
+
+    if args.range:
+        if not has_modifications:
+            print(
+                "Error: --range requires at least one modification flag "
+                "(e.g. --date, --sign-off).",
+                file=sys.stderr,
+            )
+            sys.exit(1)
+
+        start_ref, end_ref = args.range
+        start_dist, end_dist = resolve_range_distances(start_ref, end_ref)
+
+        if not args.dry_run:
+            ensure_clean_worktree_for_history_rewrite()
+
+        # Resolve any date/author args that reference git refs NOW, before we
+        # start rewriting (the hashes will change during the loop).
+        if args.date:
+            args.date = resolve_date(args.date)
+        if args.author_date:
+            args.author_date = resolve_date(args.author_date)
+        if args.committer_date:
+            args.committer_date = resolve_date(args.committer_date)
+        if args.author:
+            name, email = resolve_author(args.author)
+            args.author = f"{name} <{email}>"
+        if args.committer:
+            name, email = resolve_committer(args.committer)
+            args.committer = f"{name} <{email}>"
+
+        def dist_label(d):
+            return "HEAD" if d == 0 else f"HEAD~{d}"
+
+        print(
+            f"Processing range {dist_label(start_dist)}..{dist_label(end_dist)} "
+            f"({start_dist - end_dist + 1} commits):\n"
+        )
+
+        skipped_count = 0
+        modified_count = 0
+
+        # Iterate from furthest-back to closest so that after each rewrite the
+        # next HEAD~N still refers to the correct (now-rebased) commit.
+        for dist in range(start_dist, end_dist - 1, -1):
+            commit_ref = f"HEAD~{dist}" if dist > 0 else "HEAD"
+            commit_hash = resolve_commit(commit_ref)
+            short_hash = commit_hash[:7]
+            subject = run_git("log", "-1", "--format=%s", commit_ref)
+
+            if args.dry_run:
+                result = process_single_commit(
+                    args, commit_ref, sign_off_line, dry_run=True
+                )
+                if result["skipped"]:
+                    print(f"  skip  {short_hash} {subject}")
+                    skipped_count += 1
+                else:
+                    print(f"  would modify  {short_hash} {subject}")
+                    modified_count += 1
+            else:
+                result = process_single_commit(
+                    args, commit_ref, sign_off_line, dry_run=False
+                )
+                if result["skipped"]:
+                    print(f"  skip  {short_hash} {subject}")
+                    skipped_count += 1
+                else:
+                    new_hash = run_git("rev-parse", f"HEAD~{dist}" if dist > 0 else "HEAD")
+                    print(f"  ok    {short_hash} -> {new_hash[:7]} {subject}")
+                    modified_count += 1
+
+        print()
+        if args.dry_run:
+            print(f"Dry run: {modified_count} would be modified, {skipped_count} skipped.")
+        else:
+            print(f"Done: {modified_count} modified, {skipped_count} skipped.")
+        return
+
+    # --- Single-commit mode ---
+
+    commit_hash = resolve_commit(args.commit)
 
     # If --show or no modifications, just display metadata
     if args.show or not has_modifications:
@@ -491,7 +815,23 @@ def main():
 
     # Get current metadata for comparison and build the amend plan once.
     old_meta = get_commit_meta(commit_hash)
-    amend_args, env, projected = build_amend_plan(args, old_meta)
+
+    # Determine new message for sign-off operations
+    new_message = None
+    if args.sign_off or args.remove_sign_off:
+        new_message = compute_new_message_for_sign_off(args, commit_hash, sign_off_line)
+        has_other_mods = any([
+            args.date, args.author_date, args.committer_date,
+            args.author, args.committer,
+        ])
+        if new_message is None and not has_other_mods:
+            action = "already has" if args.sign_off else "does not have"
+            print(
+                f"Nothing to do: commit {commit_hash[:7]} {action} the sign-off."
+            )
+            return
+
+    amend_args, env, projected = build_amend_plan(args, old_meta, new_message=new_message)
 
     # --- Dry run ---
 
@@ -502,6 +842,8 @@ def main():
         print()
         print("After (projected):")
         show_commit_meta(projected)
+        if new_message is not None:
+            print("\nMessage would be changed (sign-off added/removed).")
         return
 
     # --- Execute the amend / rewrite ---
@@ -525,6 +867,9 @@ def main():
     print("After:")
     show_commit_meta(new_meta)
     show_changes(old_meta, new_meta)
+    if new_message is not None:
+        action = "added" if args.sign_off else "removed"
+        print(f"Sign-off {action}.")
 
 
 if __name__ == "__main__":
