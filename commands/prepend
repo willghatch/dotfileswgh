@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 # The >> operator is great for appending, but sometimes what you really
 # need to do is prepend.

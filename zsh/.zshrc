@@ -600,6 +600,9 @@ sourceFromDotfileswghAlts zshrc
 # compdef for commands that use the generic _help-completer that parses `--help` output.
 # I wanted to have a key binding to do it automatically for any command, but it wasn't working.  But this is still reasonably convenient.
 compdef _help-completer wnb
+compdef _help-completer git-commit-meta git-prune-squash-merged-branches
+compdef _help-completer agent-work-cleanup agt
+compdef _help-completer music-library-compress-copy.rkt
 
 if [ -x ~/vscripts/motd.sh ]
 then
