@@ -54,130 +54,137 @@
 
 (add-hook 'find-file-hook 'sensitive-if-prifs)
 
+(defun wgh/mode-hook-xref--xref-buffer-mode ()
+  (lnkmap (kbd "RET") 'xref-goto-xref))
 (add-hook 'xref--xref-buffer-mode-hook
-          (lambda ()
-            (lnkmap (kbd "RET") 'xref-goto-xref)))
+          'wgh/mode-hook-xref--xref-buffer-mode)
 
+(defun wgh/mode-hook-hexl-mode ()
+  ;; These first two are in the default hook, but add-hook seems to be
+  ;; replacing rather than adding...
+  (hexl-follow-line)
+  (hexl-activate-ruler)
+  (display-line-numbers-mode 0))
 (add-hook 'hexl-mode-hook
-          (lambda ()
-            ;; These first two are in the default hook, but add-hook seems to be
-            ;; replacing rather than adding...
-            (hexl-follow-line)
-            (hexl-activate-ruler)
-            (display-line-numbers-mode 0)))
+          'wgh/mode-hook-hexl-mode)
 
+(defun wgh/mode-hook-Buffer-menu-mode ()
+  (define-prefix-command 'my-buffer-menu-mode-map)
+  (lnkmap "m" 'my-buffer-menu-mode-map)
+  (set-keymap-parent 'my-buffer-menu-mode-map Buffer-menu-mode-map))
 (add-hook 'Buffer-menu-mode-hook
-          (lambda ()
-            (define-prefix-command 'my-buffer-menu-mode-map)
-            (lnkmap "m" 'my-buffer-menu-mode-map)
-            (set-keymap-parent 'my-buffer-menu-mode-map Buffer-menu-mode-map)))
+          'wgh/mode-hook-Buffer-menu-mode)
 
 ;;(add-hook 'text-mode-hook #'flyspell-mode)
+(defun wgh/mode-hook-prog-mode ()
+  (nobreak
+   (require 'smartparens)
+   (smartparens-mode 1)
+   (require 'rainbow-delimiters)
+   (rainbow-delimiters-mode-enable)
+   (require 'rainbow-identifiers)
+   (rainbow-identifiers-mode 1)
+   (whitespace-mode 1)
+   ;; Something is breaking the lazy loading in at least some prog modes...
+   (wgh/init-minad)
+   (wgh/init-corfu)
+   ;;(company-conf-init)
+   ;;(company-mode 1)
+   ;;(projectile-mode 1)
+   ;; The electric-indent-mode adds a hook to the post-self-insert-hook, and then does auto-indentation on things like comma.  This is extremely annoying when editing a file that doesn't conform to my auto-indent rules (eg. javascript with a different style of indent for method calls on a new line).  Yet it's not necessary for indent-after-newline, which is done with the newline-and-indent command which I already have bound to enter.  So I think I prefer just using newline-and-indent and indent-region without electric-indent-mode.  But something seems to be turning it on automatically.
+   (electric-indent-mode -1)
+   (setq c-elecric-flag nil)
+   (require 'magit)
+   (require 'git-gutter)
+   (global-git-gutter-mode 1)
+   (require 'highlight-indent-guides)
+   (highlight-indent-guides-mode 1)
+   (outline-minor-mode 1)
+   (eldoc-mode 1) ;; automatic docs in echo area, also in eldoc-doc-buffer
+   (require 'dumb-jump)
+   (add-hook 'xref-backend-functions 'dumb-jump-xref-activate 0 t)
+   (setq xref-show-definitions-function 'xref-show-definitions-completing-read) ;; Show alternate options as completing read rather than in a buffer.  The default is xref-show-definitions-buffer.  For going to definition, completing read is probably nicer, as a help for dumb-jump.
+   ;;(setq xref-show-xrefs-function 'xref--show-xref-buffer) ;; TODO should I sometimes toggle this to be a completing-read variant?  I think I probably often want both.  Maybe this should be added to my settings toggles...
+   ))
 (add-hook 'prog-mode-hook
-          (lambda ()
-            (nobreak
-             (require 'smartparens)
-             (smartparens-mode 1)
-             (require 'rainbow-delimiters)
-             (rainbow-delimiters-mode-enable)
-             (require 'rainbow-identifiers)
-             (rainbow-identifiers-mode 1)
-             (whitespace-mode 1)
-             ;; Something is breaking the lazy loading in at least some prog modes...
-             (wgh/init-minad)
-             (wgh/init-corfu)
-             ;;(company-conf-init)
-             ;;(company-mode 1)
-             ;;(projectile-mode 1)
-             ;; The electric-indent-mode adds a hook to the post-self-insert-hook, and then does auto-indentation on things like comma.  This is extremely annoying when editing a file that doesn't conform to my auto-indent rules (eg. javascript with a different style of indent for method calls on a new line).  Yet it's not necessary for indent-after-newline, which is done with the newline-and-indent command which I already have bound to enter.  So I think I prefer just using newline-and-indent and indent-region without electric-indent-mode.  But something seems to be turning it on automatically.
-             (electric-indent-mode -1)
-             (setq c-elecric-flag nil)
-             (require 'magit)
-             (require 'git-gutter)
-             (global-git-gutter-mode 1)
-             (require 'highlight-indent-guides)
-             (highlight-indent-guides-mode 1)
-             (outline-minor-mode 1)
-             (eldoc-mode 1) ;; automatic docs in echo area, also in eldoc-doc-buffer
-             (require 'dumb-jump)
-             (add-hook 'xref-backend-functions 'dumb-jump-xref-activate 0 t)
-             (setq xref-show-definitions-function 'xref-show-definitions-completing-read) ;; Show alternate options as completing read rather than in a buffer.  The default is xref-show-definitions-buffer.  For going to definition, completing read is probably nicer, as a help for dumb-jump.
-             ;;(setq xref-show-xrefs-function 'xref--show-xref-buffer) ;; TODO should I sometimes toggle this to be a completing-read variant?  I think I probably often want both.  Maybe this should be added to my settings toggles...
-             )
-            ))
+          'wgh/mode-hook-prog-mode)
 
 
+(defun wgh/mode-hook-lua-mode ()
+  (setq-local outline-regexp wgh/lua-outline-regexp)
+  (setq lua-indent-level 2))
 (add-hook 'lua-mode-hook
-          (lambda ()
-            (setq-local outline-regexp wgh/lua-outline-regexp)
-            (setq lua-indent-level 2)))
+          'wgh/mode-hook-lua-mode)
 
+(defun wgh/mode-hook-python-mode ()
+  (setq-local outline-regexp wgh/bash-outline-regexp)
+  (with-eval-after-load 'cpo-treesitter-qd
+    (setq-local cpo-treesitter-qd-splicing-predicates
+                (list
+                 (cpo-treesitter-qd-ancestor-list-predicate
+                  '("argument_list" "call"))
+                 (cpo-treesitter-qd-ancestor-list-predicate
+                  '("assignment" "expression_statement"))
+                 )))
+
+  (when (memq 'python wgh/lsp-modes)
+    (lsp-common-setup)
+    (require 'lsp-pyright)
+    (lsp)))
 (add-hook 'python-mode-hook
-          (lambda ()
-            (setq-local outline-regexp wgh/bash-outline-regexp)
-            (with-eval-after-load 'cpo-treesitter-qd
-              (setq-local cpo-treesitter-qd-splicing-predicates
-                          (list
-                           (cpo-treesitter-qd-ancestor-list-predicate
-                            '("argument_list" "call"))
-                           (cpo-treesitter-qd-ancestor-list-predicate
-                            '("assignment" "expression_statement"))
-                           )))
-
-            (when (memq 'python wgh/lsp-modes)
-              (lsp-common-setup)
-              (require 'lsp-pyright)
-              (lsp))))
+          'wgh/mode-hook-python-mode)
 
 (autoload 'web-mode "web-mode")
 (add-to-list 'auto-mode-alist '("\\.html?\\'" . web-mode))
 (add-to-list 'auto-mode-alist '("\\.php\\'" . web-mode))
+(defun wgh/mode-hook-web-mode ()
+  (setq web-mode-markup-indent-offset 2)
+  (require 'sgml-mode))
 (add-hook 'web-mode-hook
-          (lambda ()
-            (setq web-mode-markup-indent-offset 2)
-            (require 'sgml-mode)
-            ))
+          'wgh/mode-hook-web-mode)
 
+(defun wgh/mode-hook-java-mode ()
+  (nobreak
+   (when (memq 'java wgh/lsp-modes)
+     (lsp-common-setup)
+     (require 'lsp-java)
+     ;; This lsp download url should work with openjdk11.
+     ;;(setq lsp-java-jdt-download-url  "https://download.eclipse.org/jdtls/milestones/0.57.0/jdt-language-server-0.57.0-202006172108.tar.gz")
+     (lsp))
+   (setq-local outline-regexp wgh/c-outline-regexp)
+   ))
 (add-hook 'java-mode-hook
-          (lambda ()
-            (nobreak
-             (when (memq 'java wgh/lsp-modes)
-               (lsp-common-setup)
-               (require 'lsp-java)
-               ;; This lsp download url should work with openjdk11.
-               ;;(setq lsp-java-jdt-download-url  "https://download.eclipse.org/jdtls/milestones/0.57.0/jdt-language-server-0.57.0-202006172108.tar.gz")
-               (lsp))
-             (setq-local outline-regexp wgh/c-outline-regexp)
-             )))
+          'wgh/mode-hook-java-mode)
 
+(defun wgh/mode-hook-rust-mode ()
+  (nobreak
+   (when (memq 'rust wgh/lsp-modes)
+     (lsp-common-setup)
+     (lsp))
+   ))
 (add-hook 'rust-mode-hook
-          (lambda ()
-            (nobreak
-             (when (memq 'rust wgh/lsp-modes)
-               (lsp-common-setup)
-               (lsp))
-             )))
+          'wgh/mode-hook-rust-mode)
 
+(defun wgh/mode-hook-elisp-modes ()
+  (nobreak
+   (require 'elisp-slime-nav)
+   (lnkmap "gdd" 'elisp-slime-nav-find-elisp-thing-at-point)
+   (lnkmap "gdp" 'pop-tag-mark)
+   (lnkmap "gD" 'elisp-slime-nav-describe-elisp-thing-at-point)
+   (eldoc-mode 1)
+   (setq-local outline-regexp wgh/lisp-outline-regexp)
+   ))
 (add-to-hooks
- (lambda ()
-   (nobreak
-    (require 'elisp-slime-nav)
-    (lnkmap "gdd" 'elisp-slime-nav-find-elisp-thing-at-point)
-    (lnkmap "gdp" 'pop-tag-mark)
-    (lnkmap "gD" 'elisp-slime-nav-describe-elisp-thing-at-point)
-    (eldoc-mode 1)
-    (setq-local outline-regexp wgh/lisp-outline-regexp)
-    )
-   )
+ 'wgh/mode-hook-elisp-modes
  '(emacs-lisp-mode-hook
    lisp-interaction-mode-hook))
 
+(defun wgh/mode-hook-dired-mode ()
+  ;; Don't let dired override evil.  This is the easiest way to do that,
+  ;; since I don't actually use dired for anything.
+  (setcdr dired-mode-map nil))
 (add-hook 'dired-mode-hook
-          (lambda ()
-            ;; Don't let dired override evil.  This is the easiest way to do that,
-            ;; since I don't actually use dired for anything.
-            (setcdr dired-mode-map nil)
-            ))
+          'wgh/mode-hook-dired-mode)
 
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -189,14 +196,15 @@
   ;; This eval-after-load is loaded after the auto-mode-alist has done its work, so the best way to disable git-rebase-mode seems to be to undefine the symbol.
   (fset 'git-rebase-mode nil)
   )
+(defun wgh/mode-hook-git-rebase-mode ()
+  ;; git-rebase-mode does some things that are convenient, but also
+  ;; several really annoying things.
+  (read-only-mode -1)
+  ;;(setcdr git-rebase-mode-map nil)
+  ;;(git-rebase-mode) ;; Ugh, just turn off git-rebase-mode!
+  )
 (add-hook 'git-rebase-mode-hook
-          (lambda ()
-            ;; git-rebase-mode does some things that are convenient, but also
-            ;; several really annoying things.
-            (read-only-mode -1)
-            ;;(setcdr git-rebase-mode-map nil)
-            ;;(git-rebase-mode) ;; Ugh, just turn off git-rebase-mode!
-            ))
+          'wgh/mode-hook-git-rebase-mode)
 
 (defun wgh/magit-keys-setup ()
   ;; set up some keymaps that don't cleanly belong to a particular mode
@@ -209,94 +217,97 @@
   (setcdr magit-file-section-map nil)
   )
 
+(defun wgh/mode-hook-magit-revision-mode ()
+  ;; Don't override my evil-mode keymap with your default bindings.
+  (setcdr magit-revision-mode-map nil)
+  (wgh/magit-keys-setup))
 (add-hook
  'magit-revision-mode-hook
- (lambda ()
-   ;; Don't override my evil-mode keymap with your default bindings.
-   (setcdr magit-revision-mode-map nil)
-   (wgh/magit-keys-setup)
-   ))
+ 'wgh/mode-hook-magit-revision-mode)
+
+(defun wgh/mode-hook-magit-diff-mode ()
+  ;; Don't override my evil-mode keymap with your default bindings.
+  (setcdr magit-diff-mode-map nil)
+  (wgh/magit-keys-setup))
 (add-hook
  'magit-diff-mode-hook
- (lambda ()
-   ;; Don't override my evil-mode keymap with your default bindings.
-   (setcdr magit-diff-mode-map nil)
-   (wgh/magit-keys-setup)
-   ))
+ 'wgh/mode-hook-magit-diff-mode)
 
+(defun wgh/mode-hook-magit-log-mode ()
+  ;; Don't override my evil-mode keymap with your default bindings.
+  (require 'magit-conf)
+  (setcdr magit-log-mode-map nil)
+  (setq magit-log-margin
+        (list
+         ;; show margin initially
+         t
+         ;; time as a string for format-time-string, or 'age or 'age-abbreviated
+         ;;"%Y-%m-%d@%H:%M %z"
+         ;; Less precise, but shorter
+         "%Y-%m-%d@%H:%M"
+         ;; "don't change"
+         'magit-log-margin-width
+         ;; show author
+         t
+         ;; author width, default 18
+         12
+         ))
+  ;; TODO - what operations do I want handy in log view?
+  ;; • delete remote branch (with confirmation)
+  ;; • delete remote tag (with confirmation)
+  ;; • push branch/tag to remote
+  ;; • cherry pick commit onto current branch
+  ;; • diff selected commit vs current branch (or HEAD)
+  ;; • view commit details
+  ;; • merge selected commit/branch into current branch
+  ;; • copy commit hash
+  ;; • mark commit to use as "current" commit for other operations, like diff with commit at point.  I can do this by checking out a detatched head at point and then doing the diff, but a mark without checking out would be nice.
+  ;; • stash operations
+  (setq wgh/magit-log-m-keymap (make-sparse-keymap))
+  (define-key magit-log-mode-map "m" wgh/magit-log-m-keymap)
+  (lnkmap "m" wgh/magit-log-m-keymap)
+  (define-key magit-log-mode-map "C-l" 'magit-refresh)
+  (define-key magit-log-mode-map (kbd "RET") 'magit-show-commit)
+  (define-key wgh/magit-log-m-keymap "v" 'magit-show-commit)
+  (define-key wgh/magit-log-m-keymap "co" 'wgh/magit-checkout-at-point)
+  (define-key wgh/magit-log-m-keymap "bo" 'wgh/magit-branch-checkout-at-point)
+  (define-key wgh/magit-log-m-keymap "bc" 'wgh/magit-branch-create-at-point)
+  (define-key wgh/magit-log-m-keymap "bd" 'wgh/magit-branch-delete-at-point)
+  (define-key wgh/magit-log-m-keymap "bn" 'wgh/magit-branch-rename-at-point)
+  (define-key wgh/magit-log-m-keymap "tc" 'wgh/magit-tag-create-at-point)
+  ;;(define-key wgh/magit-log-m-keymap "td" 'wgh/magit-tag-delete-at-point)
+  (define-key wgh/magit-log-m-keymap "brs" 'wgh/magit-current-branch-reset-soft-at-point)
+  (define-key wgh/magit-log-m-keymap "brh" 'wgh/magit-current-branch-reset-hard-at-point)
+  (define-key wgh/magit-log-m-keymap "brm" 'wgh/magit-current-branch-reset-mixed-at-point))
 (add-hook
  'magit-log-mode-hook
- (lambda ()
-   ;; Don't override my evil-mode keymap with your default bindings.
-   (require 'magit-conf)
-   (setcdr magit-log-mode-map nil)
-   (setq magit-log-margin
-         (list
-          ;; show margin initially
-          t
-          ;; time as a string for format-time-string, or 'age or 'age-abbreviated
-          ;;"%Y-%m-%d@%H:%M %z"
-          ;; Less precise, but shorter
-          "%Y-%m-%d@%H:%M"
-          ;; “don't change”
-          'magit-log-margin-width
-          ;; show author
-          t
-          ;; author width, default 18
-          12
-          ))
-   ;; TODO - what operations do I want handy in log view?
-   ;; • delete remote branch (with confirmation)
-   ;; • delete remote tag (with confirmation)
-   ;; • push branch/tag to remote
-   ;; • cherry pick commit onto current branch
-   ;; • diff selected commit vs current branch (or HEAD)
-   ;; • view commit details
-   ;; • merge selected commit/branch into current branch
-   ;; • copy commit hash
-   ;; • mark commit to use as “current” commit for other operations, like diff with commit at point.  I can do this by checking out a detatched head at point and then doing the diff, but a mark without checking out would be nice.
-   ;; • stash operations
-   (setq wgh/magit-log-m-keymap (make-sparse-keymap))
-   (define-key magit-log-mode-map "m" wgh/magit-log-m-keymap)
-   (lnkmap "m" wgh/magit-log-m-keymap)
-   (define-key magit-log-mode-map "C-l" 'magit-refresh)
-   (define-key magit-log-mode-map (kbd "RET") 'magit-show-commit)
-   (define-key wgh/magit-log-m-keymap "v" 'magit-show-commit)
-   (define-key wgh/magit-log-m-keymap "co" 'wgh/magit-checkout-at-point)
-   (define-key wgh/magit-log-m-keymap "bo" 'wgh/magit-branch-checkout-at-point)
-   (define-key wgh/magit-log-m-keymap "bc" 'wgh/magit-branch-create-at-point)
-   (define-key wgh/magit-log-m-keymap "bd" 'wgh/magit-branch-delete-at-point)
-   (define-key wgh/magit-log-m-keymap "bn" 'wgh/magit-branch-rename-at-point)
-   (define-key wgh/magit-log-m-keymap "tc" 'wgh/magit-tag-create-at-point)
-   ;;(define-key wgh/magit-log-m-keymap "td" 'wgh/magit-tag-delete-at-point)
-   (define-key wgh/magit-log-m-keymap "brs" 'wgh/magit-current-branch-reset-soft-at-point)
-   (define-key wgh/magit-log-m-keymap "brh" 'wgh/magit-current-branch-reset-hard-at-point)
-   (define-key wgh/magit-log-m-keymap "brm" 'wgh/magit-current-branch-reset-mixed-at-point)
-   ))
+ 'wgh/mode-hook-magit-log-mode)
 
+(defun wgh/mode-hook-magit-status-mode ()
+  (lnkmap "mt" 'magit-section-toggle)
+  (lnkmap "ms" 'magit-stage)
+  (lnkmap "mu" 'magit-unstage))
 (add-hook 'magit-status-mode-hook
-          (lambda ()
-            (lnkmap "mt" 'magit-section-toggle)
-            (lnkmap "ms" 'magit-stage)
-            (lnkmap "mu" 'magit-unstage)
-            ))
+          'wgh/mode-hook-magit-status-mode)
                                         ;
 ;; so it doesn't barf when it's not set!
 (setq start-on-pager-state nil)
+(defun wgh/mode-hook-server-switch ()
+  (when start-on-pager-state
+    (progn
+      (estate-pager-state)
+      (epmap "q" 'kill-buffer-or-quit-emacs-ignore-dirty)
+      (epmap "tic" 'kill-buffer-or-quit-emacs-ignore-dirty)
+      (ansi-color-buffer)
+      )))
 (add-hook 'server-switch-hook
-          (lambda ()
-            (when start-on-pager-state
-              (progn
-                (estate-pager-state)
-                (epmap "q" 'kill-buffer-or-quit-emacs-ignore-dirty)
-                (epmap "tic" 'kill-buffer-or-quit-emacs-ignore-dirty)
-                (ansi-color-buffer)
-                ))))
+          'wgh/mode-hook-server-switch)
 
 
+(defun wgh/mode-hook-solidity-mode ()
+  (setq c-basic-offset 2))
 (add-hook 'solidity-mode-hook
-          (lambda ()
-            (setq c-basic-offset 2)))
+          'wgh/mode-hook-solidity-mode)
 
 ;; TODO -- these are default values that I should deal with now
 ;;evil-overriding-maps
@@ -332,11 +343,12 @@
       (nxml-balanced-close-start-tag-inline)
     (t (insert ">"))))
 
+(defun wgh/mode-hook-nxml-mode ()
+  ;;(ikmap ">" 'wgh/xml-magic-tag-close)
+  ;;(require 'on-xml)
+  )
 (add-hook 'nxml-mode-hook
-          (lambda ()
-            ;;(ikmap ">" 'wgh/xml-magic-tag-close)
-            ;;(require 'on-xml)
-            ))
+          'wgh/mode-hook-nxml-mode)
 
 (defun cpp-conf-setup ()
   (nobreak
@@ -384,12 +396,12 @@
 (add-hook 'tablegen-mode-hook 'wgh/start-lsp-for-mlir)
 (add-hook 'mlir-mode-hook 'wgh/start-lsp-for-mlir)
 
+(defun wgh/mode-hook-aidermacs-comint-mode ()
+  ;; TODO - check out aidermacs-comint-mode-map
+  (nobreak-define-key estate-insert-state-buffer-local-keymap
+                      (kbd "C-j") 'comint-send-input))
 (add-hook 'aidermacs-comint-mode-hook
-          (lambda ()
-            ;; TODO - check out aidermacs-comint-mode-map
-            (nobreak-define-key estate-insert-state-buffer-local-keymap
-                                (kbd "C-j") 'comint-send-input)
-            ))
+          'wgh/mode-hook-aidermacs-comint-mode)
 
 
 (load-library "js-conf")
@@ -413,5 +425,27 @@
       (when treesit-parser-type
         (treesit-parser-create treesit-parser-type)
         (setq-local wgh/treesit-initialized t)))))
+
+(defun wgh/mode-hook-functions-for-major-mode (mode)
+  "Return `wgh/mode-hook-MODE` functions for MODE and its ancestors.
+The functions are ordered the same way Emacs runs derived mode hooks:
+least-specific parent first, then the more specific modes."
+  (let (hook-fns)
+    (dolist (parent (reverse (derived-mode-all-parents mode))
+                    (nreverse hook-fns))
+      (let ((hook-fn (intern (concat "wgh/mode-hook-" (symbol-name parent)))))
+        (when (fboundp hook-fn)
+          (push hook-fn hook-fns))))))
+
+(defun wgh/apply-mode-hooks-to-open-buffers ()
+  "Run the appropriate wgh/mode-hook-MODENAME function for each open file-backed buffer.
+This allows mode hooks to be applied to already-opened files when the user
+loads the rest of their config later."
+  (interactive)
+  (dolist (buf (buffer-list))
+    (with-current-buffer buf
+      (when (buffer-file-name)
+        (dolist (hook-fn (wgh/mode-hook-functions-for-major-mode major-mode))
+          (funcall hook-fn))))))
 
 (provide 'mode-hooks-conf)

@@ -364,6 +364,8 @@
      (savehist-mode 1) ;; Save minibuffer history.
 
      ;;(load-library "keyfreq-conf")
+
+     (wgh/apply-mode-hooks-to-open-buffers)
      )))
 
 (when (not wgh/fast-start)
