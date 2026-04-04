@@ -319,6 +319,9 @@
 (define-derived-mode wgh-checklist-mode text-mode "wgh-checklist-mode"
   (lnkmap "mm" 'wgh/increment-number-at-end-of-line)
   (lnkmap "md" 'wgh/send-line-to-bottom-of-buffer)
+  (lnkmap "mc" (lambda () (interactive)
+                 (wgh/increment-number-at-end-of-line)
+                 (wgh/send-line-to-bottom-of-buffer)))
   )
 (add-to-list 'auto-mode-alist '("\\.checklist$" . wgh-checklist-mode))
 
