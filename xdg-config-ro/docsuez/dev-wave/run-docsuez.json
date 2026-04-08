@@ -36,7 +36,8 @@
         "source $DOTFILESWGH/env-more-with-mixins.sh",
         "cd mk",
         "cd wave",
-        "source .venv/bin/activate",
+        "# Don't source venv here, since it complicates worktree workflow",
+        "#source .venv/bin/activate",
         ""
       ]
     },
