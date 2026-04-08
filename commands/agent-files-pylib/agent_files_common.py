@@ -172,6 +172,72 @@ def get_raw_location_bases(config_name, git_root=None):
     return bases
 
 
+LINK_PREFIX = "link:"
+
+
+def find_link_files(base_paths, subdir):
+    """Find link files in the given subdirectory across all base paths.
+
+    Link files are empty files named ``link:ITEM_NAME`` inside a subdir
+    (typically ``default/``).  They promote the named item -- which must
+    exist somewhere in the opposite category (``non-default/`` when the
+    link is in ``default/``, and vice versa) -- into the category where
+    the link appears.
+
+    Returns an ordered dict of item_name -> link_file_path, with earlier
+    base paths taking priority (first found wins).  Only link files whose
+    names start with the ``link:`` prefix are considered.
+    """
+    links = {}
+    for base_path in base_paths:
+        link_dir = base_path / subdir
+        if not link_dir.is_dir():
+            continue
+        for entry in sorted(link_dir.iterdir()):
+            if entry.is_file() and entry.name.startswith(LINK_PREFIX):
+                target_name = entry.name[len(LINK_PREFIX):]
+                if target_name and target_name not in links:
+                    links[target_name] = entry
+    return links
+
+
+def resolve_links(items, links, donor_items, prog_name="agent-files"):
+    """Merge link-promoted items into an existing item dict.
+
+    ``items`` is the dict of name -> path for items already found in the
+    target category (e.g. default segments/skills).
+
+    ``links`` is the dict of link_name -> link_file_path returned by
+    :func:`find_link_files` for the same category.
+
+    ``donor_items`` is the dict of name -> path for items in the opposite
+    category (e.g. non-default segments/skills) from which linked items
+    are resolved.
+
+    For each link whose target name is not already present in ``items``,
+    this function looks up the target in ``donor_items`` and, if found,
+    adds it to ``items``.  If the target is not found, a warning is
+    printed to stderr.
+
+    Returns ``items`` (mutated in place for convenience).
+    """
+    for target_name, link_path in links.items():
+        if target_name in items:
+            # Already present in the target category (real item takes
+            # priority over a link).
+            continue
+        if target_name in donor_items:
+            items[target_name] = donor_items[target_name]
+        else:
+            print(
+                f"{prog_name}: warning: link '{link_path.name}' in "
+                f"'{link_path.parent}' targets '{target_name}' which "
+                f"was not found in any search path",
+                file=sys.stderr,
+            )
+    return items
+
+
 def get_state_file_path(config_name, git_root):
     """Return the path to the state file, or None if not in a git repo."""
     if not git_root:

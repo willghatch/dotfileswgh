@@ -29,11 +29,13 @@ from pathlib import Path
 sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), 'agent-files-pylib'))
 from agent_files_common import (
     find_git_root,
+    find_link_files,
     gather_dev_types,
     get_base_search_paths,
     get_raw_location_bases,
     get_state_file_path,
     load_state,
+    resolve_links,
     save_state,
 )
 
@@ -68,6 +70,20 @@ def find_segments(base_paths, subdir):
             if name not in segments:
                 segments[name] = dir_segments[name]
     return segments
+
+
+def find_all_segments(base_paths):
+    """Find default and non-default segments, resolving dev-type links.
+
+    Returns (default_segments, non_default_segments) dicts of name -> Path.
+    Link files (``link:NAME``) in default/ promote non-default items into
+    the default set.
+    """
+    default_segments = find_segments(base_paths, "default")
+    non_default_segments = find_segments(base_paths, "non-default")
+    default_links = find_link_files(base_paths, "default")
+    resolve_links(default_segments, default_links, non_default_segments, PROG_NAME)
+    return default_segments, non_default_segments
 
 
 def read_segment(path, dev_types, git_root):
@@ -284,8 +300,7 @@ def main():
             print(f"  {p}{exists}")
         return
 
-    default_segments = find_segments(base_paths, "default")
-    non_default_segments = find_segments(base_paths, "non-default")
+    default_segments, non_default_segments = find_all_segments(base_paths)
 
     # Completion / listing modes -- output to stdout and exit
     if args.list_default:
@@ -354,8 +369,7 @@ def main():
 
             # Recompute base_paths and segments with updated dev_types
             base_paths = get_base_search_paths(CONFIG_NAME, dev_types, git_root)
-            default_segments = find_segments(base_paths, "default")
-            non_default_segments = find_segments(base_paths, "non-default")
+            default_segments, non_default_segments = find_all_segments(base_paths)
 
     # Validate --add segment names
     errors = False

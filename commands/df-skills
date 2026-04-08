@@ -36,10 +36,12 @@ from pathlib import Path
 sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), 'agent-files-pylib'))
 from agent_files_common import (
     find_git_root,
+    find_link_files,
     gather_dev_types,
     get_base_search_paths,
     get_state_file_path,
     load_state,
+    resolve_links,
     save_state,
 )
 
@@ -63,6 +65,20 @@ def find_skills(base_paths, subdir):
             if entry.is_dir() and entry.name not in skills:
                 skills[entry.name] = entry
     return skills
+
+
+def find_all_skills(base_paths):
+    """Find default and non-default skills, resolving dev-type links.
+
+    Returns (default_skills, non_default_skills) dicts of name -> Path.
+    Link files (``link:NAME``) in default/ promote non-default items into
+    the default set.
+    """
+    default_skills = find_skills(base_paths, "default")
+    non_default_skills = find_skills(base_paths, "non-default")
+    default_links = find_link_files(base_paths, "default")
+    resolve_links(default_skills, default_links, non_default_skills, PROG_NAME)
+    return default_skills, non_default_skills
 
 
 def get_skill_content_path(skill_dir):
@@ -311,8 +327,7 @@ def read_skill_content_stripped(content_path, skill_name, skill_dir, dev_types, 
 
 def cmd_agents_md_snippet(args, dev_types, git_root, base_paths):
     """Generate AGENTS.md snippet with skill frontmatter."""
-    default_skills = find_skills(base_paths, "default")
-    non_default_skills = find_skills(base_paths, "non-default")
+    default_skills, non_default_skills = find_all_skills(base_paths)
 
     added = []
     omitted = []
@@ -339,8 +354,7 @@ def cmd_agents_md_snippet(args, dev_types, git_root, base_paths):
                     dev_types.append(dt)
             # Recompute paths and skills with merged dev_types
             base_paths = get_base_search_paths(CONFIG_NAME, dev_types, git_root)
-            default_skills = find_skills(base_paths, "default")
-            non_default_skills = find_skills(base_paths, "non-default")
+            default_skills, non_default_skills = find_all_skills(base_paths)
 
     active = get_active_skills(default_skills, non_default_skills, added, omitted)
 
@@ -388,8 +402,7 @@ def cmd_agents_md_snippet(args, dev_types, git_root, base_paths):
 def cmd_disclose(args, dev_types, git_root, base_paths):
     """Print the full content of a skill."""
     skill_name = args.skill_name
-    default_skills = find_skills(base_paths, "default")
-    non_default_skills = find_skills(base_paths, "non-default")
+    default_skills, non_default_skills = find_all_skills(base_paths)
 
     # Find the skill in either default or non-default
     skill_dir = default_skills.get(skill_name) or non_default_skills.get(skill_name)
@@ -440,8 +453,7 @@ def cmd_disclose(args, dev_types, git_root, base_paths):
 
 def cmd_list(args, dev_types, git_root, base_paths):
     """List available skills."""
-    default_skills = find_skills(base_paths, "default")
-    non_default_skills = find_skills(base_paths, "non-default")
+    default_skills, non_default_skills = find_all_skills(base_paths)
 
     # Handle --from-state / --from-state-strict
     if args.from_state or args.from_state_strict:
@@ -463,8 +475,7 @@ def cmd_list(args, dev_types, git_root, base_paths):
                 if dt not in dev_types:
                     dev_types.append(dt)
             base_paths = get_base_search_paths(CONFIG_NAME, dev_types, git_root)
-            default_skills = find_skills(base_paths, "default")
-            non_default_skills = find_skills(base_paths, "non-default")
+            default_skills, non_default_skills = find_all_skills(base_paths)
 
             active = get_active_skills(default_skills, non_default_skills, added, omitted)
             if args.names_only:
@@ -517,8 +528,7 @@ def cmd_save_state(args, dev_types, git_root, base_paths):
         )
         sys.exit(1)
 
-    default_skills = find_skills(base_paths, "default")
-    non_default_skills = find_skills(base_paths, "non-default")
+    default_skills, non_default_skills = find_all_skills(base_paths)
     all_skills = dict(default_skills)
     all_skills.update(non_default_skills)
 
