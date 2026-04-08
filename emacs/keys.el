@@ -1238,6 +1238,10 @@ FUNC should be a function whose first two arguments are BEG and END."
            (action yafold ((alternate ,nil)) (yafolding-toggle-element ()))
            (action yafold ((alternate alternate)) (yafolding-show-all ()))
 
+           ;; Insert date with day name using alternate-2 modifier
+           (open date-yyyy-mm-dd ((alternate-2 alternate-2) (alternate ,nil)) (,(lambda () (insert (format-time-string "%Y-%m-%d %A"))) ()))
+           (open date-yyyy-mm-dd ((alternate-2 alternate-2) (alternate alternate)) (,(lambda () (insert (format-time-string "%Y-%m-%d %A %H:%M:%S"))) ()))
+
            ;; TODO - add yasnippet matchers
 
            ;; These are kind of dummy verbs.  I want them to take registers, but for the moment I just want to bind keys for these.  Maybe later I'll think more and work them in as proper objects and such.  But for now, expedience to get something that I want working.
