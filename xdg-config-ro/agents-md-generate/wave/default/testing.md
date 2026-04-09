@@ -1,11 +1,16 @@
 # Testing
 
-Always set `WAVE_CACHE_ON=0` and `PYTHONPATH=<wave-repo-root>` when running tests.
+Run Wave lit tests with `WAVE_DIR=$PWD $WAVE_DIR/build_tools/wave-dev-setup.sh --test-wave-lit`.
+Additional arguments for `lit` can be passed after `--`, e.g. `-- path/to/specific/test.py`.
 
-Run Wave lit tests with `lit -v lit_tests` (or a specific test file path).
-Run end-to-end tests with `pytest --run-e2e`.
-The full suite is slow; target specific files and use `-k` to select tests during edit/test cycles.
+Run Wave end-to-end tests with `WAVE_DIR=$PWD $WAVE_DIR/build_tools/wave-dev-setup.sh --test-wave-e2e`.
+Additional arguments for `pytest` can be passed after `--`, e.g. `-- -k test_gemm` to select specific tests, `-- -x` to stop on first failure, or `-- path/to/test_file.py` to target a specific file.
 
-WaveASM has separate tests: `wnb --test-waveasm-lit` and `wnb --test-waveasm-e2e -- --run-e2e`.
+The full suite is slow; use `--` passthrough args to target specific files and use `-k` to select tests during edit/test cycles.
+
+WaveASM has separate tests: `--test-waveasm-lit` and `--test-waveasm-e2e` (same passthrough syntax).
+Water has lit tests: `--test-water-lit`.
+
+The test commands automatically rebuild native components (water, waveasm) before running.
 
 Lit tests work on any hardware. End-to-end tests may require specific GPUs.
