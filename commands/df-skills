@@ -2,11 +2,11 @@
 """
 df-skills - Manage reusable skill documents for AI agents
 
-Skills are directories containing one of skill.md, skill.org, or skill.prog,
-with frontmatter provided either as a separate frontmatter.md file or embedded
-at the start of skill.md in standard YAML-like format (delimited by --- lines).
-If frontmatter.md exists it takes priority; otherwise embedded frontmatter is
-extracted from skill.md.
+Skills are directories containing one of skill.md, SKILL.md, skill.org, or
+skill.prog, with frontmatter provided either as a separate frontmatter.md file
+or embedded at the start of skill.md/SKILL.md in standard YAML-like format
+(delimited by --- lines).  If frontmatter.md exists it takes priority;
+otherwise embedded frontmatter is extracted from skill.md or SKILL.md.
 
 Skill directories are found in (per location, dev-type paths precede base path):
   1. <git-root>/.git/agent-files/config/df-skills/<dev-type>/{default,non-default}/
@@ -84,9 +84,10 @@ def find_all_skills(base_paths):
 def get_skill_content_path(skill_dir):
     """Return the highest-priority skill content file path, or None.
 
-    Priority: skill.prog > skill.md > skill.org
+    Priority: skill.prog > skill.md > SKILL.md > skill.org
+    SKILL.md is the standard skill format used by tools like Claude Code.
     """
-    for filename in ("skill.prog", "skill.md", "skill.org"):
+    for filename in ("skill.prog", "skill.md", "SKILL.md", "skill.org"):
         path = skill_dir / filename
         if path.exists():
             return path
@@ -283,8 +284,10 @@ def get_skill_frontmatter(skill_dir):
             "has_embedded_frontmatter": False,
         }
 
-    # Try embedded frontmatter in skill.md
+    # Try embedded frontmatter in skill.md or SKILL.md (standard skill format)
     skill_md_path = skill_dir / "skill.md"
+    if not skill_md_path.exists():
+        skill_md_path = skill_dir / "SKILL.md"
     if not skill_md_path.exists():
         return None
 
@@ -317,7 +320,7 @@ def read_skill_content_stripped(content_path, skill_name, skill_dir, dev_types, 
     if error or not strip_frontmatter:
         return content, error
 
-    if content_path.name == "skill.md":
+    if content_path.name in ("skill.md", "SKILL.md"):
         _fields, stripped = parse_standard_frontmatter(content)
         if _fields is not None:
             return stripped, None
