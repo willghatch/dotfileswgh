@@ -676,15 +676,31 @@ walks back up to the top-level .git directory."
          (file (concat dir "prompt.org")))
     (find-file file)))
 
+(defun wgh/psnip-expand-string (text)
+  "Expand <psnip: NAME> tags in TEXT using the prompt-snippet CLI tool.
+Returns the expanded text, or the original TEXT if expansion fails."
+  (with-temp-buffer
+    (insert text)
+    (let ((result (shell-command-on-region
+                   (point-min) (point-max)
+                   "prompt-snippet expand"
+                   (current-buffer) t
+                   "*prompt-snippet-errors*" t)))
+      (if (and (numberp result) (= result 0))
+          (buffer-string)
+        (message "prompt-snippet expand failed; using unexpanded text")
+        text))))
+
 (defun wgh/agent-prompt-from-region (beg end topic)
   "Create an agent-working-directory, write region to prompt.txt, and copy a message.
-The copied message contains the directory path and prompt file path."
+The copied message contains the directory path and prompt file path.
+Any <psnip: NAME> tags in the region are expanded in the exported file."
   (interactive "r\nsTopic (hyphenated words): ")
   (let* ((text (buffer-substring-no-properties beg end))
          (dir (wgh/agent-make-working-dir topic))
          (prompt-file (concat dir "prompt.txt")))
     (with-temp-file prompt-file
-      (insert text))
+      (insert (wgh/psnip-expand-string text)))
     (let ((msg (format "Your agent-working-directory path is %s.  Read %s for instructions."
                        dir prompt-file)))
       (wgh/terminal-copy-osc-string msg)
@@ -737,16 +753,51 @@ them concatenated in root-to-current order separated by blank lines."
 (defun wgh/agent-prompt-from-outline-spine (topic)
   "Create an agent-working-directory from the outline tree spine body text at point.
 Extracts the spine body text (ancestor body text from root to current heading),
-writes it to prompt.txt, and copies a message with the directory and file paths."
+writes it to prompt.txt, and copies a message with the directory and file paths.
+Any <psnip: NAME> tags in the text are expanded in the exported file."
   (interactive "sTopic (hyphenated words): ")
   (let* ((text (wgh/outline-tree-spine-body-text))
          (dir (wgh/agent-make-working-dir topic))
          (prompt-file (concat dir "prompt.txt")))
     (with-temp-file prompt-file
-      (insert text))
+      (insert (wgh/psnip-expand-string text)))
     (let ((msg (format "Your agent-working-directory path is %s.  Read %s for instructions."
                        dir prompt-file)))
       (wgh/terminal-copy-osc-string msg)
       (message "Copied: %s" msg))))
+
+(defun wgh/prompt-snippet-insert ()
+  "Show an fzf list of prompt snippet names and insert a reference or content.
+Enter inserts the short-form tag <psnip: NAME> for later expansion.
+C-j inserts the full snippet content inline."
+  (interactive)
+  (require 'fzf-conf)
+  (let* ((names (split-string
+                 (string-trim
+                  (shell-command-to-string "prompt-snippet list 2>/dev/null"))
+                 "\n" t))
+         (insert-tag
+          (lambda (selection)
+            (let ((name (string-trim selection)))
+              (unless (string-empty-p name)
+                (insert (format "<psnip: %s>" name))))))
+         (insert-full
+          (lambda (selection _directory)
+            (let* ((name (string-trim selection))
+                   (content (when (not (string-empty-p name))
+                              (string-trim-right
+                               (shell-command-to-string
+                                (format "prompt-snippet show %s 2>/dev/null"
+                                        (shell-quote-argument name)))))))
+              (when (and content (not (string-empty-p content)))
+                (insert content))))))
+    (if names
+        (let ((fzf--target-validator #'fzf--pass-through))
+          (wgh/fzf-with-command-and-alt-actions
+           "prompt-snippet list"
+           insert-tag
+           `(("ctrl-j" . ,insert-full))
+           nil))
+      (user-error "No prompt snippets found"))))
 
 (provide 'vfuncs)
