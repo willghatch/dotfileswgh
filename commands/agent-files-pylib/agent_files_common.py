@@ -2,15 +2,18 @@
 agent_files_common - Shared utilities for agent-files tools
 
 Provides common functionality used by agents-md-generate, df-skills,
-and potentially other tools:
+prompt-snippet, and potentially other tools:
   - Git root discovery
   - Dev-types gathering (CLI + env + JSON, deduplicated)
   - XDG-based search path construction
+  - Generic file discovery by extension across search paths
+  - Content reading (.prog execution, text file reading)
   - State file reading/writing
 """
 
 import json
 import os
+import subprocess
 import sys
 from pathlib import Path
 
@@ -170,6 +173,80 @@ def get_raw_location_bases(config_name, git_root=None):
             bases.append(Path(config_dir) / config_name)
 
     return bases
+
+
+def find_files_by_extension(base_paths, extensions, subdir=None):
+    """Find files with given extensions across base paths, first-found-wins.
+
+    Searches for files matching any of the given extensions in each base path
+    (optionally under a subdirectory).  When the same stem name exists with
+    multiple extensions in the same directory, later extensions in the list
+    take priority.  Across directories, earlier base paths win (first found).
+
+    ``extensions`` is a list of file suffixes including the dot, e.g.
+    ``[".txt", ".prog"]``.  Later entries take priority within a single
+    directory (so ``.prog`` overrides ``.txt`` if listed after it).
+
+    ``subdir`` is an optional subdirectory name to append to each base path
+    (e.g. ``"default"``).  If None, files are searched directly in base paths.
+
+    Returns an ordered dict of stem_name -> Path, sorted alphabetically
+    within each directory.
+    """
+    items = {}
+    for base_path in base_paths:
+        search_dir = base_path / subdir if subdir else base_path
+        if not search_dir.is_dir():
+            continue
+        dir_items = {}
+        for ext in extensions:
+            for item_file in sorted(search_dir.glob(f"*{ext}")):
+                name = item_file.stem
+                # Later extensions win within a single directory
+                dir_items[name] = item_file
+        for name in sorted(dir_items):
+            if name not in items:
+                items[name] = dir_items[name]
+    return items
+
+
+def read_file_or_exec(path, prog_name="agent-files", env_extras=None):
+    """Read a file's content, executing .prog files as scripts.
+
+    For ``.prog`` files, runs the file as a subprocess and returns its
+    stdout.  For all other files, reads and returns the text content.
+
+    ``env_extras`` is an optional dict of extra environment variables to set
+    when executing .prog files.
+
+    Returns (content_string, error_string_or_None).
+    On .prog failure, returns (None, error_description).
+    """
+    if path.suffix == ".prog":
+        env = os.environ.copy()
+        if env_extras:
+            env.update(env_extras)
+        try:
+            result = subprocess.run(
+                [str(path)],
+                capture_output=True,
+                text=True,
+                check=False,
+                env=env,
+            )
+        except OSError as e:
+            return None, f"failed to execute '{path}': {e}"
+        if result.returncode != 0:
+            error_msg = f"'{path}' exited with code {result.returncode}"
+            if result.stderr:
+                error_msg += "\n" + result.stderr.rstrip()
+            return None, error_msg
+        return result.stdout, None
+    else:
+        try:
+            return path.read_text(), None
+        except OSError as e:
+            return None, f"failed to read '{path}': {e}"
 
 
 LINK_PREFIX = "link:"

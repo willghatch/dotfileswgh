@@ -22,12 +22,12 @@ When the same segment name exists as both .md and .prog in the same directory,
 
 import argparse
 import os
-import subprocess
 import sys
 from pathlib import Path
 
 sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), 'agent-files-pylib'))
 from agent_files_common import (
+    find_files_by_extension,
     find_git_root,
     find_link_files,
     gather_dev_types,
@@ -35,6 +35,7 @@ from agent_files_common import (
     get_raw_location_bases,
     get_state_file_path,
     load_state,
+    read_file_or_exec,
     resolve_links,
     save_state,
 )
@@ -51,25 +52,7 @@ def find_segments(base_paths, subdir):
     When both .md and .prog exist for the same name in the same directory,
     .prog takes priority.
     """
-    segments = {}
-    for base_path in base_paths:
-        segment_dir = base_path / subdir
-        if not segment_dir.is_dir():
-            continue
-        # Collect both .md and .prog files in this directory
-        dir_segments = {}
-        for segment_file in sorted(segment_dir.glob("*.md")):
-            name = segment_file.stem
-            dir_segments[name] = segment_file
-        for segment_file in sorted(segment_dir.glob("*.prog")):
-            name = segment_file.stem
-            # .prog wins over .md in the same directory
-            dir_segments[name] = segment_file
-        # Merge into overall segments (first-found-wins across directories)
-        for name in sorted(dir_segments):
-            if name not in segments:
-                segments[name] = dir_segments[name]
-    return segments
+    return find_files_by_extension(base_paths, [".md", ".prog"], subdir)
 
 
 def find_all_segments(base_paths):
@@ -91,36 +74,17 @@ def read_segment(path, dev_types, git_root):
 
     Returns the content string, or None if execution failed.
     """
-    if path.suffix == ".prog":
-        env = os.environ.copy()
-        env["DEV_TYPES"] = ",".join(dev_types)
-        if git_root:
-            env["AGENT_WORK_GIT_ROOT"] = str(git_root)
-        try:
-            result = subprocess.run(
-                [str(path)],
-                capture_output=True,
-                text=True,
-                check=False,
-                env=env,
-            )
-        except OSError as e:
-            print(
-                f"{PROG_NAME}: error: failed to execute '{path}': {e}",
-                file=sys.stderr,
-            )
-            return None
-        if result.returncode != 0:
-            print(
-                f"{PROG_NAME}: error: '{path}' exited with code {result.returncode}",
-                file=sys.stderr,
-            )
-            if result.stderr:
-                print(result.stderr, file=sys.stderr, end="")
-            return None
-        return result.stdout
-    else:
-        return path.read_text()
+    env_extras = {"DEV_TYPES": ",".join(dev_types)}
+    if git_root:
+        env_extras["AGENT_WORK_GIT_ROOT"] = str(git_root)
+    content, error = read_file_or_exec(path, PROG_NAME, env_extras)
+    if error:
+        print(
+            f"{PROG_NAME}: error: {error}",
+            file=sys.stderr,
+        )
+        return None
+    return content
 
 
 def list_dev_types(git_root):

@@ -29,7 +29,6 @@ Subcommands:
 
 import argparse
 import os
-import subprocess
 import sys
 from pathlib import Path
 
@@ -41,6 +40,7 @@ from agent_files_common import (
     get_base_search_paths,
     get_state_file_path,
     load_state,
+    read_file_or_exec,
     resolve_links,
     save_state,
 )
@@ -109,31 +109,14 @@ def read_skill_content(content_path, skill_name, skill_dir, dev_types, git_root)
     Returns (content_string, error_string_or_None).
     On .prog failure, returns (None, error_description).
     """
-    if content_path.suffix == ".prog":
-        env = os.environ.copy()
-        env["DEV_TYPES"] = ",".join(dev_types)
-        env["SKILL_NAME"] = skill_name
-        env["SKILL_DIR"] = str(skill_dir)
-        if git_root:
-            env["AGENT_WORK_GIT_ROOT"] = str(git_root)
-        try:
-            result = subprocess.run(
-                [str(content_path)],
-                capture_output=True,
-                text=True,
-                check=False,
-                env=env,
-            )
-        except OSError as e:
-            return None, f"failed to execute '{content_path}': {e}"
-        if result.returncode != 0:
-            error_msg = f"skill.prog failed with exit code {result.returncode}"
-            if result.stderr:
-                error_msg += "\n" + result.stderr.rstrip()
-            return None, error_msg
-        return result.stdout, None
-    else:
-        return content_path.read_text(), None
+    env_extras = {
+        "DEV_TYPES": ",".join(dev_types),
+        "SKILL_NAME": skill_name,
+        "SKILL_DIR": str(skill_dir),
+    }
+    if git_root:
+        env_extras["AGENT_WORK_GIT_ROOT"] = str(git_root)
+    return read_file_or_exec(content_path, PROG_NAME, env_extras)
 
 
 def get_active_skills(default_skills, non_default_skills, added_names, omitted_names):
