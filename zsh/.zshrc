@@ -36,6 +36,7 @@ source $DOTFILESWGH/bazshrc
 typeset -U PATH
 fpath=($fpath /run/current-system/sw/share/zsh/site-functions)
 fpath=($fpath $DOTFILESWGH/zsh/completion/)
+fpath=($fpath $DOTFILESWGH_GHP/zsh/completion/)
 fpath=($fpath $DOTFILESWGH_PRI/zsh/completion/)
 fpath=($fpath $DOTFILESWGH_ROOTGIT/zsh/completion/)
 fpath=($fpath $DOTFILESWGH_DOTLOCAL/zsh/completion/)
