@@ -1,0 +1,52 @@
+#compdef prompt-snippet
+
+_prompt_snippet() {
+    local context state state_descr line
+    typeset -A opt_args
+
+    _arguments -C \
+        '(- :)--help[Show help and exit]' \
+        '(- :)--show-paths[Show search paths and exit]' \
+        '*--dev-type=[Add dev-type layer]:dev type:->dev_types' \
+        '*-d=[Add dev-type layer]:dev type:->dev_types' \
+        '1:subcommand:->subcommands' \
+        '*::arg:->subcommand_args' \
+        && return 0
+
+    case $state in
+        subcommands)
+            local -a subcommands
+            subcommands=(
+                'list:List available snippet names'
+                'show:Show the content of a snippet'
+                'expand:Expand psnip tags from stdin'
+            )
+            _describe 'subcommand' subcommands
+            ;;
+        subcommand_args)
+            case $words[1] in
+                list)
+                    _arguments \
+                        '--with-path[Include file paths in output]'
+                    ;;
+                show)
+                    local snippets
+                    snippets=("${(@f)$(prompt-snippet list 2>/dev/null)}")
+                    if (( ${#snippets} )); then
+                        _describe 'snippet' snippets
+                    else
+                        _message 'no snippets found'
+                    fi
+                    ;;
+                expand)
+                    # No additional arguments
+                    ;;
+            esac
+            ;;
+        dev_types)
+            _message 'dev type name'
+            ;;
+    esac
+}
+
+_prompt_snippet "$@"

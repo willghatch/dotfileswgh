@@ -1,0 +1,217 @@
+#!/usr/bin/env python3
+"""
+prompt-snippet - Manage reusable prompt text snippets
+
+Snippets are .txt files (plain text) or .prog files (executable scripts that
+output text) found across search paths:
+  1. <git-root>/.git/agent-files/config/prompt-snippet/<dev-type>/
+  2. <git-root>/.git/agent-files/config/prompt-snippet/
+  3. XDG_CONFIG_HOME/prompt-snippet/<dev-type>/
+  4. XDG_CONFIG_HOME/prompt-snippet/
+  5. Each XDG_CONFIG_DIRS entry (same pattern)
+
+Dev types come from --dev-type flags (repeatable, highest priority), the
+DEV_TYPES environment variable (comma-separated), and
+.git/agent-files/dev-types.json (a JSON list of strings, lowest priority).
+All sources are merged and deduplicated.
+
+Earlier search paths take priority (first found wins for a given snippet name).
+When the same snippet name exists as both .txt and .prog in the same directory,
+.prog takes priority.
+
+Subcommands:
+  list     List available snippet names
+  show     Show the content of a snippet
+  expand   Read stdin, expand <psnip: NAME> tags, write to stdout
+"""
+
+import argparse
+import os
+import re
+import sys
+from pathlib import Path
+
+sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), 'agent-files-pylib'))
+from agent_files_common import (
+    find_files_by_extension,
+    find_git_root,
+    gather_dev_types,
+    get_base_search_paths,
+    read_file_or_exec,
+)
+
+PROG_NAME = "prompt-snippet"
+CONFIG_NAME = "prompt-snippet"
+
+# Extensions in priority order: .txt is base, .prog overrides
+SNIPPET_EXTENSIONS = [".txt", ".prog"]
+
+
+def find_snippets(base_paths):
+    """Find all snippets across base paths.
+
+    Returns an ordered dict of name -> Path, with earlier paths taking
+    priority.  When both .txt and .prog exist for the same name in the
+    same directory, .prog takes priority.
+    """
+    return find_files_by_extension(base_paths, SNIPPET_EXTENSIONS)
+
+
+def read_snippet(path, dev_types, git_root, snippet_name=None):
+    """Read a snippet's content.
+
+    Returns the content string, or None if execution failed.
+    """
+    env_extras = {"DEV_TYPES": ",".join(dev_types)}
+    if git_root:
+        env_extras["AGENT_WORK_GIT_ROOT"] = str(git_root)
+    if snippet_name:
+        env_extras["SNIPPET_NAME"] = snippet_name
+    content, error = read_file_or_exec(path, PROG_NAME, env_extras)
+    if error:
+        print(
+            f"{PROG_NAME}: error: {error}",
+            file=sys.stderr,
+        )
+        return None
+    return content
+
+
+def cmd_list(args, dev_types, git_root, base_paths):
+    """List available snippet names."""
+    snippets = find_snippets(base_paths)
+    for name in sorted(snippets):
+        if args.with_path:
+            print(f"{name}\t{snippets[name]}")
+        else:
+            print(name)
+
+
+def cmd_show(args, dev_types, git_root, base_paths):
+    """Show the content of a snippet."""
+    snippet_name = args.snippet_name
+    snippets = find_snippets(base_paths)
+
+    if snippet_name not in snippets:
+        print(
+            f"{PROG_NAME}: error: snippet '{snippet_name}' not found. "
+            f"Run 'prompt-snippet list' to see available snippets.",
+            file=sys.stderr,
+        )
+        sys.exit(1)
+
+    content = read_snippet(snippets[snippet_name], dev_types, git_root, snippet_name)
+    if content is None:
+        sys.exit(1)
+
+    sys.stdout.write(content)
+    if content and not content.endswith("\n"):
+        sys.stdout.write("\n")
+
+
+def cmd_expand(args, dev_types, git_root, base_paths):
+    """Read stdin, expand <psnip: NAME> tags, write to stdout."""
+    snippets = find_snippets(base_paths)
+    text = sys.stdin.read()
+
+    # Pattern matches <psnip: NAME> where NAME is one or more non-">" characters
+    pattern = re.compile(r"<psnip:\s*([^>]+?)\s*>")
+
+    def replace_match(m):
+        name = m.group(1).strip()
+        if name not in snippets:
+            print(
+                f"{PROG_NAME}: warning: snippet '{name}' not found, leaving tag unexpanded",
+                file=sys.stderr,
+            )
+            return m.group(0)
+        content = read_snippet(snippets[name], dev_types, git_root, name)
+        if content is None:
+            print(
+                f"{PROG_NAME}: warning: failed to read snippet '{name}', leaving tag unexpanded",
+                file=sys.stderr,
+            )
+            return m.group(0)
+        # Strip trailing newline from snippet content so it integrates
+        # cleanly into the surrounding text
+        return content.rstrip("\n")
+
+    result = pattern.sub(replace_match, text)
+    sys.stdout.write(result)
+
+
+def main():
+    parser = argparse.ArgumentParser(
+        description="Manage reusable prompt text snippets.",
+        formatter_class=argparse.RawDescriptionHelpFormatter,
+        epilog=__doc__,
+    )
+    parser.add_argument(
+        "--dev-type", "-d",
+        action="append",
+        metavar="TYPE",
+        default=[],
+        dest="dev_types",
+        help="Add a dev-type layer (can be repeated; prepends to $DEV_TYPES)",
+    )
+    parser.add_argument(
+        "--show-paths",
+        action="store_true",
+        help="Print search paths and exit",
+    )
+
+    subparsers = parser.add_subparsers(dest="subcommand")
+
+    # list subcommand
+    list_parser = subparsers.add_parser(
+        "list",
+        help="List available snippet names",
+    )
+    list_parser.add_argument(
+        "--with-path",
+        action="store_true",
+        help="Include file paths in output",
+    )
+
+    # show subcommand
+    show_parser = subparsers.add_parser(
+        "show",
+        help="Show the content of a snippet",
+    )
+    show_parser.add_argument(
+        "snippet_name",
+        help="Name of the snippet to show",
+    )
+
+    # expand subcommand
+    subparsers.add_parser(
+        "expand",
+        help="Read stdin, expand <psnip: NAME> tags, write to stdout",
+    )
+
+    args = parser.parse_args()
+
+    git_root = find_git_root()
+    dev_types = gather_dev_types(args.dev_types, git_root, PROG_NAME)
+    base_paths = get_base_search_paths(CONFIG_NAME, dev_types, git_root)
+
+    if args.show_paths:
+        for p in base_paths:
+            exists = " (exists)" if p.exists() else ""
+            print(f"  {p}{exists}")
+        return
+
+    if args.subcommand is None:
+        parser.print_help()
+        sys.exit(1)
+
+    if args.subcommand == "list":
+        cmd_list(args, dev_types, git_root, base_paths)
+    elif args.subcommand == "show":
+        cmd_show(args, dev_types, git_root, base_paths)
+    elif args.subcommand == "expand":
+        cmd_expand(args, dev_types, git_root, base_paths)
+
+
+if __name__ == "__main__":
+    main()
