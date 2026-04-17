@@ -1,5 +1,4 @@
 {
-  "image-builder": "dev-misc",
   "tags": {
     "network": {
       "docker-args": [
