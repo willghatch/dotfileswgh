@@ -1,0 +1,59 @@
+{
+  "tags": {
+    "dev-types": {
+      "docker-args": [
+        "-e", "DEV_TYPES=llvm,triton"
+      ]
+    },
+    "network": {
+      "docker-args": [
+        "--network=host"
+      ]
+    },
+    "user": {
+      "docker-args": [
+        "--user", "$(id -u):$(id -g)"
+      ]
+    },
+    "homedir": {
+      "volumes": {
+        "$HOME/mk/amd/docker-home": "/home/wgh"
+      },
+      "docker-args": [
+        "--workdir=/home/wgh"
+      ]
+    },
+    "term": {
+      "docker-run-script": [
+        "DOCKER_RUN_EXTRAS+=(-e \"TERM=$TERM\")"
+      ]
+    },
+    "mk": {
+      "volumes": {
+        "$HOME/mk/amd/mk-triton": "/home/wgh/mk"
+      },
+      "pre-tmux-script": [
+        "source $DOTFILESWGH/env-more-with-mixins.sh",
+        "cd mk",
+        "cd triton",
+        ""
+      ]
+    },
+    "video-groups": {
+      "docker-run-script": [
+        "# Add video and render groups dynamically",
+        "function groupid() { getent group \"$1\" | cut -d : -f 3; }",
+        "DOCKER_RUN_EXTRAS+=(--group-add \"$(groupid render)\")",
+        "DOCKER_RUN_EXTRAS+=(--group-add \"$(groupid video)\")"
+      ],
+      "docker-args": [
+        "--cap-add=SYS_PTRACE",
+        "--security-opt", "seccomp=unconfined",
+        "--ipc=host",
+        "--device=/dev/kfd",
+        "--device=/dev/dri"
+      ]
+
+    }
+  }
+}
