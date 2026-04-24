@@ -1,0 +1,10 @@
+{
+  "tags": {
+    "dotfileswgh-env-var": {
+      "docker-run-script": [
+        "# just set the variable and use whatever dotfileswgh exists in the home dir, which could just be there or be a volume",
+        "DOCKER_RUN_EXTRAS+=(-e \"DOTFILESWGH=/home/wgh/dotfileswgh\")"
+      ]
+    }
+  }
+}
