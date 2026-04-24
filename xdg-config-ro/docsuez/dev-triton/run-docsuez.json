@@ -28,6 +28,11 @@
         "DOCKER_RUN_EXTRAS+=(-e \"TERM=$TERM\")"
       ]
     },
+    "ccache": {
+      "docker-args": [
+        "-e", "CCACHE_DIR=/home/wgh/mk/ccache", "-e", "TRITON_BUILD_WITH_CCACHE=true"
+      ]
+    },
     "mk": {
       "volumes": {
         "$HOME/mk/amd/mk-triton": "/home/wgh/mk"
