@@ -38,7 +38,7 @@ AGENT_CONFIG = {
         "default_flags": [],
         "dang_flags": ["-f"],
         "dang_env": {},
-        "cli_command_base": ["agent"],
+        "cli_command_base": ["cursor-agent"],
     },
     "codex": {
         "env_if_unset": {},
