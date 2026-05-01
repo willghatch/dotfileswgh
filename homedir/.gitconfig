@@ -5,6 +5,9 @@
 	#excludesfile = ~/dotfileswgh/gitignore_global
   # I don't like setting this globally that much.  I've added a wrapper script alias for calling git diff with delta instead.
   #pager = delta-wrap
+  # The commentChar is the character for comments in git commit messages.  By default it is '#' which means that you can't fully use markdown in commit messages (no headers without the more difficult and weirder underline format).  You can use "auto" to automatically select a comment character based on what is already in a message (eg. when editing an existing commit message), but it is deprecated and will be removed in v3.0.  It is unfortunately limited to single-character ascii until 2.45 (2024) which adds the alias `commentString`.  As of 2026-04-30 I still use versions at least as old as 2.43.
+  # TODO - once I am always using at least git v2.45 everywhere, use a multi-character string that won't clash with anything that I would realistically use.  Eg. any single ascii character could be a valid first character of a line that is inside a source code block inside a commit message.
+  commentChar = "%"
 [interactive]
   #diffFilter = delta-wrap --color-only
 [delta]
