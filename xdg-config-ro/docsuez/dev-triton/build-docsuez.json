@@ -23,6 +23,7 @@
                 "# ",
                 "RUN apt-get install -y cmake ninja-build clang",
                 "RUN apt-get install -y dwarfdump ccache lld",
+                "RUN apt-get install -y libdw-dev # for source build of rocprofiler-sdk",
                 ""
             ]
         },
