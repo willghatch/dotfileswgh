@@ -65,6 +65,15 @@ UI-HINT is used for the ui-hint field if non-nil, else CONTENTS is also used as 
     (contents . ,contents)
     (ui-hint . ,(or ui-hint contents))))
 
+(defun cp/+-accumulator (existing new)
+  "Add numeric modifier values EXISTING and NEW."
+  (+ (or existing 0) new))
+
+(defun cp/mod+ (name contents)
+  "Construct an additive numeric modifier word for NAME with value CONTENTS. "
+  (append (cp/mod name contents)
+          `((accumulator . ,#'cp/+-accumulator))))
+
 (defun cp/add (&rest words)
   "Return a command that adds WORDS to current command sentence (and handles numeric argument, adding it to sentence).
 "
@@ -690,6 +699,8 @@ FUNC should be a function whose first two arguments are BEG and END."
   ("M" (lambda (n) (interactive "p") (funcall (cp/ae (cp/obj 'statement)) n)) "statement" :exit t)
   ("C" (lambda (n) (interactive "p") (funcall (cp/ae (cp/obj 'comment)) n)) "comment" :exit t)
   ("L" (lambda (n) (interactive "p") (funcall (cp/ae (cp/obj 'list)) n)) "list" :exit t)
+  ("m" (lambda (n) (interactive "p") (funcall (cp/ae (progn (require 'cpo-markdown-list) (cp/obj 'cpo-markdown-list))) n)) "markdown-list" :exit t)
+  ("T" (lambda (n) (interactive "p") (funcall (cp/ae (progn (require 'cpo-table) (cp/obj 'cpo-table))) n)) "table" :exit t)
   ("hL" (lambda (n) (interactive "p") (funcall (cp/ae (cp/obj 'linter-warning)) n)) "linter-warning" :exit t)
   ("p" (lambda (n) (interactive "p") (funcall (cp/ae (cp/obj 'proposed-change)) n)) "proposed-change" :exit t)
   ("hC" (lambda (n) (interactive "p") (funcall (cp/ae (cp/obj 'class)) n)) "class" :exit t)
@@ -743,17 +754,17 @@ FUNC should be a function whose first two arguments are BEG and END."
   ("i" (lambda (n) (interactive "p") (funcall (cp/add (cp/mod 'inner 'inner)) n)) "inner" :exit nil)
   ("u" (lambda (n) (interactive "p") (funcall (cp/add (cp/mod 'tree-vertical 'up)) n)) "up" :exit nil)
   ("d" (lambda (n) (interactive "p") (funcall (cp/add (cp/mod 'tree-vertical 'down)) n)) "down" :exit nil)
-  ("T" (lambda (n) (interactive "p") (funcall (cp/add (cp/mod 'tree-traversal 'inorder)) n)) "inorder" :exit nil)
+  ("R" (lambda (n) (interactive "p") (funcall (cp/add (cp/mod 'tree-traversal 'inorder)) n)) "inorder" :exit nil)
   ("r" (lambda (n) (interactive "p") (let ((reg (read-key "register: ")))
                                        (funcall (cp/add (cp/mod 'register reg (format "r:%c" reg))) n)))
    "register" :exit nil)
   (" " (lambda (n) (interactive "p") (funcall (cp/add (cp/mod 'surrounding-space 'surrounding-space)) n)) "surrounding-space" :exit nil)
   ("b" (lambda (n) (interactive "p") (funcall (cp/add (cp/mod 'absolute 'absolute)) n)) "absolute" :exit nil) ;; For absolute numbering (within tree if respect tree is on).  Ignore forward/backward direction.
   ("m" (lambda (n) (interactive "p") (funcall (cp/add (cp/mod 'matching 'matching)) n)) "matching" :exit nil) ;; Eg. for finding the next matching word, symbol, whatever.
-  ("a" (lambda (n) (interactive "p") (funcall (cp/add (cp/mod 'alternate 'alternate)) n)) "alternate" :exit nil) ;; For object-specific alternate behavior...
-  ("A" (lambda (n) (interactive "p") (funcall (cp/add (cp/mod 'alternate-2 'alternate-2)) n)) "alternate-2" :exit nil)
-  ("v" (lambda (n) (interactive "p") (funcall (cp/add (cp/mod 'verb-alternate 'verb-alternate)) n)) "verb-alternate" :exit nil) ;; For object-specific alternate behavior...
-  ("V" (lambda (n) (interactive "p") (funcall (cp/add (cp/mod 'verb-alternate-2 'verb-alternate-2)) n)) "verb-alternate-2" :exit nil)
+  ("a" (lambda (n) (interactive "p") (funcall (cp/add (cp/mod+ 'alternate 1)) n)) "alternate+1" :exit nil) ;; For object-specific alternate behavior...
+  ("A" (lambda (n) (interactive "p") (funcall (cp/add (cp/mod+ 'alternate 10)) n)) "alternate+10" :exit nil)
+  ("v" (lambda (n) (interactive "p") (funcall (cp/add (cp/mod+ 'verb-alternate 1)) n)) "verb-alt+1" :exit nil) ;; For object-specific alternate behavior...
+  ("V" (lambda (n) (interactive "p") (funcall (cp/add (cp/mod+ 'verb-alternate 10)) n)) "verb-alt+10" :exit nil)
 
   ("hR" (lambda (n) (interactive "p") (funcall (cp/add (cp/mod 'respect-tree 'respect-tree)) n)) "respect-tree" :exit nil)
   ("hr" (lambda (n) (interactive "p") (funcall (cp/add (cp/mod 'respect-tree nil)) n)) "DISrespect-tree" :exit nil)
@@ -1341,11 +1352,14 @@ FUNC should be a function whose first two arguments are BEG and END."
 
 
            )
-         (cdr (assq 'match-table composiphrase-current-configuration)))))
+         (cdr (assq 'match-table composiphrase-current-configuration))))
+       (sentence-pre-transformers
+        (cdr (assq 'sentence-pre-transformers composiphrase-current-configuration))))
   (setq composiphrase-current-configuration
         `((verbs . ,verbs)
           (objects . ,objects)
           (match-table . ,match-table)
+          (sentence-pre-transformers . ,sentence-pre-transformers)
           )))
 
 (message "finished loading keys.el")
