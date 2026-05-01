@@ -103,9 +103,21 @@ def apply_env_config(config, dang_enabled=False):
             env[var] = value
 
 
-
 def parse_arguments():
-    parser = argparse.ArgumentParser(description="Unified CLI for LLM agent tools.")
+    # Split on '--' before argparse sees argv so that flags intended for the
+    # underlying agent (e.g. --model) are not mistaken for agt flags.
+    argv = sys.argv[1:]
+    if '--' in argv:
+        split_idx = argv.index('--')
+        passthrough_args = argv[split_idx + 1:]
+        argv = argv[:split_idx]
+    else:
+        passthrough_args = []
+
+    parser = argparse.ArgumentParser(
+        description="Unified CLI for LLM agent tools.",
+        epilog="Use '--' to pass arguments through to the underlying agent: agt cursor -- --model gpt-4",
+    )
     parser.add_argument(
         "--dang",
         action="store_true",
@@ -127,13 +139,12 @@ def parse_arguments():
         help="Arguments to forward to the underlying agent.",
     )
 
-    args = parser.parse_args()
-
-
+    args = parser.parse_args(argv)
+    args.passthrough_args = passthrough_args
     return args
 
 
-def build_command(agent_name, config, remaining_args, dang_enabled):
+def build_command(agent_name, config, remaining_args, passthrough_args, dang_enabled):
     """Construct the command to execute.
 
     Returns a list suitable for subprocess.run.
@@ -145,8 +156,8 @@ def build_command(agent_name, config, remaining_args, dang_enabled):
         for flag in config.get("dang_flags", []):
             if flag:
                 cmd.append(flag)
-    # Remaining arguments after the optional '--'
     cmd.extend(remaining_args)
+    cmd.extend(passthrough_args)
     return cmd
 
 
@@ -166,7 +177,7 @@ def main():
     env_changes = get_env_changes(config, args.dang)
     apply_env_config(config, args.dang)
 
-    cmd = build_command(agent_name, config, args.remaining, args.dang)
+    cmd = build_command(agent_name, config, args.remaining, args.passthrough_args, args.dang)
 
     if args.verbose:
         if env_changes:
