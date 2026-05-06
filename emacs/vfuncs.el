@@ -47,10 +47,94 @@ buffer, it will call the next-buffer-func once more if advance-on-failure-p."
 
 (defalias 'nop 'ignore) ; returns nil
 
+(defun wgh/ffap-git-root-for-file (file-path)
+  "Return the git repo root for FILE-PATH, handling the case where
+FILE-PATH is inside a .git directory (e.g. .git/agent-files/...).
+In that case, return the working tree of the repo that owns that .git.
+Returns nil if not in a git repo."
+  (let* ((dir (if file-path
+                  (if (file-directory-p file-path)
+                      file-path
+                    (file-name-directory file-path))
+                default-directory))
+         (dir (expand-file-name (or dir default-directory))))
+    ;; Check if we're inside a .git directory and walk up to find the repo root.
+    (let ((git-dir-match
+           (and (string-match "\\(.*\\)/\\.git\\(/\\|$\\)" dir)
+                (match-string 1 dir))))
+      (if git-dir-match
+          ;; We're inside a .git directory; the repo root is the parent of .git.
+          (expand-file-name git-dir-match)
+        ;; Normal case: ask git for the toplevel.
+        (let ((result (string-trim
+                       (shell-command-to-string
+                        (format "git -C %s rev-parse --show-toplevel 2>/dev/null"
+                                (shell-quote-argument dir))))))
+          (if (or (string-empty-p result)
+                  (string-prefix-p "fatal:" result))
+              nil
+            result))))))
+
+(defun wgh/ffap-git-ancestor-roots (root)
+  "Return list of superproject roots above ROOT, from most-specific to outermost.
+ROOT should be an absolute path to a git working tree."
+  (let ((roots nil)
+        (dir root))
+    (while (let ((parent (string-trim
+                          (shell-command-to-string
+                           (format "git -C %s rev-parse --show-superproject-working-tree 2>/dev/null"
+                                   (shell-quote-argument dir))))))
+             (unless (string-empty-p parent)
+               (setq roots (cons parent roots))
+               (setq dir parent)))
+      )
+    (nreverse roots)))
+
 (defun ffap/no-confirm ()
+  "Open the file at point, with support for repo-relative path resolution.
+For relative paths, tries in order:
+  1. Relative from the current file's directory (default ffap behavior).
+  2. Relative from the git repo root.
+  3. Relative from each ancestor superproject root (for submodules).
+If the current buffer is visiting a file inside a .git directory,
+git-relative resolution uses the repo that owns that .git directory."
   (interactive)
   (require 'ffap)
-  (find-file-at-point (ffap-file-at-point)))
+  (let* ((ffap-path (ffap-file-at-point))
+         (current-file (buffer-file-name))
+         (current-dir (if current-file
+                          (file-name-directory current-file)
+                        default-directory)))
+    (if (null ffap-path)
+        ;; No file at point -- call interactively.
+        (call-interactively 'find-file-at-point)
+      (let ((resolved
+             (cond
+              ;; Absolute path: use as-is.
+              ((file-name-absolute-p ffap-path) ffap-path)
+              ;; Relative path: try each candidate directory in order.
+              (t
+               (let* ((git-root (wgh/ffap-git-root-for-file current-file))
+                      (ancestor-roots (if git-root
+                                          (wgh/ffap-git-ancestor-roots git-root)
+                                        nil))
+                      (candidates
+                       (append
+                        ;; (1) Relative from current file's directory.
+                        (when current-dir (list current-dir))
+                        ;; (2) Git repo root.
+                        (when git-root (list git-root))
+                        ;; (3) Ancestor superproject roots.
+                        ancestor-roots))
+                      (found nil))
+                 (catch 'done
+                   (dolist (base candidates)
+                     (let ((candidate (expand-file-name ffap-path base)))
+                       (when (file-exists-p candidate)
+                         (setq found candidate)
+                         (throw 'done nil)))))
+                 (or found ffap-path))))))
+        (find-file resolved)))))
 
 (defun wgh/find-file-no-ffap ()
   (interactive)
