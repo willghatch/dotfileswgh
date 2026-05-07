@@ -30,4 +30,5 @@ The mandatory parts are the top oneline message, and the `Change Details` line i
 - Unnecessary if there is only one change.
 ```
 
-Include a trailer following the Linux Kernel AI coding assistant convention:  `Assisted-by: AGENT_NAME:MODEL_VERSION [TOOL1] [TOOL2]`.
+Include a trailer following the Linux Kernel AI coding assistant convention:  `Assisted-by: AGENT_NAME:MODEL_VERSION`.
+Do not add tags or text implying model or agent co-authorship or advertising.
