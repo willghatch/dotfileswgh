@@ -31,7 +31,6 @@
       ]
     },
     {"search": "dockerfile-components/dfcomp-apt-core-tools"},
-    {"search": "dockerfile-components/dfcomp-uv-install"},
     {"search": "dockerfile-components/dfcomp-nodejs-install"},
     {
       "text": [
@@ -60,6 +59,7 @@
         ""
       ]
     },
+    {"search": "dockerfile-components/dfcomp-uv-install"},
     {"bash-print-text": "echo 'RUN useradd -u' $UID 'wgh \n RUN chsh -s /bin/zsh wgh'"},
     {"text": [
       "RUN usermod -aG sudo wgh",
