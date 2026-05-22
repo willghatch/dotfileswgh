@@ -160,6 +160,7 @@ sourceIfExists "$DOTFILESWGH/external/zsh/zsh-cdr/cdr.plugin.zsh"
 sourceIfExists "$DOTFILESWGH/external/zsh/zaw/zaw.plugin.zsh"
 sourceIfExists "$DOTFILESWGH/external/zsh/zsh-zaw-mpd/zaw-mpd.plugin.zsh"
 sourceIfExists "$DOTFILESWGH/external/zsh/zsh-zaw-todoman/zaw-todoman.plugin.zsh"
+sourceIfExists "$DOTFILESWGH/zsh/zsh-zaw-git-worktrees/zaw-git-worktrees.plugin.zsh"
 sourceIfExists "$DOTFILESWGH/external/zsh/zsh-saneopt/saneopt.plugin.zsh"
 sourceIfExists "$DOTFILESWGH/external/zsh/zsh-hooks/zsh-hooks.plugin.zsh"
 sourceIfExists "$DOTFILESWGH/external/zsh/zsh-megaprompt/zsh-megaprompt.plugin.zsh"
@@ -558,8 +559,9 @@ bindkey-to-prefix-map spacemap "o" zaw-open-file
 bindkey-to-prefix-map spacemap "p" zaw-process
 bindkey-to-prefix-map spacemap "c" zaw-cdr
 bindkey-to-prefix-map spacemap "F" zaw-fasd-files
-bindkey-to-prefix-map spacemap "w" zaw-widgets
+bindkey-to-prefix-map spacemap "W" zaw-widgets
 bindkey-to-prefix-map spacemap "-" zaw-widgets
+bindkey-to-prefix-map spacemap "w" zaw-git-worktrees
 # filter-select is the zaw selection mode
 # enable smart-case, ^$ for begin/end, and ! to ignore the next word
 zstyle ':filter-select' extended-search yes
