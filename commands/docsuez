@@ -566,18 +566,35 @@ class DocsuezSearcher:
         return None
 
     def find_default_addons(self) -> List[Tuple[str, Path]]:
-        """Find all default addon files (*.default.run-docsuez.json)"""
-        default_addons = []
+        """Find all default addon files.
 
+        *.default-override.run-docsuez.json takes precedence over
+        *.default.run-docsuez.json for the same addon name, suppressing
+        the .default. version.  This allows a mixin repo to override
+        which addons are loaded by default.
+        """
+        default_addons = []
+        overridden_names = set()
+
+        # First pass: collect override addons and record their names
         for search_path in self.search_paths:
             if not search_path.exists():
                 continue
 
-            # Find all *.default.run-docsuez.json files
-            for addon_file in search_path.rglob("*.default.run-docsuez.json"):
-                # Extract the name (everything before .default.run-docsuez.json)
-                name = addon_file.name.replace(".default.run-docsuez.json", "")
+            for addon_file in search_path.rglob("*.default-override.run-docsuez.json"):
+                name = addon_file.name.replace(".default-override.run-docsuez.json", "")
+                overridden_names.add(name)
                 default_addons.append((name, addon_file))
+
+        # Second pass: collect regular defaults, skipping overridden names
+        for search_path in self.search_paths:
+            if not search_path.exists():
+                continue
+
+            for addon_file in search_path.rglob("*.default.run-docsuez.json"):
+                name = addon_file.name.replace(".default.run-docsuez.json", "")
+                if name not in overridden_names:
+                    default_addons.append((name, addon_file))
 
         return default_addons
 
@@ -611,8 +628,8 @@ class DocsuezSearcher:
 
                 # Extract the name (everything before .run-docsuez.json)
                 name = addon_file.name.replace(".run-docsuez.json", "")
-                # Exclude .default addons (they're auto-loaded)
-                if not name.endswith(".default"):
+                # Exclude .default and .default-override addons (they're auto-loaded)
+                if not name.endswith(".default") and not name.endswith(".default-override"):
                     addon_names.add(name)
 
         return sorted(addon_names)
