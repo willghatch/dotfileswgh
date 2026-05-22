@@ -1,0 +1,61 @@
+#!/usr/bin/env bash
+# -*- mode: emacs-lisp; -*-
+# Align all markdown tables in the given files using Emacs markdown-mode.
+# Usage: markdown-tables-align FILE...
+
+set -euo pipefail
+
+if [[ $# -eq 0 ]] || [[ "$@" =~ "--help" ]]; then
+    echo "Usage: markdown-tables-align FILE..."
+    echo "Align all markdown tables in the given files using Emacs markdown-mode."
+    exit 0
+fi
+
+if [[ -z "${DOTFILESWGH:-}" ]]; then
+    echo "Error: DOTFILESWGH is not set." >&2
+    exit 1
+fi
+
+read -r -d '' ELISP <<'EOF' || true
+(progn
+  (condition-case err
+      (require 'markdown-mode)
+    (error
+     (message "Error: cannot load markdown-mode: %S" err)
+     (message "Ensure markdown-mode is installed (e.g. via straight.el).")
+     (kill-emacs 1)))
+
+  (dolist (file command-line-args-left)
+    (let ((filepath (expand-file-name file)))
+      (if (not (file-exists-p filepath))
+          (message "Warning: file does not exist: %s" filepath)
+        (find-file filepath)
+        (markdown-mode)
+        (goto-char (point-min))
+        (let ((aligned 0))
+          (while (re-search-forward "^[ \t]*|" nil t)
+            (beginning-of-line)
+            (condition-case err
+                (progn
+                  (markdown-table-align)
+                  (setq aligned (1+ aligned)))
+              (error (message "Warning: failed to align table at line %d in %s: %S"
+                              (line-number-at-pos) filepath err)))
+            ;; Move past this table so we don't match it again.
+            (forward-line 1)
+            (while (and (not (eobp))
+                        (looking-at "^[ \t]*|"))
+              (forward-line 1)))
+          (when (> aligned 0)
+            (save-buffer)
+            (message "Aligned %d table(s) in %s" aligned filepath))
+          (when (= aligned 0)
+            (message "No tables found in %s" filepath))))))
+
+  (setq command-line-args-left nil))
+EOF
+
+emacs --batch \
+      -l "$DOTFILESWGH/emacs/dotfileswgh-env-conf.el" \
+      --eval "$ELISP" \
+      "$@"
