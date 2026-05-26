@@ -23,10 +23,12 @@
                 "RUN apt-get install -y cmake ninja-build clang",
                 "RUN apt-get install -y dwarfdump ccache lld",
                 "RUN apt-get install -y libdw-dev # for source build of rocprofiler-sdk",
-                "RUN apt-get install -y unzip",
-                "#RUN apt-get install -y rustup",
-                "RUN apt-get install -y rustc-1.91 cargo-1.91 && update-alternatives --install /usr/bin/rustc rustc /usr/bin/rustc-1.91 100 --slave /usr/bin/cargo cargo /usr/bin/cargo-1.91",
+                "RUN apt-get install -y zip unzip",
+                "RUN apt-get install -y rustup # want re: sglang setup",
+                "#RUN apt-get install -y rustc-1.91 cargo-1.91 && update-alternatives --install /usr/bin/rustc rustc /usr/bin/rustc-1.91 100 --slave /usr/bin/cargo cargo /usr/bin/cargo-1.91",
                 "RUN apt-get install -y protobuf-compiler",
+                "RUN apt-get install -y clang-format",
+                "RUN apt-get install -y caddy",
                 ""
             ]
         },
