@@ -68,6 +68,20 @@ from pathlib import Path
 from typing import Dict, List, Optional, Any, Tuple
 
 
+def _strip_comment_keys(data):
+    """Recursively remove any dict keys starting with '#'.
+
+    JSON does not support comments.  This allows users to "comment out" a
+    config key by prefixing it with '#'; those keys are silently ignored
+    when the config is loaded.
+    """
+    if isinstance(data, dict):
+        return {k: _strip_comment_keys(v) for k, v in data.items() if not k.startswith('#')}
+    if isinstance(data, list):
+        return [_strip_comment_keys(item) for item in data]
+    return data
+
+
 class DocsuezConfig:
     """Represents a parsed run-docsuez.json configuration"""
 
@@ -85,7 +99,7 @@ class DocsuezConfig:
     def load(self):
         """Load the configuration file"""
         with open(self.config_path, 'r') as f:
-            self._raw_config = json.load(f)
+            self._raw_config = _strip_comment_keys(json.load(f))
 
     def _resolve_tags(self) -> Dict[str, Any]:
         """Resolve tags from all configs according to precedence rules
@@ -103,7 +117,7 @@ class DocsuezConfig:
         # 1. Collect tags from default addons (lowest precedence)
         for addon_name, addon_path in self.default_addons:
             with open(addon_path, 'r') as f:
-                addon_config = json.load(f)
+                addon_config = _strip_comment_keys(json.load(f))
 
             addon_tags = addon_config.get("tags", {})
             for tag_name, tag_content in addon_tags.items():
@@ -122,7 +136,7 @@ class DocsuezConfig:
                 sys.exit(1)
 
             with open(addon_path, 'r') as f:
-                addon_config = json.load(f)
+                addon_config = _strip_comment_keys(json.load(f))
 
             addon_tags = addon_config.get("tags", {})
             for tag_name, tag_content in addon_tags.items():
@@ -168,7 +182,7 @@ class DocsuezConfig:
         # Merge default addons first (without tags)
         for name, addon_path in self.default_addons:
             with open(addon_path, 'r') as f:
-                addon_config = json.load(f)
+                addon_config = _strip_comment_keys(json.load(f))
             addon_without_tags = {k: v for k, v in addon_config.items() if k != "tags"}
             merged = self._deep_merge(merged, addon_without_tags)
 
@@ -180,7 +194,7 @@ class DocsuezConfig:
                 sys.exit(1)
 
             with open(addon_path, 'r') as f:
-                addon_config = json.load(f)
+                addon_config = _strip_comment_keys(json.load(f))
             addon_without_tags = {k: v for k, v in addon_config.items() if k != "tags"}
             merged = self._deep_merge(merged, addon_without_tags)
 
@@ -285,7 +299,7 @@ class BuildConfig:
     def load(self):
         """Load the build configuration file"""
         with open(self.config_path, 'r') as f:
-            self._config = json.load(f)
+            self._config = _strip_comment_keys(json.load(f))
 
     def _resolve_search_path(self, search_file: str) -> Path:
         """Search for a file in the docsuez search paths"""
