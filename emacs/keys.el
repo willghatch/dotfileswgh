@@ -1328,15 +1328,26 @@ FUNC should be a function whose first two arguments are BEG and END."
             ,(lambda (x) t) ()
             (,(lambda (register)
                 (require 'fzf)
-                (let ((base (wgh/agent-working-dir-base))
+                (let ((bases (wgh/agent-working-dir-all-bases))
                       (fzf--target-validator #'fzf--pass-through))
-                  (if (file-directory-p base)
+                  (unless bases
+                    (user-error "No agent working directories found"))
+                  (if (= (length bases) 1)
                       (wgh/fzf-with-command-and-alt-actions
                        "find . | sort -r"
-                       (lambda (x) (wgh/cpo-copy-string (expand-file-name x base) register))
+                       (lambda (x) (wgh/cpo-copy-string (expand-file-name x (car bases)) register))
                        wgh/fzf-file-alt-actions
-                       base)
-                    (user-error "No agent working directories at: %s" base))))
+                       (car bases))
+                    (let* ((find-cmd (mapconcat
+                                      (lambda (base)
+                                        (format "find %s" (shell-quote-argument base)))
+                                      bases " ; "))
+                           (cmd (concat "{ " find-cmd " ; } | sort -r")))
+                      (wgh/fzf-with-command-and-alt-actions
+                       cmd
+                       (lambda (x) (wgh/cpo-copy-string x register))
+                       wgh/fzf-file-alt-actions
+                       (or (wgh/agent-working-dir-git-dir) default-directory))))))
              (register)))
 
            (paste-to-terminal-osc

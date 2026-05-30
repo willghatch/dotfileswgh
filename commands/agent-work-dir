@@ -1,0 +1,50 @@
+#!/bin/sh
+# agent-work-dir -- print the correct agent-work-directory base path
+#
+# Usage:
+#   agent-work-dir            Print REPO/.git/agent-files/work/
+#   agent-work-dir --resolve  Also resolve the path to an absolute canonical form
+#
+# When inside a git repo (including submodules and worktrees), this script
+# finds the top-level .git directory of the outermost repo and prints
+# GITDIR/agent-files/work/.  When not inside a git repo, it prints
+# agent-files/work/ relative to the current directory.
+#
+# Agents should use this script to determine where to place their working
+# files, rather than computing the path themselves.  This avoids the common
+# mistake of placing files under .git/modules/ or .git/worktrees/.
+
+set -e
+
+resolve=0
+if [ "$1" = "--resolve" ]; then
+    resolve=1
+fi
+
+git_common_dir=$(git rev-parse --git-common-dir 2>/dev/null) || true
+
+if [ -n "$git_common_dir" ] && ! printf '%s' "$git_common_dir" | grep -q '^fatal:'; then
+    # Make absolute
+    case "$git_common_dir" in
+        /*) abs_dir="$git_common_dir" ;;
+        *)  abs_dir="$(cd "$git_common_dir" && pwd)" ;;
+    esac
+
+    # Strip .git/modules/... or .git/worktrees/... back to the .git directory.
+    # This handles submodules (whose git-common-dir is .git/modules/SUBMOD)
+    # and worktrees (whose git-common-dir may be .git/worktrees/NAME or the
+    # main .git itself).
+    git_dir=$(printf '%s' "$abs_dir" | sed -E 's#(.*\.git)/(modules|worktrees)/.*#\1#')
+
+    if [ "$resolve" = 1 ]; then
+        git_dir=$(cd "$git_dir" && pwd)
+    fi
+
+    printf '%s/agent-files/work/\n' "$git_dir"
+else
+    if [ "$resolve" = 1 ]; then
+        printf '%s/agent-files/work/\n' "$(pwd)"
+    else
+        printf 'agent-files/work/\n'
+    fi
+fi

@@ -718,25 +718,54 @@ Also syncs to kill ring if REGISTER matches cpo-copy-sync-with-kill-ring-registe
 
 (defun wgh/agent-working-dir-base ()
   "Return the base path for agent-working-directories.
-Uses GIT_COMMON_DIR/agent-files/work/ if in a git repo, or agent-files/work/
-relative to `default-directory' otherwise.
-When git-common-dir falls inside .git/modules/... or .git/worktrees/...,
-walks back up to the top-level .git directory."
+Delegates to the agent-work-dir shell script, which handles git repos,
+submodules, worktrees, and non-repo contexts correctly."
+  (string-trim (shell-command-to-string "agent-work-dir --resolve")))
+
+(defun wgh/agent-working-dir-git-dir ()
+  "Return the top-level .git directory for the current repo, or nil.
+Resolves submodule and worktree paths back to the main .git directory.
+Returns nil when not inside a git repo."
   (let* ((git-common-dir (string-trim
                           (shell-command-to-string
-                           "git rev-parse --git-common-dir 2>/dev/null")))
-         (git-dir
-          (when (and (not (string-empty-p git-common-dir))
-                     (not (string-prefix-p "fatal:" git-common-dir)))
-            (let ((abs-dir (expand-file-name git-common-dir)))
-              ;; If inside .git/modules/... or .git/worktrees/..., strip back
-              ;; to the .git directory itself.
-              (if (string-match "\\(.*\\.git\\)/\\(?:modules\\|worktrees\\)" abs-dir)
-                  (match-string 1 abs-dir)
-                abs-dir)))))
+                           "git rev-parse --git-common-dir 2>/dev/null"))))
+    (when (and (not (string-empty-p git-common-dir))
+               (not (string-prefix-p "fatal:" git-common-dir)))
+      (let ((abs-dir (expand-file-name git-common-dir)))
+        (if (string-match "\\(.*\\.git\\)/\\(?:modules\\|worktrees\\)" abs-dir)
+            (match-string 1 abs-dir)
+          abs-dir)))))
+
+(defun wgh/agent-working-dir-all-bases ()
+  "Return a list of all agent-files/work/ directories, including misplaced ones.
+Searches the canonical location plus .git/modules/ and .git/worktrees/
+recursively for any agent-files/work/ directories that agents may have
+created in the wrong place."
+  (let* ((git-dir (wgh/agent-working-dir-git-dir))
+         (bases '()))
     (if git-dir
-        (concat git-dir "/agent-files/work/")
-      (concat (expand-file-name default-directory) "agent-files/work/"))))
+        (progn
+          ;; Canonical location
+          (let ((canonical (concat git-dir "/agent-files/work/")))
+            (when (file-directory-p canonical)
+              (push canonical bases)))
+          ;; Search for misplaced directories under .git/modules/ and .git/worktrees/
+          (dolist (subdir '("modules" "worktrees"))
+            (let ((search-root (concat git-dir "/" subdir "/")))
+              (when (file-directory-p search-root)
+                (let ((found (split-string
+                              (string-trim
+                               (shell-command-to-string
+                                (format "find %s -type d -name work -path '*/agent-files/work' 2>/dev/null"
+                                        (shell-quote-argument search-root))))
+                              "\n" t)))
+                  (dolist (dir found)
+                    (push (file-name-as-directory dir) bases))))))
+          (nreverse bases))
+      ;; Not in a git repo
+      (let ((fallback (concat (expand-file-name default-directory) "agent-files/work/")))
+        (when (file-directory-p fallback)
+          (list fallback))))))
 
 (defun wgh/agent-make-working-dir (topic)
   "Create and return a fresh agent-working-directory path for TOPIC."
