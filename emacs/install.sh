@@ -12,9 +12,10 @@ Options:
                          (new hashes win on conflict; old entries for absent repos kept)
   --freeze-remove-unused Update the lockfile replacing it entirely with currently-cloned
                          repos, removing entries for any repos no longer present
-  --straight-pull-packages PKG...
-                         Pull/update the named packages via straight-pull-package,
-                         then run --freeze afterward to capture the new versions
+  --full-clone           Install packages using full (non-shallow) git clones
+  --straight-update-packages PKG...
+                         Update the named packages to their latest upstream commit,
+                         unshallowing any shallow repos first (does not freeze)
   --print-hashes PKG...  Print the current git HEAD commit for each named package,
                          i.e. what --freeze would write to the lockfile for them
   --help                 Show this help text
@@ -29,11 +30,14 @@ case "$1" in
     --freeze)
         mode=freeze
         ;;
+    --full-clone)
+        mode=full-clone
+        ;;
     --freeze-remove-unused)
         mode=freeze-remove-unused
         ;;
-    --straight-pull-packages)
-        mode=pull-packages
+    --straight-update-packages)
+        mode=update-packages
         shift
         ;;
     --print-hashes)

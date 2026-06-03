@@ -16,7 +16,7 @@
  ("clojure-mode" . "eabe29b076fff19db552d36d4babaa36ecf0b704")
  ("company-anaconda" . "169252fca79a79da41ef22f2ec0eab0cf1313966")
  ("company-mode" . "8878e2dcbce3f77c13e671a341bd53554275ff61")
- ("compat" . "e9412bfb1596279f510d8746788bba30eb686a99")
+ ("compat" . "67688415683b74e2504b59bda4532891a46e3822")
  ("consult" . "1702e854b55adbd51242a0f7de96a72a7e10349c")
  ("copilot-chat.el" . "d2c9d1eb2d31ad31429beb3a7c3469ee2de68261")
  ("copilot.el" . "ab5c58bc969f52f6d75e972658f2c3381c70b4fa")

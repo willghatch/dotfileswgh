@@ -28,8 +28,6 @@
   "Register and build all packages with straight.
 Populates straight's internal caches and installs transitive dependencies."
 
-  (straight-thaw-versions)
-
 ;;; Load core packages most critical to my config running at all.
 ;;; These are now dotfileswgh submodules
   ;;(straight-use-package 'repeatable-motion)
@@ -251,6 +249,112 @@ included regardless of straight's profile cache."
                                  "\n "))))
     (message "Wrote %s" path)))
 
+(defun install--freeze-merge ()
+  "Merge current repo HEAD commits into the lockfile.
+New commits overwrite old entries; absent repos are kept."
+  (let* ((new-versions (install--repo-versions))
+         (old-versions (or (install--read-lockfile) nil))
+         (merged (let ((result (copy-alist old-versions)))
+                   (dolist (entry new-versions)
+                     (let ((cell (assoc (car entry) result)))
+                       (if cell
+                           (setcdr cell (cdr entry))
+                         (push entry result))))
+                   (cl-sort result #'string-lessp :key #'car))))
+    (install--write-lockfile merged)))
+
+(defun install--unshallow-if-needed (pkg-name)
+  "If the repo for PKG-NAME is a shallow clone, fetch --unshallow it.
+PKG-NAME is a string matching the straight repo directory name."
+  (let* ((repo-dir (straight--repos-dir pkg-name))
+         (shallow-file (expand-file-name ".git/shallow" repo-dir)))
+    (when (file-exists-p shallow-file)
+      (message "Unshallowing %s..." pkg-name)
+      (let* ((default-directory repo-dir)
+             (exit-code (call-process "git" nil nil nil "fetch" "--unshallow")))
+        (if (= exit-code 0)
+            (message "Unshallowed %s." pkg-name)
+          (message "Warning: failed to unshallow %s (exit code %d)"
+                   pkg-name exit-code))))))
+
+(defun install--update-repo (pkg-name)
+  "Update PKG-NAME's repo to the latest commit on origin's default branch.
+Unshallows first if shallow.  Uses origin/HEAD so no tracking config is needed."
+  (let ((default-directory (straight--repos-dir pkg-name)))
+    (install--unshallow-if-needed pkg-name)
+    ;; Resolve origin/HEAD so we can reference it without a tracking branch
+    (call-process "git" nil nil nil "remote" "set-head" "origin" "--auto")
+    (let ((fetch-exit (call-process "git" nil nil nil "fetch" "origin")))
+      (if (not (= fetch-exit 0))
+          (message "Warning: fetch failed for %s (exit %d)" pkg-name fetch-exit)
+        (let ((checkout-exit (call-process "git" nil nil nil
+                                           "checkout" "--detach" "origin/HEAD")))
+          (if (= checkout-exit 0)
+              (message "Updated %s." pkg-name)
+            (message "Warning: checkout --detach origin/HEAD failed for %s (exit %d)"
+                     pkg-name checkout-exit)))))))
+
+(defun install--do-install ()
+  "Register and install all packages."
+  (with-demoted-errors
+      "Error: %s"
+
+    (straight-thaw-versions)
+    (install--register-packages)
+
+    ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+    ;;; Single files to install without straight.el.
+
+    (defun file-to-string (file-path)
+      (with-temp-buffer (insert-file-contents file-path) (buffer-string)))
+    (defun hash-file (file-path secure-hash-name)
+      (secure-hash secure-hash-name (file-to-string file-path)))
+
+    (defun download-checked (url local-path secure-hash-name hash-value check-if-exists-p)
+      "Convenince function for installing a single file from a URL and
+checking that we get the right file.  Useful when you want a single
+file from a large repository."
+      (defun check-hash ()
+        (let ((actual-hash-value (hash-file local-path secure-hash-name)))
+          (when (not (equal actual-hash-value
+                            hash-value))
+            (error "Installing hash mismatch for %s, expected %s, got %s"
+                   local-path hash-value actual-hash-value))))
+      (if (file-exists-p local-path)
+          (when check-if-exists-p
+            (check-hash))
+        (progn
+          (url-copy-file url local-path)
+          (check-hash))))
+
+    (defun install-file-checked (path-in-install-dir url hash-name hash-value)
+      "Specialization of downoad-checked to be more convenient to write in this file."
+      (let ((install-dir (concat local-emacs.d-path "single-files/")))
+        (make-directory install-dir t)
+        (download-checked url (concat install-dir path-in-install-dir)
+                          hash-name
+                          hash-value
+                          'check-if-exists-p)))
+
+    (install-file-checked "tablegen-mode.el"
+                          "https://raw.githubusercontent.com/llvm/llvm-project/llvmorg-16.0.6/llvm/utils/emacs/tablegen-mode.el"
+                          'sha256
+                          "2c8b17f091a23572deb09649323b21bd5d870d48cdc1fd14a03891958d5b2bce")
+    (install-file-checked "llvm-mode.el"
+                          "https://raw.githubusercontent.com/llvm/llvm-project/llvmorg-16.0.6/llvm/utils/emacs/llvm-mode.el"
+                          'sha256
+                          "9d66cbae84e9868eaef841462d0f9faf877c5380b196d4414d048f69ae03cb38")
+    (install-file-checked "mlir-mode.el"
+                          "https://raw.githubusercontent.com/llvm/llvm-project/llvmorg-16.0.6/mlir/utils/emacs/mlir-mode.el"
+                          'sha256
+                          "598a1b7fb3a9e23682ca120e30392a68ecb4486599d5cd8f239d3167bc29b5b6")
+    (install-file-checked "mlir-lsp-client.el"
+                          "https://raw.githubusercontent.com/llvm/llvm-project/llvmorg-16.0.6/mlir/utils/emacs/mlir-lsp-client.el"
+                          'sha256
+                          "37761e19d08895298bbb04882a9d9810a718a2fb776e1ab4ef85877bf0886762")
+
+    (straight-thaw-versions)))
+
 (let ((bootstrap-file
        (concat dotfileswgh "external/emacs/straight.el/bootstrap.el"))
       (bootstrap-version 7))
@@ -260,64 +364,12 @@ included regardless of straight's profile cache."
 
   ("install"
    (message "Installing packages...")
+   (install--do-install))
 
-   (with-demoted-errors
-       "Error: %s"
-
-     (install--register-packages)
-
-     ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-     ;;; Single files to install without straight.el.
-
-     (defun file-to-string (file-path)
-       (with-temp-buffer (insert-file-contents file-path) (buffer-string)))
-     (defun hash-file (file-path secure-hash-name)
-       (secure-hash secure-hash-name (file-to-string file-path)))
-
-     (defun download-checked (url local-path secure-hash-name hash-value check-if-exists-p)
-       "Convenince function for installing a single file from a URL and
-checking that we get the right file.  Useful when you want a single
-file from a large repository."
-       (defun check-hash ()
-         (let ((actual-hash-value (hash-file local-path secure-hash-name)))
-           (when (not (equal actual-hash-value
-                             hash-value))
-             (error "Installing hash mismatch for %s, expected %s, got %s"
-                    local-path hash-value actual-hash-value))))
-       (if (file-exists-p local-path)
-           (when check-if-exists-p
-             (check-hash))
-         (progn
-           (url-copy-file url local-path)
-           (check-hash))))
-
-     (defun install-file-checked (path-in-install-dir url hash-name hash-value)
-       "Specialization of downoad-checked to be more convenient to write in this file."
-       (let ((install-dir (concat local-emacs.d-path "single-files/")))
-         (make-directory install-dir t)
-         (download-checked url (concat install-dir path-in-install-dir)
-                           hash-name
-                           hash-value
-                           'check-if-exists-p)))
-
-     (install-file-checked "tablegen-mode.el"
-                           "https://raw.githubusercontent.com/llvm/llvm-project/llvmorg-16.0.6/llvm/utils/emacs/tablegen-mode.el"
-                           'sha256
-                           "2c8b17f091a23572deb09649323b21bd5d870d48cdc1fd14a03891958d5b2bce")
-     (install-file-checked "llvm-mode.el"
-                           "https://raw.githubusercontent.com/llvm/llvm-project/llvmorg-16.0.6/llvm/utils/emacs/llvm-mode.el"
-                           'sha256
-                           "9d66cbae84e9868eaef841462d0f9faf877c5380b196d4414d048f69ae03cb38")
-     (install-file-checked "mlir-mode.el"
-                           "https://raw.githubusercontent.com/llvm/llvm-project/llvmorg-16.0.6/mlir/utils/emacs/mlir-mode.el"
-                           'sha256
-                           "598a1b7fb3a9e23682ca120e30392a68ecb4486599d5cd8f239d3167bc29b5b6")
-     (install-file-checked "mlir-lsp-client.el"
-                           "https://raw.githubusercontent.com/llvm/llvm-project/llvmorg-16.0.6/mlir/utils/emacs/mlir-lsp-client.el"
-                           'sha256
-                           "37761e19d08895298bbb04882a9d9810a718a2fb776e1ab4ef85877bf0886762")
-
-     (straight-thaw-versions)))
+  ("full-clone"
+   (message "Installing packages with full (non-shallow) git clones...")
+   (setq straight-vc-git-default-clone-depth 'full)
+   (install--do-install))
 
   ("freeze"
    ;; Default: merge new hashes into the existing lockfile.  Entries not
@@ -325,16 +377,7 @@ file from a large repository."
    ;; versions are not silently discarded.  New commits overwrite old ones
    ;; for repos that are still cloned.
    (message "Freezing package versions to lockfile (add-only)...")
-   (let* ((new-versions (install--repo-versions))
-          (old-versions (or (install--read-lockfile) nil))
-          (merged (let ((result (copy-alist old-versions)))
-                    (dolist (entry new-versions)
-                      (let ((cell (assoc (car entry) result)))
-                        (if cell
-                            (setcdr cell (cdr entry))
-                          (push entry result))))
-                    (cl-sort result #'string-lessp :key #'car))))
-     (install--write-lockfile merged))
+   (install--freeze-merge)
    (message "Done."))
 
   ("freeze-remove-unused"
@@ -353,14 +396,13 @@ file from a large repository."
              (message "%s: %s" pkg commit)
            (message "%s: not found (repo dir may differ from package name)" pkg))))))
 
-  ("pull-packages"
+  ("update-packages"
    (if (null install--packages)
-       (error "No packages specified for --straight-pull-packages")
-     (straight-thaw-versions)
+       (error "No packages specified for --straight-update-packages")
      (dolist (pkg install--packages)
-       (message "Pulling package: %s" pkg)
-       (straight-pull-package (intern pkg)))
-     (message "Done.  Run --freeze to update the lockfile.")))
+       (message "Updating package: %s" pkg)
+       (install--update-repo pkg))
+     (message "Done.")))
 
   (_
    (error "Unknown mode: %s" install--mode)))
