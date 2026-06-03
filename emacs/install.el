@@ -73,6 +73,7 @@
 
   (in 'wgrep)
 
+  (in 'compat)
   (in 'vertico)
   (in 'marginalia)
   (in 'consult)
