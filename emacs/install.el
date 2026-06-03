@@ -173,8 +173,6 @@ Populates straight's internal caches and installs transitive dependencies."
   (in 'gptel)
   (in 'copilot)
   (in 'copilot-chat)
-  (in '(aidermacs :type git :repo "https://github.com/MatthewZMD/aidermacs"))
-  (in '(aider :type git :repo "https://github.com/tninja/aider.el"))
 
   (in 'tldr)
   (in 'devdocs) ;; Has very nice documentation formatting in terminal emacs with hyperlinks
