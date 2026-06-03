@@ -1,48 +1,50 @@
 ;;; -*- lexical-binding: t; -*-
-;; Install files with straight.el
+;; Install/manage packages with straight.el
+
+;;; Parse command-line arguments passed after --
+;;; Consume them immediately so Emacs doesn't complain about unknown args.
+(let ((args command-line-args-left))
+  (setq command-line-args-left nil)
+  (when (and args (string= (car args) "--"))
+    (setq args (cdr args)))
+  (defvar install--mode (or (car args) "install"))
+  (defvar install--packages (cdr args)))
+
 (let ((conf-dir (file-name-directory load-file-name)))
-  (load-file (expand-file-name "./dotfileswgh-env-conf.el" conf-dir))
-  ;;(load-file (expand-file-name "./package-conf.el" conf-dir))
-  )
+  (load-file (expand-file-name "./dotfileswgh-env-conf.el" conf-dir)))
 
 (defun in (package)
-  (with-demoted-errors "Error installing: %S" (straight-use-package package)))
+  (with-demoted-errors "Error installing: %S"
+    (straight-use-package package)))
 
 (message "Current user-emacs-directory: %S" user-emacs-directory)
 (message "Current package-user-dir: %S" package-user-dir)
-(message "Installing packages...")
 
 (defun submod (name)
   ;; :type nil to make it not clone it
   `(,name :local-repo ,(concat dotfileswgh (format "external/emacs/%s/" name)) :type nil))
 
-(with-demoted-errors
-    "Error: %s"
+(defun install--register-packages ()
+  "Register and build all packages with straight.
+Populates straight's internal caches and installs transitive dependencies."
 
-  (progn
-    (let ((bootstrap-file
-           (concat dotfileswgh "external/emacs/straight.el/bootstrap.el"))
-          (bootstrap-version 7))
-      (load bootstrap-file nil 'nomessage))
+  (straight-thaw-versions)
 
-    (straight-thaw-versions)
+;;; Load core packages most critical to my config running at all.
+;;; These are now dotfileswgh submodules
+  ;;(straight-use-package 'repeatable-motion)
+  ;;(straight-use-package 'hydra)
+  ;;(straight-use-package 'undo-tree) ;; NOTE: this depends on the queue package, which is resolved by straight, but I want to remember why I have the queue package as a submodule now
+  (straight-use-package (submod 'estate))
+  (straight-use-package (submod 'repeatable-motion))
+  (straight-use-package (submod 'composiphrase))
+  (straight-use-package (submod 'composiphrase-objects))
+  (straight-use-package (submod 'composiphrase-demo))
 
-  ;;; Load core packages most critical to my config running at all.
-  ;;; These are now dotfileswgh submodules
-    ;;(straight-use-package 'repeatable-motion)
-    ;;(straight-use-package 'hydra)
-    ;;(straight-use-package 'undo-tree) ;; NOTE: this depends on the queue package, which is resolved by straight, but I want to remember why I have the queue package as a submodule now
-    (straight-use-package (submod 'estate))
-    (straight-use-package (submod 'repeatable-motion))
-    (straight-use-package (submod 'composiphrase))
-    (straight-use-package (submod 'composiphrase-objects))
-    (straight-use-package (submod 'composiphrase-demo))
-
-    (straight-use-package (submod 'hydra))
-    (straight-use-package (submod 'queue))
-    (straight-use-package (submod 'undo-tree))
-    ;; The above are the most critical to getting my config running at all.
-    )
+  (straight-use-package (submod 'hydra))
+  (straight-use-package (submod 'queue))
+  (straight-use-package (submod 'undo-tree))
+  ;; The above are the most critical to getting my config running at all.
 
   (straight-use-package (submod 'sexp-rewrite))
   (straight-use-package (submod 'whitespace-final-newline))
@@ -185,10 +187,10 @@
   (in 'avy) ;; jump to char, like ace-jump, or like pentadactyl link highlighting.  I never used it back in the day when I had ace-jump installed, but maybe worth another try.
   (in 'dumb-jump) ;; go to definition heuristically using ripgrep, I hear good things about it.  (add-hook 'xref-backend-functions #'dumb-jump-xref-activate), also can set xref-show-definitions-function for completing-read.
   (in 'symbol-overlay) ;; use symbol-overlay-put to put an overlay on the symbol at point.  Has symbol-overlay-switch-forward/backward to move between highlighted symbols, symbol-overlay-remove-all to remove highlights.  Has some more features, but these look the most interesting.
-  ;;(in 'visual-regexp) (in 'visual-regexp-steroids) ;; has vr/replace, vr/query-replace, vr/mc-mark (multiple-cursors), steroids version adds pcre2el/python support for “normal” regexps.  The steroids package also lets you use pcre for isearch.
+  ;;(in 'visual-regexp) (in 'visual-regexp-steroids) ;; has vr/replace, vr/query-replace, vr/mc-mark (multiple-cursors), steroids version adds pcre2el/python support for "normal" regexps.  The steroids package also lets you use pcre for isearch.
   ;;(in 'devdocs) ;; uses the devdocs.io documentation website, but views things in editor.  But maybe requires gui emacs?  Unclear from 2 minute look.  But maybe makes looking at other language documentation more like emacs documentation, which is convenient.
   ;; (in 'git-time-machine) ;; use M-x git-time-machine to enter the time machine, then it has bindings to go back/forward between versions, copy the hash, go to revision by commit message, view magit-blame on the old version, etc.
-  ;; link-hint ;; provides pentadactyl-like hints for “links”, and it supports many different kinds of “links” including file paths, xref, org agenda items... but does this provide something better than moving point to the thing and then using some act-on-thing-at-point library (maybe embark? maybe hyperbole?) or such?  Eg. this is like a less general avy plus action-on-thing-at-point.  Maybe worth a try, but probably not right now.
+  ;; link-hint ;; provides pentadactyl-like hints for "links", and it supports many different kinds of "links" including file paths, xref, org agenda items... but does this provide something better than moving point to the thing and then using some act-on-thing-at-point library (maybe embark? maybe hyperbole?) or such?  Eg. this is like a less general avy plus action-on-thing-at-point.  Maybe worth a try, but probably not right now.
   ;; inspector ;; inspect elisp data, some kind of improved data viewer
   ;; vlf ;; for viewing very large files in chunks
   ;; deadgrep ;; another ripgrep frontend, maybe it is better than the rg  package.
@@ -213,59 +215,154 @@
   ;; link-hint -- I'm not sure there's a good way of defining new link types (eg. define a regex and a handler function).
   ;;              Also, it auto-follows a link if there is only one, which I don't like (may be configurable).
   ;; (in 'link-hint)
+  )
 
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;;; Single files to install without straight.el.
+(defun install--repo-versions ()
+  "Return a sorted alist of (REPO . COMMIT) for every cloned straight repo.
+Scans the repos directory directly, so transitive dependencies are
+included regardless of straight's profile cache."
+  (cl-sort
+   (delq nil
+         (mapcar (lambda (repo)
+                   (when (file-directory-p
+                          (expand-file-name ".git" (straight--repos-dir repo)))
+                     (when-let ((commit (straight-vc-get-commit 'git repo)))
+                       (cons repo commit))))
+                 (directory-files (straight--repos-dir) nil "^[^.]")))
+   #'string-lessp :key #'car))
 
-  (defun file-to-string (file-path)
-    (with-temp-buffer (insert-file-contents file-path) (buffer-string)))
-  (defun hash-file (file-path secure-hash-name)
-    (secure-hash secure-hash-name (file-to-string file-path)))
+(defun install--read-lockfile ()
+  "Read the existing straight lockfile and return an alist, or nil if absent."
+  (let ((path (straight--versions-file (cdr (car straight-profiles)))))
+    (when (file-exists-p path)
+      (with-temp-buffer
+        (insert-file-contents path)
+        (goto-char (point-min))
+        (condition-case nil
+            (read (current-buffer))
+          (error nil))))))
 
-  (defun download-checked (url local-path secure-hash-name hash-value check-if-exists-p)
-    "Convenince function for installing a single file from a URL and
+(defun install--write-lockfile (versions-alist)
+  "Write VERSIONS-ALIST to the straight lockfile."
+  (let ((path (straight--versions-file (cdr (car straight-profiles)))))
+    (make-directory (file-name-directory path) 'parents)
+    (with-temp-file path
+      (insert (format "(%s)\n:gamma\n"
+                      (mapconcat (apply-partially #'format "%S")
+                                 versions-alist
+                                 "\n "))))
+    (message "Wrote %s" path)))
+
+(let ((bootstrap-file
+       (concat dotfileswgh "external/emacs/straight.el/bootstrap.el"))
+      (bootstrap-version 7))
+  (load bootstrap-file nil 'nomessage))
+
+(pcase install--mode
+
+  ("install"
+   (message "Installing packages...")
+
+   (with-demoted-errors
+       "Error: %s"
+
+     (install--register-packages)
+
+     ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+     ;;; Single files to install without straight.el.
+
+     (defun file-to-string (file-path)
+       (with-temp-buffer (insert-file-contents file-path) (buffer-string)))
+     (defun hash-file (file-path secure-hash-name)
+       (secure-hash secure-hash-name (file-to-string file-path)))
+
+     (defun download-checked (url local-path secure-hash-name hash-value check-if-exists-p)
+       "Convenince function for installing a single file from a URL and
 checking that we get the right file.  Useful when you want a single
 file from a large repository."
-    (defun check-hash ()
-      (let ((actual-hash-value (hash-file local-path secure-hash-name)))
-        (when (not (equal actual-hash-value
-                          hash-value))
-          (error "Installing hash mismatch for %s, expected %s, got %s"
-                 local-path hash-value actual-hash-value))))
-    (if (file-exists-p local-path)
-        (when check-if-exists-p
-          (check-hash))
-      (progn
-        (url-copy-file url local-path)
-        (check-hash))))
+       (defun check-hash ()
+         (let ((actual-hash-value (hash-file local-path secure-hash-name)))
+           (when (not (equal actual-hash-value
+                             hash-value))
+             (error "Installing hash mismatch for %s, expected %s, got %s"
+                    local-path hash-value actual-hash-value))))
+       (if (file-exists-p local-path)
+           (when check-if-exists-p
+             (check-hash))
+         (progn
+           (url-copy-file url local-path)
+           (check-hash))))
 
-  (defun install-file-checked (path-in-install-dir url hash-name hash-value)
-    "Specialization of downoad-checked to be more convenient to write in this file."
-    (let ((install-dir (concat local-emacs.d-path "single-files/")))
-      (make-directory install-dir t)
-      (download-checked url (concat install-dir path-in-install-dir)
-                        hash-name
-                        hash-value
-                        'check-if-exists-p)))
+     (defun install-file-checked (path-in-install-dir url hash-name hash-value)
+       "Specialization of downoad-checked to be more convenient to write in this file."
+       (let ((install-dir (concat local-emacs.d-path "single-files/")))
+         (make-directory install-dir t)
+         (download-checked url (concat install-dir path-in-install-dir)
+                           hash-name
+                           hash-value
+                           'check-if-exists-p)))
 
-  (install-file-checked "tablegen-mode.el"
-                        "https://raw.githubusercontent.com/llvm/llvm-project/llvmorg-16.0.6/llvm/utils/emacs/tablegen-mode.el"
-                        'sha256
-                        "2c8b17f091a23572deb09649323b21bd5d870d48cdc1fd14a03891958d5b2bce")
-  (install-file-checked "llvm-mode.el"
-                        "https://raw.githubusercontent.com/llvm/llvm-project/llvmorg-16.0.6/llvm/utils/emacs/llvm-mode.el"
-                        'sha256
-                        "9d66cbae84e9868eaef841462d0f9faf877c5380b196d4414d048f69ae03cb38")
-  (install-file-checked "mlir-mode.el"
-                        "https://raw.githubusercontent.com/llvm/llvm-project/llvmorg-16.0.6/mlir/utils/emacs/mlir-mode.el"
-                        'sha256
-                        "598a1b7fb3a9e23682ca120e30392a68ecb4486599d5cd8f239d3167bc29b5b6")
-  (install-file-checked "mlir-lsp-client.el"
-                        "https://raw.githubusercontent.com/llvm/llvm-project/llvmorg-16.0.6/mlir/utils/emacs/mlir-lsp-client.el"
-                        'sha256
-                        "37761e19d08895298bbb04882a9d9810a718a2fb776e1ab4ef85877bf0886762")
+     (install-file-checked "tablegen-mode.el"
+                           "https://raw.githubusercontent.com/llvm/llvm-project/llvmorg-16.0.6/llvm/utils/emacs/tablegen-mode.el"
+                           'sha256
+                           "2c8b17f091a23572deb09649323b21bd5d870d48cdc1fd14a03891958d5b2bce")
+     (install-file-checked "llvm-mode.el"
+                           "https://raw.githubusercontent.com/llvm/llvm-project/llvmorg-16.0.6/llvm/utils/emacs/llvm-mode.el"
+                           'sha256
+                           "9d66cbae84e9868eaef841462d0f9faf877c5380b196d4414d048f69ae03cb38")
+     (install-file-checked "mlir-mode.el"
+                           "https://raw.githubusercontent.com/llvm/llvm-project/llvmorg-16.0.6/mlir/utils/emacs/mlir-mode.el"
+                           'sha256
+                           "598a1b7fb3a9e23682ca120e30392a68ecb4486599d5cd8f239d3167bc29b5b6")
+     (install-file-checked "mlir-lsp-client.el"
+                           "https://raw.githubusercontent.com/llvm/llvm-project/llvmorg-16.0.6/mlir/utils/emacs/mlir-lsp-client.el"
+                           'sha256
+                           "37761e19d08895298bbb04882a9d9810a718a2fb776e1ab4ef85877bf0886762")
 
-  (straight-thaw-versions)
+     (straight-thaw-versions)))
 
+  ("freeze"
+   ;; Default: merge new hashes into the existing lockfile.  Entries not
+   ;; present in the current repos are kept so that previously-trusted
+   ;; versions are not silently discarded.  New commits overwrite old ones
+   ;; for repos that are still cloned.
+   (message "Freezing package versions to lockfile (add-only)...")
+   (let* ((new-versions (install--repo-versions))
+          (old-versions (or (install--read-lockfile) nil))
+          (merged (let ((result (copy-alist old-versions)))
+                    (dolist (entry new-versions)
+                      (let ((cell (assoc (car entry) result)))
+                        (if cell
+                            (setcdr cell (cdr entry))
+                          (push entry result))))
+                    (cl-sort result #'string-lessp :key #'car))))
+     (install--write-lockfile merged))
+   (message "Done."))
 
-  )
+  ("freeze-remove-unused"
+   ;; Write only currently-cloned repos, removing any lockfile entries
+   ;; for repos that are no longer present.
+   (message "Freezing package versions to lockfile (replacing)...")
+   (install--write-lockfile (install--repo-versions))
+   (message "Done."))
+
+  ("print-hashes"
+   (if (null install--packages)
+       (error "No packages specified for --print-hashes")
+     (let ((repo-commits (install--repo-versions)))
+       (dolist (pkg install--packages)
+         (if-let ((commit (cdr (assoc pkg repo-commits))))
+             (message "%s: %s" pkg commit)
+           (message "%s: not found (repo dir may differ from package name)" pkg))))))
+
+  ("pull-packages"
+   (if (null install--packages)
+       (error "No packages specified for --straight-pull-packages")
+     (straight-thaw-versions)
+     (dolist (pkg install--packages)
+       (message "Pulling package: %s" pkg)
+       (straight-pull-package (intern pkg)))
+     (message "Done.  Run --freeze to update the lockfile.")))
+
+  (_
+   (error "Unknown mode: %s" install--mode)))
