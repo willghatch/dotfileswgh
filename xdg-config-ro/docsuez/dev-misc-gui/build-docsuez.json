@@ -35,9 +35,10 @@
             ]
         },
         {"text": "RUN apt-get install -y bubblewrap"},
-        
+
         {"text": "### GUI stuff"},
         {"text": "RUN apt-get install -y libgtk-4-dev libglib2.0-dev libgraphene-1.0-dev libgdk-pixbuf-2.0-dev libpango1.0-dev libcairo2-dev gsettings-desktop-schemas"},
+        {"text": "RUN apt-get install -y cmake ninja-build libgl1 qt6-base-dev qmake6"},
         {"search": "dockerfile-components/dfcomp-uv-install"},
         {"bash-print-text": "echo 'RUN useradd -u' $UID 'wgh \n RUN chsh -s /bin/zsh wgh'"},
         {"text": ""}
