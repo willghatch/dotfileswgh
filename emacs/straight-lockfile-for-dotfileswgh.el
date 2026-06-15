@@ -140,7 +140,7 @@
  ("treemacs" . "d42ef4b89447fd8945945a65449785a68eda0172")
  ("typescript.el" . "dd10f702d4946ddb2e1c2863bf02bf241bce5fc8")
  ("undo-tree" . "d8f72bbe7d3c3a2808986febd3bb1a46d4da7f51")
- ("vertico" . "6e45be6105819297da8472dd8f37a38eb4a0b6e5")
+ ("vertico" . "c818dc9d333649be31553d47b8981fd765eb1d66")
  ("web-mode" . "be2d59c8fa02b1a45ae54ce4079e502e659cefe6")
  ("wfnames" . "164e4efa2a96bed201a0a5402e137ebeef15bcc6")
  ("with-editor" . "ca902ae02972bdd6919a902be2593d8cb6bd991b")
