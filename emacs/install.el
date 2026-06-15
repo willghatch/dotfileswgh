@@ -168,9 +168,9 @@ Populates straight's internal caches and installs transitive dependencies."
 
   (in 'lsp-pyright)
 
-  (in 'gptel)
-  (in 'copilot)
-  (in 'copilot-chat)
+  ;;(in 'gptel)
+  ;;(in 'copilot)
+  ;;(in 'copilot-chat)
 
   (in 'tldr)
   (in 'devdocs) ;; Has very nice documentation formatting in terminal emacs with hyperlinks
