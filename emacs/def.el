@@ -25,40 +25,6 @@
 (let ((conf-dir (file-name-directory load-file-name)))
   (load-file (expand-file-name "./dotfileswgh-env-conf.el" conf-dir)))
 
-(nobreak
- (setq package-user-dir (concat local-emacs.d-path "elpa/"))
- ;; Set up load path for requires
- (let ((default-directory (concat dotfileswgh "emacs/")))
-   (normal-top-level-add-subdirs-to-load-path))
- (let ((default-directory (concat dotfileswgh "external/emacs/")))
-   (normal-top-level-add-subdirs-to-load-path))
- (let ((default-directory (concat dotfileswgh-ghp "emacs/")))
-   (when (file-exists-p default-directory)
-     (normal-top-level-add-subdirs-to-load-path)))
- (let ((default-directory (concat dotfileswgh-pri "emacs/")))
-   (when (file-exists-p default-directory)
-     (normal-top-level-add-subdirs-to-load-path)))
- (let ((default-directory (concat dotfileswgh-dotlocal "emacs/")))
-   (when (file-exists-p default-directory)
-     (normal-top-level-add-subdirs-to-load-path)))
- (let ((default-directory (concat dotfileswgh-pri-dotlocal "emacs/")))
-   (when (file-exists-p default-directory)
-     (normal-top-level-add-subdirs-to-load-path)))
- (setq load-path (cons (concat local-emacs.d-path "single-files/") load-path))
- (setq load-path (cons (concat dotfileswgh "emacs/") load-path))
- (setq load-path (cons (concat dotfileswgh-ghp "emacs/") load-path))
- (setq load-path (cons (concat dotfileswgh-pri "emacs/") load-path))
- (setq load-path (cons (concat dotfileswgh-pri-dotlocal "emacs/") load-path))
- (setq load-path (cons (concat dotfileswgh-dotlocal "emacs/") load-path))
- ;; Add straight build dirs, so that emacs can search in them, rather than using
- ;; straight on every emacs load.  It won't process autoloads, but I can wrap
- ;; key bindings with requires or otherwise force autoload evaluation for things
- ;; that I care about.
- (let ((default-directory (concat straight-base-dir "straight/build")))
-   (when (file-exists-p default-directory)
-     (normal-top-level-add-subdirs-to-load-path)))
- )
-
 (defun load-library--around (orig-fun &rest args)
   (let ((curtime (current-time))
         (mylib (car args)))

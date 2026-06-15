@@ -60,20 +60,34 @@
 (setq package-enable-at-startup nil)
 (setq package-user-dir (concat local-emacs.d-path "elpa/"))
 
+(defvar wgh/system-load-path load-path
+  "The default Emacs load-path before any dotfileswgh paths are added.")
+
+;; The way we add paths tends to append them, but we want system paths at the end.
+(setq load-path nil)
+
 ;; Set up load path for requires
 (let ((default-directory (concat dotfileswgh "emacs/")))
   (normal-top-level-add-subdirs-to-load-path))
 (let ((default-directory (concat dotfileswgh "external/emacs/")))
   (normal-top-level-add-subdirs-to-load-path))
+(let ((default-directory (concat dotfileswgh-ghp "emacs/")))
+  (when (file-exists-p default-directory)
+    (normal-top-level-add-subdirs-to-load-path)))
 (let ((default-directory (concat dotfileswgh-pri "emacs/")))
   (when (file-exists-p default-directory)
     (normal-top-level-add-subdirs-to-load-path)))
 (let ((default-directory (concat dotfileswgh-dotlocal "emacs/")))
   (when (file-exists-p default-directory)
     (normal-top-level-add-subdirs-to-load-path)))
+(let ((default-directory (concat dotfileswgh-pri-dotlocal "emacs/")))
+  (when (file-exists-p default-directory)
+    (normal-top-level-add-subdirs-to-load-path)))
 (setq load-path (cons (concat local-emacs.d-path "single-files/") load-path))
 (setq load-path (cons (concat dotfileswgh "emacs/") load-path))
+(setq load-path (cons (concat dotfileswgh-ghp "emacs/") load-path))
 (setq load-path (cons (concat dotfileswgh-pri "emacs/") load-path))
+(setq load-path (cons (concat dotfileswgh-pri-dotlocal "emacs/") load-path))
 (setq load-path (cons (concat dotfileswgh-dotlocal "emacs/") load-path))
 ;; Add straight build dirs, so that emacs can search in them, rather than using
 ;; straight on every emacs load.  It won't process autoloads, but I can wrap
@@ -82,5 +96,11 @@
 (let ((default-directory (concat straight-base-dir "straight/build")))
   (when (file-exists-p default-directory)
     (normal-top-level-add-subdirs-to-load-path)))
+;; System paths go last so they don't shadow dotfiles or installed package paths.
+;; This is important for the `compat` library -- apparently some emacs installs
+;; come with a compat library, which is strange because it means it is frozen at
+;; an outdated version... we need our locally installed version of compat to take
+;; precedence.
+(setq load-path (append load-path wgh/system-load-path))
 
 (provide 'dotfileswgh-env-conf)
