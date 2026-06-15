@@ -69,10 +69,9 @@ TARGET-VALIDATOR and EXTRACTOR-LIST are as in `fzf--after-term-handle-exit'."
                ;; The line before that is the key (may be empty for Enter).
                (key-line (string-trim (or (cadr trimmed-rev) "")))
                (target (string-trim
-                        (concat
-                         (when directory
-                           (file-name-as-directory directory))
-                         selected-entry)))
+                        (if (and directory (not (file-name-absolute-p selected-entry)))
+                            (concat (file-name-as-directory directory) selected-entry)
+                          selected-entry)))
                (target (funcall target-validator target text msg process-name))
                (alt-action (when (not (string-empty-p key-line))
                              (cdr (assoc key-line alt-action-alist)))))
