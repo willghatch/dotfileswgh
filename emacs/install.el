@@ -263,6 +263,52 @@ New commits overwrite old entries; absent repos are kept."
                    (cl-sort result #'string-lessp :key #'car))))
     (install--write-lockfile merged)))
 
+(defun install--quarantine-repo (pkg-name commit)
+  "Move PKG-NAME's repo out of the straight repos dir into repos-quarantined/.
+The build dir symlinks become dangling, preventing the package from loading.
+The repo content is preserved for inspection."
+  (let* ((repo-dir (straight--repos-dir pkg-name))
+         (quarantine-base (expand-file-name
+                           "repos-quarantined"
+                           (file-name-directory (directory-file-name
+                                                 (file-name-directory repo-dir)))))
+         (quarantine-dir (expand-file-name pkg-name quarantine-base)))
+    (make-directory quarantine-base t)
+    (when (file-exists-p quarantine-dir)
+      (delete-directory quarantine-dir t))
+    (rename-file repo-dir quarantine-dir)
+    (message (concat "ERROR: Pinned commit %.8s for package %s could not be obtained.\n"
+                     "  The repo has been moved to %s.\n"
+                     "  Inspect the repo, resolve the issue, and re-run the installer.")
+             commit pkg-name quarantine-dir)))
+
+(defun install--ensure-pinned-commits ()
+  "Fetch pinned commits that are missing from shallow repos.
+For each lockfile entry, if the repo is a shallow clone and does not
+already contain the pinned commit, fetches that commit at depth 1.
+Falls back to unshallowing if the targeted fetch fails.
+If the pinned commit still cannot be obtained, quarantines the repo by
+moving it to repos-quarantined/, leaving build/ symlinks dangling so the
+package cannot load."
+  (let ((lockfile-versions (install--read-lockfile)))
+    (dolist (entry lockfile-versions)
+      (let* ((pkg-name (car entry))
+             (commit (cdr entry))
+             (repo-dir (straight--repos-dir pkg-name))
+             (shallow-file (expand-file-name ".git/shallow" repo-dir)))
+        (when (and (file-directory-p repo-dir)
+                   (file-exists-p shallow-file))
+          (let ((default-directory repo-dir))
+            (unless (= 0 (call-process "git" nil nil nil "cat-file" "-t" commit))
+              (message "Fetching pinned commit %.8s for %s..." commit pkg-name)
+              (unless (= 0 (call-process "git" nil nil nil
+                                         "fetch" "--depth=1" "origin" commit))
+                (message "Targeted fetch failed for %s, falling back to unshallow..." pkg-name)
+                (install--unshallow-if-needed pkg-name))
+              ;; Verify the commit is now present; quarantine if not.
+              (unless (= 0 (call-process "git" nil nil nil "cat-file" "-t" commit))
+                (install--quarantine-repo pkg-name commit)))))))))
+
 (defun install--unshallow-if-needed (pkg-name)
   "If the repo for PKG-NAME is a shallow clone, fetch --unshallow it.
 PKG-NAME is a string matching the straight repo directory name."
@@ -299,6 +345,7 @@ Unshallows first if shallow.  Uses origin/HEAD so no tracking config is needed."
   (with-demoted-errors
       "Error: %s"
 
+    (install--ensure-pinned-commits)
     (straight-thaw-versions)
     (install--register-packages)
 
@@ -353,6 +400,7 @@ file from a large repository."
                           'sha256
                           "37761e19d08895298bbb04882a9d9810a718a2fb776e1ab4ef85877bf0886762")
 
+    (install--ensure-pinned-commits)
     (straight-thaw-versions)))
 
 (let ((bootstrap-file
