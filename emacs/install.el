@@ -13,6 +13,15 @@
 (let ((conf-dir (file-name-directory load-file-name)))
   (load-file (expand-file-name "./dotfileswgh-env-conf.el" conf-dir)))
 
+;; Use the GitHub mirror for nongnu-elpa; the upstream Savannah URL is unreliable.
+(setq straight-recipe-overrides
+      '((nil . ((nongnu-elpa :type git
+                             ;; :repo "https://git.savannah.gnu.org/git/emacs/nongnu.git"
+                             :repo "https://github.com/emacsmirror/nongnu_elpa"
+                             :depth (full single-branch)
+                             :local-repo "nongnu-elpa"
+                             :build nil)))))
+
 (defun in (package)
   (with-demoted-errors "Error installing: %S"
     (straight-use-package package)))
