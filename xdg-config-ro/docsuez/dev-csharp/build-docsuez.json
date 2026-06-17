@@ -1,0 +1,28 @@
+{
+    "dockerfile": [
+        {
+            "text": [
+                "#FROM ubuntu:24.04",
+                "FROM ubuntu:25.10",
+                "",
+                "ENV DEBIAN_FRONTEND=noninteractive",
+                "",
+                "# Update package lists",
+                "RUN apt-get update",
+                "",
+                "# .NET SDK (for modern C# projects targeting net6.0+)",
+                "RUN apt-get install -y --no-install-recommends dotnet-sdk-8.0",
+                "",
+                "# Mono (for .NET Framework projects, including WinForms via mono-complete)",
+                "RUN apt-get install -y --no-install-recommends mono-complete",
+                ""
+            ]
+        },
+        {"search": "dockerfile-components/dfcomp-apt-core-tools"},
+        {"text": "RUN apt-get install -y build-essential"},
+        {"search": "dockerfile-components/dfcomp-apt-core-tools"},
+        {"bash-print-text": "echo 'RUN useradd -u' $UID 'wgh \n RUN chsh -s /bin/zsh wgh'"},
+        {"text": ""}
+    ],
+    "build-context-directory": "."
+}
