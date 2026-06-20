@@ -1240,18 +1240,17 @@ FUNC should be a function whose first two arguments are BEG and END."
          `(
            (open tempel-snippet-hole () (,(lambda () (estate-insert-state-with-thunk (lambda () (call-interactively 'tempel-insert)))) ()))
            (move tempel-snippet-hole ((direction forward) (alternate ,nil)) (,(lambda (n) (rmo/tempel-next (or n 1))) (num)))
-           (move tempel-snippet-hole ((direction forward) (alternate alternate)) (tempel-end ()))
+           (move tempel-snippet-hole ((direction forward) (alternate 1)) (tempel-end ()))
            (move tempel-snippet-hole ((direction backward) (alternate ,nil)) (,(lambda (n) (rmo/tempel-previous (or n 1))) (num)))
-           (move tempel-snippet-hole ((direction backward) (alternate alternate)) (tempel-beginning ()))
+           (move tempel-snippet-hole ((direction backward) (alternate 1)) (tempel-beginning ()))
            (action tempel-snippet-hole ((direction forward)) (tempel-done ()))
            (action tempel-snippet-hole ((direction backward)) (tempel-abort ()))
 
            (action yafold ((alternate ,nil)) (yafolding-toggle-element ()))
-           (action yafold ((alternate alternate)) (yafolding-show-all ()))
+           (action yafold ((alternate 1)) (yafolding-show-all ()))
 
-           ;; Insert date with day name using alternate-2 modifier
-           (open date-yyyy-mm-dd ((alternate-2 alternate-2) (alternate ,nil)) (,(lambda () (insert (format-time-string "%Y-%m-%d %A"))) ()))
-           (open date-yyyy-mm-dd ((alternate-2 alternate-2) (alternate alternate)) (,(lambda () (insert (format-time-string "%Y-%m-%d %A %H:%M:%S"))) ()))
+           (open date-yyyy-mm-dd ((alternate 10)) (,(lambda () (insert (format-time-string "%Y-%m-%d %A"))) ()))
+           (open date-yyyy-mm-dd ((alternate 11)) (,(lambda () (insert (format-time-string "%Y-%m-%d %A %H:%M:%S"))) ()))
 
            ;; TODO - add yasnippet matchers
 
