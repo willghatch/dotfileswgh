@@ -22,7 +22,8 @@
 
   // Choose the order of the modules
   "modules-left": [
-    "sway/workspaces"
+    "custom/terminal"
+    ,"sway/workspaces"
     ,"sway/mode"
     ,"sway/scratchpad"
     ,"hyprland/workspaces"
@@ -299,6 +300,11 @@
     //"max-length": 25, // This supposedly is a max length in characters, but it is shortening well before that.
     "exec": "waybar-hmcount.sh",
     "restart-interval": 60
+  },
+  "custom/terminal": {
+    "format": "T>",
+    "on-click": "vlaunch terminal",
+    "tooltip": false
   },
   "custom/mooncrater": {
     "format": "⌨ {}",
