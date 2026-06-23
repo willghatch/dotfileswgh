@@ -60,12 +60,6 @@
 (setq package-enable-at-startup nil)
 (setq package-user-dir (concat local-emacs.d-path "elpa/"))
 
-(defvar wgh/system-load-path load-path
-  "The default Emacs load-path before any dotfileswgh paths are added.")
-
-;; The way we add paths tends to append them, but we want system paths at the end.
-(setq load-path nil)
-
 ;; Set up load path for requires
 (let ((default-directory (concat dotfileswgh "emacs/")))
   (normal-top-level-add-subdirs-to-load-path))
@@ -96,11 +90,15 @@
 (let ((default-directory (concat straight-base-dir "straight/build")))
   (when (file-exists-p default-directory)
     (normal-top-level-add-subdirs-to-load-path)))
-;; System paths go last so they don't shadow dotfiles or installed package paths.
-;; This is important for the `compat` library -- apparently some emacs installs
-;; come with a compat library, which is strange because it means it is frozen at
-;; an outdated version... we need our locally installed version of compat to take
-;; precedence.
-(setq load-path (append load-path wgh/system-load-path))
+;; Some packages ship with Emacs but at a version older than what straight installs.
+;; Previously I moved the system paths to the end of the load path (normal-top-level-add-subdirs-to-load-path adds to the end).
+;; But doing so broke things.
+;; It turns out that there are many conflicts between system paths and straight-install paths, and at least some need to get the system version, or I get serious breakage in some situations.
+;; But we still need SOME straight install packages to win, so explicitly promote their straight build dirs to the front so our version wins.
+(let ((straight-priority-packages '(compat)))
+  (dolist (pkg straight-priority-packages)
+    (let ((pkg-dir (concat straight-base-dir "straight/build/" (symbol-name pkg) "/")))
+      (when (file-exists-p pkg-dir)
+        (setq load-path (cons pkg-dir load-path))))))
 
 (provide 'dotfileswgh-env-conf)
