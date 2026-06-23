@@ -31,4 +31,5 @@ The mandatory parts are the top oneline message, and the `Change Details` line i
 ```
 
 Include a trailer following the Linux Kernel AI coding assistant convention:  `Assisted-by: AGENT_NAME:MODEL_VERSION`.
-Do not add tags or text implying model or agent co-authorship or advertising.
+NEVER add a `Co-authored-by:` trailer.
+NEVER add a `Signed-off-by:` trailer.
