@@ -87,7 +87,7 @@ class DocsuezConfig:
 
     def __init__(self, config_path: Path, searcher: 'DocsuezSearcher',
                  addons: Optional[List[str]] = None,
-                 default_addons: Optional[List[Tuple[str, Path]]] = None):
+                 default_addons: Optional[List[Tuple[str, Path, str]]] = None):
         self.config_path = config_path
         self.searcher = searcher
         self.config_dir = config_path.parent
@@ -102,56 +102,77 @@ class DocsuezConfig:
             self._raw_config = _strip_comment_keys(json.load(f))
 
     def _resolve_tags(self) -> Dict[str, Any]:
-        """Resolve tags from all configs according to precedence rules
+        """Resolve tags from all configs according to precedence rules.
 
         Precedence (lowest to highest):
-        1. Default addons tags
-        2. Main config tags
-        3. User-specified addons tags (error if multiple addons define same tag)
+        1. Default addon tags  (*.default.run-docsuez.json)
+        2. Base config tags
+        3. Default-override addon tags  (*.default-override.run-docsuez.json)
+        4. User-specified addon tags  (-a flag)
+
+        Two sources at the same priority level that define the same tag key
+        are an error.  When sources at different levels define the same tag,
+        the higher-priority source wins (its content replaces the lower one).
         """
-        # Dictionary to track which config provides each tag
-        # Format: {tag_name: (source_type, source_name, tag_content)}
-        # source_type: "default_addon", "main", "user_addon"
-        tag_sources = {}
+        def _load_tags(path):
+            with open(path, 'r') as f:
+                return _strip_comment_keys(json.load(f)).get("tags", {})
 
-        # 1. Collect tags from default addons (lowest precedence)
-        for addon_name, addon_path in self.default_addons:
-            with open(addon_path, 'r') as f:
-                addon_config = _strip_comment_keys(json.load(f))
+        def _collect(addon_list, level_label):
+            """Return {tag_name: (source_name, tag_content)}, error on duplicates."""
+            tags = {}
+            for addon_name, addon_path in addon_list:
+                for tag_name, tag_content in _load_tags(addon_path).items():
+                    if tag_name in tags:
+                        prev = tags[tag_name][0]
+                        print(f"Error: Tag '{tag_name}' is defined in both "
+                              f"'{prev}' and '{addon_name}' ({level_label})",
+                              file=sys.stderr)
+                        sys.exit(1)
+                    tags[tag_name] = (addon_name, tag_content)
+            return tags
 
-            addon_tags = addon_config.get("tags", {})
-            for tag_name, tag_content in addon_tags.items():
-                tag_sources[tag_name] = ("default_addon", addon_name, tag_content)
+        # Separate default addons by kind
+        regular_defaults  = [(n, p) for n, p, k in self.default_addons if k == "default"]
+        override_defaults = [(n, p) for n, p, k in self.default_addons if k == "default-override"]
 
-        # 2. Collect tags from main config (overrides default addons)
-        main_tags = self._raw_config.get("tags", {})
-        for tag_name, tag_content in main_tags.items():
-            tag_sources[tag_name] = ("main", self.config_path.name, tag_content)
+        # Level 1: base config
+        base_tags = {
+            tag: (self.config_path.name, content)
+            for tag, content in self._raw_config.get("tags", {}).items()
+        }
 
-        # 3. Collect tags from user-specified addons (highest precedence)
+        # Level 2: regular defaults
+        default_tags = _collect(regular_defaults, "default addons")
+
+        # Level 3: default-overrides
+        override_tags = _collect(override_defaults, "default-override addons")
+
+        # Level 4: user-specified addons
+        user_addon_list = []
         for addon_name in self.addons:
             addon_path = self.searcher.find_addon(addon_name)
             if not addon_path:
                 print(f"Error: Addon config not found for '{addon_name}'", file=sys.stderr)
                 sys.exit(1)
+            user_addon_list.append((addon_name, addon_path))
+        user_tags = _collect(user_addon_list, "explicit addons")
 
-            with open(addon_path, 'r') as f:
-                addon_config = _strip_comment_keys(json.load(f))
+        # Build final tag map: higher priority silently replaces lower
+        final = {}
+        for tag, (_, content) in default_tags.items():
+            final[tag] = content
+        for tag, (_, content) in base_tags.items():
+            final[tag] = content
+        for tag, (_, content) in override_tags.items():
+            final[tag] = content
+        for tag, (_, content) in user_tags.items():
+            final[tag] = content
 
-            addon_tags = addon_config.get("tags", {})
-            for tag_name, tag_content in addon_tags.items():
-                # Check if another user addon already defined this tag
-                if tag_name in tag_sources and tag_sources[tag_name][0] == "user_addon":
-                    prev_source = tag_sources[tag_name][1]
-                    print(f"Error: Tag '{tag_name}' is defined in both '{prev_source}' and '{addon_name}'", file=sys.stderr)
-                    sys.exit(1)
-                tag_sources[tag_name] = ("user_addon", addon_name, tag_content)
-
-        # Merge all selected tag contents into a single config
+        # Merge all winning tag contents into a single config dict
         result = {}
-        for tag_name, (source_type, source_name, tag_content) in tag_sources.items():
+        for tag_content in final.values():
             result = self._deep_merge(result, tag_content)
-
         return result
 
     def _merge_configs(self) -> Dict[str, Any]:
@@ -180,7 +201,7 @@ class DocsuezConfig:
         merged = self._deep_merge(merged, config_without_tags)
 
         # Merge default addons first (without tags)
-        for name, addon_path in self.default_addons:
+        for name, addon_path, _kind in self.default_addons:
             with open(addon_path, 'r') as f:
                 addon_config = _strip_comment_keys(json.load(f))
             addon_without_tags = {k: v for k, v in addon_config.items() if k != "tags"}
@@ -554,8 +575,31 @@ class DocsuezSearcher:
 
         return None
 
+    def _all_default_files(self) -> Dict[str, Path]:
+        """Return {name: path} for all *.default.run-docsuez.json files.
+
+        Defaults have the lowest tag priority, so they can be shadowed by the
+        base config, overrides, or explicit addons.  All defaults are therefore
+        available as explicit addons (-a NAME) so callers can reinstate one at
+        higher priority.
+        """
+        defaults: Dict[str, Path] = {}
+        for search_path in self.search_paths:
+            if not search_path.exists():
+                continue
+            for f in search_path.rglob("*.default.run-docsuez.json"):
+                name = f.name.replace(".default.run-docsuez.json", "")
+                if name not in defaults:
+                    defaults[name] = f
+        return defaults
+
     def find_addon(self, addon_name: str) -> Optional[Path]:
-        """Find an addon configuration file (NAME.run-docsuez.json)"""
+        """Find an addon configuration file (NAME.run-docsuez.json).
+
+        Also finds any *.default.run-docsuez.json file so it can be explicitly
+        requested with -a (where it gets user-addon priority, overriding the
+        default, base-config, and default-override layers).
+        """
         addon_filename = f"{addon_name}.run-docsuez.json"
 
         # Check if it's a direct path
@@ -577,38 +621,34 @@ class DocsuezSearcher:
             for addon_file in search_path.rglob(addon_filename):
                 return addon_file
 
-        return None
+        # Fall back to any default file
+        return self._all_default_files().get(addon_name)
 
-    def find_default_addons(self) -> List[Tuple[str, Path]]:
+    def find_default_addons(self) -> List[Tuple[str, Path, str]]:
         """Find all default addon files.
 
-        *.default-override.run-docsuez.json takes precedence over
-        *.default.run-docsuez.json for the same addon name, suppressing
-        the .default. version.  This allows a mixin repo to override
-        which addons are loaded by default.
+        Returns a list of (name, path, kind) tuples where kind is
+        'default' or 'default-override'.  Tag conflicts between the two
+        kinds are resolved by priority in DocsuezConfig._resolve_tags:
+        default-overrides beat regular defaults.
         """
         default_addons = []
-        overridden_names = set()
 
-        # First pass: collect override addons and record their names
         for search_path in self.search_paths:
             if not search_path.exists():
                 continue
 
             for addon_file in search_path.rglob("*.default-override.run-docsuez.json"):
                 name = addon_file.name.replace(".default-override.run-docsuez.json", "")
-                overridden_names.add(name)
-                default_addons.append((name, addon_file))
+                default_addons.append((name, addon_file, "default-override"))
 
-        # Second pass: collect regular defaults, skipping overridden names
         for search_path in self.search_paths:
             if not search_path.exists():
                 continue
 
             for addon_file in search_path.rglob("*.default.run-docsuez.json"):
                 name = addon_file.name.replace(".default.run-docsuez.json", "")
-                if name not in overridden_names:
-                    default_addons.append((name, addon_file))
+                default_addons.append((name, addon_file, "default"))
 
         return default_addons
 
@@ -628,23 +668,29 @@ class DocsuezSearcher:
         return sorted(config_names)
 
     def get_addon_names(self) -> List[str]:
-        """Get list of available addon names that can be used with -a flag"""
+        """Get list of available addon names that can be used with -a flag.
+
+        Includes all *.default.run-docsuez.json files, since any of them can be
+        re-added explicitly with -a to override what the base config or a
+        default-override would otherwise select.
+        """
         addon_names = set()
 
         for search_path in self.search_paths:
             if not search_path.exists():
                 continue
 
-            # Find all *.run-docsuez.json files (but not run-docsuez.json itself)
             for addon_file in search_path.rglob("*.run-docsuez.json"):
                 if addon_file.name == "run-docsuez.json":
                     continue
 
-                # Extract the name (everything before .run-docsuez.json)
                 name = addon_file.name.replace(".run-docsuez.json", "")
-                # Exclude .default and .default-override addons (they're auto-loaded)
+                # Exclude .default and .default-override addons (auto-loaded)
                 if not name.endswith(".default") and not name.endswith(".default-override"):
                     addon_names.add(name)
+
+        # All defaults can be used explicitly to reinstate at higher priority
+        addon_names.update(self._all_default_files().keys())
 
         return sorted(addon_names)
 
@@ -1077,8 +1123,8 @@ class Docsuez:
             default_addons = self.searcher.find_default_addons()
             if default_addons:
                 print("Using default addons:")
-                for name, path in default_addons:
-                    print(f"  {name}: {path}")
+                for name, path, kind in default_addons:
+                    print(f"  {name} ({kind}): {path}")
                 sys.stdout.flush()
 
         # Get user-specified addons from args
