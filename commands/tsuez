@@ -433,12 +433,21 @@ class Tsuez:
         socket_dir = Path(tempfile.mkdtemp(prefix=prefix, dir=base_dir))
         return socket_dir
 
-    def _get_color_for_session_name(self, session_name: str) -> str:
-        """Get a consistent color for a session name by hashing it"""
+    def _get_color_for_session_name(self, session_name: str, hostname: Optional[str] = None) -> str:
+        """Get a consistent color for a session name by hashing it.
+
+        If hostname is provided (either the real hostname or an override), it is
+        included in the hash so different machines get different colors for the
+        same session name.
+        """
         import hashlib
 
-        # Hash the session name
-        hash_obj = hashlib.md5(session_name.encode())
+        # Hash the session name, optionally combined with hostname
+        if hostname:
+            hash_input = f"{hostname}:{session_name}"
+        else:
+            hash_input = session_name
+        hash_obj = hashlib.md5(hash_input.encode())
         hash_bytes = hash_obj.digest()
 
         # Convert first 4 bytes to an integer
@@ -493,7 +502,15 @@ class Tsuez:
             color = self.color_dict.get(color, color)
         else:
             # Select a consistent color based on session name hash
-            color = self._get_color_for_session_name(session_name)
+            hostname = None
+            hostname_override = getattr(args, 'hostname_override', None)
+            use_hostname = getattr(args, 'use_hostname', False)
+            if hostname_override:
+                hostname = hostname_override
+            elif use_hostname:
+                import socket
+                hostname = socket.gethostname()
+            color = self._get_color_for_session_name(session_name, hostname=hostname)
 
         # Build the configuration
         config = {
@@ -588,6 +605,10 @@ class Tsuez:
         docsuez_parser.add_argument("-s", "--session-name", help="Name for the new session")
         docsuez_parser.add_argument("-b", "--base-name", help="Base name to generate session name from")
         docsuez_parser.add_argument("-c", "--color", help="Background color (name or hex value)")
+        docsuez_parser.add_argument("-H", "--use-hostname", action="store_true",
+                                    help="Include hostname in color hash, for per-machine color variation")
+        docsuez_parser.add_argument("--hostname-override",
+                                    help="Use this name as hostname in color hash instead of the real hostname (implies --use-hostname)")
 
         args = parser.parse_args()
 

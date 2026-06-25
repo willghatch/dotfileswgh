@@ -959,8 +959,31 @@ class Docsuez:
             f.write('"${docker_cmd[@]}"\n')
 
     def _call_tsuez_generate_config(self, session_name: str = None, base_name: str = None, color: str = None) -> Dict[str, Any]:
-        """Call tsuez to generate docsuez config and return parsed JSON"""
+        """Call tsuez to generate docsuez config and return parsed JSON
+
+        Reads three env vars:
+        DOCSUEZ_TSUEZ_COLOR sets the tsuez session color explicitly (overrides hash-based selection).
+        DOCSUEZ_TSUEZ_USE_HOSTNAME accepts 1/true/t/y/yes (enable) or 0/false/f/n/no (disable).
+        DOCSUEZ_TSUEZ_HOSTNAME, if set along with DOCSUEZ_TSUEZ_USE_HOSTNAME, overrides the
+        hostname name used in the hash (useful for containers with random hostnames).
+        The explicit color takes precedence over hostname-based hashing.
+        Either can be overridden by explicit CLI flags passed to docsuez.
+        """
         import json as json_mod
+
+        # Use explicit color arg if provided; otherwise check env var
+        if not color:
+            color = os.environ.get("DOCSUEZ_TSUEZ_COLOR")
+
+        # Check hostname env vars
+        _use_hostname_val = os.environ.get("DOCSUEZ_TSUEZ_USE_HOSTNAME", "").strip().lower()
+        if _use_hostname_val in ("1", "true", "t", "y", "yes"):
+            use_hostname = True
+        elif _use_hostname_val in ("0", "false", "f", "n", "no"):
+            use_hostname = False
+        else:
+            use_hostname = bool(_use_hostname_val)
+        hostname_override = os.environ.get("DOCSUEZ_TSUEZ_HOSTNAME")
 
         cmd = [self.tsuez_cmd, "generate-docsuez-config"]
         if session_name:
@@ -969,6 +992,11 @@ class Docsuez:
             cmd.extend(["-b", base_name])
         if color:
             cmd.extend(["-c", color])
+        elif use_hostname:
+            if hostname_override:
+                cmd.extend(["--hostname-override", hostname_override])
+            else:
+                cmd.append("--use-hostname")
 
         result = subprocess.run(
             cmd,
@@ -1144,6 +1172,19 @@ class Docsuez:
                    "  DOCSUEZ_NO_USER_NAME_PREPEND\n"
                    "                  If set, do not prepend $USER to docker image and\n"
                    "                  container names\n"
+                   "  DOCSUEZ_TSUEZ_COLOR\n"
+                   "                  Background color for tsuez sessions (name or hex value);\n"
+                   "                  overrides hash-based color selection; can be overridden\n"
+                   "                  by the --color CLI flag\n"
+                   "  DOCSUEZ_TSUEZ_USE_HOSTNAME\n"
+                   "                  Include the real hostname in the tsuez color hash, giving\n"
+                   "                  different colors per machine; accepts 1/true/t/y/yes or\n"
+                   "                  0/false/f/n/no; ignored when DOCSUEZ_TSUEZ_COLOR or\n"
+                   "                  --color is set\n"
+                   "  DOCSUEZ_TSUEZ_HOSTNAME\n"
+                   "                  If DOCSUEZ_TSUEZ_USE_HOSTNAME is set, use this name as the\n"
+                   "                  hostname in the hash instead of the real hostname; useful\n"
+                   "                  on containers with random hostnames (e.g. docker)\n"
                    "  TMPDIR          Directory for temporary files such as generated\n"
                    "                  Dockerfiles and run scripts (default: /tmp)\n",
             formatter_class=argparse.RawDescriptionHelpFormatter,
