@@ -8,16 +8,106 @@
 
 workspaces:
   entries:
-    - name: W0
-    - name: W1
-    - name: W2
-    - name: W3
-    - name: W4
-    - name: W5
-    - name: W6
-    - name: W7
-    - name: W8
-    - name: W9
+    - name: A0
+      monitors: [0]
+    - name: A1
+      monitors: [0]
+    - name: A2
+      monitors: [0]
+    - name: A3
+      monitors: [0]
+    - name: A4
+      monitors: [0]
+    - name: A5
+      monitors: [0]
+    - name: A6
+      monitors: [0]
+    - name: A7
+      monitors: [0]
+    - name: A8
+      monitors: [0]
+    - name: A9
+      monitors: [0]
+    - name: B0
+      monitors: [1]
+    - name: B1
+      monitors: [1]
+    - name: B2
+      monitors: [1]
+    - name: B3
+      monitors: [1]
+    - name: B4
+      monitors: [1]
+    - name: B5
+      monitors: [1]
+    - name: B6
+      monitors: [1]
+    - name: B7
+      monitors: [1]
+    - name: B8
+      monitors: [1]
+    - name: B9
+      monitors: [1]
+    - name: C0
+      monitors: [2]
+    - name: C1
+      monitors: [2]
+    - name: C2
+      monitors: [2]
+    - name: C3
+      monitors: [2]
+    - name: C4
+      monitors: [2]
+    - name: C5
+      monitors: [2]
+    - name: C6
+      monitors: [2]
+    - name: C7
+      monitors: [2]
+    - name: C8
+      monitors: [2]
+    - name: C9
+      monitors: [2]
+    - name: D0
+      monitors: [3]
+    - name: D1
+      monitors: [3]
+    - name: D2
+      monitors: [3]
+    - name: D3
+      monitors: [3]
+    - name: D4
+      monitors: [3]
+    - name: D5
+      monitors: [3]
+    - name: D6
+      monitors: [3]
+    - name: D7
+      monitors: [3]
+    - name: D8
+      monitors: [3]
+    - name: D9
+      monitors: [3]
+    - name: E0
+      monitors: [4]
+    - name: E1
+      monitors: [4]
+    - name: E2
+      monitors: [4]
+    - name: E3
+      monitors: [4]
+    - name: E4
+      monitors: [4]
+    - name: E5
+      monitors: [4]
+    - name: E6
+      monitors: [4]
+    - name: E7
+      monitors: [4]
+    - name: E8
+      monitors: [4]
+    - name: E9
+      monitors: [4]
 
 layout_engines:
   entries:
@@ -85,13 +175,13 @@ keybinds:
       keybind: Win+G
     - command: whim.command_palette.move_window_to_workspace
       keybind: Win+Alt+G
-    - command: whim.core.activate_next_workspace
+    - command: whim.core.focus_next_workspace_on_current_monitor
       keybind: Win+W
-    - command: whim.core.activate_previous_workspace
+    - command: whim.core.focus_previous_workspace_on_current_monitor
       keybind: Win+B
-    - command: whim.core.move_window_to_next_workspace
+    - command: whim.core.move_window_to_next_workspace_on_monitor
       keybind: Win+Alt+W
-    - command: whim.core.move_window_to_previous_workspace
+    - command: whim.core.move_window_to_previous_workspace_on_monitor
       keybind: Win+Alt+B
 
     # Monitors, matching the Hyprland Super N/P and Super+Alt N/P pattern.
