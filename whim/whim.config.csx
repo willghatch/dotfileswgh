@@ -47,6 +47,14 @@ void DoConfig(IContext context)
 	);
 	context.KeybindManager.SetKeybind("whim.custom.lock_screen", new Keybind(KeyModifiers.LWin, VIRTUAL_KEY.VK_Q));
 
+  context.CommandManager.Add(
+    identifier: "whim.custom.launch_terminal",
+    title: "Launch terminal",
+    callback: () => Process.Start("wezterm-gui")
+    //callback: () => Process.Start("wt")
+  );
+  context.KeybindManager.SetKeybind("whim.custom.launch_terminal", new Keybind(KeyModifiers.LWin, VIRTUAL_KEY.VK_V));
+
 	// YAML config. It's best to load this first so that you can use it in your C# config.
 	YamlLoader.Load(context);
 }
