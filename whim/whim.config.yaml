@@ -1,0 +1,163 @@
+# whim setup from source instructions:
+# - Install .NET SDK 8: `winget install Microsoft.DotNet.SDK.8`
+# - get Whim source code
+# - `dotnet restore Whim.sln`
+# - build with: `dotnet build src\Whim.Runner\Whim.Runner.csproj -c Release -p:Platform=x64 "-p:SolutionDir=$PWD\"`  Note that in Command Prompt, $PWD may not expand properly and needs to be manually expanded, and note the terminating `\` on the SolutionDir is important, and maybe needs a double slash.
+# - the executable is at src\Whim.Runner\bin\Release\_target-specific-path_\publish\Whim.Runner.exe
+# - run with `--dir CONFIG_DIR`
+
+workspaces:
+  entries:
+    - name: W0
+    - name: W1
+    - name: W2
+    - name: W3
+    - name: W4
+    - name: W5
+    - name: W6
+    - name: W7
+    - name: W8
+    - name: W9
+
+layout_engines:
+  entries:
+    - type: slice
+      variant:
+        type: primary_stack
+    - type: focus
+      maximize: false
+    - type: floating
+
+keybinds:
+  entries:
+    # Window focus and stack ordering, matching the Hyprland Super J/K and Super+Alt J/K pattern.
+    - command: whim.slice_layout.focus.demote
+      keybind: Win+J
+    - command: whim.slice_layout.focus.promote
+      keybind: Win+K
+    - command: whim.slice_layout.window.demote
+      keybind: Win+Alt+J
+    - command: whim.slice_layout.window.promote
+      keybind: Win+Alt+K
+
+    # Directional focus/swap fallbacks for layouts that support geometry-aware movement.
+    - command: whim.core.focus_window_in_direction.left
+      keybind: Win+Left
+    - command: whim.core.focus_window_in_direction.down
+      keybind: Win+Down
+    - command: whim.core.focus_window_in_direction.up
+      keybind: Win+Up
+    - command: whim.core.focus_window_in_direction.right
+      keybind: Win+Right
+    - command: whim.core.swap_window_in_direction.left
+      keybind: Win+Alt+Left
+    - command: whim.core.swap_window_in_direction.down
+      keybind: Win+Alt+Down
+    - command: whim.core.swap_window_in_direction.up
+      keybind: Win+Alt+Up
+    - command: whim.core.swap_window_in_direction.right
+      keybind: Win+Alt+Right
+
+    # Resize equivalents for Hyprland Super H/L master-factor adjustment.
+    - command: whim.core.move_window_left_edge_left
+      keybind: Win+H
+    - command: whim.core.move_window_right_edge_right
+      keybind: Win+L
+    - command: whim.core.move_window_left_edge_right
+      keybind: Win+Ctrl+H
+    - command: whim.core.move_window_right_edge_left
+      keybind: Win+Ctrl+L
+
+    # Layout and window state.
+    - command: whim.core.cycle_layout_engine.next
+      keybind: Win+Space
+    - command: whim.core.cycle_layout_engine.previous
+      keybind: Win+Alt+Space
+    - command: whim.core.maximize_window
+      keybind: Win+F
+    - command: whim.floating_window.toggle_window_floating
+      keybind: Win+Ctrl+F
+    - command: whim.core.minimize_window
+      keybind: Win+C
+
+    # Workspaces. Whim YAML cannot run arbitrary scripts, so Super G opens create-workspace.
+    - command: whim.command_palette.create_workspace
+      keybind: Win+G
+    - command: whim.command_palette.move_window_to_workspace
+      keybind: Win+Alt+G
+    - command: whim.core.activate_next_workspace
+      keybind: Win+W
+    - command: whim.core.activate_previous_workspace
+      keybind: Win+B
+    - command: whim.core.move_window_to_next_workspace
+      keybind: Win+Alt+W
+    - command: whim.core.move_window_to_previous_workspace
+      keybind: Win+Alt+B
+
+    # Monitors, matching the Hyprland Super N/P and Super+Alt N/P pattern.
+    - command: whim.core.focus_next_monitor
+      keybind: Win+N
+    - command: whim.core.focus_previous_monitor
+      keybind: Win+P
+    - command: whim.core.move_window_to_next_monitor
+      keybind: Win+Alt+N
+    - command: whim.core.move_window_to_previous_monitor
+      keybind: Win+Alt+P
+
+    # Palette/search and Whim lifecycle.
+    # - command: whim.command_palette.toggle
+    #   keybind: Win+R
+    # - command: whim.command_palette.find_focus_window
+    #   keybind: Win+V
+    - command: whim.command_palette.remove_window
+      keybind: Win+Alt+C
+    - command: whim.core.restart_whim
+      keybind: Win+Alt+R
+    - command: whim.core.exit_whim
+      keybind: Win+Alt+Q
+
+  unify_key_modifiers: true
+
+filters:
+  entries: []
+
+routers:
+  entries: []
+  routing_behavior: route_to_launched_workspace
+
+plugins:
+  # bar:
+  #   left_components:
+  #     entries:
+  #       - type: workspace_widget
+  #   right_components:
+  #     entries:
+  #       - type: active_layout_widget
+  #       - type: date_time_widget
+  #         format: HH:mm:ss, dd MMM yyyy
+
+  slice_layout:
+    is_enabled: true
+  floating_window:
+    is_enabled: true
+  gaps:
+    is_enabled: true
+    outer_gap: 0
+    inner_gap: 0
+    default_outer_delta: 2
+    default_inner_delta: 2
+  command_palette:
+    is_enabled: true
+    max_height_percent: 40
+    max_width_pixels: 800
+    y_position_percent: 20
+  focus_indicator:
+    is_enabled: true
+    border_size: 4
+    is_fade_enabled: true
+    fade_timeout: 2
+    color: "#33CCFF"
+  layout_preview:
+    is_enabled: true
+  updater:
+    is_enabled: false

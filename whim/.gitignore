@@ -1,0 +1,3 @@
+# using this as the whim config dir will mean that it puts state and logs here
+state
+logs
