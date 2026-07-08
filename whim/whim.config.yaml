@@ -62,6 +62,12 @@ keybinds:
     - command: whim.core.move_window_right_edge_left
       keybind: Win+Ctrl+L
 
+    # Increase/decrease the number of primary windows
+    - command: whim.slice_layout.primary.increase
+      keybind: Win+Alt+H
+    - command: whim.slice_layout.primary.decrease
+      keybind: Win+Alt+L
+
     # Layout and window state.
     - command: whim.core.cycle_layout_engine.next
       keybind: Win+Space
