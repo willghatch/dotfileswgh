@@ -12,6 +12,12 @@ workspaces:
   entries:
     - name: "0"
       monitors: [0]
+    - name: "1"
+      monitors: [1]
+    - name: "2"
+      monitors: [2]
+    - name: "3"
+      monitors: [3]
 
 layout_engines:
   entries:
