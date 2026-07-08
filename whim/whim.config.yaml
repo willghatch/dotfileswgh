@@ -1,3 +1,5 @@
+# This config will only work on my forked Whim that adds new commands.
+#
 # whim setup from source instructions:
 # - Install .NET SDK 8: `winget install Microsoft.DotNet.SDK.8`
 # - get Whim source code
@@ -8,86 +10,8 @@
 
 workspaces:
   entries:
-    - name: A0
+    - name: "0"
       monitors: [0]
-    - name: A1
-      monitors: [0]
-    - name: A2
-      monitors: [0]
-    - name: A3
-      monitors: [0]
-    - name: A4
-      monitors: [0]
-    - name: A5
-      monitors: [0]
-    - name: A6
-      monitors: [0]
-    - name: A7
-      monitors: [0]
-    - name: A8
-      monitors: [0]
-    - name: A9
-      monitors: [0]
-    - name: B0
-      monitors: [1]
-    - name: B1
-      monitors: [1]
-    - name: B2
-      monitors: [1]
-    - name: B3
-      monitors: [1]
-    - name: B4
-      monitors: [1]
-    - name: B5
-      monitors: [1]
-    - name: B6
-      monitors: [1]
-    - name: B7
-      monitors: [1]
-    - name: B8
-      monitors: [1]
-    - name: B9
-      monitors: [1]
-    - name: C0
-      monitors: [2]
-    - name: C1
-      monitors: [2]
-    - name: C2
-      monitors: [2]
-    - name: C3
-      monitors: [2]
-    - name: C4
-      monitors: [2]
-    - name: C5
-      monitors: [2]
-    - name: C6
-      monitors: [2]
-    - name: C7
-      monitors: [2]
-    - name: C8
-      monitors: [2]
-    - name: C9
-      monitors: [2]
-    - name: D0
-      monitors: [3]
-    - name: D1
-      monitors: [3]
-    - name: D2
-      monitors: [3]
-    - name: D3
-      monitors: [3]
-    - name: D4
-      monitors: [3]
-    - name: D5
-      monitors: [3]
-    - name: D6
-      monitors: [3]
-    - name: D7
-      monitors: [3]
-    - name: D8
-      monitors: [3]
-    - name: D9
-      monitors: [3]
 
 layout_engines:
   entries:
@@ -100,14 +24,14 @@ layout_engines:
 
 keybinds:
   entries:
-    # Window focus and stack ordering, matching the Hyprland Super J/K and Super+Alt J/K pattern.
-    - command: whim.slice_layout.focus.demote
+    # Window focus and movement among all windows in the workspace
+    - command: whim.core.focus_window_next
       keybind: Win+J
-    - command: whim.slice_layout.focus.promote
+    - command: whim.core.focus_window_previous
       keybind: Win+K
-    - command: whim.slice_layout.window.demote
+    - command: whim.core.swap_window_next
       keybind: Win+Alt+J
-    - command: whim.slice_layout.window.promote
+    - command: whim.core.swap_window_previous
       keybind: Win+Alt+K
 
     # Directional focus/swap fallbacks for layouts that support geometry-aware movement.
@@ -128,7 +52,7 @@ keybinds:
     - command: whim.core.swap_window_in_direction.right
       keybind: Win+Alt+Right
 
-    # Resize equivalents for Hyprland Super H/L master-factor adjustment.
+    # Resize
     - command: whim.core.move_window_left_edge_left
       keybind: Win+H
     - command: whim.core.move_window_right_edge_right
@@ -150,8 +74,8 @@ keybinds:
     - command: whim.core.minimize_window
       keybind: Win+C
 
-    # Workspaces. Whim YAML cannot run arbitrary scripts, so Super G opens create-workspace.
-    - command: whim.command_palette.create_workspace
+    # Workspaces.
+    - command: whim.core.create_workspace_on_current_monitor
       keybind: Win+G
     - command: whim.command_palette.move_window_to_workspace
       keybind: Win+Alt+G
@@ -163,8 +87,20 @@ keybinds:
       keybind: Win+Alt+W
     - command: whim.core.move_window_to_previous_workspace_on_monitor
       keybind: Win+Alt+B
+    # Reorder the current workspace among the workspaces on this monitor (keeps focus).
+    - command: whim.core.swap_workspace_order_next
+      keybind: Win+Ctrl+W
+    - command: whim.core.swap_workspace_order_previous
+      keybind: Win+Ctrl+B
+    # Pin/unpin the current workspace to the current monitor, and close it (fails if last on monitor).
+    - command: whim.core.pin_workspace_to_current_monitor
+      keybind: Win+Shift+G
+    # - command: whim.core.unpin_workspace
+    #   keybind: Win+Ctrl+G
+    - command: whim.core.close_workspace_on_current_monitor
+      keybind: Win+Ctrl+Alt+C
 
-    # Monitors, matching the Hyprland Super N/P and Super+Alt N/P pattern.
+    # Monitors
     - command: whim.core.focus_next_monitor
       keybind: Win+N
     - command: whim.core.focus_previous_monitor
@@ -173,6 +109,10 @@ keybinds:
       keybind: Win+Alt+N
     - command: whim.core.move_window_to_previous_monitor
       keybind: Win+Alt+P
+    - command: whim.core.move_current_workspace_to_next_monitor
+      keybind: Win+Ctrl+N
+    - command: whim.core.move_current_workspace_to_previous_monitor
+      keybind: Win+Ctrl+P
 
     # Palette/search and Whim lifecycle.
     # - command: whim.command_palette.toggle
