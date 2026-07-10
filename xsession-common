@@ -27,7 +27,8 @@ if [ -z "$XSESSION_COMMON_RUN_P" ]; then
   #} &
 
   # get keyboard layout
-  hkk
+  #hkk
+
   # set sticky keys, don't cancel sticky keys if two keys are pressed at once, allow latch-to-lock
   xkbset sticky -twokey latchlock
 
