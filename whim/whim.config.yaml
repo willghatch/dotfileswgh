@@ -141,6 +141,8 @@ keybinds:
   unify_key_modifiers: true
   # Move the mouse cursor to the center of the newly focused monitor on Win+N / Win+P.
   center_cursor_on_monitor_switch: true
+  # Send a dummy key tap on bare Win press so Windows does not open the Start menu.
+  suppress_bare_win_key: true
 
 filters:
   entries: []
