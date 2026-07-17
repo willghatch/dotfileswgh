@@ -1,0 +1,32 @@
+{
+  "tags": {
+    "network": {
+      "docker-args": [
+        "--network=host"
+      ]
+    },
+    "user": {
+      "docker-args": [
+        "--user", "$(id -u):$(id -g)"
+      ]
+    },
+    "homedir": {
+      "volumes": {
+        "$HOME/mk/misc/docker-home": "/home/wgh"
+      },
+      "docker-args": [
+        "--workdir=/home/wgh"
+      ]
+    },
+    "term": {
+      "docker-run-script": [
+        "DOCKER_RUN_EXTRAS+=(-e \"TERM=$TERM\")"
+      ]
+    },
+    "mk": {
+      "volumes": {
+        "$HOME/mk/misc/mk-android": "/home/wgh/mk"
+      }
+    }
+  }
+}

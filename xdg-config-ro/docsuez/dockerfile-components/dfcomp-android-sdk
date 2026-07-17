@@ -1,0 +1,85 @@
+# === Android SDK / app-build toolchain ===
+
+# --- Versions / configuration (edit these) ---------------------------------
+# Values pinned here so image builds are reproducible.  Anything that can have
+# more than one version installed is a space-separated list, iterated below.
+
+# Where the SDK lives.  Both env-var names are honored by different tools.
+ARG ANDROID_SDK_ROOT=/opt/android-sdk
+# JDK major versions to install (space-separated list).  The Android Gradle
+# Plugin runs on the JDK; 17 is the broadly compatible baseline, 21 covers the
+# newest AGP/Gradle.
+ARG JDK_VERSIONS="21 17"
+# Android command-line tools bundle version (single value, the sdkmanager
+# bootstrap).
+ARG ANDROID_CMDLINE_TOOLS_VERSION=15859902
+# Platform (API) levels to install (space-separated list).
+ARG ANDROID_PLATFORMS="android-36"
+# build-tools versions to install (space-separated list).
+ARG ANDROID_BUILD_TOOLS_VERSIONS="36.0.0"
+# NDK versions (space-separated list) -- optional native/JNI toolchain, used below.
+ARG ANDROID_NDK_VERSIONS="27.3.13750724"
+# CMake versions (space-separated list) -- Gradle-integrated native build system.
+ARG ANDROID_CMAKE_VERSIONS="3.22.1"
+# Install the emulator + a system image per platform?  "true" or "false".
+# Running it needs /dev/kvm passed through; building APKs does not require it.
+ARG EMULATOR=false
+# ---------------------------------------------------------------------------
+
+# Both env-var names are honored by different tools; derive from the ARG.
+ENV ANDROID_SDK_ROOT=${ANDROID_SDK_ROOT}
+ENV ANDROID_HOME=${ANDROID_SDK_ROOT}
+
+# JDK(s).
+RUN set -eux; \
+    pkgs=""; for v in $JDK_VERSIONS; do pkgs="$pkgs openjdk-$v-jdk"; done; \
+    apt-get install -y --no-install-recommends $pkgs
+
+# Supporting tools needed to fetch/unpack the SDK and to run adb/aapt.
+RUN apt-get install -y --no-install-recommends \
+    unzip wget curl ca-certificates \
+    zip zipalign \
+    git-lfs \
+    lib32z1
+
+# Gradle is normally provided per-project by the Gradle wrapper (./gradlew),
+# but a system Gradle is handy for bootstrapping / wrapper-less projects.
+RUN apt-get install -y --no-install-recommends gradle
+
+# Install the command-line tools into the layout sdkmanager expects
+# ($ANDROID_SDK_ROOT/cmdline-tools/latest).
+RUN mkdir -p "$ANDROID_SDK_ROOT/cmdline-tools" && \
+    cd /tmp && \
+    wget -q "https://dl.google.com/android/repository/commandlinetools-linux-${ANDROID_CMDLINE_TOOLS_VERSION}_latest.zip" -O cmdline-tools.zip && \
+    unzip -q cmdline-tools.zip -d "$ANDROID_SDK_ROOT/cmdline-tools" && \
+    mv "$ANDROID_SDK_ROOT/cmdline-tools/cmdline-tools" "$ANDROID_SDK_ROOT/cmdline-tools/latest" && \
+    rm cmdline-tools.zip
+
+ENV PATH=$PATH:$ANDROID_SDK_ROOT/cmdline-tools/latest/bin:$ANDROID_SDK_ROOT/platform-tools
+
+# Accept licenses, then install the core packages needed to build an APK:
+# platform-tools (adb/fastboot), build-tools set(s), and platform(s)
+# (android.jar).  Semicolons live inside the shell variable, so they are
+# literal package-name characters, not command separators.
+RUN yes | sdkmanager --licenses >/dev/null; \
+    set -eux; \
+    pkgs="platform-tools cmdline-tools;latest"; \
+    for p in $ANDROID_PLATFORMS; do pkgs="$pkgs platforms;$p"; done; \
+    for b in $ANDROID_BUILD_TOOLS_VERSIONS; do pkgs="$pkgs build-tools;$b"; done; \
+    sdkmanager --install $pkgs
+
+# Optional native (NDK) toolchain, for C/C++ (JNI) code.  Adds ~2.5GB per NDK.
+# Skipped entirely when both version lists are empty.
+RUN set -eux; \
+    pkgs=""; \
+    for n in $ANDROID_NDK_VERSIONS; do pkgs="$pkgs ndk;$n"; done; \
+    for c in $ANDROID_CMAKE_VERSIONS; do pkgs="$pkgs cmake;$c"; done; \
+    if [ -n "$pkgs" ]; then sdkmanager --install $pkgs; fi
+
+# Optional emulator + a system image per platform, gated on EMULATOR=true.
+RUN set -eux; \
+    if [ "$EMULATOR" = "true" ]; then \
+      pkgs="emulator"; \
+      for p in $ANDROID_PLATFORMS; do pkgs="$pkgs system-images;$p;google_apis;x86_64"; done; \
+      sdkmanager --install $pkgs; \
+    fi
