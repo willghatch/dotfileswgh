@@ -153,17 +153,17 @@ routers:
 
 plugins:
   bar:
-    # Bar size. These are the previous defaults, made explicit so they are easy to tweak.
-    height: 30
-    font_size: 14
+    # default height 30 font_size 14
+    height: 22
+    font_size: 12
     left_components:
       entries:
         - type: workspace_widget
     right_components:
       entries:
-        - type: active_layout_widget
         - type: date_time_widget
           format: yyyy-MM-dd HH:mm
+        - type: active_layout_widget
 
   slice_layout:
     is_enabled: true
