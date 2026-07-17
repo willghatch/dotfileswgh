@@ -89,7 +89,7 @@ keybinds:
     # Workspaces.
     - command: whim.core.create_workspace_on_current_monitor
       keybind: Win+G
-    - command: whim.command_palette.move_window_to_workspace
+    - command: whim.core.move_window_to_new_workspace_on_current_monitor
       keybind: Win+Alt+G
     - command: whim.core.focus_next_workspace_on_current_monitor
       keybind: Win+W
@@ -139,6 +139,8 @@ keybinds:
       keybind: Win+Alt+Q
 
   unify_key_modifiers: true
+  # Move the mouse cursor to the center of the newly focused monitor on Win+N / Win+P.
+  center_cursor_on_monitor_switch: true
 
 filters:
   entries: []
@@ -149,6 +151,9 @@ routers:
 
 plugins:
   bar:
+    # Bar size. These are the previous defaults, made explicit so they are easy to tweak.
+    height: 30
+    font_size: 14
     left_components:
       entries:
         - type: workspace_widget
