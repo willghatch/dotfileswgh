@@ -1,0 +1,10 @@
+{
+  "tags": {
+    "usb-devices-full-permissions": {
+      "docker-args": [
+        "--mount=type=bind,src=/dev/bus/usb,dst=/dev/bus/usb",
+        "--device-cgroup-rule='c 189:* rwm'"
+      ]
+    }
+  }
+}
