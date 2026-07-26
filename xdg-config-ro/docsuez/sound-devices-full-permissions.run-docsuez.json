@@ -1,0 +1,10 @@
+{
+  "tags": {
+    "sound-devices-full-permissions": {
+      "docker-args": [
+        "--mount=type=bind,src=/dev/snd,dst=/dev/snd",
+        "--device-cgroup-rule='c 116:* rwm'"
+      ]
+    }
+  }
+}
