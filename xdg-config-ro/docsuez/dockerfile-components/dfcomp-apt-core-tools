@@ -8,3 +8,4 @@ RUN apt-get install -y --no-install-recommends racket
 # I want some basic networking tools so that I can tell if I can even reach the network
 RUN apt-get install -y --no-install-recommends net-tools iputils-ping
 RUN apt-get install -y --no-install-recommends lldb
+RUN apt-get install -y --no-install-recommends zip unzip
