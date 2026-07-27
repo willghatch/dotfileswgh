@@ -8,16 +8,6 @@
 # - the executable is at src\Whim.Runner\bin\Release\_target-specific-path_\publish\Whim.Runner.exe
 # - run with `--dir CONFIG_DIR`, or put config dir at ~/.whim -- the restart command ALWAYS reads ~/.whim.
 
-workspaces:
-  entries:
-    - name: "0"
-      monitors: [0]
-    - name: "1"
-      monitors: [1]
-    - name: "2"
-      monitors: [2]
-    - name: "3"
-      monitors: [3]
 
 layout_engines:
   entries:
