@@ -716,13 +716,13 @@ Also syncs to kill ring if REGISTER matches cpo-copy-sync-with-kill-ring-registe
 
 ;;; Agent working directory helpers
 
-(defun wgh/agent-working-dir-base ()
-  "Return the base path for agent-working-directories.
+(defun wgh/agent-work-dir-base ()
+  "Return the base path for agent-work-directories.
 Delegates to the agent-work-dir shell script, which handles git repos,
 submodules, worktrees, and non-repo contexts correctly."
   (string-trim (shell-command-to-string "agent-work-dir --resolve")))
 
-(defun wgh/agent-working-dir-git-dir ()
+(defun wgh/agent-work-dir-git-dir ()
   "Return the top-level .git directory for the current repo, or nil.
 Resolves submodule and worktree paths back to the main .git directory.
 Returns nil when not inside a git repo."
@@ -736,12 +736,12 @@ Returns nil when not inside a git repo."
             (match-string 1 abs-dir)
           abs-dir)))))
 
-(defun wgh/agent-working-dir-all-bases ()
+(defun wgh/agent-work-dir-all-bases ()
   "Return a list of all agent-files/work/ directories, including misplaced ones.
 Searches the canonical location plus .git/modules/ and .git/worktrees/
 recursively for any agent-files/work/ directories that agents may have
 created in the wrong place."
-  (let* ((git-dir (wgh/agent-working-dir-git-dir))
+  (let* ((git-dir (wgh/agent-work-dir-git-dir))
          (bases '()))
     (if git-dir
         (progn
@@ -768,8 +768,8 @@ created in the wrong place."
           (list fallback))))))
 
 (defun wgh/agent-make-working-dir (topic)
-  "Create and return a fresh agent-working-directory path for TOPIC."
-  (let* ((base (wgh/agent-working-dir-base))
+  "Create and return a fresh agent-work-directory path for TOPIC."
+  (let* ((base (wgh/agent-work-dir-base))
          (topic (replace-regexp-in-string
                  ;; Sanitize topic, primarily to remove spaces but let's also remove others.
                  "[^a-zA-Z0-9_-]" ""
@@ -783,7 +783,7 @@ created in the wrong place."
     dir))
 
 (defun wgh/agent-prompt-org (topic)
-  "Prompt for TOPIC, create an agent-working-directory, and open prompt.org."
+  "Prompt for TOPIC, create an agent-work-directory, and open prompt.org."
   (interactive "sTopic (hyphenated words): ")
   (let* ((dir (wgh/agent-make-working-dir topic))
          (file (concat dir "prompt.org")))
@@ -805,7 +805,7 @@ Returns the expanded text, or the original TEXT if expansion fails."
         text))))
 
 (defun wgh/agent-prompt-from-region (beg end topic)
-  "Create an agent-working-directory, write region to prompt.txt, and copy a message.
+  "Create an agent-work-directory, write region to prompt.txt, and copy a message.
 The copied message contains the directory path and prompt file path.
 Any <psnip: NAME> tags in the region are expanded in the exported file."
   (interactive "r\nsTopic (hyphenated words): ")
@@ -814,7 +814,7 @@ Any <psnip: NAME> tags in the region are expanded in the exported file."
          (prompt-file (concat dir "prompt.txt")))
     (with-temp-file prompt-file
       (insert (wgh/psnip-expand-string text)))
-    (let ((msg (format "Your agent-working-directory path is %s.  Read %s for instructions."
+    (let ((msg (format "Your agent-work-directory path is %s.  Read %s for instructions."
                        dir prompt-file)))
       (wgh/terminal-copy-osc-string msg)
       (message "Copied: %s" msg))))
@@ -864,7 +864,7 @@ them concatenated in root-to-current order separated by blank lines."
        "\n"))))
 
 (defun wgh/agent-prompt-from-outline-spine (topic)
-  "Create an agent-working-directory from the outline tree spine body text at point.
+  "Create an agent-work-directory from the outline tree spine body text at point.
 Extracts the spine body text (ancestor body text from root to current heading),
 writes it to prompt.txt, and copies a message with the directory and file paths.
 Any <psnip: NAME> tags in the text are expanded in the exported file."
@@ -874,7 +874,7 @@ Any <psnip: NAME> tags in the text are expanded in the exported file."
          (prompt-file (concat dir "prompt.txt")))
     (with-temp-file prompt-file
       (insert (wgh/psnip-expand-string text)))
-    (let ((msg (format "Your agent-working-directory path is %s.  Read %s for instructions."
+    (let ((msg (format "Your agent-work-directory path is %s.  Read %s for instructions."
                        dir prompt-file)))
       (wgh/terminal-copy-osc-string msg)
       (message "Copied: %s" msg))))

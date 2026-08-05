@@ -345,7 +345,7 @@ The command also executes the sentence, with region as the object, if the region
 (emmap " yfZ" (cp/ae (cp/verb 'copy-all-fzf-file-name)))
 (emmap " yfu" (cp/ae (cp/verb 'copy-untracked-fzf-file-name)))
 (emmap " yfS" (cp/ae (cp/verb 'copy-submodule-fzf-file-name)))
-(emmap " yfa" (cp/ae (cp/verb 'copy-agent-working-directory-fzf-name)))
+(emmap " yfa" (cp/ae (cp/verb 'copy-agent-work-directory-fzf-name)))
 (emmap " yT" (cp/ae (cp/verb 'paste-to-terminal-osc)))
 (autoload 'wgh/git-permalink "git-permalink" "" t)
 (emmap " yP" (lambda () (interactive)
@@ -836,7 +836,7 @@ FUNC should be a function whose first two arguments are BEG and END."
 (emmap "tfZ" 'wgh/fzf-all-files)
 (emmap "tfu" 'wgh/fzf-untracked-files)
 (emmap "tfS" 'wgh/fzf-submodule-files)
-(emmap "tfa" 'wgh/agent-working-dir-fzf-open)
+(emmap "tfa" 'wgh/agent-work-dir-fzf-open)
 (emmap "tfdd" 'wgh/fzf-dotfileswgh-mixin)
 (emmap "tfde" 'wgh/fzf-dotfileswgh-mixin-emacs)
 (emmap "tfdc" 'wgh/fzf-dotfileswgh-mixin-commands)
@@ -1220,7 +1220,7 @@ FUNC should be a function whose first two arguments are BEG and END."
            (copy-all-fzf-file-name      (register . ,(lambda () cpo-copy-default-register))  (default-object . dummy-object))
            (copy-untracked-fzf-file-name (register . ,(lambda () cpo-copy-default-register))  (default-object . dummy-object))
            (copy-submodule-fzf-file-name (register . ,(lambda () cpo-copy-default-register))  (default-object . dummy-object))
-           (copy-agent-working-directory-fzf-name     (register . ,(lambda () cpo-copy-default-register))  (default-object . dummy-object))
+           (copy-agent-work-directory-fzf-name     (register . ,(lambda () cpo-copy-default-register))  (default-object . dummy-object))
            (paste-to-terminal-osc       (register . ,(lambda () cpo-paste-default-register)) (default-object . dummy-object))
            )
          (cdr (assq 'verbs composiphrase-current-configuration))))
@@ -1323,11 +1323,11 @@ FUNC should be a function whose first two arguments are BEG and END."
                        root-dir)
                     (user-error "Not inside a Git repository"))))
              (register)))
-           (copy-agent-working-directory-fzf-name
+           (copy-agent-work-directory-fzf-name
             ,(lambda (x) t) ()
             (,(lambda (register)
                 (require 'fzf)
-                (let ((bases (wgh/agent-working-dir-all-bases))
+                (let ((bases (wgh/agent-work-dir-all-bases))
                       (fzf--target-validator #'fzf--pass-through))
                   (unless bases
                     (user-error "No agent working directories found"))
@@ -1346,7 +1346,7 @@ FUNC should be a function whose first two arguments are BEG and END."
                        cmd
                        (lambda (x) (wgh/cpo-copy-string x register))
                        wgh/fzf-file-alt-actions
-                       (or (wgh/agent-working-dir-git-dir) default-directory))))))
+                       (or (wgh/agent-work-dir-git-dir) default-directory))))))
              (register)))
 
            (paste-to-terminal-osc

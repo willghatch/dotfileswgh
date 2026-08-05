@@ -326,14 +326,14 @@ Supports alternate actions (C-j menu, C-x super-rel copy)."
          root)
       (user-error "Not inside a Git repository"))))
 
-(defun wgh/agent-working-dir-fzf-open ()
-  "Open a file in agent-working-directories using fzf.
+(defun wgh/agent-work-dir-fzf-open ()
+  "Open a file in agent-work-directories using fzf.
 Searches the canonical location and also any misplaced agent-files/work/
 directories under .git/modules/ or .git/worktrees/.
 Supports alternate actions (C-j menu, C-x super-rel copy)."
   (interactive)
   (require 'fzf)
-  (let ((bases (wgh/agent-working-dir-all-bases))
+  (let ((bases (wgh/agent-work-dir-all-bases))
         (fzf--target-validator #'fzf--pass-through))
     (unless bases
       (user-error "No agent working directories found"))
@@ -346,7 +346,7 @@ Supports alternate actions (C-j menu, C-x super-rel copy)."
        cmd
        (lambda (x) (find-file x))
        wgh/fzf-file-alt-actions
-       (or (wgh/agent-working-dir-git-dir) default-directory)))))
+       (or (wgh/agent-work-dir-git-dir) default-directory)))))
 
 
 ;;; Dotfileswgh mixin path helpers
