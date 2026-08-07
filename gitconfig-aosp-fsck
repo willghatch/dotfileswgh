@@ -1,0 +1,7 @@
+# The platform/external/python/watchdog android-related repo has a bad timezone in a commit which fails fsck.
+# `fetch.fsck.badTimezone = ignore` doesn't help: over https, fetch-pack runs index-pack with a bare --fsck-objects and drops the per-message severity overrides.
+# So the check has to be off entirely here.
+[fetch]
+	fsckobjects = false
+[transfer]
+	fsckobjects = false

@@ -64,10 +64,16 @@
 ## according to https://groups.google.com/forum/#!topic/binary-transparency/f-BI4o8HZW0
 [transfer]
         fsckobjects = true
+[transfer "fsck"]
+	badTimezone = ignore
 [fetch]
         fsckobjects = true
+[fetch "fsck"]
+	badTimezone = ignore
 [receive]
         fsckObjects = true
+[receive "fsck"]
+	badTimezone = ignore
 ## lineage OS objects have zero padded filemodes... but I guess it shouldn't be a serious problem?
 ## BUT there appears to be a git bug such that running git fsck by itself uses this setting, but not
 ## auto-run git-fsck when doing transfer/fetch/receive... so for now I'll just comment out the above
@@ -102,3 +108,9 @@
   # IE record before and after states of rebase conflicts and, with autoupdate, automatically re-apply the resolutions if they are seen again
   enabled = true
   autoupdate = true
+
+## This repo has a commit with a bad timezone in its history; the badTimezone
+## ignore above has no effect because fetch-pack drops per-message overrides
+## over https.  Must stay after [fetch]/[transfer] -- last value wins.
+[includeIf "hasconfig:remote.*.url:https://android.googlesource.com/platform/external/python/watchdog"]
+	path = ~/dotfileswgh/gitconfig-aosp-fsck
