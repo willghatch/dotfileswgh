@@ -184,6 +184,12 @@ zstyle ':completion:*' separate-sections true
 zstyle ':completion:*' show-completer true
 # prompt between pages of completions -- MUST BE SET TO ALLOW PAGING
 zstyle ':completion:*' list-prompt "%l"
+# _hosts gets its host list from `getent hosts` (IE /etc/hosts) plus known_hosts
+# files.  /etc/hosts is mostly a blacklist of thousands of pinned domains that
+# are useless as completions, on most of my machines, so stub out the getent
+# call (IE to call the `true` binary).  known_hosts and ~/.ssh/config hosts are
+# unaffected.
+zstyle ':completion:*:hosts' command 'true'
 
 # count / as word separators, so I can kill partial paths
 # count other stuff as word characters, because it always messes me up
