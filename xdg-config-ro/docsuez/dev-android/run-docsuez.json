@@ -23,6 +23,15 @@
         "DOCKER_RUN_EXTRAS+=(-e \"TERM=$TERM\")"
       ]
     },
+    "ccache": {
+      "docker-args": [
+        "-e", "USE_CCACHE=1",
+        "-e", "CCACHE_EXEC=/usr/bin/ccache",
+        "-e", "CCACHE_DIR=/home/wgh/mk/ccache",
+        "-e", "CCACHE_MAXSIZE=100G",
+        "-e", "CCACHE_COMPRESS=1"
+      ]
+    },
     "mk": {
       "volumes": {
         "$HOME/mk/misc/mk-android": "/home/wgh/mk"

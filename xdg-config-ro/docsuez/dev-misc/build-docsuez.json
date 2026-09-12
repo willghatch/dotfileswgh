@@ -26,6 +26,8 @@
             [
                 "# tools for 3d model viewing",
                 "RUN apt-get install -y openscad xvfb numpy-stl python3-numpy python3-matplotlib ",
+                "# for midi stuff",
+                "RUN apt-get install -y alsa alsa-utils libasound2-dev pkg-config python3-dev",
                 ""
             ]
         },

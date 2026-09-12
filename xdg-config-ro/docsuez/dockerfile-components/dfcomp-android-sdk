@@ -14,13 +14,16 @@ ARG JDK_VERSIONS="21 17"
 # bootstrap).
 ARG ANDROID_CMDLINE_TOOLS_VERSION=15859902
 # Platform (API) levels to install (space-separated list).
-ARG ANDROID_PLATFORMS="android-36"
+# NOTE: platforms now carry a minor version (android-37.0, android-37.1, ...).
+# A bare `compileSdk = 37` with no `compileSdkMinor` resolves to android-37.0;
+# there is no bare "android-37" package.
+ARG ANDROID_PLATFORMS="android-36 android-37.0"
 # build-tools versions to install (space-separated list).
-ARG ANDROID_BUILD_TOOLS_VERSIONS="36.0.0"
+ARG ANDROID_BUILD_TOOLS_VERSIONS="36.0.0 37.0.0"
 # NDK versions (space-separated list) -- optional native/JNI toolchain, used below.
-ARG ANDROID_NDK_VERSIONS="27.3.13750724"
+ARG ANDROID_NDK_VERSIONS="27.3.13750724 29.0.14206865"
 # CMake versions (space-separated list) -- Gradle-integrated native build system.
-ARG ANDROID_CMAKE_VERSIONS="3.22.1"
+ARG ANDROID_CMAKE_VERSIONS="3.22.1 4.1.2"
 # Install the emulator + a system image per platform?  "true" or "false".
 # Running it needs /dev/kvm passed through; building APKs does not require it.
 ARG EMULATOR=false
@@ -42,31 +45,55 @@ RUN apt-get install -y --no-install-recommends \
     git-lfs \
     lib32z1
 
+# repo for working with AOSP/LineageOS sources
+RUN apt-get install -y --no-install-recommends repo
+# other stuff for AOSP
+RUN apt-get install -y --no-install-recommends bc bison build-essential ccache curl flex g++-multilib  gcc-multilib \
+    git git-lfs gnupg gperf imagemagick lib32readline-dev lib32z1-dev  libelf-dev \
+    libsdl1.2-dev libssl-dev  libxml2-utils lzop pngcrush \
+    rsync schedtool squashfs-tools xsltproc zip zlib1g-dev
+
+RUN apt-get install -y --no-install-recommends apksigner aapt
+
 # Gradle is normally provided per-project by the Gradle wrapper (./gradlew),
 # but a system Gradle is handy for bootstrapping / wrapper-less projects.
 RUN apt-get install -y --no-install-recommends gradle
 
-# Install the command-line tools into the layout sdkmanager expects
-# ($ANDROID_SDK_ROOT/cmdline-tools/latest).
+# Bootstrap the command-line tools.  This copy only exists long enough to
+# install the managed `cmdline-tools;latest` package in the next step, which is
+# what ends up on PATH.
 RUN mkdir -p "$ANDROID_SDK_ROOT/cmdline-tools" && \
     cd /tmp && \
     wget -q "https://dl.google.com/android/repository/commandlinetools-linux-${ANDROID_CMDLINE_TOOLS_VERSION}_latest.zip" -O cmdline-tools.zip && \
     unzip -q cmdline-tools.zip -d "$ANDROID_SDK_ROOT/cmdline-tools" && \
-    mv "$ANDROID_SDK_ROOT/cmdline-tools/cmdline-tools" "$ANDROID_SDK_ROOT/cmdline-tools/latest" && \
+    mv "$ANDROID_SDK_ROOT/cmdline-tools/cmdline-tools" "$ANDROID_SDK_ROOT/cmdline-tools/bootstrap" && \
     rm cmdline-tools.zip
+
+# Let the bootstrap copy install the managed `cmdline-tools;latest` package,
+# then discard the bootstrap.  Unzipping the bundle straight into `latest/`
+# *and* installing the package makes sdkmanager find `latest/` already occupied
+# by an unmanaged directory and drop the real package in `latest-2/`, which
+# every later invocation warns about ("Observed package id
+# 'cmdline-tools;latest' in inconsistent location").
+RUN set -eux; \
+    boot="$ANDROID_SDK_ROOT/cmdline-tools/bootstrap/bin/sdkmanager"; \
+    yes | "$boot" --licenses >/dev/null; \
+    "$boot" --install "cmdline-tools;latest"; \
+    rm -rf "$ANDROID_SDK_ROOT/cmdline-tools/bootstrap"; \
+    chmod -R a+rX,a-w "$ANDROID_SDK_ROOT/cmdline-tools"
 
 ENV PATH=$PATH:$ANDROID_SDK_ROOT/cmdline-tools/latest/bin:$ANDROID_SDK_ROOT/platform-tools
 
-# Accept licenses, then install the core packages needed to build an APK:
-# platform-tools (adb/fastboot), build-tools set(s), and platform(s)
-# (android.jar).  Semicolons live inside the shell variable, so they are
-# literal package-name characters, not command separators.
-RUN yes | sdkmanager --licenses >/dev/null; \
-    set -eux; \
-    pkgs="platform-tools cmdline-tools;latest"; \
+# Install the core packages needed to build an APK: platform-tools
+# (adb/fastboot), build-tools set(s), and platform(s) (android.jar).  Semicolons
+# live inside the shell variable, so they are literal package-name characters,
+# not command separators.
+RUN set -eux; \
+    pkgs="platform-tools"; \
     for p in $ANDROID_PLATFORMS; do pkgs="$pkgs platforms;$p"; done; \
     for b in $ANDROID_BUILD_TOOLS_VERSIONS; do pkgs="$pkgs build-tools;$b"; done; \
-    sdkmanager --install $pkgs
+    sdkmanager --install $pkgs; \
+    chmod -R a+rX,a-w "$ANDROID_SDK_ROOT/platform-tools" "$ANDROID_SDK_ROOT/platforms" "$ANDROID_SDK_ROOT/build-tools"
 
 # Optional native (NDK) toolchain, for C/C++ (JNI) code.  Adds ~2.5GB per NDK.
 # Skipped entirely when both version lists are empty.
@@ -74,7 +101,12 @@ RUN set -eux; \
     pkgs=""; \
     for n in $ANDROID_NDK_VERSIONS; do pkgs="$pkgs ndk;$n"; done; \
     for c in $ANDROID_CMAKE_VERSIONS; do pkgs="$pkgs cmake;$c"; done; \
-    if [ -n "$pkgs" ]; then sdkmanager --install $pkgs; fi
+    if [ -n "$pkgs" ]; then \
+      sdkmanager --install $pkgs; \
+      for d in ndk cmake; do \
+        if [ -d "$ANDROID_SDK_ROOT/$d" ]; then chmod -R a+rX,a-w "$ANDROID_SDK_ROOT/$d"; fi; \
+      done; \
+    fi
 
 # Optional emulator + a system image per platform, gated on EMULATOR=true.
 RUN set -eux; \
@@ -82,4 +114,5 @@ RUN set -eux; \
       pkgs="emulator"; \
       for p in $ANDROID_PLATFORMS; do pkgs="$pkgs system-images;$p;google_apis;x86_64"; done; \
       sdkmanager --install $pkgs; \
+      chmod -R a+rX,a-w "$ANDROID_SDK_ROOT/emulator" "$ANDROID_SDK_ROOT/system-images"; \
     fi
