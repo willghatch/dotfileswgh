@@ -24,6 +24,13 @@
         {"search": "dockerfile-components/dfcomp-core-rust-apt"},
         {
             "text":
+            [
+                "RUN apt-get install -y libudev-dev libseat-dev libdrm-dev libgbm-dev libinput-dev libxkbcommon-dev libwayland-dev guile-3.0-dev libegl-dev libgl-dev",
+                ""
+            ]
+        },
+        {
+            "text":
             "RUN apt-get install -y gcc avr-libc avrdude dfu-programmer dfu-util gcc-arm-none-eabi # For QMK"
         },
         {
