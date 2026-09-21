@@ -17,7 +17,8 @@ the order given, so the first --dev-type has the highest priority.
 
 Earlier search paths take priority (first found wins for a given segment name).
 When the same segment name exists as both .md and .prog in the same directory,
-.prog takes priority.
+.prog takes priority.  If any segment fails (eg. a .prog exits non-zero),
+nothing is written and the exit status is non-zero.
 """
 
 import argparse
@@ -69,22 +70,45 @@ def find_all_segments(base_paths):
     return default_segments, non_default_segments
 
 
-def read_segment(path, dev_types, git_root):
+def read_segment(name, path, dev_types, git_root):
     """Read a segment's content.  For .md files, read text; for .prog files, execute.
 
-    Returns the content string, or None if execution failed.
+    Returns the content string, or None if reading/execution failed.  On
+    failure, the failing segment's name and path are reported on stderr
+    first, followed by the details (eg. the .prog's exit code and stderr).
     """
     env_extras = {"DEV_TYPES": ",".join(dev_types)}
     if git_root:
         env_extras["AGENT_WORK_GIT_ROOT"] = str(git_root)
-    content, error = read_file_or_exec(path, PROG_NAME, env_extras)
+    try:
+        content, error = read_file_or_exec(path, PROG_NAME, env_extras)
+    except Exception as e:  # eg. UnicodeDecodeError from non-UTF-8 content
+        content, error = None, f"{type(e).__name__}: {e}"
     if error:
+        kind = "program" if path.suffix == ".prog" else "file"
         print(
-            f"{PROG_NAME}: error: {error}",
+            f"{PROG_NAME}: error: segment '{name}' ({kind} {path}) failed:",
             file=sys.stderr,
         )
+        detail = error
+        if path.suffix == ".prog" and "\n" not in error and "exited with code" in error:
+            detail += "\n(the program wrote nothing to stderr)"
+        for line in detail.splitlines():
+            print(f"  {line}", file=sys.stderr)
         return None
     return content
+
+
+def load_state_or_exit(state_path):
+    """Load the state file, exiting with an error naming the file if it is invalid."""
+    try:
+        return load_state(state_path)
+    except (OSError, ValueError) as e:
+        print(
+            f"{PROG_NAME}: error: failed to read state file '{state_path}': {e}",
+            file=sys.stderr,
+        )
+        sys.exit(1)
 
 
 def list_dev_types(git_root):
@@ -222,7 +246,7 @@ def main():
     # Handle --from-state / --from-state-strict: load state and merge with CLI flags
     if args.from_state or args.from_state_strict:
         state_path = get_state_file_path(CONFIG_NAME, git_root)
-        state = load_state(state_path)
+        state = load_state_or_exit(state_path)
         if state is None:
             if args.from_state_strict:
                 print(
@@ -293,7 +317,7 @@ def main():
     # Handle --save-state with --update: load existing state and apply modifications
     if args.save_state and args.update:
         state_path = get_state_file_path(CONFIG_NAME, git_root)
-        state = load_state(state_path)
+        state = load_state_or_exit(state_path)
         if state is not None:
             existing_added = set(state.get("added", []))
             existing_omitted = set(state.get("omitted", []))
@@ -373,12 +397,19 @@ def main():
     for name in args.add:
         to_emit.append((name, non_default_segments[name]))
 
-    # Concatenate and write to stdout
-    for i, (name, path) in enumerate(to_emit):
-        content = read_segment(path, dev_types, git_root)
+    # Read all segments first, so a failing segment produces no partial output
+    contents = []
+    failed = False
+    for name, path in to_emit:
+        content = read_segment(name, path, dev_types, git_root)
         if content is None:
-            # .prog execution failed, skip this segment
-            continue
+            failed = True
+        contents.append(content)
+    if failed:
+        sys.exit(1)
+
+    # Concatenate and write to stdout
+    for i, content in enumerate(contents):
         if i > 0:
             sys.stdout.write("\n")
         sys.stdout.write(content)
