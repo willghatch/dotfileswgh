@@ -11,9 +11,28 @@ otherwise embedded frontmatter is extracted from skill.md or SKILL.md.
 Skill directories are found in (per location, dev-type paths precede base path):
   1. <git-root>/.git/agent-files/config/df-skills/<dev-type>/{default,non-default}/
   2. <git-root>/.git/agent-files/config/df-skills/{default,non-default}/
-  3. XDG_CONFIG_HOME/df-skills/<dev-type>/{default,non-default}/
-  4. XDG_CONFIG_HOME/df-skills/{default,non-default}/
-  5. Each XDG_CONFIG_DIRS entry (same pattern)
+  3. <repo-root>/.agents/skills/ (direct)
+  4. XDG_CONFIG_HOME/df-skills/<dev-type>/{default,non-default}/
+  5. XDG_CONFIG_HOME/df-skills/{default,non-default}/
+  6. Each XDG_CONFIG_DIRS entry (same pattern)
+  7. Each DF_SKILLS_EXTRA_DIRS entry (same pattern, without df-skills/ appended)
+  8. Each DF_SKILLS_EXTRA_DIRS_DIRECT entry (direct)
+
+<repo-root> is the top of the working tree containing the current directory
+(the worktree or submodule itself, not the host repository).  "Direct"
+locations contain skill directories directly, with no dev-type or
+default/non-default nesting; their skills are treated as default skills.
+DF_SKILLS_EXTRA_DIRS and DF_SKILLS_EXTRA_DIRS_DIRECT are colon-delimited.
+
+`disclose` also accepts:
+  - Sub-skills, e.g. `disclose foo/bar`.  The relative path is appended to
+    each skill location in priority order (default locations before
+    non-default ones), and the first directory with a skill file wins.
+    Sub-skills are never listed; parent skills should mention them.
+  - File paths.  A name starting with `/`, `./`, or `../` (or containing a
+    `..` component) is only treated as a path to a skill directory.  Other
+    names prefer the search path, but fall back to a skill directory relative
+    to the current directory if nothing is found there.
 
 Dev types come from --dev-type flags (repeatable, highest priority), the
 DEV_TYPES environment variable (comma-separated), and
@@ -30,7 +49,7 @@ Subcommands:
 import argparse
 import os
 import sys
-from pathlib import Path
+from pathlib import Path, PurePosixPath
 
 sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), 'agent-files-pylib'))
 from agent_files_common import (
@@ -49,17 +68,91 @@ PROG_NAME = "df-skills"
 CONFIG_NAME = "df-skills"
 
 
-def find_skills(base_paths, subdir):
-    """Find all skills in the given subdirectory across all base paths.
+class SkillRoot:
+    """A location to search for skills.
+
+    Tagged roots contain default/ and non-default/ subdirectories.  Direct
+    roots contain skill directories directly, and their skills count as
+    default skills.
+    """
+
+    def __init__(self, path, direct=False):
+        self.path = path
+        self.direct = direct
+
+    def category_dir(self, category):
+        """Return the directory holding skills of the given category, or None."""
+        if self.direct:
+            return self.path if category == "default" else None
+        return self.path / category
+
+    def __str__(self):
+        return f"{self.path} (direct)" if self.direct else str(self.path)
+
+
+def split_dir_list(value):
+    """Split a colon-delimited directory list, skipping empty entries."""
+    return [Path(os.path.expanduser(d)) for d in (value or "").split(":") if d]
+
+
+def find_worktree_root():
+    """Return the top of the git working tree containing cwd, or None.
+
+    Unlike find_git_root, this does not follow worktree/submodule .git files
+    to the host repository, since we want files checked out in this tree.
+    """
+    cwd = Path.cwd()
+    for candidate in [cwd] + list(cwd.parents):
+        if (candidate / ".git").exists():
+            return candidate
+    return None
+
+
+def get_skill_roots(dev_types, git_root):
+    """Return the ordered list of SkillRoots to search, de-duplicated."""
+    roots = []
+
+    # Per-repo private config (in .git/agent-files)
+    if git_root:
+        git_config_base = git_root / ".git" / "agent-files" / "config" / CONFIG_NAME
+        for dt in dev_types:
+            roots.append(SkillRoot(git_config_base / dt))
+        roots.append(SkillRoot(git_config_base))
+
+    # Skills checked into the current repo
+    worktree_root = find_worktree_root()
+    if worktree_root:
+        roots.append(SkillRoot(worktree_root / ".agents" / "skills", direct=True))
+
+    # XDG locations, then DF_SKILLS_EXTRA_DIRS (same nesting)
+    extra_bases = split_dir_list(os.environ.get("DF_SKILLS_EXTRA_DIRS"))
+    for path in get_base_search_paths(CONFIG_NAME, dev_types, None, extra_bases):
+        roots.append(SkillRoot(path))
+
+    for path in split_dir_list(os.environ.get("DF_SKILLS_EXTRA_DIRS_DIRECT")):
+        roots.append(SkillRoot(path, direct=True))
+
+    seen = set()
+    deduped = []
+    for root in roots:
+        key = (root.path.resolve(), root.direct)
+        if key not in seen:
+            seen.add(key)
+            deduped.append(root)
+    return deduped
+
+
+def find_skills(roots, category):
+    """Find all skills of the given category across all skill roots.
 
     Returns an ordered dict of name -> Path (skill directory), with earlier
-    paths taking priority.  Skills within a single directory are sorted
+    roots taking priority.  Skills within a single directory are sorted
     alphabetically by name.
     """
     skills = {}
-    for base_path in base_paths:
-        skill_parent = base_path / subdir
-        if not skill_parent.is_dir():
+    for root in roots:
+        skill_parent = root.category_dir(category)
+        if skill_parent is None or not skill_parent.is_dir():
             continue
         for entry in sorted(skill_parent.iterdir()):
             if entry.is_dir() and entry.name not in skills:
@@ -67,16 +160,17 @@ def find_skills(base_paths, subdir):
     return skills
 
 
-def find_all_skills(base_paths):
+def find_all_skills(roots):
     """Find default and non-default skills, resolving dev-type links.
 
     Returns (default_skills, non_default_skills) dicts of name -> Path.
     Link files (``link:NAME``) in default/ promote non-default items into
-    the default set.
+    the default set.  Direct roots do not support link files.
     """
-    default_skills = find_skills(base_paths, "default")
-    non_default_skills = find_skills(base_paths, "non-default")
-    default_links = find_link_files(base_paths, "default")
+    default_skills = find_skills(roots, "default")
+    non_default_skills = find_skills(roots, "non-default")
+    tagged_paths = [root.path for root in roots if not root.direct]
+    default_links = find_link_files(tagged_paths, "default")
     resolve_links(default_skills, default_links, non_default_skills, PROG_NAME)
     return default_skills, non_default_skills
 
@@ -92,6 +186,59 @@ def get_skill_content_path(skill_dir):
         if path.exists():
             return path
     return None
+
+
+def is_skill_dir(path):
+    """Return True if path is a directory containing a skill file."""
+    return path.is_dir() and (
+        get_skill_content_path(path) is not None
+        or (path / "frontmatter.md").exists()
+    )
+
+
+def find_subskill(roots, rel_path):
+    """Find a sub-skill by appending rel_path to each skill location.
+
+    Default locations are searched before non-default ones, matching the
+    priority used for top-level skills.  Returns a Path or None.
+    """
+    for category in ("default", "non-default"):
+        for root in roots:
+            skill_parent = root.category_dir(category)
+            if skill_parent is None:
+                continue
+            candidate = skill_parent / rel_path
+            if is_skill_dir(candidate):
+                return candidate
+    return None
+
+
+def resolve_disclose_target(skill_name, roots):
+    """Find the skill directory for a disclose argument.
+
+    Returns a Path, or None if no skill was found.
+    """
+    parts = PurePosixPath(skill_name).parts
+    is_path = (
+        skill_name.startswith(("/", "./", "../"))
+        or skill_name in (".", "..")
+        or ".." in parts
+    )
+    if is_path:
+        path = Path(os.path.abspath(os.path.expanduser(skill_name)))
+        return path if path.is_dir() else None
+
+    if len(parts) == 1:
+        default_skills, non_default_skills = find_all_skills(roots)
+        skill_dir = default_skills.get(parts[0]) or non_default_skills.get(parts[0])
+    else:
+        skill_dir = find_subskill(roots, Path(*parts))
+    if skill_dir is not None:
+        return skill_dir
+
+    # Fall back to a skill directory relative to the current directory
+    path = Path(os.path.abspath(skill_name))
+    return path if is_skill_dir(path) else None
 
 
 def get_skill_content_label(content_path):
@@ -311,9 +458,9 @@ def read_skill_content_stripped(content_path, skill_name, skill_dir, dev_types, 
     return content, error
 
 
-def cmd_agents_md_snippet(args, dev_types, git_root, base_paths):
+def cmd_agents_md_snippet(args, dev_types, git_root, roots):
     """Generate AGENTS.md snippet with skill frontmatter."""
-    default_skills, non_default_skills = find_all_skills(base_paths)
+    default_skills, non_default_skills = find_all_skills(roots)
 
     added = []
     omitted = []
@@ -339,8 +486,8 @@ def cmd_agents_md_snippet(args, dev_types, git_root, base_paths):
                 if dt not in dev_types:
                     dev_types.append(dt)
             # Recompute paths and skills with merged dev_types
-            base_paths = get_base_search_paths(CONFIG_NAME, dev_types, git_root)
-            default_skills, non_default_skills = find_all_skills(base_paths)
+            roots = get_skill_roots(dev_types, git_root)
+            default_skills, non_default_skills = find_all_skills(roots)
 
     active = get_active_skills(default_skills, non_default_skills, added, omitted)
 
@@ -385,13 +532,10 @@ def cmd_agents_md_snippet(args, dev_types, git_root, base_paths):
             sys.stdout.write("\n")
 
 
-def cmd_disclose(args, dev_types, git_root, base_paths):
+def cmd_disclose(args, dev_types, git_root, roots):
     """Print the full content of a skill."""
     skill_name = args.skill_name
-    default_skills, non_default_skills = find_all_skills(base_paths)
-
-    # Find the skill in either default or non-default
-    skill_dir = default_skills.get(skill_name) or non_default_skills.get(skill_name)
+    skill_dir = resolve_disclose_target(skill_name, roots)
     if skill_dir is None:
         print(
             f"{PROG_NAME}: error: skill '{skill_name}' not found. "
@@ -437,9 +581,9 @@ def cmd_disclose(args, dev_types, git_root, base_paths):
         sys.stdout.write("\n")
 
 
-def cmd_list(args, dev_types, git_root, base_paths):
+def cmd_list(args, dev_types, git_root, roots):
     """List available skills."""
-    default_skills, non_default_skills = find_all_skills(base_paths)
+    default_skills, non_default_skills = find_all_skills(roots)
 
     # Handle --from-state / --from-state-strict
     if args.from_state or args.from_state_strict:
@@ -460,8 +604,8 @@ def cmd_list(args, dev_types, git_root, base_paths):
             for dt in state_dev_types:
                 if dt not in dev_types:
                     dev_types.append(dt)
-            base_paths = get_base_search_paths(CONFIG_NAME, dev_types, git_root)
-            default_skills, non_default_skills = find_all_skills(base_paths)
+            roots = get_skill_roots(dev_types, git_root)
+            default_skills, non_default_skills = find_all_skills(roots)
 
             active = get_active_skills(default_skills, non_default_skills, added, omitted)
             if args.names_only:
@@ -497,7 +641,7 @@ def cmd_list(args, dev_types, git_root, base_paths):
                 print(f"{name}\tnon-default\t{non_default_skills[name]}")
 
 
-def cmd_save_state(args, dev_types, git_root, base_paths):
+def cmd_save_state(args, dev_types, git_root, roots):
     """Save skill configuration to state file."""
     # Handle --delete-state
     if args.delete_state:
@@ -514,7 +658,7 @@ def cmd_save_state(args, dev_types, git_root, base_paths):
         )
         sys.exit(1)
 
-    default_skills, non_default_skills = find_all_skills(base_paths)
+    default_skills, non_default_skills = find_all_skills(roots)
     all_skills = dict(default_skills)
     all_skills.update(non_default_skills)
 
@@ -616,7 +760,7 @@ def main():
     )
     disclose_parser.add_argument(
         "skill_name",
-        help="Name of the skill to disclose",
+        help="Name of the skill to disclose (or sub-skill path like foo/bar, or path to a skill directory)",
     )
 
     # list subcommand
@@ -697,12 +841,12 @@ def main():
 
     # Combine --dev-type flags, $DEV_TYPES env var, and dev-types.json
     dev_types = gather_dev_types(args.dev_types, git_root, PROG_NAME)
-    base_paths = get_base_search_paths(CONFIG_NAME, dev_types, git_root)
+    roots = get_skill_roots(dev_types, git_root)
 
     if args.show_paths:
-        for p in base_paths:
-            exists = " (exists)" if p.exists() else ""
-            print(f"  {p}{exists}")
+        for root in roots:
+            exists = " (exists)" if root.path.exists() else ""
+            print(f"  {root}{exists}")
         return
 
     if args.subcommand is None:
@@ -710,13 +854,13 @@ def main():
         sys.exit(1)
 
     if args.subcommand == "agents-md-snippet":
-        cmd_agents_md_snippet(args, dev_types, git_root, base_paths)
+        cmd_agents_md_snippet(args, dev_types, git_root, roots)
     elif args.subcommand == "disclose":
-        cmd_disclose(args, dev_types, git_root, base_paths)
+        cmd_disclose(args, dev_types, git_root, roots)
     elif args.subcommand == "list":
-        cmd_list(args, dev_types, git_root, base_paths)
+        cmd_list(args, dev_types, git_root, roots)
     elif args.subcommand == "save-state":
-        cmd_save_state(args, dev_types, git_root, base_paths)
+        cmd_save_state(args, dev_types, git_root, roots)
 
 
 if __name__ == "__main__":

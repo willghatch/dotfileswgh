@@ -109,13 +109,16 @@ def gather_dev_types(cli_dev_types, git_root, prog_name="agent-files"):
     return dev_types
 
 
-def get_base_search_paths(config_name, dev_types=(), git_root=None):
+def get_base_search_paths(config_name, dev_types=(), git_root=None, extra_bases=()):
     """Return ordered list of base paths that each contain default/ and non-default/ subdirs.
 
     config_name is the tool-specific directory name (e.g. "agents-md-generate"
     or "df-skills").
 
-    Priority: git root > XDG_CONFIG_HOME > XDG_CONFIG_DIRS.
+    extra_bases is an optional list of additional location bases (used as-is,
+    without config_name appended) that are searched after XDG_CONFIG_DIRS.
+
+    Priority: git root > XDG_CONFIG_HOME > XDG_CONFIG_DIRS > extra_bases.
     Within each location, dev-type-specific paths precede the base path.
     """
     paths = []
@@ -140,6 +143,10 @@ def get_base_search_paths(config_name, dev_types=(), git_root=None):
     for config_dir in xdg_config_dirs.split(":"):
         if config_dir:
             add_location(Path(config_dir) / config_name)
+
+    # Tool-specific extra locations (e.g. from an environment variable)
+    for extra_base in extra_bases:
+        add_location(Path(extra_base))
 
     # De-duplicate while preserving order
     seen = set()

@@ -32,12 +32,19 @@ _df_skills() {
                         '--from-state-strict[Use saved state (error if no state)]'
                     ;;
                 disclose)
-                    local skills
-                    skills=("${(@f)$(df-skills list --names-only 2>/dev/null)}")
-                    if (( ${#skills} )); then
-                        _describe 'skill' skills
+                    # Skill paths are rare, so only complete directories
+                    # when the word looks like a path (starts with / or .)
+                    if [[ $PREFIX == [/.]* ]]; then
+                        _files -/
                     else
-                        _message 'no skills found'
+                        local -a skills
+                        skills=("${(@f)$(df-skills list --names-only 2>/dev/null)}")
+                        skills=(${skills:#})
+                        if (( ${#skills} )); then
+                            _describe 'skill' skills
+                        else
+                            _message 'no skills found'
+                        fi
                     fi
                     ;;
                 list)
