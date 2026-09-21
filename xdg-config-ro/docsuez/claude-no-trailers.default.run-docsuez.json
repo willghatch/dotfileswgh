@@ -1,0 +1,21 @@
+{
+    "#comment": [
+        "Mount a Claude Code managed-settings drop-in that disables the",
+        "Co-Authored-By commit trailer, PR-body attribution, and Claude-Session",
+        "trailer/link.  Claude Code merges /etc/claude-code/managed-settings.d/*.json",
+        "in filename order, so other addons can mount their own fragments there."
+    ],
+    "tags": {
+        "claude-no-trailers": {
+            "docker-run-script": {
+                "100": [
+                    "_docsuez_cnt_dir=\"$(mktemp -d \"${XDG_RUNTIME_DIR:-/tmp}/docsuez-claude-no-trailers.XXXXXX\")\"",
+                    "_docsuez_cnt_file=\"$_docsuez_cnt_dir/no-trailers.json\"",
+                    "printf '%s\\n' '{\"attribution\": {\"commit\": \"\", \"pr\": \"\", \"sessionUrl\": false}}' > \"$_docsuez_cnt_file\"",
+                    "chmod 644 \"$_docsuez_cnt_file\"",
+                    "DOCSUEZ_VOLUMES+=(\"$_docsuez_cnt_file:/etc/claude-code/managed-settings.d/50-no-trailers.json:ro\")"
+                ]
+            }
+        }
+    }
+}
