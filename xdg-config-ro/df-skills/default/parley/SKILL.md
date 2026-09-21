@@ -22,6 +22,8 @@ The file plus the original prompt must suffice for handing off to another agent:
 ** Q1. QUESTION
 Recommended: ANSWER
 * Planned assumptions
+* Test plan
+- BEHAVIOR -- BUG IT CATCHES
 * Resolved
 ** Q1. QUESTION
 Answer: ANSWER
