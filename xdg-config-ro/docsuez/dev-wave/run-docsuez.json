@@ -1,10 +1,8 @@
 {
+  "docker-run-script": {
+    "1": "DEV_TYPES=\"$DEV_TYPES,wave\""
+  },
   "tags": {
-    "dev-types": {
-      "docker-args": [
-        "-e", "DEV_TYPES=wave"
-      ]
-    },
     "network": {
       "docker-args": [
         "--network=host"

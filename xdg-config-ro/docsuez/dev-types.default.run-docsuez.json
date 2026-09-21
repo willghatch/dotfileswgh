@@ -1,0 +1,29 @@
+{
+    "#comment": [
+        "Manage DEV_TYPES (comma-separated), starting from the host value.",
+        "Configs and addons extend it at key 1, eg. DEV_TYPES=\"$DEV_TYPES,foo\".",
+        "At key 90 it is cleaned (empty entries and duplicates removed) and passed to docker."
+    ],
+    "tags": {
+        "dev-types-env": {
+            "docker-run-script": {
+                "0": [
+                    "export DEV_TYPES=\"${DEV_TYPES-}\""
+                ],
+                "90": [
+                    "_docsuez_dt_in=\"$DEV_TYPES\"",
+                    "DEV_TYPES=\"\"",
+                    "IFS=',' read -ra _docsuez_dt_parts <<< \"$_docsuez_dt_in\"",
+                    "for _docsuez_dt in \"${_docsuez_dt_parts[@]}\"; do",
+                    "  _docsuez_dt=\"${_docsuez_dt//[[:space:]]/}\"",
+                    "  if [[ -n \"$_docsuez_dt\" && \",$DEV_TYPES,\" != *\",$_docsuez_dt,\"* ]]; then",
+                    "    DEV_TYPES=\"${DEV_TYPES:+$DEV_TYPES,}$_docsuez_dt\"",
+                    "  fi",
+                    "done",
+                    "export DEV_TYPES",
+                    "DOCKER_RUN_EXTRAS+=(-e \"DEV_TYPES=$DEV_TYPES\")"
+                ]
+            }
+        }
+    }
+}
