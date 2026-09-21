@@ -34,6 +34,12 @@ run-docsuez.json - Specifies how to run a container:
   }
 }
 
+"docker-run-script" may be a string, a list of strings, or a dict mapping
+numeric keys (as strings, e.g. "0", "100") to a string or list of strings.
+Parts are ordered by key, lowest first; plain strings and lists count as key
+50.  Parts from different configs/addons are merged, never replaced; parts at
+the same key keep their merge order.
+
 Note: Only one of "image-builder" or "image-name" should be specified:
 - "image-builder": References a build-docsuez.json to build/use an image
 - "image-name": Directly specifies a Docker image name to run (e.g., "ubuntu:22.04")
@@ -80,6 +86,44 @@ def _strip_comment_keys(data):
     if isinstance(data, list):
         return [_strip_comment_keys(item) for item in data]
     return data
+
+
+DOCKER_RUN_SCRIPT_DEFAULT_KEY = 50
+
+
+def _normalize_run_script(value) -> Dict[float, List[str]]:
+    """Normalize a docker-run-script value to {numeric_key: [lines]}."""
+    if value is None:
+        return {}
+    if isinstance(value, str):
+        return {DOCKER_RUN_SCRIPT_DEFAULT_KEY: [value]}
+    if isinstance(value, list):
+        return {DOCKER_RUN_SCRIPT_DEFAULT_KEY: list(value)}
+    if isinstance(value, dict):
+        result = {}
+        for key, part in value.items():
+            if isinstance(key, (int, float)):
+                num = key
+            else:
+                try:
+                    num = float(key)
+                except ValueError:
+                    print(f"Error: docker-run-script key '{key}' is not a number",
+                          file=sys.stderr)
+                    sys.exit(1)
+            lines = [part] if isinstance(part, str) else list(part)
+            result.setdefault(num, []).extend(lines)
+        return result
+    print(f"Error: invalid docker-run-script value: {value!r}", file=sys.stderr)
+    sys.exit(1)
+
+
+def _merge_run_script(base, overlay) -> Dict[float, List[str]]:
+    """Merge two docker-run-script values; same-key parts are concatenated."""
+    result = {k: list(v) for k, v in _normalize_run_script(base).items()}
+    for key, lines in _normalize_run_script(overlay).items():
+        result.setdefault(key, []).extend(lines)
+    return result
 
 
 class DocsuezConfig:
@@ -234,7 +278,9 @@ class DocsuezConfig:
                 # Don't propagate include directives
                 continue
 
-            if key in result and isinstance(result[key], dict) and isinstance(value, dict):
+            if key == "docker-run-script":
+                result[key] = _merge_run_script(result.get(key), value)
+            elif key in result and isinstance(result[key], dict) and isinstance(value, dict):
                 result[key] = self._deep_merge(result[key], value)
             elif key in result and isinstance(result[key], list) and isinstance(value, list):
                 result[key] = result[key] + value
@@ -283,12 +329,10 @@ class DocsuezConfig:
         return config.get("tmux-socket-dir")
 
     def get_docker_run_script(self) -> List[str]:
-        """Get script components to run before docker"""
+        """Get script components to run before docker, ordered by key"""
         config = self._merge_configs()
-        script = config.get("docker-run-script", [])
-        if isinstance(script, str):
-            return [script]
-        return script
+        parts = _normalize_run_script(config.get("docker-run-script"))
+        return [line for key in sorted(parts) for line in parts[key]]
 
     def get_pre_tmux_script(self) -> List[str]:
         """Get shell lines to run inside docker container before launching tmux"""
