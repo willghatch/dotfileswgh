@@ -1,19 +1,18 @@
 {
   "docker-run-script": {
+    "0": [
+      "DOCSUEZ_CONTAINER_BUILD_TIME_USER_NAME=wgh",
+      "DOCSUEZ_CONTAINER_BUILD_TIME_UID=\"$(id -u)\""
+    ],
     "1": "DEV_TYPES=\"$DEV_TYPES,llvm,triton\""
   },
   "tags": {
-    "user": {
-      "docker-args": [
-        "--user", "$(id -u):$(id -g)"
-      ]
-    },
     "homedir": {
       "volumes": {
-        "$HOME/mk/amd/docker-home": "/home/wgh"
+        "$HOME/mk/amd/docker-home": "$DOCSUEZ_CONTAINER_HOME"
       },
       "docker-args": [
-        "--workdir=/home/wgh"
+        "--workdir=$DOCSUEZ_CONTAINER_HOME"
       ]
     },
     "term": {
@@ -23,12 +22,12 @@
     },
     "ccache": {
       "docker-args": [
-        "-e", "CCACHE_DIR=/home/wgh/mk/ccache", "-e", "TRITON_BUILD_WITH_CCACHE=true"
+        "-e", "CCACHE_DIR=$DOCSUEZ_CONTAINER_HOME/mk/ccache", "-e", "TRITON_BUILD_WITH_CCACHE=true"
       ]
     },
     "mk": {
       "volumes": {
-        "$HOME/mk/amd/mk-triton": "/home/wgh/mk"
+        "$HOME/mk/amd/mk-triton": "$DOCSUEZ_CONTAINER_HOME/mk"
       },
       "pre-tmux-script": [
         "source $DOTFILESWGH/env-more-with-mixins.sh",

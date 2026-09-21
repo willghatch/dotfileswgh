@@ -40,6 +40,19 @@ Parts are ordered by key, lowest first; plain strings and lists count as key
 50.  Parts from different configs/addons are merged, never replaced; parts at
 the same key keep their merge order.
 
+Volumes: "volumes" maps host paths to container paths.  Both sides are
+expanded by bash (in double quotes) after all docker-run-script parts have
+run, so they can use variables set there (eg. $DOCSUEZ_CONTAINER_HOME).  They
+are appended to the DOCSUEZ_VOLUMES bash array ("host:container[:options]"),
+which docker-run-script parts may also append to directly instead of adding
+-v to DOCKER_RUN_EXTRAS.  Before docker runs, missing host paths are created,
+and a mount nested inside another mount gets its mountpoint pre-created in
+the enclosing mount's host directory, so files and directories are owned by
+the invoking user rather than created by docker as root.
+
+The generated script unsets any inherited DOCSUEZ_CONTAINER_* variables
+before running docker-run-script parts.
+
 Note: Only one of "image-builder" or "image-name" should be specified:
 - "image-builder": References a build-docsuez.json to build/use an image
 - "image-name": Directly specifies a Docker image name to run (e.g., "ubuntu:22.04")
@@ -124,6 +137,48 @@ def _merge_run_script(base, overlay) -> Dict[float, List[str]]:
     for key, lines in _normalize_run_script(overlay).items():
         result.setdefault(key, []).extend(lines)
     return result
+
+
+VOLUME_PREPARE_SCRIPT = r'''# Prepare volumes: create missing host paths, and pre-create mountpoints for
+# mounts nested inside other mounts (in the innermost enclosing mount's host
+# directory), so docker doesn't create them owned by root.
+_docsuez_vol_src=()
+_docsuez_vol_dst=()
+for _docsuez_vol in "${DOCSUEZ_VOLUMES[@]}"; do
+  IFS=: read -r _docsuez_src _docsuez_dst _docsuez_opts <<< "$_docsuez_vol"
+  _docsuez_vol_src+=("${_docsuez_src%/}")
+  _docsuez_vol_dst+=("${_docsuez_dst%/}")
+  if [[ ! -e "$_docsuez_src" ]]; then
+    mkdir -p "$_docsuez_src" || echo "Warning: could not create volume source $_docsuez_src" >&2
+  fi
+done
+for _docsuez_i in "${!_docsuez_vol_dst[@]}"; do
+  _docsuez_dst="${_docsuez_vol_dst[$_docsuez_i]}"
+  _docsuez_parent=""
+  for _docsuez_j in "${!_docsuez_vol_dst[@]}"; do
+    _docsuez_pdst="${_docsuez_vol_dst[$_docsuez_j]}"
+    if [[ -n "$_docsuez_pdst" && "$_docsuez_dst" == "$_docsuez_pdst"/* && ${#_docsuez_pdst} -gt ${#_docsuez_parent} ]]; then
+      _docsuez_parent="$_docsuez_pdst"
+      _docsuez_parent_src="${_docsuez_vol_src[$_docsuez_j]}"
+    fi
+  done
+  if [[ -n "$_docsuez_parent" && -d "$_docsuez_parent_src" ]]; then
+    _docsuez_stub="$_docsuez_parent_src/${_docsuez_dst#"$_docsuez_parent"/}"
+    if [[ ! -e "$_docsuez_stub" ]]; then
+      if [[ -d "${_docsuez_vol_src[$_docsuez_i]}" ]]; then
+        mkdir -p "$_docsuez_stub"
+      else
+        mkdir -p "$(dirname "$_docsuez_stub")"
+        touch "$_docsuez_stub"
+      fi
+    fi
+  fi
+done
+_docsuez_volume_args=()
+for _docsuez_vol in "${DOCSUEZ_VOLUMES[@]}"; do
+  _docsuez_volume_args+=(-v "$_docsuez_vol")
+done
+'''
 
 
 class DocsuezConfig:
@@ -300,18 +355,9 @@ class DocsuezConfig:
         return config.get("image-name")
 
     def get_volumes(self) -> Dict[str, str]:
-        """Get volume mounts, with environment variable expansion"""
+        """Get volume mounts (unexpanded; expanded by bash in the run script)"""
         config = self._merge_configs()
-        volumes = config.get("volumes", {})
-
-        # Expand environment variables
-        expanded = {}
-        for external, internal in volumes.items():
-            external_expanded = os.path.expandvars(external)
-            internal_expanded = os.path.expandvars(internal)
-            expanded[external_expanded] = internal_expanded
-
-        return expanded
+        return config.get("volumes", {})
 
     def get_docker_args(self) -> List[str]:
         """Get extra docker run arguments"""
@@ -895,18 +941,30 @@ class Docsuez:
         if tsuez_mode:
             f.write(f"export DOCSUEZ_ENV_NAME={session_name}\n\n")
 
+        f.write("# Don't inherit container settings from an outer docsuez container\n")
+        f.write('for _docsuez_var in $(compgen -v DOCSUEZ_CONTAINER_ || true); do unset "$_docsuez_var"; done\n\n')
+
         f.write("# Array for extra docker run arguments\n")
-        f.write("DOCKER_RUN_EXTRAS=()\n\n")
+        f.write("DOCKER_RUN_EXTRAS=()\n")
+        f.write("# Array of volume mounts, host:container[:options]\n")
+        f.write("DOCSUEZ_VOLUMES=()\n\n")
 
         # Add user script parts
         for script_part in script_parts:
             f.write(f"# User script component\n")
             f.write(f"{script_part}\n\n")
 
-        # Create volume directories to ensure proper ownership
-        f.write("# Create volume directories if they don't exist\n")
-        for external in volumes.keys():
-            f.write(f"mkdir -p \"{external}\"\n")
+        # Add configured volumes, expanded now that script parts have run
+        f.write("# Configured volumes\n")
+        for external, internal in volumes.items():
+            f.write(f'DOCSUEZ_VOLUMES+=("{external}:{internal}")\n')
+        if tsuez_mode:
+            # Mount socket directory and the tsuez command
+            tsuez_path = subprocess.run(["which", self.tsuez_cmd], capture_output=True, text=True, check=True).stdout.strip()
+            f.write(f'DOCSUEZ_VOLUMES+=("{socket_dir}:/tsuez-dir")\n')
+            f.write(f'DOCSUEZ_VOLUMES+=("{tsuez_path}:/usr/local/bin/tsuez:ro")\n')
+        f.write("\n")
+        f.write(VOLUME_PREPARE_SCRIPT)
         f.write("\n")
 
         # Build inner script for tsuez mode
@@ -962,17 +1020,7 @@ class Docsuez:
             f.write("  docker run --rm -it\n")
 
         # Add volumes
-        for external, internal in volumes.items():
-            f.write(f"  -v {external}:{internal}\n")
-
-        # Add tsuez-specific volumes and env vars
-        if tsuez_mode:
-            # Mount socket directory
-            f.write(f"  -v {socket_dir}:/tsuez-dir\n")
-
-            # Mount tsuez command so it's available inside the container
-            tsuez_path = subprocess.run(["which", self.tsuez_cmd], capture_output=True, text=True, check=True).stdout.strip()
-            f.write(f"  -v {tsuez_path}:/usr/local/bin/tsuez:ro\n")
+        f.write('  "${_docsuez_volume_args[@]}"\n')
 
         # Add docker args
         for arg in config.get_docker_args():

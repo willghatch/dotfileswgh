@@ -1,0 +1,34 @@
+{
+    "#comment": [
+        "Container user settings.  Override the `user` tag (eg. in an addon) to set",
+        "different concrete values at key 0; DOCSUEZ_CONTAINER_HOME may also be set",
+        "there, otherwise it defaults to /home/$DOCSUEZ_CONTAINER_USER_NAME.",
+        "The `user-setup` tag derives defaults and passes everything to docker."
+    ],
+    "tags": {
+        "user": {
+            "docker-run-script": {
+                "0": [
+                    "DOCSUEZ_CONTAINER_USER_NAME=wgh",
+                    "DOCSUEZ_CONTAINER_UID=\"$(id -u)\"",
+                    "DOCSUEZ_CONTAINER_GID=\"$(id -g)\""
+                ]
+            }
+        },
+        "user-setup": {
+            "docker-run-script": {
+                "1": [
+                    "export DOCSUEZ_CONTAINER_USER_NAME DOCSUEZ_CONTAINER_UID DOCSUEZ_CONTAINER_GID",
+                    "export DOCSUEZ_CONTAINER_HOME=\"${DOCSUEZ_CONTAINER_HOME:-/home/$DOCSUEZ_CONTAINER_USER_NAME}\""
+                ],
+                "90": [
+                    "DOCKER_RUN_EXTRAS+=(--user \"$DOCSUEZ_CONTAINER_UID:$DOCSUEZ_CONTAINER_GID\")",
+                    "DOCKER_RUN_EXTRAS+=(-e \"USER=$DOCSUEZ_CONTAINER_USER_NAME\" -e \"HOME=$DOCSUEZ_CONTAINER_HOME\")",
+                    "for _docsuez_var in $(compgen -v DOCSUEZ_CONTAINER_ || true); do",
+                    "  DOCKER_RUN_EXTRAS+=(-e \"$_docsuez_var=${!_docsuez_var}\")",
+                    "done"
+                ]
+            }
+        }
+    }
+}

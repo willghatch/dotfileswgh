@@ -2,7 +2,7 @@
     "tags": {
         "dotfileswgh": {
             "volumes": {
-                "$HOME/dotfileswgh": "/home/wgh/dotfileswgh"
+                "$HOME/dotfileswgh": "$DOCSUEZ_CONTAINER_HOME/dotfileswgh"
             }
         }
     }

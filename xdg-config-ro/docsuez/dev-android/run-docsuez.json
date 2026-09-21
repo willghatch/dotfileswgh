@@ -1,21 +1,22 @@
 {
+  "docker-run-script": {
+    "0": [
+      "DOCSUEZ_CONTAINER_BUILD_TIME_USER_NAME=wgh",
+      "DOCSUEZ_CONTAINER_BUILD_TIME_UID=\"$(id -u)\""
+    ]
+  },
   "tags": {
     "network": {
       "docker-args": [
         "--network=host"
       ]
     },
-    "user": {
-      "docker-args": [
-        "--user", "$(id -u):$(id -g)"
-      ]
-    },
     "homedir": {
       "volumes": {
-        "$HOME/mk/misc/docker-home": "/home/wgh"
+        "$HOME/mk/misc/docker-home": "$DOCSUEZ_CONTAINER_HOME"
       },
       "docker-args": [
-        "--workdir=/home/wgh"
+        "--workdir=$DOCSUEZ_CONTAINER_HOME"
       ]
     },
     "term": {
@@ -27,14 +28,14 @@
       "docker-args": [
         "-e", "USE_CCACHE=1",
         "-e", "CCACHE_EXEC=/usr/bin/ccache",
-        "-e", "CCACHE_DIR=/home/wgh/mk/ccache",
+        "-e", "CCACHE_DIR=$DOCSUEZ_CONTAINER_HOME/mk/ccache",
         "-e", "CCACHE_MAXSIZE=100G",
         "-e", "CCACHE_COMPRESS=1"
       ]
     },
     "mk": {
       "volumes": {
-        "$HOME/mk/misc/mk-android": "/home/wgh/mk"
+        "$HOME/mk/misc/mk-android": "$DOCSUEZ_CONTAINER_HOME/mk"
       }
     }
   }

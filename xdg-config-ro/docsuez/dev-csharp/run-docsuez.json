@@ -1,16 +1,17 @@
 {
+  "docker-run-script": {
+    "0": [
+      "DOCSUEZ_CONTAINER_BUILD_TIME_USER_NAME=wgh",
+      "DOCSUEZ_CONTAINER_BUILD_TIME_UID=\"$(id -u)\""
+    ]
+  },
   "tags": {
-    "user": {
-      "docker-args": [
-        "--user", "$(id -u):$(id -g)"
-      ]
-    },
     "homedir": {
       "volumes": {
-        "$HOME/mk/misc/docker-home": "/home/wgh"
+        "$HOME/mk/misc/docker-home": "$DOCSUEZ_CONTAINER_HOME"
       },
       "docker-args": [
-        "--workdir=/home/wgh"
+        "--workdir=$DOCSUEZ_CONTAINER_HOME"
       ]
     },
     "term": {
@@ -20,7 +21,7 @@
     },
     "mk": {
       "volumes": {
-        "$HOME/mk/misc/mk-misc-default": "/home/wgh/mk"
+        "$HOME/mk/misc/mk-misc-default": "$DOCSUEZ_CONTAINER_HOME/mk"
       }
     }
   }
