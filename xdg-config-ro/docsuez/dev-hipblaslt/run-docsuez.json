@@ -4,7 +4,7 @@
       "DOCSUEZ_CONTAINER_BUILD_TIME_USER_NAME=wgh",
       "DOCSUEZ_CONTAINER_BUILD_TIME_UID=\"$(id -u)\""
     ],
-    "1": "DEV_TYPES=\"$DEV_TYPES,gpu\""
+    "1": "DEV_TYPES=\"$DEV_TYPES,gpu,amdgpu\""
   },
   "tags": {
     "network": {
