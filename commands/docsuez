@@ -1196,7 +1196,9 @@ class Docsuez:
                 return
 
             # Run the script
-            subprocess.run(["bash", script_path], check=True)
+            result = subprocess.run(["bash", script_path])
+            if result.returncode != 0:
+                sys.exit(result.returncode)
         finally:
             if os.path.exists(script_path):
                 os.unlink(script_path)
@@ -1296,7 +1298,9 @@ class Docsuez:
                 with open(script_path, 'r') as f:
                     print(f.read())
             else:
-                subprocess.run(["bash", script_path])
+                result = subprocess.run(["bash", script_path])
+                if result.returncode != 0:
+                    sys.exit(result.returncode)
         finally:
             if os.path.exists(script_path):
                 os.unlink(script_path)

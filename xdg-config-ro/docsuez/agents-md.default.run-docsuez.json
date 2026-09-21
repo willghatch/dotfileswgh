@@ -1,0 +1,47 @@
+{
+    "#comment": [
+        "Generate a per-user AGENTS.md with agents-md-generate (using DEV_TYPES) and",
+        "mount it read-only where each agent tool reads its global instructions.",
+        "Addons can append comma-separated segment names to AGENTS_MD_GENERATE_ADD",
+        "and AGENTS_MD_GENERATE_OMIT (after key 0, before key 100) to drive --add/--omit.",
+        "Runs outside any git repo so the host cwd's repo config doesn't leak in.",
+        "Failure (or empty output) aborts the run."
+    ],
+    "tags": {
+        "agents-md": {
+            "docker-run-script": {
+                "0": [
+                    "AGENTS_MD_GENERATE_ADD=\"\"",
+                    "AGENTS_MD_GENERATE_OMIT=\"\""
+                ],
+                "100": [
+                    "_docsuez_amd_args=()",
+                    "IFS=',' read -ra _docsuez_amd_parts <<< \"$AGENTS_MD_GENERATE_ADD\"",
+                    "for _docsuez_amd in \"${_docsuez_amd_parts[@]}\"; do",
+                    "  _docsuez_amd=\"${_docsuez_amd//[[:space:]]/}\"",
+                    "  if [[ -n \"$_docsuez_amd\" ]]; then _docsuez_amd_args+=(--add \"$_docsuez_amd\"); fi",
+                    "done",
+                    "IFS=',' read -ra _docsuez_amd_parts <<< \"$AGENTS_MD_GENERATE_OMIT\"",
+                    "for _docsuez_amd in \"${_docsuez_amd_parts[@]}\"; do",
+                    "  _docsuez_amd=\"${_docsuez_amd//[[:space:]]/}\"",
+                    "  if [[ -n \"$_docsuez_amd\" ]]; then _docsuez_amd_args+=(--omit \"$_docsuez_amd\"); fi",
+                    "done",
+                    "_docsuez_amd_dir=\"$(mktemp -d \"${XDG_RUNTIME_DIR:-/tmp}/docsuez-agents-md.XXXXXX\")\"",
+                    "_docsuez_amd_file=\"$_docsuez_amd_dir/AGENTS.md\"",
+                    "if ! (cd \"$_docsuez_amd_dir\" && env -u AGENT_WORK_GIT_ROOT agents-md-generate --no-preamble \"${_docsuez_amd_args[@]}\" > \"$_docsuez_amd_file\"); then",
+                    "  echo \"Error: agents-md-generate failed\" >&2",
+                    "  exit 1",
+                    "fi",
+                    "if [[ ! -s \"$_docsuez_amd_file\" ]]; then",
+                    "  echo \"Error: agents-md-generate produced empty output\" >&2",
+                    "  exit 1",
+                    "fi",
+                    "chmod 644 \"$_docsuez_amd_file\"",
+                    "for _docsuez_amd in .claude/CLAUDE.md .codex/AGENTS.md .config/opencode/AGENTS.md .pi/agent/AGENTS.md .config/agents/AGENTS.md; do",
+                    "  DOCSUEZ_VOLUMES+=(\"$_docsuez_amd_file:$DOCSUEZ_CONTAINER_HOME/$_docsuez_amd:ro\")",
+                    "done"
+                ]
+            }
+        }
+    }
+}
