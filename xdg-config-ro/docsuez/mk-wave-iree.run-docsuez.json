@@ -1,6 +1,6 @@
 {
     "docker-run-script": {
-        "1": "DEV_TYPES=\"$DEV_TYPES,wave,iree\""
+        "1": "DEV_TYPES=\"$DEV_TYPES,llvm,wave,iree,gpu\""
     },
     "tags": {
         "mk": {

@@ -4,7 +4,7 @@
       "DOCSUEZ_CONTAINER_BUILD_TIME_USER_NAME=wgh",
       "DOCSUEZ_CONTAINER_BUILD_TIME_UID=\"$(id -u)\""
     ],
-    "1": "DEV_TYPES=\"$DEV_TYPES,llvm,triton\""
+    "1": "DEV_TYPES=\"$DEV_TYPES,llvm,triton,gpu\""
   },
   "tags": {
     "homedir": {
