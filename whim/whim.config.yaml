@@ -6,7 +6,7 @@
 # - `dotnet restore Whim.sln`
 # - build with: `dotnet build src\Whim.Runner\Whim.Runner.csproj -c Release -p:Platform=x64 "-p:SolutionDir=$PWD\"`  Note that in Command Prompt, $PWD may not expand properly and needs to be manually expanded, and note the terminating `\` on the SolutionDir is important, and maybe needs a double slash.
 # - the executable is at src\Whim.Runner\bin\Release\_target-specific-path_\publish\Whim.Runner.exe
-# - run with `--dir CONFIG_DIR`, or put config dir at ~/.whim -- the restart command ALWAYS reads ~/.whim.
+# - run with `--dir CONFIG_DIR`, or put config dir at ~/.whim -- the restart command keeps the `--dir` argument.
 
 
 layout_engines:
@@ -152,6 +152,10 @@ plugins:
         - type: workspace_widget
     right_components:
       entries:
+        # Panic button: un-hide and un-minimize every window, and bring hidden workspaces' windows onto the monitors.
+        - type: command_widget
+          command: whim.core.show_all_windows
+          label: Show all
         - type: date_time_widget
           format: yyyy-MM-dd HH:mm
         - type: active_layout_widget
