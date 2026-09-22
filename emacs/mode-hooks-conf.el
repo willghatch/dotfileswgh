@@ -31,9 +31,6 @@
 (autoload 'mlir-mode "mlir-mode")
 (add-to-list 'auto-mode-alist '("\\.mlir$" . mlir-mode))
 
-(autoload 'markdown-mode "markdown-mode")
-(add-to-list 'auto-mode-alist '("\\.md$" . markdown-mode))
-
 (add-to-list 'auto-mode-alist '("^.gitmodules$" . conf-unix-mode))
 (add-to-list 'auto-mode-alist '("^.gitignore$" . conf-unix-mode))
 

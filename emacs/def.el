@@ -272,6 +272,8 @@
    ;;(lsp)
    )
  (require 'org-mode-conf)
+ (autoload 'markdown-mode "markdown-mode")
+ (add-to-list 'auto-mode-alist '("\\.md$" . markdown-mode))
  )
 
 (setq wgh/de-fast-run nil)
@@ -396,4 +398,3 @@
 (message (format "start time: %f" (time-to-seconds (time-subtract (current-time) before-init-time))))
 
 (setq gc-cons-threshold (or wgh/orig-gc-threshold 800000))
-
