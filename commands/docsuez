@@ -73,6 +73,43 @@ build-docsuez.json - Specifies how to build an image:
   }
 }
 
+To build FROM another docsuez-managed image, use a "from-docsuez" entry
+inside the "dockerfile" spec list.  It is an alternative to keys like
+"text" and "relative-path" and controls where the FROM line appears in
+the assembled Dockerfile.  To copy files out of another docsuez-managed
+image, use a "copy-from-docsuez" entry the same way:
+{
+  "dockerfile": [
+    {"from-docsuez": "my-builder-image", "as": "builder"},
+    {"text": ["RUN make", "RUN make install DESTDIR=/out"]},
+    {"from-docsuez": "my-base-image"},
+    {"text": ["COPY --from=builder /out/ /"]},
+    {"copy-from-docsuez": "my-tools-image", "src": "/usr/local/bin/tool", "dst": "/usr/local/bin/"},
+    {"copy-from-docsuez": "my-tools-image", "src": ["/etc/a.conf", "/etc/b.conf"], "dst": "/etc/"}
+  ]
+}
+
+docsuez resolves each referenced docsuez image (building it first if
+needed), then substitutes its resolved Docker image name into the
+assembled Dockerfile in place of the entry:
+- {"from-docsuez": IMAGE} becomes "FROM <resolved IMAGE>".
+  The optional "as" key adds a stage name: "FROM <resolved IMAGE> AS NAME".
+  The stage name can be used in ordinary entries, eg. "COPY --from=NAME ...".
+- {"copy-from-docsuez": IMAGE, "src": SRC, "dst": DST} becomes
+  "COPY --from=<resolved IMAGE> SRC... DST".  "src" is a path or a list of
+  paths; "src" and "dst" are required.
+Both kinds of entry can appear any number of times, eg. for multi-stage
+builds.  Other keys in these entries are an error.
+
+Each referenced docsuez image is checked (and built if needed) at most once
+per docsuez invocation, however many times it is referenced, directly or
+through other docsuez images.  A cycle of references is an error.
+When checking whether an image is out of date (eg. "run" in its default
+"--build detect" mode), an image is rebuilt if any docsuez image it
+references is newer than it, as well as when its own sources changed.
+This applies transitively, since rebuilt dependencies are newer.
+"build --dry-show" resolves referenced image names without building them.
+
 Note:
 - Unless environment variable $DOCSUEZ_NO_USER_NAME_PREPEND is set, the $USER
   variable will be prepended to docker image and container names.
@@ -398,7 +435,16 @@ class DocsuezConfig:
 
 
 class BuildConfig:
-    """Represents a parsed build-docsuez.json configuration"""
+    """Represents a parsed build-docsuez.json configuration
+
+    {"from-docsuez": ...} and {"copy-from-docsuez": ...} entries may appear
+    anywhere (and any number of times) inside the "dockerfile" spec list.
+    Each names another docsuez build config whose resolved Docker image name
+    is substituted into a FROM or COPY --from line at that position in the
+    assembled Dockerfile.  The entries play the same role as "text",
+    "relative-path", etc. — their position in the list controls where the
+    lines appear.
+    """
 
     def __init__(self, config_path: Path, searcher: 'DocsuezSearcher' = None):
         self.config_path = config_path
@@ -406,11 +452,111 @@ class BuildConfig:
         self.searcher = searcher
         self._config = {}
         self._generated_dockerfile = None
+        # Maps docsuez dependency specs to resolved image names.  Filled in by
+        # the caller (via set_docsuez_image) after dependencies are resolved;
+        # _generate_dockerfile substitutes these into FROM / COPY --from lines.
+        self._docsuez_images: Dict[str, str] = {}
 
     def load(self):
         """Load the build configuration file"""
         with open(self.config_path, 'r') as f:
             self._config = _strip_comment_keys(json.load(f))
+
+    DOCKERFILE_ENTRY_KINDS = ("from-docsuez", "copy-from-docsuez", "text",
+                              "bash-print-text", "relative-path", "search")
+
+    def _invalid_dockerfile_spec(self, spec, message: str):
+        """Report a malformed dockerfile spec and exit."""
+        print(f"Error: in {self.config_path}: invalid dockerfile spec {json.dumps(spec)}: {message}",
+              file=sys.stderr)
+        sys.exit(1)
+
+    def _dockerfile_spec_entries(self) -> List[Dict[str, Any]]:
+        """Return the dockerfile spec as a list of entries.
+
+        A missing or empty spec means the "Dockerfile" file in the config
+        directory, a string spec is a path relative to the config directory,
+        and a single entry may be given without an enclosing list.  Exits with
+        an error if the spec or any entry is malformed.
+        """
+        dockerfile_spec = self._config.get("dockerfile")
+        if not dockerfile_spec:
+            dockerfile_spec = "Dockerfile"
+        if isinstance(dockerfile_spec, str):
+            entries = [{"relative-path": dockerfile_spec}]
+        elif isinstance(dockerfile_spec, dict):
+            entries = [dockerfile_spec]
+        elif isinstance(dockerfile_spec, list):
+            entries = dockerfile_spec
+        else:
+            self._invalid_dockerfile_spec(dockerfile_spec,
+                                          "must be a string, an entry object, or a list of entry objects")
+        for entry in entries:
+            if not isinstance(entry, dict) or not any(k in entry for k in self.DOCKERFILE_ENTRY_KINDS):
+                self._invalid_dockerfile_spec(
+                    entry, "each entry must be an object with one of the keys "
+                    + ", ".join(f'"{k}"' for k in self.DOCKERFILE_ENTRY_KINDS))
+        return entries
+
+    def _parse_docsuez_entry(self, spec) -> Optional[Tuple[str, str]]:
+        """Validate a dockerfile spec entry that references a docsuez image.
+
+        Returns (kind, dependency_spec), where kind is "from-docsuez" or
+        "copy-from-docsuez", or None if the entry is some other kind.
+        Exits with an error for malformed entries.
+        """
+        if not isinstance(spec, dict):
+            return None
+        if "from-docsuez" in spec:
+            kind, allowed = "from-docsuez", {"from-docsuez", "as"}
+        elif "copy-from-docsuez" in spec:
+            kind, allowed = "copy-from-docsuez", {"copy-from-docsuez", "src", "dst"}
+        else:
+            return None
+
+        def fail(message):
+            print(f"Error: in {self.config_path}: invalid '{kind}' entry {spec}: {message}",
+                  file=sys.stderr)
+            sys.exit(1)
+
+        extra = set(spec) - allowed
+        if extra:
+            fail(f"unknown key(s) {', '.join(sorted(extra))}")
+        if not isinstance(spec[kind], str):
+            fail(f"'{kind}' must be a string")
+        if kind == "from-docsuez":
+            if "as" in spec and not isinstance(spec["as"], str):
+                fail("'as' must be a string")
+        else:
+            src = spec.get("src")
+            if isinstance(src, str):
+                src = [src]
+            if not src or not isinstance(src, list) or not all(isinstance(x, str) for x in src):
+                fail("'src' is required and must be a string or a non-empty list of strings")
+            if not isinstance(spec.get("dst"), str):
+                fail("'dst' is required and must be a string")
+        return kind, spec[kind]
+
+    def get_docsuez_dependencies(self) -> List[str]:
+        """Return the docsuez image specs this build references, in order, without repeats.
+
+        These are the names in {"from-docsuez": ...} and
+        {"copy-from-docsuez": ...} entries of the "dockerfile" spec list.
+        """
+        deps = []
+        for entry in self._dockerfile_spec_entries():
+            parsed = self._parse_docsuez_entry(entry)
+            if parsed is not None and parsed[1] not in deps:
+                deps.append(parsed[1])
+        return deps
+
+    def set_docsuez_image(self, dep_spec: str, image_name: str):
+        """Record the resolved Docker image name for a docsuez dependency spec.
+
+        Must be called for every spec from get_docsuez_dependencies() before
+        get_dockerfile() / _generate_dockerfile().
+        """
+        self._docsuez_images[dep_spec] = image_name
 
     def _resolve_search_path(self, search_file: str) -> Path:
         """Search for a file in the docsuez search paths"""
@@ -425,18 +571,37 @@ class BuildConfig:
         raise FileNotFoundError(f"Could not find '{search_file}' in any search path: {self.searcher.search_paths}")
 
     def _generate_dockerfile(self) -> Tuple[str, Path]:
-        """Generate dockerfile content and return (content, temp_path)"""
+        """Generate dockerfile content and return (content, temp_path).
+
+        When the dockerfile spec references docsuez images, the caller must
+        first call set_docsuez_image() for each of them.  Each
+        {"from-docsuez": ...} or {"copy-from-docsuez": ...} entry is then
+        replaced with the corresponding FROM or COPY --from line at that
+        position in the Dockerfile.
+        """
         import tempfile
 
-        dockerfile_spec = self._config.get("dockerfile", "Dockerfile")
-
-        # Handle string or list
-        if isinstance(dockerfile_spec, str):
-            dockerfile_spec = [dockerfile_spec]
-
         content_parts = []
-        for spec in dockerfile_spec:
-            if isinstance(spec, dict) and "text" in spec:
+
+        for spec in self._dockerfile_spec_entries():
+            docsuez_entry = self._parse_docsuez_entry(spec)
+            if docsuez_entry is not None:
+                kind, dep_spec = docsuez_entry
+                if dep_spec not in self._docsuez_images:
+                    raise ValueError(
+                        f"set_docsuez_image() must be called for '{dep_spec}' "
+                        "before _generate_dockerfile()"
+                    )
+                image = self._docsuez_images[dep_spec]
+                if kind == "from-docsuez":
+                    line = f"FROM {image}"
+                    if "as" in spec:
+                        line += f" AS {spec['as']}"
+                else:
+                    srcs = spec["src"] if isinstance(spec["src"], list) else [spec["src"]]
+                    line = f"COPY --from={image} {' '.join(srcs)} {spec['dst']}"
+                content_parts.append(line)
+            elif isinstance(spec, dict) and "text" in spec:
                 # Literal text - handle string or list of strings
                 dockerfile_text = spec["text"]
                 if isinstance(dockerfile_text, list):
@@ -462,13 +627,11 @@ class BuildConfig:
                 file_path = self.config_dir / spec["relative-path"]
                 with open(file_path, 'r') as f:
                     content_parts.append(f.read())
-            elif isinstance(spec, dict) and "search" in spec:
+            else:
                 # Search for file in search paths
                 file_path = self._resolve_search_path(spec["search"])
                 with open(file_path, 'r') as f:
                     content_parts.append(f.read())
-            else:
-                raise ValueError(f"Invalid dockerfile spec: {spec}")
 
         content = "\n".join(content_parts)
 
@@ -481,42 +644,42 @@ class BuildConfig:
         return content, Path(temp_path)
 
     def get_dockerfile(self) -> str:
-        """Get the Dockerfile path"""
+        """Get the Dockerfile path.
+
+        When the dockerfile spec references docsuez images,
+        set_docsuez_image() must be called for each of them first.
+        """
         if self._generated_dockerfile:
             return str(self._generated_dockerfile)
 
-        dockerfile_spec = self._config.get("dockerfile", "Dockerfile")
-
-        # If it's a list or contains literal text, generate it
-        if isinstance(dockerfile_spec, list) or isinstance(dockerfile_spec, dict):
-            _, temp_path = self._generate_dockerfile()
-            return str(temp_path)
+        dockerfile_spec = self._config.get("dockerfile") or "Dockerfile"
 
         # Simple string path
-        return str(self.config_dir / dockerfile_spec)
+        if isinstance(dockerfile_spec, str):
+            return str(self.config_dir / dockerfile_spec)
+
+        _, temp_path = self._generate_dockerfile()
+        return str(temp_path)
 
     def get_dockerfile_sources(self) -> List[Path]:
-        """Get all source files that contribute to the dockerfile"""
-        dockerfile_spec = self._config.get("dockerfile", "Dockerfile")
+        """Get all source files that contribute to the dockerfile.
 
-        if isinstance(dockerfile_spec, str):
-            return [self.config_dir / dockerfile_spec]
-
-        if isinstance(dockerfile_spec, list):
-            sources = []
-            for spec in dockerfile_spec:
-                if isinstance(spec, dict) and "relative-path" in spec:
-                    sources.append(self.config_dir / spec["relative-path"])
-                elif isinstance(spec, dict) and "search" in spec:
-                    try:
-                        sources.append(self._resolve_search_path(spec["search"]))
-                    except FileNotFoundError:
-                        # Skip if not found during source collection
-                        pass
-                # Skip literal text entries
-            return sources
-
-        return [self.config_dir / "Dockerfile"]
+        {"from-docsuez": ...} and {"copy-from-docsuez": ...} entries have no
+        local source files of their own; each dependency is tracked via its
+        own BuildConfig.
+        """
+        sources = []
+        for spec in self._dockerfile_spec_entries():
+            if "relative-path" in spec:
+                sources.append(self.config_dir / spec["relative-path"])
+            elif "search" in spec:
+                try:
+                    sources.append(self._resolve_search_path(spec["search"]))
+                except FileNotFoundError:
+                    # Skip if not found during source collection
+                    pass
+            # Skip literal text and docsuez image entries
+        return sources
 
     def get_newest_source_mtime(self) -> float:
         """Get the newest modification time among all build sources (dockerfile + config)"""
@@ -804,6 +967,11 @@ class Docsuez:
     def __init__(self):
         self.searcher = DocsuezSearcher()
         self.tsuez_cmd = "tsuez"  # Find tsuez on PATH
+        # Docsuez dependency images already resolved in this invocation, keyed
+        # by resolved build config path, so each is checked/built only once.
+        self._resolved_dependency_images: Dict[Path, str] = {}
+        # Build configs currently being resolved, for cycle detection.
+        self._resolving_build_configs: List[Path] = []
 
     def cmd_list_configurations(self, args):
         """List available configuration names for use with 'docsuez run'"""
@@ -834,14 +1002,164 @@ class Docsuez:
         build_config = BuildConfig(build_config_path, self.searcher)
         build_config.load()
 
+        # Resolve and build any docsuez image dependencies before assembling
+        # the Dockerfile or running the build.  Use "detect" build mode by
+        # default (the build subcommand always builds the top-level image, but
+        # dependencies are only rebuilt if out of date).  A dry run only
+        # resolves dependency image names, without touching docker.
+        dry_show = getattr(args, 'dry_show', False)
+        self._resolve_top_level_dependencies(
+            build_config, no_cache=getattr(args, 'no_cache', False), dry_run=dry_show)
+
         # If dry-show mode, print the assembled dockerfile and exit
-        if getattr(args, 'dry_show', False):
+        if dry_show:
             content, _ = build_config._generate_dockerfile()
             print(content)
             build_config.cleanup()
             return
 
-        # Build the docker image
+        self._do_build(build_config, args)
+
+    def _image_created_timestamp(self, image_name: str) -> Optional[float]:
+        """Return the creation time of a docker image, or None if it is missing or unreadable."""
+        result = subprocess.run(
+            ["docker", "image", "inspect", image_name],
+            capture_output=True,
+            text=True
+        )
+        if result.returncode != 0:
+            return None
+
+        image_info = json.loads(result.stdout)
+        if not image_info:
+            return None
+
+        image_created_str = image_info[0].get("Created", "")
+        from datetime import datetime
+        try:
+            image_created = datetime.fromisoformat(image_created_str.replace("Z", "+00:00"))
+            return image_created.timestamp()
+        except ValueError:
+            return None
+
+    def _should_build_image(self, build_mode: str, build_config: BuildConfig, image_name: str,
+                            dependency_images: List[str] = ()) -> bool:
+        """Determine if image should be built based on build mode and staleness.
+
+        In detect mode, the image is built if it doesn't exist, if any of its
+        build sources is newer than it, or if any of dependency_images (its
+        resolved docsuez image dependencies) is newer than it.
+        """
+        if build_mode in ["yes", "force", "true"]:
+            return True
+        if build_mode in ["no", "false"]:
+            return False
+
+        # build_mode == "detect" (default)
+        # A missing or unparseable image timestamp means rebuild to be safe.
+        image_mtime = self._image_created_timestamp(image_name)
+        if image_mtime is None:
+            return True
+
+        # Compare with build source mtimes (dockerfile + config)
+        if build_config.get_newest_source_mtime() > image_mtime:
+            return True
+
+        for dep_image in dependency_images:
+            dep_mtime = self._image_created_timestamp(dep_image)
+            if dep_mtime is None or dep_mtime > image_mtime:
+                return True
+
+        return False
+
+    def _resolve_top_level_dependencies(self, build_config: BuildConfig, no_cache: bool,
+                                        dry_run: bool) -> List[str]:
+        """Resolve the docsuez image dependencies of the image being built or run.
+
+        Dependencies use "detect" build mode.  Returns the resolved dependency
+        image names (see _resolve_docsuez_dependencies).
+        """
+        # The top-level config counts as being resolved, so a dependency that
+        # leads back to it is reported as a cycle.
+        self._resolving_build_configs.append(build_config.config_path.resolve())
+        images = self._resolve_docsuez_dependencies(
+            build_config, build_mode="detect", no_cache=no_cache, dry_run=dry_run)
+        self._resolving_build_configs.pop()
+        return images
+
+    def _resolve_docsuez_dependencies(self, build_config: BuildConfig, build_mode: str,
+                                      no_cache: bool = False,
+                                      dry_run: bool = False) -> List[str]:
+        """Resolve and, if needed, build the docsuez image dependencies of a BuildConfig.
+
+        Dependencies are the images named by {"from-docsuez": ...} and
+        {"copy-from-docsuez": ...} entries in its dockerfile spec.  Each
+        resolved image name is recorded on build_config, and the list of
+        resolved image names is returned.
+
+        Dependencies are resolved recursively, and each is checked (and built
+        if needed) at most once per docsuez invocation.  The same build_mode
+        (force/detect/skip) is applied to every dependency.  A dependency
+        cycle is an error.
+
+        With dry_run, dependency image names are resolved but nothing is
+        inspected or built.
+        """
+        images = []
+        for dep_spec in build_config.get_docsuez_dependencies():
+            image = self._resolve_docsuez_dependency(dep_spec, build_mode, no_cache, dry_run)
+            build_config.set_docsuez_image(dep_spec, image)
+            images.append(image)
+        return images
+
+    def _resolve_docsuez_dependency(self, dep_spec: str, build_mode: str,
+                                    no_cache: bool, dry_run: bool) -> str:
+        """Resolve one docsuez dependency spec to an image name, building it if needed."""
+        dep_config_path = self.searcher.find_build_config(dep_spec)
+        if not dep_config_path:
+            print(f"Error: docsuez image dependency '{dep_spec}' not found", file=sys.stderr)
+            sys.exit(1)
+
+        key = dep_config_path.resolve()
+        if key in self._resolved_dependency_images:
+            return self._resolved_dependency_images[key]
+        if key in self._resolving_build_configs:
+            cycle = self._resolving_build_configs[self._resolving_build_configs.index(key):]
+            chain = " -> ".join(str(p) for p in cycle + [key])
+            print(f"Error: docsuez image dependency cycle: {chain}", file=sys.stderr)
+            sys.exit(1)
+
+        self._resolving_build_configs.append(key)
+        dep_config = BuildConfig(dep_config_path, self.searcher)
+        dep_config.load()
+
+        # Resolve deeper dependencies first, so that a rebuilt deeper
+        # dependency is newer than this one and makes it stale in detect mode.
+        nested_images = self._resolve_docsuez_dependencies(dep_config, build_mode, no_cache,
+                                                           dry_run)
+
+        dep_image_name = dep_config.get_builder_image_name()
+
+        if not dry_run and self._should_build_image(build_mode, dep_config, dep_image_name,
+                                                    nested_images):
+            print(f"Building docsuez image dependency: {dep_image_name}...")
+            sys.stdout.flush()
+            dep_args = argparse.Namespace(image_spec=dep_spec, no_cache=no_cache, dry_show=False)
+            self._do_build(dep_config, dep_args)
+
+        dep_config.cleanup()
+        self._resolving_build_configs.pop()
+        self._resolved_dependency_images[key] = dep_image_name
+        return dep_image_name
+
+    def _do_build(self, build_config: BuildConfig, args):
+        """Execute the docker build for a pre-loaded BuildConfig.
+
+        build_config must already be loaded and its docsuez image
+        dependencies resolved (see _resolve_docsuez_dependencies).  This is
+        the inner build routine shared between cmd_build and
+        _resolve_docsuez_dependency.
+        """
         build_cmd = ["docker", "build"]
 
         # Add --no-cache if requested
@@ -856,7 +1174,7 @@ class Docsuez:
         image_name = build_config.get_builder_image_name()
         build_cmd.extend(["-t", image_name])
 
-        # Add dockerfile if specified
+        # Add dockerfile
         dockerfile = build_config.get_dockerfile()
         if dockerfile:
             build_cmd.extend(["-f", dockerfile])
@@ -866,52 +1184,13 @@ class Docsuez:
 
         print(f"Building image: {' '.join(build_cmd)}")
         try:
-            result = subprocess.run(build_cmd, check=True)
+            subprocess.run(build_cmd, check=True)
         except subprocess.CalledProcessError as e:
             print(f"\nError: Image build failed with exit code {e.returncode}", file=sys.stderr)
             build_config.cleanup()
             sys.exit(1)
         finally:
             build_config.cleanup()
-
-    def _should_build_image(self, build_mode: str, build_config: BuildConfig, image_name: str) -> bool:
-        """Determine if image should be built based on build mode and modification times"""
-        if build_mode in ["yes", "force", "true"]:
-            return True
-        if build_mode in ["no", "false"]:
-            return False
-
-        # build_mode == "detect" (default)
-        # Check if image exists
-        result = subprocess.run(
-            ["docker", "image", "inspect", image_name],
-            capture_output=True,
-            text=True
-        )
-
-        if result.returncode != 0:
-            # Image doesn't exist, need to build
-            return True
-
-        # Get image creation time
-        import json as json_mod
-        image_info = json_mod.loads(result.stdout)
-        if not image_info:
-            return True
-
-        image_created_str = image_info[0].get("Created", "")
-        from datetime import datetime
-        try:
-            image_created = datetime.fromisoformat(image_created_str.replace("Z", "+00:00"))
-            image_mtime = image_created.timestamp()
-        except:
-            # Can't parse, rebuild to be safe
-            return True
-
-        # Compare with build source mtimes (dockerfile + config)
-        source_mtime = build_config.get_newest_source_mtime()
-
-        return source_mtime > image_mtime
 
     def _generate_docker_run_script(self, script_file, config: DocsuezConfig, image_name: str,
                                      tsuez_mode: bool = False, tsuez_config: Optional[Dict[str, Any]] = None,
@@ -1260,13 +1539,18 @@ class Docsuez:
             build_config.load()
             image_name = build_config.get_builder_image_name()
 
-            # Determine if we should build (skip if --dry-show is set)
-            if not getattr(args, 'dry_show', False) and self._should_build_image(args.build, build_config, image_name):
-                print(f"Building image {image_name}...")
-                sys.stdout.flush()
-                build_args_obj = argparse.Namespace(image_spec=image_builder,
-                                                   no_cache=getattr(args, 'no_cache', False))
-                self.cmd_build(build_args_obj)
+            # Determine if we should build (skip if --dry-show is set, and
+            # leave dependencies alone when building is disabled).  In detect
+            # mode, dependencies are resolved (and rebuilt if stale) first, and
+            # the image is rebuilt if any of them is newer than it.
+            if not getattr(args, 'dry_show', False) and args.build not in ["no", "false"]:
+                no_cache = getattr(args, 'no_cache', False)
+                dep_images = self._resolve_top_level_dependencies(
+                    build_config, no_cache=no_cache, dry_run=False)
+                if self._should_build_image(args.build, build_config, image_name, dep_images):
+                    print(f"Building image {image_name}...")
+                    sys.stdout.flush()
+                    self._do_build(build_config, argparse.Namespace(no_cache=no_cache))
 
         # Get extra docker args from command line
         extra_docker_args = getattr(args, 'extra_docker_args', None)
