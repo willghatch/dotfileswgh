@@ -52,6 +52,7 @@ class SearchMergeTest(unittest.TestCase):
             env=env or self.env,
             text=True,
             capture_output=True,
+            timeout=5,
         )
 
     def dry_show(self, name="env"):
@@ -187,6 +188,16 @@ class SearchMergeTest(unittest.TestCase):
         self.assertIn("cycle", result.stderr.lower())
         self.assertIn(str(one), result.stderr)
         self.assertIn(str(two), result.stderr)
+
+    def test_search_merge_path_must_be_search_root_relative(self):
+        outside = self.write_json(self.root / "outside.json", {"text": "OUTSIDE"})
+        self.make_build({"search-merge": str(outside)})
+
+        result = self.dry_show()
+
+        self.assertNotEqual(result.returncode, 0)
+        self.assertIn("relative", result.stderr.lower())
+        self.assertIn(str(self.first / "env/build-docsuez.json"), result.stderr)
 
     def test_imported_json_and_relative_files_make_an_existing_image_stale(self):
         self.make_build({"search-merge": "extensions/hook.json"})
