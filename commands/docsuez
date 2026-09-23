@@ -64,6 +64,7 @@ build-docsuez.json - Specifies how to build an image:
     {"relative-path": "Dockerfile.base"},
     {"text": ["RUN apt install cowsay", "RUN apt install fortune"]},
     {"bash-print-text": "echo 'RUN echo Built on '$(date)"},
+    {"search-merge": "build-fragments/my-dev-env/after-packages"},
     {"relative-path": "Dockerfile.extra"}
   ],
   "build-context-directory": ".",
@@ -72,6 +73,16 @@ build-docsuez.json - Specifies how to build an image:
     "BASE_IMAGE": "ubuntu:22.04"
   }
 }
+
+"search-merge" is an optional Dockerfile extension point.  Its relative path
+is checked under every docsuez search path.  Each match may be a JSON file or
+a directory whose immediate children are regular *.json files.  A JSON file
+contains one dockerfile entry, a list of entries, or numeric keys mapping to
+an entry or list of entries.  Unkeyed forms use position 50.  Contributions
+are ordered by position, search-path order, filename, and list order.  No
+matches is a no-op, while a found invalid path or contribution is an error.
+Imported relative paths and bash programs use their JSON file's directory.
+Nested search-merge entries are allowed; cycles are errors.
 
 To build FROM another docsuez-managed image, use a "from-docsuez" entry
 inside the "dockerfile" spec list.  It is an alternative to keys like
@@ -146,6 +157,7 @@ Note:
 import argparse
 import fcntl
 import json
+import math
 import os
 import shlex
 import shutil
@@ -471,7 +483,8 @@ class BuildConfig:
     """Represents a parsed build-docsuez.json configuration
 
     {"from-docsuez": ...} and {"copy-from-docsuez": ...} entries may appear
-    anywhere (and any number of times) inside the "dockerfile" spec list.
+    anywhere (and any number of times) inside the "dockerfile" spec list or
+    JSON contributions expanded from a {"search-merge": ...} entry.
     Each names another docsuez build config whose resolved Docker image name
     is substituted into a FROM or COPY --from line at that position in the
     assembled Dockerfile.  The entries play the same role as "text",
@@ -485,6 +498,8 @@ class BuildConfig:
         self.searcher = searcher
         self._config = {}
         self._generated_dockerfile = None
+        self._expanded_dockerfile_entries = None
+        self._search_merge_sources: List[Path] = []
         # Maps docsuez dependency specs to resolved image names.  Filled in by
         # the caller (via set_docsuez_image) after dependencies are resolved;
         # _generate_dockerfile substitutes these into FROM / COPY --from lines.
@@ -494,6 +509,8 @@ class BuildConfig:
         """Load the build configuration file"""
         with open(self.config_path, 'r') as f:
             self._config = _strip_comment_keys(json.load(f))
+        self._expanded_dockerfile_entries = None
+        self._search_merge_sources = []
         # Validate a "nix" spec up front, before anything relies on it.
         self.get_nix_spec()
 
@@ -567,13 +584,69 @@ class BuildConfig:
         return sources
 
     DOCKERFILE_ENTRY_KINDS = ("from-docsuez", "copy-from-docsuez", "text",
-                              "bash-print-text", "relative-path", "search")
+                              "bash-print-text", "relative-path", "search",
+                              "search-merge")
 
-    def _invalid_dockerfile_spec(self, spec, message: str):
+    def _invalid_dockerfile_spec(self, spec, message: str, source: Path = None):
         """Report a malformed dockerfile spec and exit."""
-        print(f"Error: in {self.config_path}: invalid dockerfile spec {json.dumps(spec)}: {message}",
+        source = source or self.config_path
+        print(f"Error: in {source}: invalid dockerfile spec {json.dumps(spec)}: {message}",
               file=sys.stderr)
         sys.exit(1)
+
+    def _validate_dockerfile_entry(self, entry, source: Path):
+        """Validate one entry object from a build config or extension."""
+        if not isinstance(entry, dict):
+            self._invalid_dockerfile_spec(
+                entry, "each entry must be an object with one of the keys "
+                + ", ".join(f'"{key}"' for key in self.DOCKERFILE_ENTRY_KINDS),
+                source)
+        kinds = [key for key in self.DOCKERFILE_ENTRY_KINDS if key in entry]
+        if len(kinds) != 1:
+            self._invalid_dockerfile_spec(
+                entry, "each entry must have exactly one of the keys "
+                + ", ".join(f'"{key}"' for key in self.DOCKERFILE_ENTRY_KINDS),
+                source)
+
+        kind = kinds[0]
+        allowed = {
+            "from-docsuez": {"from-docsuez", "as"},
+            "copy-from-docsuez": {"copy-from-docsuez", "src", "dst"},
+        }.get(kind, {kind})
+        extra = set(entry) - allowed
+        if extra:
+            self._invalid_dockerfile_spec(
+                entry, f'a "{kind}" entry has unknown key(s) '
+                f"{', '.join(sorted(extra))}", source)
+
+        value = entry[kind]
+        if kind in ("text", "bash-print-text"):
+            if not isinstance(value, str) and not (
+                    isinstance(value, list) and all(isinstance(item, str) for item in value)):
+                self._invalid_dockerfile_spec(
+                    entry, f'"{kind}" must be a string or list of strings', source)
+        elif kind in ("relative-path", "search", "search-merge", "from-docsuez"):
+            if not isinstance(value, str) or not value:
+                self._invalid_dockerfile_spec(
+                    entry, f'"{kind}" must be a non-empty string', source)
+            if kind == "from-docsuez" and "as" in entry \
+                    and not isinstance(entry["as"], str):
+                self._invalid_dockerfile_spec(entry, '"as" must be a string', source)
+        else:
+            if not isinstance(value, str) or not value:
+                self._invalid_dockerfile_spec(
+                    entry, '"copy-from-docsuez" must be a non-empty string', source)
+            src = entry.get("src")
+            if isinstance(src, str):
+                src = [src]
+            if not src or not isinstance(src, list) or not all(
+                    isinstance(item, str) for item in src):
+                self._invalid_dockerfile_spec(
+                    entry, '"src" is required and must be a string or non-empty list of strings',
+                    source)
+            if not isinstance(entry.get("dst"), str):
+                self._invalid_dockerfile_spec(
+                    entry, '"dst" is required and must be a string', source)
 
     def _dockerfile_spec_entries(self) -> List[Dict[str, Any]]:
         """Return the dockerfile spec as a list of entries.
@@ -596,11 +669,156 @@ class BuildConfig:
             self._invalid_dockerfile_spec(dockerfile_spec,
                                           "must be a string, an entry object, or a list of entry objects")
         for entry in entries:
-            if not isinstance(entry, dict) or not any(k in entry for k in self.DOCKERFILE_ENTRY_KINDS):
-                self._invalid_dockerfile_spec(
-                    entry, "each entry must be an object with one of the keys "
-                    + ", ".join(f'"{k}"' for k in self.DOCKERFILE_ENTRY_KINDS))
+            self._validate_dockerfile_entry(entry, self.config_path)
         return entries
+
+    def _record_search_merge_source(self, path: Path):
+        """Record a file or directory that affects search-merge expansion."""
+        if path not in self._search_merge_sources:
+            self._search_merge_sources.append(path)
+
+    def _record_search_merge_parent(self, candidate: Path, search_root: Path):
+        """Track the nearest existing parent so additions and removals make builds stale."""
+        parent = candidate.parent
+        while parent != search_root and not parent.exists():
+            parent = parent.parent
+        if parent.exists():
+            self._record_search_merge_source(parent)
+
+    def _search_merge_files(self, merge_path: str, source: Path) -> List[Tuple[int, Path]]:
+        """Return matching JSON files as (search-root index, path)."""
+        if not self.searcher:
+            self._invalid_dockerfile_spec(
+                {"search-merge": merge_path},
+                'cannot use "search-merge" without a searcher instance', source)
+        merge_path_obj = Path(merge_path)
+        if merge_path_obj.is_absolute() or ".." in merge_path_obj.parts:
+            self._invalid_dockerfile_spec(
+                {"search-merge": merge_path},
+                '"search-merge" must be relative and remain within each search root',
+                source)
+
+        matches = []
+        for root_index, search_root in enumerate(self.searcher.search_paths):
+            candidate = search_root / merge_path_obj
+            if search_root.exists():
+                self._record_search_merge_parent(candidate, search_root)
+            if not candidate.exists():
+                continue
+            if candidate.is_symlink():
+                self._invalid_dockerfile_spec(
+                    {"search-merge": merge_path},
+                    f"matched path {candidate} must be a regular JSON file or directory",
+                    source)
+            if candidate.is_file():
+                self._record_search_merge_source(candidate)
+                matches.append((root_index, candidate))
+                continue
+            if not candidate.is_dir():
+                self._invalid_dockerfile_spec(
+                    {"search-merge": merge_path},
+                    f"matched path {candidate} must be a regular JSON file or directory",
+                    source)
+
+            self._record_search_merge_source(candidate)
+            for child in sorted(candidate.iterdir(), key=lambda path: path.name):
+                if child.is_symlink() or not child.is_file() or child.suffix != ".json":
+                    self._invalid_dockerfile_spec(
+                        {"search-merge": merge_path},
+                        f"directory {candidate} contains non-JSON file {child}", source)
+                self._record_search_merge_source(child)
+                matches.append((root_index, child))
+        return matches
+
+    def _numeric_merge_position(self, key, source: Path) -> float:
+        """Parse a finite numeric search-merge position."""
+        try:
+            position = float(key)
+        except (TypeError, ValueError):
+            self._invalid_dockerfile_spec(
+                {key: "..."}, f"search-merge position {key!r} is not a number", source)
+        if not math.isfinite(position):
+            self._invalid_dockerfile_spec(
+                {key: "..."}, f"search-merge position {key!r} is not finite", source)
+        return position
+
+    def _contribution_entries(self, path: Path) -> List[Tuple[float, int, Dict[str, Any]]]:
+        """Load and normalize one JSON contribution to (position, list index, entry)."""
+        try:
+            with open(path, 'r') as f:
+                contribution = _strip_comment_keys(json.load(f))
+        except (OSError, json.JSONDecodeError) as error:
+            print(f"Error: invalid search-merge contribution {path}: {error}", file=sys.stderr)
+            sys.exit(1)
+
+        positioned = []
+
+        def add(position, value):
+            entries = value if isinstance(value, list) else [value]
+            for list_index, entry in enumerate(entries):
+                self._validate_dockerfile_entry(entry, path)
+                positioned.append((position, list_index, entry))
+
+        if isinstance(contribution, list):
+            add(50, contribution)
+        elif isinstance(contribution, dict) and any(
+                kind in contribution for kind in self.DOCKERFILE_ENTRY_KINDS):
+            add(50, contribution)
+        elif isinstance(contribution, dict) and contribution:
+            for key, value in contribution.items():
+                position = self._numeric_merge_position(key, path)
+                if not isinstance(value, (dict, list)):
+                    self._invalid_dockerfile_spec(
+                        contribution,
+                        f"value at search-merge position {key!r} must be an entry or list",
+                        path)
+                add(position, value)
+        else:
+            self._invalid_dockerfile_spec(
+                contribution,
+                "a search-merge contribution must be an entry, a list of entries, "
+                "or a non-empty numeric-keyed object",
+                path)
+        return positioned
+
+    def _expand_search_merge(self, merge_path: str, source: Path,
+                             stack: List[Path]) -> List[Tuple[Dict[str, Any], Path]]:
+        """Expand one search-merge entry, retaining each JSON file as its origin."""
+        contributions = []
+        for root_index, path in self._search_merge_files(merge_path, source):
+            resolved = path.resolve()
+            if resolved in stack:
+                cycle = stack[stack.index(resolved):] + [resolved]
+                print("Error: search-merge cycle: "
+                      + " -> ".join(str(item) for item in cycle), file=sys.stderr)
+                sys.exit(1)
+            for position, list_index, entry in self._contribution_entries(path):
+                contributions.append(
+                    (position, root_index, path.name, list_index, entry, path, resolved))
+
+        contributions.sort(key=lambda item: item[:4])
+        expanded = []
+        for _position, _root_index, _name, _list_index, entry, path, resolved in contributions:
+            if "search-merge" in entry:
+                expanded.extend(self._expand_search_merge(
+                    entry["search-merge"], path, stack + [resolved]))
+            else:
+                expanded.append((entry, path.parent))
+        return expanded
+
+    def _get_expanded_dockerfile_entries(self) -> List[Tuple[Dict[str, Any], Path]]:
+        """Return entries with search-merge points recursively expanded."""
+        if self._expanded_dockerfile_entries is None:
+            self._search_merge_sources = []
+            expanded = []
+            for entry in self._dockerfile_spec_entries():
+                if "search-merge" in entry:
+                    expanded.extend(self._expand_search_merge(
+                        entry["search-merge"], self.config_path, []))
+                else:
+                    expanded.append((entry, self.config_dir))
+            self._expanded_dockerfile_entries = expanded
+        return self._expanded_dockerfile_entries
 
     def _parse_docsuez_entry(self, spec) -> Optional[Tuple[str, str]]:
         """Validate a dockerfile spec entry that references a docsuez image.
@@ -645,13 +863,13 @@ class BuildConfig:
         """Return the docsuez image specs this build references, in order, without repeats.
 
         These are the names in {"from-docsuez": ...} and
-        {"copy-from-docsuez": ...} entries of the "dockerfile" spec list.
+        {"copy-from-docsuez": ...} entries of the expanded Dockerfile spec.
         Nix builds have none; nix expressions compose in nix.
         """
         if self.get_nix_spec() is not None:
             return []
         deps = []
-        for entry in self._dockerfile_spec_entries():
+        for entry, _origin in self._get_expanded_dockerfile_entries():
             parsed = self._parse_docsuez_entry(entry)
             if parsed is not None and parsed[1] not in deps:
                 deps.append(parsed[1])
@@ -690,7 +908,7 @@ class BuildConfig:
 
         content_parts = []
 
-        for spec in self._dockerfile_spec_entries():
+        for spec, origin in self._get_expanded_dockerfile_entries():
             docsuez_entry = self._parse_docsuez_entry(spec)
             if docsuez_entry is not None:
                 kind, dep_spec = docsuez_entry
@@ -726,12 +944,12 @@ class BuildConfig:
                     capture_output=True,
                     text=True,
                     check=True,
-                    cwd=self.config_dir
+                    cwd=origin
                 )
                 content_parts.append(result.stdout)
             elif isinstance(spec, dict) and "relative-path" in spec:
-                # File path relative to config directory
-                file_path = self.config_dir / spec["relative-path"]
+                # File path relative to the build config or contribution.
+                file_path = origin / spec["relative-path"]
                 with open(file_path, 'r') as f:
                     content_parts.append(f.read())
             else:
@@ -775,10 +993,11 @@ class BuildConfig:
         local source files of their own; each dependency is tracked via its
         own BuildConfig.
         """
-        sources = []
-        for spec in self._dockerfile_spec_entries():
+        entries = self._get_expanded_dockerfile_entries()
+        sources = list(self._search_merge_sources)
+        for spec, origin in entries:
             if "relative-path" in spec:
-                sources.append(self.config_dir / spec["relative-path"])
+                sources.append(origin / spec["relative-path"])
             elif "search" in spec:
                 try:
                     sources.append(self._resolve_search_path(spec["search"]))
