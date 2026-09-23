@@ -204,7 +204,7 @@ class SearchMergeTest(unittest.TestCase):
             "  printf '%s\\n' '[{\"Id\":\"sha256:test\",\"Created\":\"2030-01-01T00:00:00Z\"}]'\n"
             "  exit 0\n"
             "fi\n"
-            f"printf '%s\\n' \"$*\" >> {docker_log}\n"
+            f"if [ \"$1\" = build ]; then printf '%s\\n' \"$*\" >> {docker_log}; fi\n"
             "exit 0\n",
         )
         fake_docker.chmod(0o755)
