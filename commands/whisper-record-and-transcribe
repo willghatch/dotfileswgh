@@ -15,7 +15,7 @@ Record audio and transcribe it using whisper-cli.
 
 Options:
     --list-microphones      List available microphones and exit
-    --microphone DEVICE     Select a specific microphone device
+    --microphone DEVICE     Select a specific PulseAudio source (default: the default source)
     --timeout-seconds N     Stop recording after N seconds (default: 600)
     --stereo               Record in stereo (2 channels, default)
     --mono                 Record in mono (1 channel)
@@ -27,7 +27,7 @@ Examples:
     $(basename "$0") --list-microphones
 
     # Record using a specific microphone
-    $(basename "$0") --microphone hw:1,0
+    $(basename "$0") --microphone RDPSource
 
     # Use default microphone
     $(basename "$0")
@@ -35,19 +35,19 @@ Examples:
 Environment Variables:
     WHISPER_MODEL_DIR      Directory containing whisper models (default: $XDG_CACHE_DIR/whisper-models)
     WHISPER_MODEL          Whisper model filename or path (default: ggml-base.bin)
+    PULSE_SOURCE           Default PulseAudio source, used when --microphone is not given
+
+Recording uses parecord, so it works with PulseAudio, PipeWire (via
+pipewire-pulse), and WSLg (whose microphone source is RDPSource).
 EOF
 }
 
 while [[ $# -gt 0 ]]; do
     case "$1" in
         --list-microphones)
-            echo "Available microphones:" >&2
+            echo "Available PulseAudio sources (use name with --microphone):" >&2
             echo "" >&2
-            echo "=== Hardware devices (card, device) ===" >&2
-            arecord -l
-            echo "" >&2
-            echo "=== PCM devices (use with --microphone) ===" >&2
-            arecord -L
+            pactl list short sources
             exit 0
             ;;
         --microphone)
@@ -140,25 +140,25 @@ if [[ "$QUIET" -eq 0 ]]; then
     echo "Audio will be saved temporarily to: $TEMP_AUDIO" >&2
 fi
 
-# Start arecord in the background
-# -f S16_LE: 16-bit signed little-endian (CD quality)
-# -r 16000: 16kHz sample rate (optimal for Whisper)
-# -c N: number of channels (1=mono, 2=stereo)
-# -t wav: WAV format
-# -D device: select specific microphone (if specified)
-ARECORD_ARGS=(-f S16_LE -r 16000 -c "$CHANNELS" -t wav)
+# Start parecord in the background
+# --format=s16le: 16-bit signed little-endian (CD quality)
+# --rate=16000: 16kHz sample rate (optimal for Whisper)
+# --channels=N: number of channels (1=mono, 2=stereo)
+# --file-format=wav: WAV format
+# --device=SOURCE: select specific microphone (if specified)
+PARECORD_ARGS=(--format=s16le --rate=16000 --channels="$CHANNELS" --file-format=wav)
 if [[ -n "$MICROPHONE" ]]; then
-    ARECORD_ARGS+=(-D "$MICROPHONE")
+    PARECORD_ARGS+=(--device="$MICROPHONE")
 fi
-arecord "${ARECORD_ARGS[@]}" "$TEMP_AUDIO" >/dev/null 2>&1 &
-ARECORD_PID=$!
+parecord "${PARECORD_ARGS[@]}" "$TEMP_AUDIO" >/dev/null 2>&1 &
+PARECORD_PID=$!
 
 # Wait for user to press Enter or timeout
 read -r -t "$TIMEOUT_SECONDS" || true
 
-# Stop recording by killing arecord
-kill "$ARECORD_PID" 2>/dev/null || true
-wait "$ARECORD_PID" 2>/dev/null || true
+# Stop recording; parecord finalizes the WAV file on SIGTERM
+kill "$PARECORD_PID" 2>/dev/null || true
+wait "$PARECORD_PID" 2>/dev/null || true
 
 if [[ "$QUIET" -eq 0 ]]; then
     echo "" >&2
