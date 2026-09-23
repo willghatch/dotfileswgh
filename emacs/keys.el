@@ -902,6 +902,7 @@ FUNC should be a function whose first two arguments are BEG and END."
 (emmap "tam" (lambda () (interactive) (exchange-point-and-mark)))
 (enmap "tad" 'insert-date)
 (enmap "taD" 'insert-date-time)
+(enmap "taw" 'whisper-record-and-transcribe)
 (autoload 'alternate-region-activate "alternate-region" "" t)
 (autoload 'alternate-region-swap "alternate-region" "" t)
 (autoload 'alternate-region-cycle "alternate-region" "" t)
