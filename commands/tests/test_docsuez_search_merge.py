@@ -119,6 +119,8 @@ class SearchMergeTest(unittest.TestCase):
             ("malformed JSON", lambda: self.write(self.second / "extensions/hook", "{broken")),
             ("invalid contribution", lambda: self.write_json(
                 self.second / "extensions/hook", {"50": "RUN echo not-an-entry"})),
+            ("invalid entry value", lambda: self.write_json(
+                self.second / "extensions/hook", {"text": 42})),
             ("non-JSON directory child", lambda: self.write(
                 self.second / "extensions/hook/README", "not JSON")),
             ("nested directory", lambda: (self.second / "extensions/hook/nested").mkdir(
@@ -209,7 +211,7 @@ class SearchMergeTest(unittest.TestCase):
         )
         fake_docker.chmod(0o755)
         env = dict(self.env, PATH=f"{fake_bin}{os.pathsep}{self.env['PATH']}")
-        old = 1_800_000_000
+        old = 1_700_000_000
         new = 2_000_000_000
         for path in (self.first / "env/build-docsuez.json", contribution, relative):
             os.utime(path, (old, old))
@@ -226,6 +228,7 @@ class SearchMergeTest(unittest.TestCase):
         self.assertIn("build", docker_log.read_text())
 
         before = docker_log.read_text().count("build")
+        os.utime(relative, (old, old))
         os.utime(contribution, (new, new))
         stale_json = self.docsuez("run", "env", "--no-default-addons", env=env)
 
