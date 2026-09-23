@@ -6,6 +6,9 @@ MICROPHONE=""
 QUIET=0
 TIMEOUT_SECONDS=600
 CHANNELS=2  # Default to stereo
+MODEL_ARG=""
+LIST_MODELS=0
+DEBUG_SHOW_MODEL=0
 
 show_help() {
     cat << EOF
@@ -16,6 +19,9 @@ Record audio and transcribe it using whisper-cli.
 Options:
     --list-microphones      List available microphones and exit
     --microphone DEVICE     Select a specific PulseAudio source (default: the default source)
+    --model NAME            Whisper model name or path (overrides WHISPER_MODEL, see Model Selection)
+    --models                List models in the models directory and exit
+    --debug-show-model      Print the path of the model that would be used and exit
     --timeout-seconds N     Stop recording after N seconds (default: 600)
     --stereo               Record in stereo (2 channels, default)
     --mono                 Record in mono (1 channel)
@@ -32,9 +38,24 @@ Examples:
     # Use default microphone
     $(basename "$0")
 
+    # Use a medium model (eg. ggml-medium.bin, or ggml-medium.en.bin if that's the only one)
+    $(basename "$0") --model medium
+
+Model Selection:
+    A model given as a path (containing a slash) must name an existing file.
+    Any other name is looked up in the models directory, comparing names
+    without the "ggml-" prefix and ".bin" suffix, in this order:
+      1. an exact match
+      2. models whose name starts with NAME followed by ".", "-", or "_"
+      3. models whose name contains NAME
+    Among several matches, the shortest name wins, then the highest version.
+    For example, "large" picks ggml-large-v3.bin over ggml-large-v2.bin and
+    ggml-large-v3-turbo.bin.
+
 Environment Variables:
-    WHISPER_MODEL_DIR      Directory containing whisper models (default: $XDG_CACHE_DIR/whisper-models)
-    WHISPER_MODEL          Whisper model filename or path (default: ggml-base.bin)
+    WHISPER_MODEL_DIR      Directory containing whisper models
+                           (default: \$XDG_CACHE_HOME/whisper-models, where XDG_CACHE_HOME defaults to ~/.cache)
+    WHISPER_MODEL          Whisper model name or path (default: ggml-base.bin)
     PULSE_SOURCE           Default PulseAudio source, used when --microphone is not given
 
 Recording uses parecord, so it works with PulseAudio, PipeWire (via
@@ -57,6 +78,22 @@ while [[ $# -gt 0 ]]; do
             fi
             MICROPHONE="$2"
             shift 2
+            ;;
+        --model)
+            if [[ $# -lt 2 ]]; then
+                echo "Error: --model requires a model name or path" >&2
+                exit 1
+            fi
+            MODEL_ARG="$2"
+            shift 2
+            ;;
+        --models)
+            LIST_MODELS=1
+            shift
+            ;;
+        --debug-show-model)
+            DEBUG_SHOW_MODEL=1
+            shift
             ;;
         --timeout-seconds)
             if [[ $# -lt 2 ]]; then
@@ -90,6 +127,110 @@ while [[ $# -gt 0 ]]; do
     esac
 done
 
+WHISPER_MODEL_DIR="${WHISPER_MODEL_DIR:-${XDG_CACHE_HOME:-$HOME/.cache}/whisper-models}"
+WHISPER_MODEL="${MODEL_ARG:-${WHISPER_MODEL:-ggml-base.bin}}"
+
+# Print the model filenames in WHISPER_MODEL_DIR, sorted, one per line
+list_models() {
+    local f
+    for f in "$WHISPER_MODEL_DIR"/*.bin; do
+        if [[ -f "$f" ]]; then
+            printf '%s\n' "${f##*/}"
+        fi
+    done | sort
+}
+
+# Model name without directory, "ggml-" prefix, or ".bin" suffix
+model_stem() {
+    local name="${1##*/}"
+    name="${name#ggml-}"
+    printf '%s\n' "${name%.bin}"
+}
+
+# Print the best of the given model filenames: shortest stem, then highest version
+best_model() {
+    local name stem
+    for name in "$@"; do
+        stem=$(model_stem "$name")
+        printf '%s\t%s\t%s\n' "${#stem}" "$stem" "$name"
+    done | sort -t $'\t' -k1,1n -k2,2Vr | sed -n 1p | cut -f3
+}
+
+# Print the path of the model selected by $1, per the Model Selection rules in --help
+resolve_model() {
+    local query="$1"
+    if [[ "$query" == */* ]]; then
+        if [[ -f "$query" ]]; then
+            printf '%s\n' "$query"
+            return 0
+        fi
+        echo "Error: Whisper model file '$query' not found" >&2
+        return 1
+    fi
+
+    if [[ -f "$WHISPER_MODEL_DIR/$query" ]]; then
+        printf '%s\n' "$WHISPER_MODEL_DIR/$query"
+        return 0
+    fi
+
+    local want name stem exact=""
+    local prefix_matches=() substring_matches=()
+    want=$(model_stem "$query")
+    while IFS= read -r name; do
+        if [[ -z "$name" ]]; then
+            continue
+        fi
+        stem=$(model_stem "$name")
+        if [[ "$stem" == "$want" ]]; then
+            exact="$name"
+        elif [[ "$stem" == "$want".* || "$stem" == "$want"-* || "$stem" == "$want"_* ]]; then
+            prefix_matches+=("$name")
+        elif [[ "$stem" == *"$want"* ]]; then
+            substring_matches+=("$name")
+        fi
+    done <<< "$(list_models)"
+
+    local chosen="$exact"
+    if [[ -z "$chosen" && ${#prefix_matches[@]} -gt 0 ]]; then
+        chosen=$(best_model "${prefix_matches[@]}")
+    fi
+    if [[ -z "$chosen" && ${#substring_matches[@]} -gt 0 ]]; then
+        chosen=$(best_model "${substring_matches[@]}")
+    fi
+    if [[ -n "$chosen" ]]; then
+        printf '%s\n' "$WHISPER_MODEL_DIR/$chosen"
+        return 0
+    fi
+
+    echo "Error: Could not find whisper model '$query' in $WHISPER_MODEL_DIR" >&2
+    local available
+    available=$(list_models)
+    if [[ -n "$available" ]]; then
+        echo "Available models:" >&2
+        sed 's/^/  /' <<< "$available" >&2
+    else
+        echo "No models found there." >&2
+    fi
+    return 1
+}
+
+if [[ "$LIST_MODELS" -eq 1 ]]; then
+    MODELS=$(list_models)
+    if [[ -n "$MODELS" ]]; then
+        printf '%s\n' "$MODELS"
+    else
+        echo "No models found in $WHISPER_MODEL_DIR" >&2
+    fi
+    exit 0
+fi
+
+WHISPER_MODEL_PATH=$(resolve_model "$WHISPER_MODEL")
+
+if [[ "$DEBUG_SHOW_MODEL" -eq 1 ]]; then
+    printf '%s\n' "$WHISPER_MODEL_PATH"
+    exit 0
+fi
+
 # Create temporary directory for audio recording and transcription
 TEMP_BASE="${XDG_RUNTIME_DIR:-/tmp}"
 TEMP_DIR=$(mktemp -d --tmpdir="$TEMP_BASE" record-and-transcribe_XXXXX)
@@ -98,46 +239,34 @@ trap "rm -rf '$TEMP_DIR'" EXIT
 TEMP_AUDIO="$TEMP_DIR/audio.wav"
 TEMP_OUTPUT="${TEMP_AUDIO}.txt"
 
-# Set up whisper model path with fallback logic
-WHISPER_MODEL_DIR="${WHISPER_MODEL_DIR:-${XDG_CACHE_DIR:-$HOME/.cache}/whisper-models}"
-WHISPER_MODEL="${WHISPER_MODEL:-ggml-base.bin}"
-
-# Find the model file with the following priority:
-# 1. If it's an absolute path to a file, use it
-# 2. If it's a path from WHISPER_MODEL_DIR to a file, use it
-# 3. If it's a relative path from $PWD to a file, use it
-# 4. Otherwise raise an error
-if [[ "$WHISPER_MODEL" = /* ]] && [[ -f "$WHISPER_MODEL" ]]; then
-    # Already an absolute path and exists
-    WHISPER_MODEL_PATH="$WHISPER_MODEL"
-elif [[ -f "$WHISPER_MODEL_DIR/$WHISPER_MODEL" ]]; then
-    # Found in model directory
-    WHISPER_MODEL_PATH="$WHISPER_MODEL_DIR/$WHISPER_MODEL"
-elif [[ -f "$WHISPER_MODEL" ]]; then
-    # Found as relative path from current directory
-    WHISPER_MODEL_PATH="$WHISPER_MODEL"
-else
-    echo "Error: Could not find whisper model '$WHISPER_MODEL'" >&2
-    echo "Searched in:" >&2
-    echo "  - Absolute path: $WHISPER_MODEL" >&2
-    echo "  - Model directory: $WHISPER_MODEL_DIR/$WHISPER_MODEL" >&2
-    echo "  - Current directory: $(pwd)/$WHISPER_MODEL" >&2
-    exit 1
-fi
-
-# Check if whisper-cli is available
-if ! command -v whisper-cli &> /dev/null; then
-    echo "Error: whisper-cli not found in PATH" >&2
-    echo "Please install whisper.cpp and ensure whisper-cli is in your PATH" >&2
-    exit 1
-fi
-
-if [[ "$QUIET" -eq 0 ]]; then
-    echo "Recording audio... Press ENTER to stop recording (or wait ${TIMEOUT_SECONDS}s for timeout)." >&2
-    if [[ -n "$MICROPHONE" ]]; then
-        echo "Using microphone: $MICROPHONE" >&2
+# Check that everything needed is available before recording starts, so that
+# a missing piece (eg. when ssh-ed into a machine without audio) fails before
+# the user starts talking rather than after.
+require_command() {
+    if ! command -v "$1" &> /dev/null; then
+        echo "Error: $1 not found in PATH" >&2
+        echo "$2" >&2
+        exit 1
     fi
-    echo "Audio will be saved temporarily to: $TEMP_AUDIO" >&2
+}
+require_command whisper-cli "Please install whisper.cpp and ensure whisper-cli is in your PATH"
+require_command parecord "Please install PulseAudio client tools (eg. pulseaudio-utils) for parecord and pactl"
+require_command pactl "Please install PulseAudio client tools (eg. pulseaudio-utils) for parecord and pactl"
+
+if ! pactl info &> /dev/null; then
+    echo "Error: Could not connect to a PulseAudio server (PulseAudio, pipewire-pulse, or WSLg)" >&2
+    exit 1
+fi
+
+REQUESTED_SOURCE="${MICROPHONE:-${PULSE_SOURCE:-}}"
+if [[ -n "$REQUESTED_SOURCE" ]]; then
+    AVAILABLE_SOURCES=$(pactl list short sources | cut -f2)
+    if ! grep -qxF -- "$REQUESTED_SOURCE" <<< "$AVAILABLE_SOURCES"; then
+        echo "Error: PulseAudio source '$REQUESTED_SOURCE' not found" >&2
+        echo "Available sources:" >&2
+        sed 's/^/  /' <<< "$AVAILABLE_SOURCES" >&2
+        exit 1
+    fi
 fi
 
 # Start parecord in the background
@@ -150,11 +279,44 @@ PARECORD_ARGS=(--format=s16le --rate=16000 --channels="$CHANNELS" --file-format=
 if [[ -n "$MICROPHONE" ]]; then
     PARECORD_ARGS+=(--device="$MICROPHONE")
 fi
-parecord "${PARECORD_ARGS[@]}" "$TEMP_AUDIO" >/dev/null 2>&1 &
+PARECORD_LOG="$TEMP_DIR/parecord.log"
+parecord "${PARECORD_ARGS[@]}" "$TEMP_AUDIO" >"$PARECORD_LOG" 2>&1 &
 PARECORD_PID=$!
 
-# Wait for user to press Enter or timeout
-read -r -t "$TIMEOUT_SECONDS" || true
+parecord_failed() {
+    echo "Error: parecord stopped unexpectedly while recording" >&2
+    cat "$PARECORD_LOG" >&2
+    exit 1
+}
+
+# Give parecord a moment to connect, so errors such as a rejected source are
+# reported before the user starts talking.
+sleep 0.3
+kill -0 "$PARECORD_PID" 2>/dev/null || parecord_failed
+
+if [[ "$QUIET" -eq 0 ]]; then
+    echo "Recording audio... Press ENTER to stop recording (or wait ${TIMEOUT_SECONDS}s for timeout)." >&2
+    echo "Leave a pause before you start and after you finish speaking, or the beginning or end may be cut off." >&2
+    if [[ -n "$MICROPHONE" ]]; then
+        echo "Using microphone: $MICROPHONE" >&2
+    fi
+    echo "Using model: $WHISPER_MODEL_PATH" >&2
+    echo "Audio will be saved temporarily to: $TEMP_AUDIO" >&2
+fi
+
+# Wait for the user to press Enter (or close stdin), or for the timeout.
+# Poll in short intervals so that a recording that dies partway (eg. the audio
+# server goes away) is reported promptly rather than when the user finishes.
+DEADLINE=$((SECONDS + TIMEOUT_SECONDS))
+while (( SECONDS < DEADLINE )); do
+    kill -0 "$PARECORD_PID" 2>/dev/null || parecord_failed
+    READ_STATUS=0
+    read -r -t 1 || READ_STATUS=$?
+    # read exits with a status above 128 only on timeout
+    if (( READ_STATUS <= 128 )); then
+        break
+    fi
+done
 
 # Stop recording; parecord finalizes the WAV file on SIGTERM
 kill "$PARECORD_PID" 2>/dev/null || true
@@ -166,11 +328,16 @@ if [[ "$QUIET" -eq 0 ]]; then
     echo "" >&2
 fi
 
-# Transcribe with whisper-cli and save as JSON
-# Redirect stderr to suppress verbose output
-whisper-cli -m "$WHISPER_MODEL_PATH" -f "$TEMP_AUDIO" --output-txt >/dev/null 2>&1
+# Transcribe with whisper-cli, which writes the text next to the audio file.
+# Its verbose output is only shown if it fails.
+WHISPER_LOG="$TEMP_DIR/whisper-cli.log"
+if ! whisper-cli -m "$WHISPER_MODEL_PATH" -f "$TEMP_AUDIO" --output-txt >"$WHISPER_LOG" 2>&1; then
+    echo "Error: whisper-cli failed" >&2
+    cat "$WHISPER_LOG" >&2
+    exit 1
+fi
 
-# Print the JSON output
-cat "${TEMP_OUTPUT}"
+# whisper-cli prefixes each line of text with whitespace
+sed 's/^[[:space:]]*//' "${TEMP_OUTPUT}"
 
 rm -rf "$TEMP_DIR"

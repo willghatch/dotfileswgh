@@ -669,27 +669,59 @@ This works in most graphical terminals, I think, as DECSCUSR CSI code.
 
 (defun whisper-record-and-transcribe ()
   "Record audio and transcribe it using the whisper-record-and-transcribe script.
-Wait for the user to press Enter or for the script to timeout, then insert
-the transcription at point."
+Wait for the user to press any key or for the script to timeout, then insert
+the transcription at point.
+If the script fails, signal an error with its message as soon as it exits,
+even while still waiting for a key press, and insert nothing."
   (interactive)
   (let* ((output-buffer (generate-new-buffer " *whisper-record-and-transcribe*"))
-         (process (start-process "whisper-record-and-transcribe"
-                                output-buffer
-                                "whisper-record-and-transcribe"
-                                "--quiet")))
-    ;; Set a no-op sentinel to prevent "Process finished" messages
-    (set-process-sentinel process 'ignore)
-    (message "Recording... Press ENTER to stop.")
-    (read-event)  ; Wait for user to press a key
-    (process-send-string process "\n")  ; Send Enter to the process
-    ;; Wait for the process to finish
-    (while (process-live-p process)
-      (accept-process-output process 0.1))
-    ;; Get the output and insert it
-    (let ((output (with-current-buffer output-buffer
+         (stderr-buffer (generate-new-buffer " *whisper-record-and-transcribe-stderr*"))
+         ;; A separate stderr pipe keeps error text out of the transcription.
+         ;; Its sentinel is a no-op to prevent "Process finished" messages.
+         (stderr-process (make-pipe-process :name "whisper-record-and-transcribe-stderr"
+                                            :buffer stderr-buffer
+                                            :sentinel #'ignore
+                                            :noquery t))
+         (process nil))
+    (unwind-protect
+        (progn
+          (setq process (make-process :name "whisper-record-and-transcribe"
+                                      :buffer output-buffer
+                                      :stderr stderr-process
+                                      :command '("whisper-record-and-transcribe" "--quiet")
+                                      :connection-type 'pipe
+                                      :sentinel #'ignore
+                                      :noquery t))
+          (message "Recording... Press any key to stop.  Pause before and after speaking, or the start/end may be cut off.")
+          ;; Poll for a key press so that an early script failure (eg. missing
+          ;; tools or audio server) is reported without waiting for the user.
+          (let ((key nil))
+            (while (and (not key) (process-live-p process))
+              (setq key (read-event nil nil 0.1))))
+          (when (process-live-p process)
+            (process-send-string process "\n"))  ; Send Enter to stop recording
+          (while (process-live-p process)
+            (accept-process-output process 0.1))
+          ;; Collect any remaining stderr, with a bound in case the pipe
+          ;; process lingers after the script exits.
+          (let ((deadline (+ (float-time) 1)))
+            (while (and (process-live-p stderr-process) (< (float-time) deadline))
+              (accept-process-output stderr-process 0.05)))
+          (let ((status (process-exit-status process)))
+            (unless (eq status 0)
+              (let ((stderr (string-trim (with-current-buffer stderr-buffer
+                                           (buffer-string)))))
+                (user-error "whisper-record-and-transcribe failed (exit %s)%s"
+                            status
+                            (if (string-empty-p stderr) "" (concat ": " stderr))))))
+          (insert (with-current-buffer output-buffer
                     (buffer-string))))
+      (when (and process (process-live-p process))
+        (delete-process process))
+      (when (process-live-p stderr-process)
+        (delete-process stderr-process))
       (kill-buffer output-buffer)
-      (insert output))))
+      (kill-buffer stderr-buffer))))
 
 (defun wgh/cpo-copy-string (str register)
   "Store STR to REGISTER following cpo-copy conventions.
