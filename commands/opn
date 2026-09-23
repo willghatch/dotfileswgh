@@ -14,7 +14,7 @@ openDefault() {
         ]]; then
         exec a ffxd "$1"
     elif [[ "$1" == *.pdf ]]; then
-        exec a zathura "$1"
+        exec a sphouse-pdf "$1"
     elif [[ "$1" == *.mp3
                 || "$1" == *.ogg
                 || "$1" == *.flac
