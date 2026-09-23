@@ -1,0 +1,50 @@
+#compdef git-worktree-submodule-helper
+
+_git_worktree_submodule_helper() {
+    local context state state_descr line
+    typeset -A opt_args
+
+    _arguments -C \
+        '(- :)'{-h,--help}'[Show help and exit]' \
+        '1:subcommand:->subcommands' \
+        '*::arg:->subcommand_args' \
+        && return 0
+
+    case $state in
+        subcommands)
+            local -a subcommands
+            subcommands=(
+                'add-worktree:Create a new git worktree with submodule worktrees sharing the base object store'
+                'submodule-update:Check out submodules at recorded commits (use instead of git submodule update)'
+                'remove-worktree:Remove a git worktree and its submodule worktrees'
+            )
+            _describe 'subcommand' subcommands
+            ;;
+        subcommand_args)
+            case $words[1] in
+                add-worktree)
+                    _arguments \
+                        '(- :)'{-h,--help}'[Show help and exit]' \
+                        '(-b --branch)'{-b,--branch}'=[Branch name for the new worktree (created if needed; default: basename of PATH)]:branch:' \
+                        '--start=[Start point for a new branch (default: HEAD)]:start point:' \
+                        '1:path:_directories'
+                    ;;
+                submodule-update)
+                    _arguments \
+                        '(- :)'{-h,--help}'[Show help and exit]' \
+                        '--recursive[Also update nested submodules]'
+                    ;;
+                remove-worktree)
+                    _arguments \
+                        '(- :)'{-h,--help}'[Show help and exit]' \
+                        '1:path:_directories'
+                    ;;
+                *)
+                    _message 'no further arguments'
+                    ;;
+            esac
+            ;;
+    esac
+}
+
+_git_worktree_submodule_helper "$@"

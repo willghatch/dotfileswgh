@@ -1,0 +1,572 @@
+#!/usr/bin/env python3
+"""git-worktree-submodule-helper - Generic git worktree add/remove with submodule support.
+
+Requires git 2.48.0 or newer.
+
+Creates worktrees where each submodule is itself a worktree of the main
+checkout's submodule storage, so branches are shared and the object store is
+not duplicated.  Works with arbitrarily nested submodules.
+
+Inside such worktrees, `git submodule update` and related commands must not be
+used (see WORKFLOW_HELP); the submodule-update subcommand replaces it.
+"""
+
+from __future__ import annotations
+
+import argparse
+import os
+import re
+import shutil
+import subprocess
+import sys
+from pathlib import Path
+
+
+PROG = "git-worktree-submodule-helper"
+MIN_GIT_VERSION = (2, 48, 0)
+
+
+def die(message: str, code: int = 1) -> None:
+    print(f"{PROG}: {message}", file=sys.stderr)
+    raise SystemExit(code)
+
+
+def git(*args: str, cwd: Path, check: bool = True) -> str:
+    result = subprocess.run(
+        ["git", *args],
+        cwd=str(cwd),
+        check=check,
+        text=True,
+        capture_output=True,
+    )
+    return result.stdout.strip()
+
+
+def git_ok(*args: str, cwd: Path) -> bool:
+    result = subprocess.run(
+        ["git", *args],
+        cwd=str(cwd),
+        capture_output=True,
+    )
+    return result.returncode == 0
+
+
+def run(cmd: list[str], *, cwd: Path) -> None:
+    subprocess.run(cmd, cwd=str(cwd), check=True)
+
+
+def check_git_version() -> None:
+    try:
+        output = subprocess.run(
+            ["git", "--version"], check=True, text=True, capture_output=True
+        ).stdout.strip()
+    except (OSError, subprocess.CalledProcessError) as exc:
+        die(f"could not run git --version: {exc}")
+    # Eg. "git version 2.51.0", "git version 2.39.3 (Apple Git-146)".
+    match = re.search(r"(\d+)\.(\d+)(?:\.(\d+))?", output)
+    if match is None:
+        die(f"could not parse git version from {output!r}")
+    found = tuple(int(part or 0) for part in match.groups())
+    if found < MIN_GIT_VERSION:
+        minimum = ".".join(map(str, MIN_GIT_VERSION))
+        die(f"git {match.group(0)} is too old; {PROG} requires git {minimum} or newer")
+
+
+# ---------------------------------------------------------------------------
+# Repo / worktree helpers
+# ---------------------------------------------------------------------------
+
+def git_common_dir(repo: Path) -> Path:
+    return Path(git("rev-parse", "--path-format=absolute", "--git-common-dir", cwd=repo))
+
+
+def main_worktree_path(repo: Path) -> Path:
+    """Return the main checkout of repo, which may be a linked worktree."""
+    porcelain = git("worktree", "list", "--porcelain", cwd=repo)
+    # The main worktree is always listed first: "worktree <path>".
+    return Path(porcelain.splitlines()[0][len("worktree "):])
+
+
+def linked_worktree_storage(checkout: Path) -> Path | None:
+    """Return the common git dir if checkout is a linked worktree, else None."""
+    result = subprocess.run(
+        ["git", "rev-parse", "--path-format=absolute", "--git-dir", "--git-common-dir"],
+        cwd=str(checkout),
+        text=True,
+        capture_output=True,
+    )
+    if result.returncode != 0:
+        return None
+    git_dir, common = (Path(line).resolve() for line in result.stdout.split("\n")[:2])
+    return common if git_dir != common else None
+
+
+def repo_toplevel(path: Path) -> Path:
+    return Path(git("rev-parse", "--path-format=absolute", "--show-toplevel", cwd=path))
+
+
+def submodule_git_dir(sub_path: Path) -> Path | None:
+    """Return the real .git directory for a populated submodule.
+
+    The submodule's .git is a file containing 'gitdir: <relative-path>'.
+    Returns the absolute path to the actual git dir, or None if not found.
+    """
+    dot_git = sub_path / ".git"
+    if dot_git.is_dir():
+        return dot_git
+    if dot_git.is_file():
+        content = dot_git.read_text().strip()
+        # Format: "gitdir: <path>"
+        if content.startswith("gitdir:"):
+            rel = content[len("gitdir:"):].strip()
+            candidate = (sub_path / rel).resolve()
+            if candidate.is_dir():
+                return candidate
+    return None
+
+
+def submodule_is_populated(sub_path: Path) -> bool:
+    """A submodule is populated if its directory exists and contains a .git entry."""
+    return sub_path.is_dir() and (sub_path / ".git").exists()
+
+
+# ---------------------------------------------------------------------------
+# Discover submodules recursively
+# ---------------------------------------------------------------------------
+
+def collect_populated_submodules(base_root: Path, prefix: str = "") -> list[str]:
+    """Return list of all populated submodule paths (relative to base_root), recursively.
+
+    Each returned string is the path relative to base_root (with / separators).
+    prefix is used internally for recursion; callers should leave it empty.
+    """
+    result: list[str] = []
+    for _name, sub_rel in list_submodules(base_root):
+        rel_from_base = sub_rel if not prefix else f"{prefix}/{sub_rel}"
+        sub_path = base_root / sub_rel
+        if submodule_is_populated(sub_path):
+            result.append(rel_from_base)
+            # Recurse into nested submodules, using the actual submodule path.
+            result.extend(collect_populated_submodules(sub_path, prefix=rel_from_base))
+    return result
+
+
+# ---------------------------------------------------------------------------
+# Submodule worktree management
+# ---------------------------------------------------------------------------
+
+def ref_is_branch(name: str, cwd: Path) -> bool:
+    return git_ok("show-ref", "--verify", "--quiet", f"refs/heads/{name}", cwd=cwd)
+
+
+def warn(message: str) -> None:
+    print(f"{PROG}: warning: {message}", file=sys.stderr)
+
+
+def storage_git(storage: Path, *args: str) -> subprocess.CompletedProcess[str]:
+    """Run git against a submodule's shared storage (its git dir under modules/)."""
+    # The storage's core.worktree names the main checkout's copy of the
+    # submodule, and may be stale or corrupted (eg. by `git submodule update` in
+    # a linked worktree), which makes git die at startup.  An explicit
+    # GIT_WORK_TREE overrides it; the commands run here don't use a work tree.
+    env = dict(os.environ, GIT_DIR=str(storage), GIT_WORK_TREE=str(storage))
+    return subprocess.run(
+        ["git", *args], cwd=str(storage), env=env, text=True, capture_output=True
+    )
+
+
+def list_submodules(checkout: Path) -> list[tuple[str, str]]:
+    """Return (name, path) for each submodule declared in checkout's .gitmodules."""
+    gitmodules = checkout / ".gitmodules"
+    if not gitmodules.is_file():
+        return []
+    # Run outside any repository: inside checkout, git would set up its repo
+    # and die if that repo's core.worktree is corrupted.
+    result = subprocess.run(
+        ["git", "config", "--file", str(gitmodules), "-z", "--get-regexp", r"^submodule\..*\.path$"],
+        cwd="/",
+        text=True,
+        capture_output=True,
+    )
+    if result.returncode != 0:
+        return []
+    submodules: list[tuple[str, str]] = []
+    for entry in result.stdout.split("\0"):
+        # Format: submodule.<name>.path\n<path>
+        key, sep, path = entry.partition("\n")
+        if sep:
+            submodules.append((key[len("submodule."):-len(".path")], path))
+    return submodules
+
+
+def recorded_commit(checkout: Path, sub_rel: str) -> str | None:
+    """Return the submodule commit recorded at sub_rel in checkout's HEAD tree."""
+    out = git("ls-tree", "-z", "--full-tree", "HEAD", "--", sub_rel, cwd=checkout)
+    for entry in out.split("\0"):
+        meta, _, path = entry.partition("\t")
+        fields = meta.split()
+        if path == sub_rel and len(fields) == 3 and fields[1] == "commit":
+            return fields[2]
+    return None
+
+
+def ensure_commit(storage: Path, commit: str) -> bool:
+    """Make sure commit is in storage, fetching it if needed.  Return success."""
+    def present() -> bool:
+        return storage_git(storage, "cat-file", "-e", f"{commit}^{{commit}}").returncode == 0
+
+    if present():
+        return True
+    storage_git(storage, "fetch", "--quiet")
+    if present():
+        return True
+    # Like `git submodule update`, fall back to fetching the commit directly.
+    for remote in storage_git(storage, "remote").stdout.split():
+        storage_git(storage, "fetch", "--quiet", remote, commit)
+        if present():
+            return True
+    return False
+
+
+def update_submodules(
+    checkout: Path, *, recursive: bool, errors: list[str], prefix: str = ""
+) -> None:
+    """Check out checkout's submodules at the commits its HEAD records.
+
+    Each submodule is a worktree of the storage git keeps for it in the main
+    checkout (modules/<name> under the parent's common git dir), so objects and
+    branches are shared.  Missing submodule worktrees are created; submodules
+    whose storage doesn't exist yet are skipped with a warning.
+    Problems with individual submodules are appended to errors.
+    """
+    common = git_common_dir(checkout)
+    for name, sub_rel in list_submodules(checkout):
+        display = f"{prefix}{sub_rel}"
+        commit = recorded_commit(checkout, sub_rel)
+        if commit is None:
+            # Declared in .gitmodules but not in the tree; git ignores it too.
+            continue
+        storage = common / "modules" / name
+        sub = checkout / sub_rel
+        if not (storage / "HEAD").is_file():
+            warn(
+                f"skipping {display}: no submodule storage at {storage}; "
+                "run `git submodule update --init` in the main checkout first"
+            )
+            continue
+
+        if (sub / ".git").exists():
+            if git_common_dir(sub).resolve() != storage.resolve():
+                errors.append(f"{display} is not a worktree of {storage}; left alone")
+                continue
+            if git("rev-parse", "HEAD", cwd=sub) != commit:
+                if not ensure_commit(storage, commit):
+                    errors.append(f"commit {commit} for {display} not found in {storage} or its remotes")
+                    continue
+                result = subprocess.run(
+                    ["git", "checkout", "--quiet", "--detach", commit],
+                    cwd=str(sub),
+                    text=True,
+                    capture_output=True,
+                )
+                if result.returncode != 0:
+                    errors.append(f"failed to check out {commit} in {display}: {result.stderr.strip()}")
+                    continue
+        else:
+            # git leaves an empty directory where an unpopulated submodule goes.
+            if sub.exists() and (not sub.is_dir() or any(sub.iterdir())):
+                errors.append(f"{display} exists and is not an empty directory; left alone")
+                continue
+            if not ensure_commit(storage, commit):
+                errors.append(f"commit {commit} for {display} not found in {storage} or its remotes")
+                continue
+            result = storage_git(storage, "worktree", "add", "--quiet", "--detach", str(sub), commit)
+            if result.returncode != 0:
+                errors.append(f"failed to add submodule worktree for {display}: {result.stderr.strip()}")
+                continue
+
+        if recursive:
+            update_submodules(sub, recursive=True, errors=errors, prefix=f"{display}/")
+
+
+def report_errors(errors: list[str]) -> None:
+    for error in errors:
+        print(f"{PROG}: error: {error}", file=sys.stderr)
+
+
+def collect_submodule_worktrees(checkout: Path) -> list[tuple[Path, Path]]:
+    """Return (path, storage) for checkout's submodule worktrees, recursively, parents first.
+
+    Only submodules that are linked worktrees are included; anything else
+    (eg. an independent clone) is not ours to unregister.
+    """
+    found: list[tuple[Path, Path]] = []
+    for _name, sub_rel in list_submodules(checkout):
+        sub = checkout / sub_rel
+        if not (sub / ".git").is_file():
+            continue
+        storage = linked_worktree_storage(sub)
+        if storage is not None:
+            found.append((sub, storage))
+            found.extend(collect_submodule_worktrees(sub))
+    return found
+
+
+# ---------------------------------------------------------------------------
+# core.worktree repair
+# ---------------------------------------------------------------------------
+
+def repair_core_worktree_for_sub(base_root: Path, sub_rel: str) -> bool:
+    """Ensure core.worktree in the submodule's git config points at base_root/sub_rel.
+
+    `git submodule update` run in a linked worktree rewrites the shared
+    core.worktree to point at that worktree's copy of the submodule, which breaks
+    the main checkout.  This function corrects it to point at the main
+    checkout's copy.
+
+    For nested submodules (e.g. "a/b"), the submodule's git dir is obtained by
+    reading the .git file of the submodule inside base_root.
+
+    Returns True if a repair was made.
+    """
+    sub_path = base_root / sub_rel
+    git_dir = submodule_git_dir(sub_path)
+    if git_dir is None:
+        return False
+
+    config_file = git_dir / "config"
+    if not config_file.exists():
+        return False
+
+    # The correct core.worktree is the relative path from the git dir to the submodule checkout.
+    correct_worktree = os.path.relpath(sub_path, git_dir)
+
+    result = subprocess.run(
+        ["git", "config", "--file", str(config_file), "core.worktree"],
+        cwd="/",
+        text=True,
+        capture_output=True,
+    )
+    if result.returncode != 0:
+        return False
+    current = result.stdout.strip()
+    if (git_dir / current).resolve() == sub_path.resolve():
+        return False
+
+    subprocess.run(
+        ["git", "config", "--file", str(config_file), "core.worktree", correct_worktree],
+        cwd="/",
+        check=True,
+        capture_output=True,
+    )
+    print(
+        f"{PROG}: repaired core.worktree for {sub_rel}: {current!r} -> {correct_worktree!r}",
+        file=sys.stderr,
+    )
+    return True
+
+
+def repair_submodules(base_root: Path, sub_rels: list[str]) -> None:
+    """Repair core.worktree for the given submodules of the main checkout."""
+    for sub_rel in sub_rels:
+        repair_core_worktree_for_sub(base_root, sub_rel)
+
+
+# ---------------------------------------------------------------------------
+# Subcommand: add-worktree
+# ---------------------------------------------------------------------------
+
+def cmd_add(args: argparse.Namespace) -> None:
+    target = Path(args.path).resolve()
+    if target.exists():
+        die(f"path already exists: {target}")
+
+    try:
+        toplevel = repo_toplevel(Path.cwd())
+    except subprocess.CalledProcessError:
+        die("not inside a git repository")
+
+    # Determine the branch / start point for the new worktree.
+    branch = args.branch or target.name
+    start = args.start or "HEAD"
+
+    # Create the superproject worktree.
+    if ref_is_branch(branch, toplevel):
+        run(["git", "worktree", "add", str(target), branch], cwd=toplevel)
+    elif git_ok("rev-parse", "--verify", branch, cwd=toplevel):
+        run(["git", "worktree", "add", "--detach", str(target), branch], cwd=toplevel)
+    else:
+        run(["git", "worktree", "add", "-b", branch, str(target), start], cwd=toplevel)
+
+    errors: list[str] = []
+    update_submodules(target, recursive=True, errors=errors)
+    report_errors(errors)
+    print(target)
+    if errors:
+        raise SystemExit(1)
+
+
+# ---------------------------------------------------------------------------
+# Subcommand: submodule-update
+# ---------------------------------------------------------------------------
+
+def cmd_submodule_update(args: argparse.Namespace) -> None:
+    try:
+        toplevel = repo_toplevel(Path.cwd())
+    except subprocess.CalledProcessError:
+        die("not inside a git repository")
+
+    git_dir = Path(git("rev-parse", "--path-format=absolute", "--git-dir", cwd=toplevel))
+    if git_dir.resolve() == git_common_dir(toplevel).resolve():
+        die(
+            "not in a linked worktree; in the main checkout, "
+            "use `git submodule update` instead"
+        )
+
+    errors: list[str] = []
+    update_submodules(toplevel, recursive=args.recursive, errors=errors)
+    report_errors(errors)
+    if errors:
+        raise SystemExit(1)
+
+
+# ---------------------------------------------------------------------------
+# Subcommand: remove-worktree
+# ---------------------------------------------------------------------------
+
+def cmd_remove(args: argparse.Namespace) -> None:
+    target = Path(args.path).resolve()
+    if not target.is_dir():
+        die(f"not a directory: {target}")
+
+    if not git_ok("rev-parse", "--is-inside-work-tree", cwd=target):
+        die(f"not a git worktree: {target}")
+
+    if linked_worktree_storage(target) is None:
+        die("refusing to remove the main worktree")
+    main_root = main_worktree_path(target)
+
+    # Remove submodule worktrees leaves first, walking the target's own tree.
+    storages: list[Path] = []
+    for sub, storage in reversed(collect_submodule_worktrees(target)):
+        storage_git(storage, "worktree", "remove", "--force", str(sub))
+        if sub.is_symlink() or sub.exists():
+            shutil.rmtree(sub, ignore_errors=True)
+        storages.append(storage)
+
+    # Remove the superproject worktree.
+    try:
+        run(["git", "worktree", "remove", "--force", str(target)], cwd=main_root)
+    except subprocess.CalledProcessError:
+        shutil.rmtree(target, ignore_errors=True)
+        subprocess.run(["git", "worktree", "prune"], cwd=str(main_root), capture_output=True)
+
+    # Clear registrations left by the rmtree fallbacks.  `git worktree prune`
+    # skips locked entries, including ones another process is still creating.
+    for storage in dict.fromkeys(storages):
+        storage_git(storage, "worktree", "prune")
+
+    # Repair submodule config in case a forbidden command corrupted it.
+    repair_submodules(main_root, collect_populated_submodules(main_root))
+
+    print(f"removed {target}")
+
+
+# ---------------------------------------------------------------------------
+# Argument parsing
+# ---------------------------------------------------------------------------
+
+WORKFLOW_HELP = f"""\
+In worktrees made by this helper, use `{PROG} submodule-update`
+instead of `git submodule update`.  Do NOT run these git commands in such
+worktrees:
+
+  git submodule update (any options, including --init and --remote)
+      Rewrites core.worktree in the shared submodule config, which breaks
+      the main checkout ("cannot chdir to ...").  --init also clones
+      unshared copies.
+  git pull --recurse-submodules (or git pull with submodule.recurse=true)
+      Runs `git submodule update` internally.
+  git checkout/switch --recurse-submodules (or with submodule.recurse=true)
+      Looks for new submodules' storage under this worktree's own git dir,
+      not the shared storage.  Use a plain checkout, then submodule-update.
+  git submodule add, init, deinit, sync
+      These write config shared with the main checkout, or clone unshared
+      submodule storage.
+  git submodule absorbgitdirs, and git mv / git rm of a submodule path
+      These rewrite submodule git pointers; unsupported in these worktrees.
+
+In the main checkout, these commands are fine.  If one of them broke the main
+checkout, `{PROG} remove-worktree` repairs it.
+"""
+
+
+def build_parser() -> argparse.ArgumentParser:
+    parser = argparse.ArgumentParser(
+        prog=PROG,
+        formatter_class=argparse.RawDescriptionHelpFormatter,
+        description=(
+            "Create, update, or remove git worktrees whose submodules (at any\n"
+            "nesting depth) are worktrees of the main checkout's submodules, so\n"
+            "they share objects and branches instead of being re-cloned.\n"
+            "Requires git 2.48.0 or newer."
+        ),
+        epilog=WORKFLOW_HELP,
+    )
+    subparsers = parser.add_subparsers(dest="command", required=True)
+
+    add_p = subparsers.add_parser(
+        "add-worktree",
+        help="Create a new git worktree with submodule worktrees.",
+    )
+    add_p.add_argument("path", help="Directory to create for the new worktree.")
+    add_p.add_argument(
+        "--branch", "-b",
+        help="Branch name for the new worktree (created if needed). Default: basename of PATH.",
+    )
+    add_p.add_argument(
+        "--start",
+        help="Start point for a new branch. Default: HEAD.",
+    )
+    add_p.set_defaults(func=cmd_add)
+
+    update_p = subparsers.add_parser(
+        "submodule-update",
+        help="Check out the current worktree's submodules at their recorded commits.",
+        formatter_class=argparse.RawDescriptionHelpFormatter,
+        description=(
+            "Replacement for `git submodule update` in worktrees made by this helper.\n"
+            "Checks out each submodule of the current worktree at the commit its parent\n"
+            "records, detached, fetching if needed.  Missing submodule worktrees are\n"
+            "created from the main checkout's submodule storage; submodules the main\n"
+            "checkout has never cloned are skipped with a warning.\n"
+            "Only the plain checkout mode is supported (no --remote, --merge, etc.)."
+        ),
+        epilog=WORKFLOW_HELP,
+    )
+    update_p.add_argument(
+        "--recursive",
+        action="store_true",
+        help="Also update nested submodules.",
+    )
+    update_p.set_defaults(func=cmd_submodule_update)
+
+    rm_p = subparsers.add_parser(
+        "remove-worktree",
+        help="Remove a git worktree and its submodule worktrees.",
+    )
+    rm_p.add_argument("path", help="The worktree directory to remove.")
+    rm_p.set_defaults(func=cmd_remove)
+
+    return parser
+
+
+def main() -> None:
+    parser = build_parser()
+    args = parser.parse_args()
+    check_git_version()
+    args.func(args)
+
+
+if __name__ == "__main__":
+    main()
