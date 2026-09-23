@@ -31,6 +31,7 @@
       ]
     },
     {"search": "dockerfile-components/dfcomp-apt-core-tools"},
+    {"search": "dockerfile-components/dfcomp-apt-git-core-ppa"},
     {"search": "dockerfile-components/dfcomp-nodejs-install"},
     {
       "text": [

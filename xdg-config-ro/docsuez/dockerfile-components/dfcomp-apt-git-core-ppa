@@ -1,0 +1,10 @@
+# Up-to-date git from the Ubuntu Git Maintainers PPA (Ubuntu bases only).
+# Include after dfcomp-apt-core-tools; installing git again upgrades it to the PPA version.
+ARG GIT_MIN_VERSION=2.48
+RUN apt-get install -y --no-install-recommends software-properties-common gpg-agent
+RUN add-apt-repository -y ppa:git-core/ppa && apt-get update
+RUN apt-get install -y --no-install-recommends git
+# Fail the build rather than silently keeping an old git.
+RUN v="$(git --version | cut -d' ' -f3)" && \
+    dpkg --compare-versions "$v" ge "$GIT_MIN_VERSION" || \
+    { echo "git $v is older than $GIT_MIN_VERSION" >&2; exit 1; }
