@@ -110,16 +110,49 @@ references is newer than it, as well as when its own sources changed.
 This applies transitively, since rebuilt dependencies are newer.
 "build --dry-show" resolves referenced image names without building them.
 
+Nix-built images: a build-docsuez.json may have a "nix" key instead of
+"dockerfile", naming a nix expression that evaluates to a dockerTools image
+(a tarball, or a streamLayeredImage stream script):
+{"nix": {"file": "image.nix", "attr": "devImage", "args": {"foo": "bar"}}}
+{"nix": {"flake": ".#devImage"}}
+"file" is relative to the config directory; "attr" and "args" (passed as
+--argstr) are optional and only apply to "file".  "flake" is evaluated with
+the config directory as the working directory.  "nix" cannot be combined
+with "dockerfile", "build-args", or "build-context-directory".  docsuez runs
+nix-build (or nix build, for flakes), loads the result with docker load, and
+tags it with the usual docsuez image name, so run configs and
+from-docsuez / copy-from-docsuez entries use nix images like any other.
+To be run directly, a nix image needs at least bash, tmux, coreutils, a
+writable /tmp, and whatever the enabled addons use; to be built FROM with
+RUN lines, it needs /bin/sh (eg. dockerTools.binSh).
+Out-of-date checks for nix images compare the build cache (below) with the
+config and every *.nix and flake.lock file under the config directory,
+without evaluating nix; use "--build force" after changing inputs outside
+it (eg. a nixpkgs update).  A forced build still skips docker load when the
+nix output is unchanged.
+
+Build cache: docsuez records when it builds or loads each image in
+$XDG_CACHE_HOME/docsuez/build-cache.json (default ~/.cache), along with the
+docker image id.  Out-of-date checks use that time while docker still has
+the same image id under that name, and otherwise fall back to docker's
+creation time.  An image with no cache entry and a creation time near unix
+time 0 (eg. a nix dockerTools image) counts as out of date.
+
 Note:
 - Unless environment variable $DOCSUEZ_NO_USER_NAME_PREPEND is set, the $USER
   variable will be prepended to docker image and container names.
 """
 
 import argparse
+import fcntl
 import json
 import os
+import shlex
+import shutil
 import subprocess
 import sys
+import tempfile
+import time
 from pathlib import Path
 from typing import Dict, List, Optional, Any, Tuple
 
@@ -461,6 +494,77 @@ class BuildConfig:
         """Load the build configuration file"""
         with open(self.config_path, 'r') as f:
             self._config = _strip_comment_keys(json.load(f))
+        # Validate a "nix" spec up front, before anything relies on it.
+        self.get_nix_spec()
+
+    NIX_EXCLUSIVE_KEYS = ("dockerfile", "build-args", "build-context-directory", "context")
+
+    def get_nix_spec(self) -> Optional[Dict[str, Any]]:
+        """Return the validated "nix" spec, or None if this is a Dockerfile build.
+
+        The spec has either "file" (relative to the config directory, with
+        optional "attr" and string-valued "args") or "flake".  Exits with an
+        error if it is malformed.
+        """
+        spec = self._config.get("nix")
+        if spec is None:
+            return None
+
+        def fail(message):
+            print(f"Error: in {self.config_path}: invalid \"nix\" spec {json.dumps(spec)}: {message}",
+                  file=sys.stderr)
+            sys.exit(1)
+
+        if not isinstance(spec, dict):
+            fail("must be an object")
+        conflicting = [k for k in self.NIX_EXCLUSIVE_KEYS if k in self._config]
+        if conflicting:
+            fail(f"cannot be combined with {', '.join(conflicting)}")
+        unknown = set(spec) - {"file", "attr", "args", "flake"}
+        if unknown:
+            fail(f"unknown key(s) {', '.join(sorted(unknown))}")
+        if ("file" in spec) == ("flake" in spec):
+            fail('exactly one of "file" or "flake" is required')
+        if "flake" in spec:
+            if not isinstance(spec["flake"], str):
+                fail('"flake" must be a string')
+            if "attr" in spec or "args" in spec:
+                fail('"attr" and "args" only apply to "file"')
+        else:
+            if not isinstance(spec["file"], str):
+                fail('"file" must be a string')
+            if "attr" in spec and not isinstance(spec["attr"], str):
+                fail('"attr" must be a string')
+            args = spec.get("args", {})
+            if not isinstance(args, dict) or not all(isinstance(v, str) for v in args.values()):
+                fail('"args" must be an object with string values')
+        return spec
+
+    def get_nix_build_command(self) -> List[str]:
+        """Return the command that builds this nix config and prints its output path.
+
+        It must be run with the config directory as the working directory.
+        """
+        spec = self.get_nix_spec()
+        if "flake" in spec:
+            return ["nix", "build", "--no-link", "--print-out-paths", spec["flake"]]
+        cmd = ["nix-build", "--no-out-link", str(self.config_dir / spec["file"])]
+        if "attr" in spec:
+            cmd.extend(["-A", spec["attr"]])
+        for key, value in spec.get("args", {}).items():
+            cmd.extend(["--argstr", key, value])
+        return cmd
+
+    def _nix_source_files(self) -> List[Path]:
+        """Return the nix files under the config directory that the image is assumed to depend on."""
+        sources = []
+        # os.walk does not follow symlinks, so eg. a nix "result" link into
+        # the store is not traversed.
+        for dirpath, _dirnames, filenames in os.walk(self.config_dir):
+            for name in filenames:
+                if name.endswith(".nix") or name == "flake.lock":
+                    sources.append(Path(dirpath) / name)
+        return sources
 
     DOCKERFILE_ENTRY_KINDS = ("from-docsuez", "copy-from-docsuez", "text",
                               "bash-print-text", "relative-path", "search")
@@ -542,7 +646,10 @@ class BuildConfig:
 
         These are the names in {"from-docsuez": ...} and
         {"copy-from-docsuez": ...} entries of the "dockerfile" spec list.
+        Nix builds have none; nix expressions compose in nix.
         """
+        if self.get_nix_spec() is not None:
+            return []
         deps = []
         for entry in self._dockerfile_spec_entries():
             parsed = self._parse_docsuez_entry(entry)
@@ -682,8 +789,16 @@ class BuildConfig:
         return sources
 
     def get_newest_source_mtime(self) -> float:
-        """Get the newest modification time among all build sources (dockerfile + config)"""
-        sources = self.get_dockerfile_sources()
+        """Get the newest modification time among all build sources (dockerfile + config)
+
+        For nix builds, the sources are the config plus every *.nix and
+        flake.lock file under the config directory.  Changes to nix inputs
+        outside it are not detected.
+        """
+        if self.get_nix_spec() is not None:
+            sources = self._nix_source_files()
+        else:
+            sources = self.get_dockerfile_sources()
 
         # Also include the build config file itself
         sources.append(self.config_path)
@@ -963,9 +1078,81 @@ class DocsuezSearcher:
         return sorted(build_names)
 
 
+class BuildCache:
+    """Records when docsuez built or loaded each image.
+
+    Stored as JSON in $XDG_CACHE_HOME/docsuez/build-cache.json, keyed by full
+    docker image name.  Each entry has the docker "image-id" it describes, the
+    "built-at" time (unix seconds), and for nix-backed images the
+    "nix-out-path" that was loaded and the "checked-at" time the nix output
+    was last confirmed unchanged.  An entry only applies while docker still
+    has that image id under that name.
+    """
+
+    def __init__(self):
+        cache_home = os.environ.get("XDG_CACHE_HOME") or str(Path.home() / ".cache")
+        self.path = Path(cache_home) / "docsuez" / "build-cache.json"
+        self._warned = False
+
+    def _warn(self, message: str):
+        """Print a cache warning once per invocation."""
+        if not self._warned:
+            print(f"Warning: {message}", file=sys.stderr)
+            self._warned = True
+
+    def _read(self) -> Dict[str, Any]:
+        """Return the whole cache; a missing, unreadable, or corrupt file reads as empty."""
+        try:
+            text = self.path.read_text()
+        except FileNotFoundError:
+            return {}
+        except OSError as e:
+            self._warn(f"cannot read build cache {self.path}: {e}")
+            return {}
+        try:
+            data = json.loads(text)
+        except ValueError:
+            data = None
+        if not isinstance(data, dict):
+            self._warn(f"ignoring corrupt build cache {self.path}")
+            return {}
+        return data
+
+    def get_entry(self, image_name: str, image_id: Optional[str]) -> Optional[Dict[str, Any]]:
+        """Return the entry for image_name if it describes image_id, else None."""
+        if not image_id:
+            return None
+        entry = self._read().get(image_name)
+        if isinstance(entry, dict) and entry.get("image-id") == image_id:
+            return entry
+        return None
+
+    def update(self, image_name: str, entry: Dict[str, Any]):
+        """Replace the entry for image_name."""
+        self.path.parent.mkdir(parents=True, exist_ok=True)
+        # Lock a separate file: the cache file itself is replaced by rename,
+        # so a lock on it would not exclude a concurrent writer.
+        with open(self.path.with_name(self.path.name + ".lock"), "w") as lock:
+            fcntl.flock(lock, fcntl.LOCK_EX)
+            data = self._read()
+            data[image_name] = entry
+            fd, tmp_path = tempfile.mkstemp(dir=self.path.parent, prefix=".build-cache.",
+                                            suffix=".json")
+            with os.fdopen(fd, "w") as f:
+                json.dump(data, f, indent=2, sort_keys=True)
+                f.write("\n")
+            os.replace(tmp_path, self.path)
+
+
+# Docker creation times before this are treated as unknown.  Nix dockerTools
+# images are created at unix time 0 for reproducibility.
+PLAUSIBLE_IMAGE_CREATION_TIME = 315532800.0  # 1980-01-01T00:00:00Z
+
+
 class Docsuez:
     def __init__(self):
         self.searcher = DocsuezSearcher()
+        self.build_cache = BuildCache()
         self.tsuez_cmd = "tsuez"  # Find tsuez on PATH
         # Docsuez dependency images already resolved in this invocation, keyed
         # by resolved build config path, so each is checked/built only once.
@@ -1011,7 +1198,17 @@ class Docsuez:
         self._resolve_top_level_dependencies(
             build_config, no_cache=getattr(args, 'no_cache', False), dry_run=dry_show)
 
-        # If dry-show mode, print the assembled dockerfile and exit
+        # If dry-show mode, print the assembled dockerfile (or the nix build
+        # commands) and exit
+        if dry_show and build_config.get_nix_spec() is not None:
+            image_name = build_config.get_builder_image_name()
+            print(f"# in {build_config.config_dir}:")
+            print(shlex.join(build_config.get_nix_build_command()))
+            print("# then, unless the build cache shows OUT_PATH already loaded as "
+                  f"{image_name}:")
+            print("docker load -i OUT_PATH   # or: OUT_PATH | docker load, for a stream script")
+            print(f"docker tag LOADED_IMAGE {shlex.quote(image_name)}")
+            return
         if dry_show:
             content, _ = build_config._generate_dockerfile()
             print(content)
@@ -1020,8 +1217,8 @@ class Docsuez:
 
         self._do_build(build_config, args)
 
-    def _image_created_timestamp(self, image_name: str) -> Optional[float]:
-        """Return the creation time of a docker image, or None if it is missing or unreadable."""
+    def _inspect_image(self, image_name: str) -> Optional[Dict[str, Any]]:
+        """Return docker's inspect data for an image, or None if it is missing or unreadable."""
         result = subprocess.run(
             ["docker", "image", "inspect", image_name],
             capture_output=True,
@@ -1029,26 +1226,68 @@ class Docsuez:
         )
         if result.returncode != 0:
             return None
-
-        image_info = json.loads(result.stdout)
-        if not image_info:
-            return None
-
-        image_created_str = image_info[0].get("Created", "")
-        from datetime import datetime
         try:
-            image_created = datetime.fromisoformat(image_created_str.replace("Z", "+00:00"))
-            return image_created.timestamp()
+            image_info = json.loads(result.stdout)
         except ValueError:
             return None
+        if not image_info:
+            return None
+        return image_info[0]
+
+    def _image_build_times(self, image_name: str) -> Optional[Tuple[float, float]]:
+        """Return (built_at, checked_at) for an image, or None if unknown.
+
+        built_at is when the image's current content was built or loaded; it
+        is what dependents compare against.  checked_at is when its sources
+        were last confirmed to match it, which is later than built_at when a
+        nix rebuild produced unchanged output; it is what the image's own
+        sources compare against.
+
+        Both come from the build cache when it has an entry for the image
+        docker currently has under that name, and otherwise from docker's
+        creation time.  A missing image, or an implausible creation time
+        (eg. unix time 0 for nix images), is unknown.
+        """
+        info = self._inspect_image(image_name)
+        if info is None:
+            return None
+
+        entry = self.build_cache.get_entry(image_name, info.get("Id"))
+        if entry is not None and isinstance(entry.get("built-at"), (int, float)):
+            built_at = float(entry["built-at"])
+            checked_at = entry.get("checked-at")
+            if not isinstance(checked_at, (int, float)) or checked_at < built_at:
+                checked_at = built_at
+            return built_at, float(checked_at)
+
+        from datetime import datetime
+        try:
+            created = datetime.fromisoformat(
+                info.get("Created", "").replace("Z", "+00:00")).timestamp()
+        except ValueError:
+            return None
+        if created < PLAUSIBLE_IMAGE_CREATION_TIME:
+            return None
+        return created, created
+
+    def _record_build(self, image_name: str, **extra):
+        """Record in the build cache that image_name was just built or loaded."""
+        info = self._inspect_image(image_name)
+        if info is None or not info.get("Id"):
+            print(f"Warning: cannot inspect {image_name}; not recording it in the build cache",
+                  file=sys.stderr)
+            return
+        now = time.time()
+        self.build_cache.update(image_name, {"image-id": info["Id"], "built-at": now, **extra})
 
     def _should_build_image(self, build_mode: str, build_config: BuildConfig, image_name: str,
                             dependency_images: List[str] = ()) -> bool:
         """Determine if image should be built based on build mode and staleness.
 
-        In detect mode, the image is built if it doesn't exist, if any of its
-        build sources is newer than it, or if any of dependency_images (its
-        resolved docsuez image dependencies) is newer than it.
+        In detect mode, the image is built if it doesn't exist or its build
+        time is unknown, if any of its build sources is newer than it, or if
+        any of dependency_images (its resolved docsuez image dependencies) is
+        newer than it.  Build times come from _image_build_times.
         """
         if build_mode in ["yes", "force", "true"]:
             return True
@@ -1056,18 +1295,19 @@ class Docsuez:
             return False
 
         # build_mode == "detect" (default)
-        # A missing or unparseable image timestamp means rebuild to be safe.
-        image_mtime = self._image_created_timestamp(image_name)
-        if image_mtime is None:
+        # A missing image or unknown build time means rebuild to be safe.
+        times = self._image_build_times(image_name)
+        if times is None:
             return True
+        built_at, checked_at = times
 
         # Compare with build source mtimes (dockerfile + config)
-        if build_config.get_newest_source_mtime() > image_mtime:
+        if build_config.get_newest_source_mtime() > checked_at:
             return True
 
         for dep_image in dependency_images:
-            dep_mtime = self._image_created_timestamp(dep_image)
-            if dep_mtime is None or dep_mtime > image_mtime:
+            dep_times = self._image_build_times(dep_image)
+            if dep_times is None or dep_times[0] > built_at:
                 return True
 
         return False
@@ -1160,6 +1400,10 @@ class Docsuez:
         the inner build routine shared between cmd_build and
         _resolve_docsuez_dependency.
         """
+        if build_config.get_nix_spec() is not None:
+            self._do_nix_build(build_config)
+            return
+
         build_cmd = ["docker", "build"]
 
         # Add --no-cache if requested
@@ -1191,6 +1435,77 @@ class Docsuez:
             sys.exit(1)
         finally:
             build_config.cleanup()
+        self._record_build(image_name)
+
+    def _do_nix_build(self, build_config: BuildConfig):
+        """Build a nix config's image with nix and load it into docker.
+
+        The load is skipped when the build cache shows the same nix output
+        already loaded under the image name; the cache entry's checked-at
+        time is refreshed instead, so detect mode stops re-checking.
+        """
+        image_name = build_config.get_builder_image_name()
+        nix_cmd = build_config.get_nix_build_command()
+        if shutil.which(nix_cmd[0]) is None:
+            print(f"Error: '{nix_cmd[0]}' not found on PATH; it is needed to build "
+                  f"{build_config.config_path}", file=sys.stderr)
+            sys.exit(1)
+
+        print(f"Building nix image: {shlex.join(nix_cmd)}")
+        sys.stdout.flush()
+        result = subprocess.run(nix_cmd, cwd=build_config.config_dir,
+                                stdout=subprocess.PIPE, text=True)
+        out_lines = [line for line in result.stdout.splitlines() if line.strip()]
+        if result.returncode != 0 or not out_lines:
+            print(f"\nError: nix build failed with exit code {result.returncode}", file=sys.stderr)
+            sys.exit(1)
+        out_path = out_lines[-1].strip()
+
+        info = self._inspect_image(image_name)
+        entry = self.build_cache.get_entry(image_name, info.get("Id") if info else None)
+        if entry is not None and entry.get("nix-out-path") == out_path:
+            print(f"Nix output unchanged; {image_name} is up to date")
+            self.build_cache.update(image_name, {**entry, "checked-at": time.time()})
+            return
+
+        # dockerTools produces either an image tarball or (streamLayeredImage)
+        # an executable that writes the image to stdout.
+        print(f"Loading {out_path} into docker...")
+        sys.stdout.flush()
+        if os.path.isfile(out_path) and os.access(out_path, os.X_OK):
+            stream = subprocess.Popen([out_path], stdout=subprocess.PIPE)
+            load = subprocess.run(["docker", "load"], stdin=stream.stdout,
+                                  stdout=subprocess.PIPE, text=True)
+            stream.stdout.close()
+            stream_rc = stream.wait()
+        else:
+            load = subprocess.run(["docker", "load", "-i", out_path],
+                                  stdout=subprocess.PIPE, text=True)
+            stream_rc = 0
+        sys.stdout.write(load.stdout)
+        if load.returncode != 0 or stream_rc != 0:
+            print(f"\nError: docker load of {out_path} failed", file=sys.stderr)
+            sys.exit(1)
+
+        loaded = None
+        for line in load.stdout.splitlines():
+            for prefix in ("Loaded image: ", "Loaded image ID: "):
+                if line.startswith(prefix):
+                    loaded = line[len(prefix):].strip()
+        if loaded is None:
+            print("\nError: could not find the loaded image name in docker load output",
+                  file=sys.stderr)
+            sys.exit(1)
+
+        if loaded != image_name:
+            subprocess.run(["docker", "tag", loaded, image_name], check=True)
+            # Drop the tag from the nix expression; the image stays under
+            # image_name.  An image loaded by id only has no tag to drop.
+            if not loaded.startswith("sha256:"):
+                subprocess.run(["docker", "rmi", loaded], check=True,
+                               stdout=subprocess.DEVNULL)
+
+        self._record_build(image_name, **{"nix-out-path": out_path})
 
     def _generate_docker_run_script(self, script_file, config: DocsuezConfig, image_name: str,
                                      tsuez_mode: bool = False, tsuez_config: Optional[Dict[str, Any]] = None,
