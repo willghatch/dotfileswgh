@@ -249,7 +249,8 @@ xwayland enable
 
 
 
-exec --no-startup-id sway-startup-programs.sh
+exec --no-startup-id waybar-configured
+exec --no-startup-id wayland-startup-programs.sh
 
 # Might as well start with a terminal, since I'm going to launch one anyway.
 exec vlaunch terminal

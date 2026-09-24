@@ -2,20 +2,17 @@
 
 if [[ "$@" =~ "--help" ]]; then
     echo "Usage: $0"
-    echo "Launch startup programs for a sway session (swayidle, waybar, wallpaper, etc.)."
-    echo "Sourced at the end of sway configuration."
+    echo "Launch startup programs shared by Wayland sessions (swayidle, wallpaper, etc.)."
+    echo "Run by the per-compositor startup scripts, eg. hyprland-startup-programs.sh."
+    echo "Things that differ per compositor, like the bar, belong in those scripts instead."
     exit 0
 fi
 
-# This is executed at the end of sway configuration.
-# Sway should be launched in some way such that it already has env-more sourced before launch.
+# This is run by the per-compositor startup scripts.
+# The compositor should be launched in some way such that it already has env-more sourced before launch.
 #source $DOTFILESWGH/env-more.sh
 
 swayidle-configured &
-
-# TODO - I'm frustrated with both of these bars.  Waybar keeps crashing, but ironbar has issues when a monitor disconnects/reconnects (eg. due to idle).
-waybar-configured &
-#ironbar-configured &
 
 wallpaper-sway-random-rotate &
 
@@ -42,14 +39,14 @@ xsettingsd-wrapper --start &
 ## state would just work for both.
 #hkk
 
-if [ -f $DOTFILESWGH_PRI/sway-startup-rc ]; then
-    source $DOTFILESWGH_PRI/sway-startup-rc
+if [ -f $DOTFILESWGH_PRI/wayland-startup-rc ]; then
+    source $DOTFILESWGH_PRI/wayland-startup-rc
 fi
-if [ -f $HOME/rootgit-dotfiles/sway-startup-rc ]; then
-    source $HOME/rootgit-dotfiles/sway-startup-rc
+if [ -f $HOME/rootgit-dotfiles/wayland-startup-rc ]; then
+    source $HOME/rootgit-dotfiles/wayland-startup-rc
 fi
-if [ -f $DOTFILESWGH_DOTLOCAL/sway-startup-rc ]; then
-    source $DOTFILESWGH_DOTLOCAL/sway-startup-rc
+if [ -f $DOTFILESWGH_DOTLOCAL/wayland-startup-rc ]; then
+    source $DOTFILESWGH_DOTLOCAL/wayland-startup-rc
 fi
 
 
