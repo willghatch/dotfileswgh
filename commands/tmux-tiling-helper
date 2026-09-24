@@ -1,0 +1,234 @@
+#!/usr/bin/env bash
+
+# Build a balanced tmux layout without moving panes through temporary windows.
+# A custom layout is applied by tmux as one operation, so pane processes and
+# pane IDs are preserved throughout the rebuild.
+
+set -euo pipefail
+
+usage() {
+    cat >&2 <<'EOF'
+Usage: tmux-tiling-helper --group-count COUNT [--group-type column|row]
+                          [--target-window WINDOW | --target-pane PANE]
+EOF
+}
+
+group_count=
+group_type=column
+target_window=
+target_pane=
+
+while (($#)); do
+    case $1 in
+        --group-count)
+            (($# >= 2)) || { usage; exit 2; }
+            group_count=$2
+            shift 2
+            ;;
+        --group-count=*)
+            group_count=${1#*=}
+            shift
+            ;;
+        --group-type)
+            (($# >= 2)) || { usage; exit 2; }
+            group_type=$2
+            shift 2
+            ;;
+        --group-type=*)
+            group_type=${1#*=}
+            shift
+            ;;
+        --target-window)
+            (($# >= 2)) || { usage; exit 2; }
+            target_window=$2
+            shift 2
+            ;;
+        --target-window=*)
+            target_window=${1#*=}
+            shift
+            ;;
+        --target-pane)
+            (($# >= 2)) || { usage; exit 2; }
+            target_pane=$2
+            shift 2
+            ;;
+        --target-pane=*)
+            target_pane=${1#*=}
+            shift
+            ;;
+        -h|--help)
+            usage
+            exit 0
+            ;;
+        *)
+            printf 'tmux-tiling-helper: unknown argument: %s\n' "$1" >&2
+            usage
+            exit 2
+            ;;
+    esac
+done
+
+if [[ ! $group_count =~ ^[1-9][0-9]*$ ]]; then
+    printf 'tmux-tiling-helper: --group-count must be a positive integer\n' >&2
+    exit 2
+fi
+
+case $group_type in
+    column|row) ;;
+    *)
+        printf 'tmux-tiling-helper: --group-type must be column or row\n' >&2
+        exit 2
+        ;;
+esac
+
+if [[ -n $target_window && -n $target_pane ]]; then
+    printf 'tmux-tiling-helper: use only one of --target-window and --target-pane\n' >&2
+    exit 2
+fi
+
+if [[ -n $target_window ]]; then
+    target=$target_window
+elif [[ -n $target_pane ]]; then
+    target=$target_pane
+elif [[ -n ${TMUX_PANE:-} ]]; then
+    target=$TMUX_PANE
+else
+    printf 'tmux-tiling-helper: no target window or pane was supplied\n' >&2
+    exit 2
+fi
+
+# A pane-exited hook for a final pane may run after its window disappeared.
+# Treat a missing event target as a successful no-op.
+if ! window_info=$(tmux display-message -p -t "$target" \
+        '#{window_id}|#{window_width}|#{window_height}' 2>/dev/null); then
+    exit 0
+fi
+IFS='|' read -r window_id window_width window_height <<<"$window_info"
+
+panes=()
+while IFS= read -r pane_id; do
+    [[ -n $pane_id ]] && panes+=("${pane_id#%}")
+done < <(tmux list-panes -t "$window_id" -F '#{pane_id}')
+
+pane_count=${#panes[@]}
+((pane_count > 1)) || exit 0
+
+physical_groups=$group_count
+((physical_groups <= pane_count)) || physical_groups=$pane_count
+
+# Every pane needs at least one cell and adjacent panes need a separator. If
+# the requested orientation cannot represent the existing pane count, retain
+# the current valid layout rather than partially changing the pane tree.
+if [[ $group_type == column ]]; then
+    group_capacity=$(((window_width + 1) / 2))
+    member_capacity=$(((window_height + 1) / 2))
+else
+    group_capacity=$(((window_height + 1) / 2))
+    member_capacity=$(((window_width + 1) / 2))
+fi
+((physical_groups <= group_capacity)) || physical_groups=$group_capacity
+((physical_groups > 0)) || exit 0
+(( (pane_count + physical_groups - 1) / physical_groups <= member_capacity )) || exit 0
+
+# append_leaf WIDTH HEIGHT LEFT TOP PANE_NUMBER
+append_leaf() {
+    layout_body+="$1x$2,$3,$4,$5"
+}
+
+pane_cursor=0
+
+if [[ $group_type == column ]]; then
+    available_group_size=$((window_width - physical_groups + 1))
+    group_size_base=$((available_group_size / physical_groups))
+    group_size_remainder=$((available_group_size % physical_groups))
+    member_count_base=$((pane_count / physical_groups))
+    member_count_remainder=$((pane_count % physical_groups))
+
+    layout_body=
+    if ((physical_groups > 1)); then
+        layout_body="${window_width}x${window_height},0,0{"
+    fi
+    left=0
+    for ((group=0; group<physical_groups; group++)); do
+        width=$group_size_base
+        ((group >= physical_groups - group_size_remainder)) && ((width++))
+        members=$member_count_base
+        ((group >= physical_groups - member_count_remainder)) && ((members++))
+
+        if ((members == 1)); then
+            append_leaf "$width" "$window_height" "$left" 0 "${panes[pane_cursor]}"
+            ((pane_cursor += 1))
+        else
+            layout_body+="${width}x${window_height},${left},0["
+            available_member_size=$((window_height - members + 1))
+            member_size_base=$((available_member_size / members))
+            member_size_remainder=$((available_member_size % members))
+            top=0
+            for ((member=0; member<members; member++)); do
+                height=$member_size_base
+                ((member >= members - member_size_remainder)) && ((height++))
+                append_leaf "$width" "$height" "$left" "$top" "${panes[pane_cursor]}"
+                ((pane_cursor += 1))
+                ((top += height + 1))
+                ((member == members - 1)) || layout_body+=','
+            done
+            layout_body+=']'
+        fi
+        ((left += width + 1))
+        ((group == physical_groups - 1)) || layout_body+=','
+    done
+    ((physical_groups == 1)) || layout_body+='}'
+else
+    available_group_size=$((window_height - physical_groups + 1))
+    group_size_base=$((available_group_size / physical_groups))
+    group_size_remainder=$((available_group_size % physical_groups))
+    member_count_base=$((pane_count / physical_groups))
+    member_count_remainder=$((pane_count % physical_groups))
+
+    layout_body=
+    if ((physical_groups > 1)); then
+        layout_body="${window_width}x${window_height},0,0["
+    fi
+    top=0
+    for ((group=0; group<physical_groups; group++)); do
+        height=$group_size_base
+        ((group >= physical_groups - group_size_remainder)) && ((height++))
+        members=$member_count_base
+        ((group >= physical_groups - member_count_remainder)) && ((members++))
+
+        if ((members == 1)); then
+            append_leaf "$window_width" "$height" 0 "$top" "${panes[pane_cursor]}"
+            ((pane_cursor += 1))
+        else
+            layout_body+="${window_width}x${height},0,${top}{"
+            available_member_size=$((window_width - members + 1))
+            member_size_base=$((available_member_size / members))
+            member_size_remainder=$((available_member_size % members))
+            left=0
+            for ((member=0; member<members; member++)); do
+                width=$member_size_base
+                ((member >= members - member_size_remainder)) && ((width++))
+                append_leaf "$width" "$height" "$left" "$top" "${panes[pane_cursor]}"
+                ((pane_cursor += 1))
+                ((left += width + 1))
+                ((member == members - 1)) || layout_body+=','
+            done
+            layout_body+='}'
+        fi
+        ((top += height + 1))
+        ((group == physical_groups - 1)) || layout_body+=','
+    done
+    ((physical_groups == 1)) || layout_body+=']'
+fi
+
+# tmux prefixes serialized layouts with a 16-bit rotating checksum.
+checksum=0
+LC_ALL=C
+for ((i=0; i<${#layout_body}; i++)); do
+    printf -v byte '%d' "'${layout_body:i:1}"
+    checksum=$(( ((checksum >> 1) | ((checksum & 1) << 15)) + byte ))
+    checksum=$((checksum & 65535))
+done
+printf -v layout '%04x,%s' "$checksum" "$layout_body"
+
+tmux select-layout -t "$window_id" "$layout" >/dev/null
