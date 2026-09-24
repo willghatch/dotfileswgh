@@ -40,6 +40,9 @@ Parts are ordered by key, lowest first; plain strings and lists count as key
 50.  Parts from different configs/addons are merged, never replaced; parts at
 the same key keep their merge order.
 
+"pre-tmux-script" uses the same forms and ordering, but its lines run inside
+the container before the tmux server starts.
+
 Volumes: "volumes" maps host paths to container paths.  Both sides are
 expanded by bash (in double quotes) after all docker-run-script parts have
 run, so they can use variables set there (eg. $DOCSUEZ_CONTAINER_HOME).  They
@@ -183,17 +186,17 @@ def _strip_comment_keys(data):
     return data
 
 
-DOCKER_RUN_SCRIPT_DEFAULT_KEY = 50
+RUN_SCRIPT_DEFAULT_KEY = 50
 
 
-def _normalize_run_script(value) -> Dict[float, List[str]]:
-    """Normalize a docker-run-script value to {numeric_key: [lines]}."""
+def _normalize_run_script(value, name="docker-run-script") -> Dict[float, List[str]]:
+    """Normalize an ordered script value to {numeric_key: [lines]}."""
     if value is None:
         return {}
     if isinstance(value, str):
-        return {DOCKER_RUN_SCRIPT_DEFAULT_KEY: [value]}
+        return {RUN_SCRIPT_DEFAULT_KEY: [value]}
     if isinstance(value, list):
-        return {DOCKER_RUN_SCRIPT_DEFAULT_KEY: list(value)}
+        return {RUN_SCRIPT_DEFAULT_KEY: list(value)}
     if isinstance(value, dict):
         result = {}
         for key, part in value.items():
@@ -203,20 +206,20 @@ def _normalize_run_script(value) -> Dict[float, List[str]]:
                 try:
                     num = float(key)
                 except ValueError:
-                    print(f"Error: docker-run-script key '{key}' is not a number",
+                    print(f"Error: {name} key '{key}' is not a number",
                           file=sys.stderr)
                     sys.exit(1)
             lines = [part] if isinstance(part, str) else list(part)
             result.setdefault(num, []).extend(lines)
         return result
-    print(f"Error: invalid docker-run-script value: {value!r}", file=sys.stderr)
+    print(f"Error: invalid {name} value: {value!r}", file=sys.stderr)
     sys.exit(1)
 
 
-def _merge_run_script(base, overlay) -> Dict[float, List[str]]:
-    """Merge two docker-run-script values; same-key parts are concatenated."""
-    result = {k: list(v) for k, v in _normalize_run_script(base).items()}
-    for key, lines in _normalize_run_script(overlay).items():
+def _merge_run_script(base, overlay, name="docker-run-script") -> Dict[float, List[str]]:
+    """Merge ordered script values; same-key parts are concatenated."""
+    result = {k: list(v) for k, v in _normalize_run_script(base, name).items()}
+    for key, lines in _normalize_run_script(overlay, name).items():
         result.setdefault(key, []).extend(lines)
     return result
 
@@ -415,8 +418,8 @@ class DocsuezConfig:
                 # Don't propagate include directives
                 continue
 
-            if key == "docker-run-script":
-                result[key] = _merge_run_script(result.get(key), value)
+            if key in ("docker-run-script", "pre-tmux-script"):
+                result[key] = _merge_run_script(result.get(key), value, key)
             elif key in result and isinstance(result[key], dict) and isinstance(value, dict):
                 result[key] = self._deep_merge(result[key], value)
             elif key in result and isinstance(result[key], list) and isinstance(value, list):
@@ -463,12 +466,10 @@ class DocsuezConfig:
         return [line for key in sorted(parts) for line in parts[key]]
 
     def get_pre_tmux_script(self) -> List[str]:
-        """Get shell lines to run inside docker container before launching tmux"""
+        """Get ordered shell lines to run in the container before tmux."""
         config = self._merge_configs()
-        lines = config.get("pre-tmux-script", [])
-        if isinstance(lines, str):
-            return [lines]
-        return lines
+        parts = _normalize_run_script(config.get("pre-tmux-script"), "pre-tmux-script")
+        return [line for key in sorted(parts) for line in parts[key]]
 
     def get_post_tmux_script(self) -> List[str]:
         """Get shell lines to run inside docker container after launching tmux"""

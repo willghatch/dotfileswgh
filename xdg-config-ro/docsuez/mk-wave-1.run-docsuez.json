@@ -4,12 +4,13 @@
             "volumes": {
                 "$HOME/mk/amd/mk-wave-1": "$DOCSUEZ_CONTAINER_HOME/mk"
             },
-            "pre-tmux-script": [
-                "source $DOTFILESWGH/env-more-with-mixins.sh",
-                "cd mk",
-                "source venv/bin/activate",
-                "cd wave"
-            ]
+            "pre-tmux-script": {
+                "50": [
+                    "cd mk",
+                    "source venv/bin/activate",
+                    "cd wave"
+                ]
+            }
         }
     }
 }

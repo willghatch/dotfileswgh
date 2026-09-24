@@ -29,14 +29,15 @@
       "volumes": {
         "$HOME/mk/amd/mk-wave-default": "$DOCSUEZ_CONTAINER_HOME/mk"
       },
-      "pre-tmux-script": [
-        "source $DOTFILESWGH/env-more-with-mixins.sh",
-        "cd mk",
-        "cd wave",
-        "# Don't source venv here, since it complicates worktree workflow",
-        "#source .venv/bin/activate",
-        ""
-      ]
+      "pre-tmux-script": {
+        "50": [
+          "cd mk",
+          "cd wave",
+          "# Don't source venv here, since it complicates worktree workflow",
+          "#source .venv/bin/activate",
+          ""
+        ]
+      }
     },
     "video-groups": {
       "docker-run-script": [

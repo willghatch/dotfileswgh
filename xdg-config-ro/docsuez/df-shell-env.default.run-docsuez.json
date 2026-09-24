@@ -1,0 +1,6 @@
+{
+    "#comment": "Load dotfiles paths before starting the tmux server.",
+    "pre-tmux-script": {
+        "0": "source \"$DOTFILESWGH/env-more-with-mixins.sh\""
+    }
+}
