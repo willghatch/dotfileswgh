@@ -1,0 +1,49 @@
+# Table Highlight Markdown Examples
+
+Opening this file in `markdown-mode` should enable combined row and column highlighting with the default dotfiles configuration.
+
+## Basic table
+
+| Color | Wavelength | Example |
+| --- | --- | --- |
+| Red | Long | Stop sign |
+| Orange | Medium-long | Orange peel |
+| Yellow | Medium | Sunflower |
+| Green | Medium-short | Fern |
+| Blue | Short | Clear sky |
+| Violet | Very short | Amethyst |
+
+## Unaligned source
+
+These rows intentionally have uneven source widths so that the colors, rather than source alignment, make the columns easy to follow.
+
+Name | Status | Owner | Notes
+--- | --- | --- | ---
+Tiny task | Done | Ada | Short
+A report with a much longer title | In progress | Grace Hopper | This cell is also substantially longer than its neighbors
+Review | Blocked | Linus | Waiting for a response from another team
+Ship | Ready | Margaret Hamilton | All checks passed
+
+## Escaped pipes
+
+| Expression | Meaning | Result |
+| --- | --- | --- |
+| `left \| right` | A literal pipe remains inside column zero | One cell |
+| `alpha` | Ordinary content | Another cell |
+| `beta \| gamma` | A second escaped pipe example | Still three columns |
+
+## Wide AI-style report
+
+| Finding | Evidence | Impact | Recommendation | Owner | Priority | Follow-up | Notes |
+| --- | --- | --- | --- | --- | --- | --- | --- |
+| The generated report contains a table wider than the current window | Several cells contain complete explanatory sentences that wrap across visual lines | Readers can lose track of which wrapped text belongs to which heading | Use the alternating row shades and repeating column palette as unobtrusive visual guides | Documentation team | High | Recheck in a narrow window | This eighth column wraps back to the first column color |
+| The source rows are not manually aligned | Column widths vary substantially because the report was generated quickly | Traditional source alignment provides little help | Leave the text unchanged and rely on highlighting | Tooling team | Medium | Compare row-only and column-only styles | None |
+| More columns exist than the default seven-color cycle | This table has eight columns | The eighth column intentionally repeats the first column color | Treat the repeating palette as a positional cycle | UI team | Low | Customize the face count if a longer cycle is preferred | Adjacent columns use hues that are not adjacent in the rainbow |
+
+Ordinary prose with a | pipe | is not a table because it has no Markdown delimiter row.
+
+```text
+| Table-shaped | fenced code |
+| --- | --- |
+| This content | should not be highlighted |
+```
