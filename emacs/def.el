@@ -274,6 +274,9 @@
  (require 'org-mode-conf)
  (autoload 'markdown-mode "markdown-mode")
  (add-to-list 'auto-mode-alist '("\\.md$" . markdown-mode))
+ (require 'table-highlight)
+ (add-hook 'org-mode-hook #'table-highlight-turn-on)
+ (add-hook 'markdown-mode-hook #'table-highlight-turn-on)
  )
 
 (setq wgh/de-fast-run nil)
