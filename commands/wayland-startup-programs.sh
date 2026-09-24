@@ -3,7 +3,7 @@
 if [[ "$@" =~ "--help" ]]; then
     echo "Usage: $0"
     echo "Launch startup programs shared by Wayland sessions (swayidle, wallpaper, etc.)."
-    echo "Run by the per-compositor startup scripts, eg. hyprland-startup-programs.sh."
+    echo "Run by the per-compositor startup scripts, eg. hyprland-startup-programs.sh and floatile-startup-programs.sh."
     echo "Things that differ per compositor, like the bar, belong in those scripts instead."
     exit 0
 fi
