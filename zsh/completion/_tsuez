@@ -18,6 +18,7 @@ _tsuez() {
         'attach:Attach to a session by name'
         'next:Detach and attach to next session'
         'previous:Detach and attach to previous session'
+        'pick:Detach and choose a session with a fuzzy picker'
         'new:Create a new tmux session'
         'generate-docsuez-config:Generate configuration for docsuez'
       )

@@ -6,10 +6,13 @@ tsuez - A tmux session manager that works across multiple socket directories
 import argparse
 import difflib
 import os
+import shutil
 import sys
 import subprocess
 import socket
 import tempfile
+import termios
+import tty
 from pathlib import Path
 from typing import List, Tuple, Optional, Dict
 
@@ -196,6 +199,51 @@ class Tsuez:
 
         return [session for _, session in sorted(enumerate(sessions), key=key)]
 
+    def _pick_session(self, sessions: List[Tuple[str, Path]],
+                      current: Optional[Tuple[str, Path]] = None) -> Optional[Tuple[str, Path]]:
+        """Interactively choose a session, filtering by fuzzy name match as the user types.
+
+        Enter picks the top (best) match; C-g, Esc, C-c, or C-d abort and return None.
+        """
+        fd = sys.stdin.fileno()
+        old_attrs = termios.tcgetattr(fd)
+        query = ""
+        try:
+            tty.setraw(fd)
+            while True:
+                ranked = self.rank_sessions(query, sessions)
+                columns, rows = shutil.get_terminal_size()
+                # Raw mode needs explicit carriage returns.
+                out = ["\x1b[H\x1b[2J", f"session> {query}"]
+                for i, session in enumerate(ranked[:max(rows - 1, 1)]):
+                    marker = "*" if session == current else " "
+                    line = f"{marker} {session[0]}"[:columns - 1]
+                    out.append(f"\r\n\x1b[7m{line}\x1b[0m" if i == 0 else f"\r\n{line}")
+                # Put the cursor back at the end of the query.
+                out.append(f"\x1b[1;{len('session> ') + len(query) + 1}H")
+                sys.stdout.write("".join(out))
+                sys.stdout.flush()
+
+                keys = os.read(fd, 64).decode(errors="ignore")
+                if keys.startswith("\x1b") and len(keys) > 1:
+                    # Escape sequence, eg. an arrow key: ignore.
+                    continue
+                for key in keys:
+                    if key in ("\r", "\n"):
+                        return ranked[0]
+                    elif key in ("\x07", "\x1b", "\x03", "\x04"):
+                        return None
+                    elif key in ("\x7f", "\x08"):
+                        query = query[:-1]
+                    elif key == "\x15":
+                        query = ""
+                    elif key.isprintable():
+                        query += key
+        finally:
+            termios.tcsetattr(fd, termios.TCSADRAIN, old_attrs)
+            sys.stdout.write("\x1b[H\x1b[2J")
+            sys.stdout.flush()
+
     def _get_control_command_file(self, socket_path: Path, session_name: str) -> Path:
         """Get the path to the control command file for a session
 
@@ -318,6 +366,21 @@ class Tsuez:
                                 control_file = self._get_control_command_file(socket_path, session_name)
                             # If no previous session found, re-attach to current session
                             continue
+                        elif command == "pick":
+                            while True:
+                                sessions = self.list_all_sessions()
+                                if not sessions:
+                                    return
+                                session_info = self._pick_session(sessions, (session_name, socket_path))
+                                if session_info:
+                                    session_name, socket_path = session_info
+                                    socket_dir = socket_path.parent
+                                    control_file = self._get_control_command_file(socket_path, session_name)
+                                    break
+                                # Aborted: go back to the current session, unless it went away meanwhile
+                                if (session_name, socket_path) in self.list_all_sessions():
+                                    break
+                            continue
 
                 # Normal detach without control command, exit
                 break
@@ -411,8 +474,8 @@ class Tsuez:
 
         return None
 
-    def cmd_next(self, args):
-        """Detach and attach to the next session"""
+    def _send_control_command(self, command: str):
+        """Ask the outer tsuez loop to run command, then detach so it runs"""
         # Check if running under tsuez
         if "TSUEZ_MANAGED" not in os.environ:
             print("Not running under tsuez attach", file=sys.stderr)
@@ -435,39 +498,22 @@ class Tsuez:
 
         # Write the control command directly to the file
         with open(control_file, 'w') as f:
-            f.write("tsuez-control: next\n")
+            f.write(f"tsuez-control: {command}\n")
 
         # Detach from tmux
         subprocess.run(["tmux", "detach-client"])
+
+    def cmd_next(self, args):
+        """Detach and attach to the next session"""
+        self._send_control_command("next")
 
     def cmd_previous(self, args):
         """Detach and attach to the previous session"""
-        # Check if running under tsuez
-        if "TSUEZ_MANAGED" not in os.environ:
-            print("Not running under tsuez attach", file=sys.stderr)
-            sys.exit(1)
+        self._send_control_command("previous")
 
-        # Get session name from TSUEZ_MANAGED
-        session_name = os.environ["TSUEZ_MANAGED"]
-
-        # Get the current socket path from TMUX env var (works in container)
-        tmux_env = os.environ.get("TMUX")
-        if not tmux_env:
-            print("Not in a tmux session", file=sys.stderr)
-            sys.exit(1)
-
-        socket_path = Path(tmux_env.split(",")[0])
-
-        # Compute control file path based on current socket path
-        # This ensures we use the container path inside Docker, not the host path
-        control_file = self._get_control_command_file(socket_path, session_name)
-
-        # Write the control command directly to the file
-        with open(control_file, 'w') as f:
-            f.write("tsuez-control: previous\n")
-
-        # Detach from tmux
-        subprocess.run(["tmux", "detach-client"])
+    def cmd_pick(self, args):
+        """Detach and choose a session to attach to with a fuzzy picker"""
+        self._send_control_command("pick")
 
     def _create_socket_dir(self, session_name: Optional[str] = None) -> Path:
         """Create a unique temporary socket directory for a new tsuez instance"""
@@ -645,6 +691,9 @@ class Tsuez:
 
         # previous command
         subparsers.add_parser("previous", help="Detach and attach to previous session")
+
+        # pick command
+        subparsers.add_parser("pick", help="Detach and choose a session with a fuzzy picker")
 
         # new command
         new_parser = subparsers.add_parser("new", help="Create a new session")
