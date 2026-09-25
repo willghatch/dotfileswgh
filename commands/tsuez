@@ -4,6 +4,7 @@ tsuez - A tmux session manager that works across multiple socket directories
 """
 
 import argparse
+import difflib
 import os
 import sys
 import subprocess
@@ -161,6 +162,39 @@ class Tsuez:
             if name == session_name:
                 return (name, socket_path)
         return None
+
+    @staticmethod
+    def rank_sessions(query: str, sessions: List[Tuple[str, Path]]) -> List[Tuple[str, Path]]:
+        """Order sessions by how well their names match query, best first.
+
+        Every session is returned, so the best match exists whenever any session does.
+        An empty query keeps the original order.
+        """
+        if not query:
+            return list(sessions)
+        q = query.lower()
+
+        def is_subsequence(name: str) -> bool:
+            chars = iter(name)
+            return all(c in chars for c in q)
+
+        def key(indexed):
+            index, (name, _) = indexed
+            n = name.lower()
+            # Tiers: exact, prefix, substring, subsequence (all case-insensitive), then anything else.
+            if n == q:
+                tier = 0
+            elif n.startswith(q):
+                tier = 1
+            elif q in n:
+                tier = 2
+            elif is_subsequence(n):
+                tier = 3
+            else:
+                return (4, -difflib.SequenceMatcher(None, q, n).ratio(), len(name), index)
+            return (tier, 0, len(name), index)
+
+        return [session for _, session in sorted(enumerate(sessions), key=key)]
 
     def _get_control_command_file(self, socket_path: Path, session_name: str) -> Path:
         """Get the path to the control command file for a session
@@ -328,6 +362,10 @@ class Tsuez:
 
     def cmd_attach(self, args):
         """Attach to a session by name"""
+        if args.session is None and not (args.fuzzy and not args.socket_dir):
+            print("A session name is required unless --fuzzy is given", file=sys.stderr)
+            sys.exit(1)
+
         # If socket-dir is specified, use it directly
         if hasattr(args, 'socket_dir') and args.socket_dir:
             socket_dir = Path(args.socket_dir)
@@ -342,7 +380,18 @@ class Tsuez:
             self._session_loop(session_name, socket_path, create_new=False)
         else:
             # Use the standard search mechanism
-            session_info = self.find_session(args.session)
+            if args.session is not None:
+                session_info = self.find_session(args.session)
+            else:
+                session_info = None
+
+            if not session_info and args.fuzzy:
+                ranked = self.rank_sessions(args.session or "", self.list_all_sessions())
+                if not ranked:
+                    print("No tmux sessions found", file=sys.stderr)
+                    sys.exit(1)
+                session_info = ranked[0]
+                print(f"tsuez: '{args.session or ''}' -> '{session_info[0]}'", file=sys.stderr)
 
             if not session_info:
                 print(f"Session '{args.session}' not found", file=sys.stderr)
@@ -584,8 +633,12 @@ class Tsuez:
 
         # attach command
         attach_parser = subparsers.add_parser("attach", help="Attach to a session")
-        attach_parser.add_argument("session", help="Session name to attach to")
+        attach_parser.add_argument("session", nargs="?",
+                                   help="Session name to attach to (optional with --fuzzy)")
         attach_parser.add_argument("--socket-dir", type=Path, help="Specific socket directory to use")
+        attach_parser.add_argument("--fuzzy", action="store_true",
+                                   help="If no session has exactly this name, attach to the closest match "
+                                   "(or the first session if no name is given); ignored with --socket-dir")
 
         # next command
         subparsers.add_parser("next", help="Detach and attach to next session")

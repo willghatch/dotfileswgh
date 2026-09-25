@@ -29,7 +29,8 @@ _tsuez() {
         attach)
           _arguments \
             '1:session name:->sessions' \
-            '--socket-dir[Specific socket directory to use]:socket directory:_directories'
+            '--socket-dir[Specific socket directory to use]:socket directory:_directories' \
+            '--fuzzy[Attach to the closest session name if there is no exact match]'
 
           case $state in
             sessions)
