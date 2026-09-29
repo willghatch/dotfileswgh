@@ -30,6 +30,21 @@ echo -e "\e[3m\e[1mbold italic\e[0m"
 echo -e "\e[4m\e[1mbold underline\e[0m"
 echo -e "\e[4m\e[9m\e[3m\e[1mbold italic strikethrough underline\e[0m"
 echo -e "\e[4m\e[9m\e[3m\e[1m\e[5mblink bold italic strikethrough underline\e[0m"
+echo
+
+echo "Testing underline styles (each shape should be visibly different):"
+echo -e "\e[4:0mno underline (4:0)\e[0m  \e[4:1msingle (4:1)\e[0m  \e[4:2mdouble (4:2)\e[0m  \e[4:3mcurly (4:3)\e[0m  \e[4:4mdotted (4:4)\e[0m  \e[4:5mdashed (4:5)\e[0m"
+echo -e "\e[21mdouble via SGR 21 (some terminals treat 21 as bold-off instead)\e[0m"
+echo "Testing underline colors (underline color should differ from the text color):"
+for style in 1 2 3 4 5; do
+    line=""
+    for rgb in "255;85;85" "229;192;123" "152;195;121" "97;175;239" "198;120;221"; do
+        line+="\e[4:${style};58;2;${rgb}m  4:${style} colored  \e[0m"
+    done
+    echo -e "$line"
+done
+echo -e "\e[4:3;58;5;196m256-color curly underline (58;5;196)\e[0m  \e[38;2;97;175;239;4:3;58;2;255;85;85mblue text, red curly underline\e[0m  \e[4:1;58;2;255;85;85mred underline\e[59m then default underline color (59)\e[0m"
+echo -e "\e[1;3;4:3;58;2;255;85;85mbold italic curly red underline\e[0m  \e[9;4:2;58;2;152;195;121mstrikethrough double green underline\e[0m"
 
 
 # - maybe print a list of interactive things to test?
