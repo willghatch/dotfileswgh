@@ -17,7 +17,7 @@
         },
         "user-setup": {
             "docker-run-script": {
-                "1": [
+                "2": [
                     "export DOCSUEZ_CONTAINER_USER_NAME DOCSUEZ_CONTAINER_UID DOCSUEZ_CONTAINER_GID",
                     "export DOCSUEZ_CONTAINER_HOME=\"${DOCSUEZ_CONTAINER_HOME:-/home/$DOCSUEZ_CONTAINER_USER_NAME}\""
                 ],
