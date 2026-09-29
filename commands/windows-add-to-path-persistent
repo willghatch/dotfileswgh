@@ -1,0 +1,123 @@
+#!/usr/bin/env bash
+
+set -o pipefail
+
+usage() {
+    cat <<'EOF'
+Usage: windows-add-to-path-persistent [--scope user|machine] [--dry-run] DIRECTORY
+
+Append a directory to the persistent Windows Path unless it is already
+present. The default scope is "user". Machine scope requires elevation.
+With --dry-run, read the current Path and print the proposed change.
+
+Pass a Windows path such as: C:\Users\me\bin
+EOF
+}
+
+scope=user
+dry_run=false
+args=()
+while (( $# )); do
+    case "$1" in
+        --help|-h)
+            usage
+            exit 0
+            ;;
+        --scope)
+            if (( $# < 2 )); then
+                echo "windows-add-to-path-persistent: --scope requires a value" >&2
+                exit 2
+            fi
+            scope=$2
+            shift 2
+            ;;
+        --scope=*)
+            scope=${1#*=}
+            shift
+            ;;
+        --dry-run)
+            dry_run=true
+            shift
+            ;;
+        --)
+            shift
+            args+=("$@")
+            break
+            ;;
+        -*)
+            echo "windows-add-to-path-persistent: unknown option: $1" >&2
+            exit 2
+            ;;
+        *)
+            args+=("$1")
+            shift
+            ;;
+    esac
+done
+set -- "${args[@]}"
+
+if [[ $# -ne 1 || -z "$1" ]]; then
+    usage >&2
+    exit 2
+fi
+
+directory=$1
+
+case "${scope,,}" in
+    user) scope=User ;;
+    machine) scope=Machine ;;
+    *)
+        echo "windows-add-to-path-persistent: invalid scope: $scope" >&2
+        usage >&2
+        exit 2
+        ;;
+esac
+
+if [[ "$directory" == *';'* ]]; then
+    echo "windows-add-to-path-persistent: a PATH entry cannot contain a semicolon" >&2
+    exit 2
+fi
+
+command_dir=$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd)
+get_env="$command_dir/windows-get-env"
+set_env="$command_dir/windows-set-env-persistent"
+
+current_path=$("$get_env" Path --scope "$scope")
+get_status=$?
+if (( get_status == 1 )); then
+    current_path=
+elif (( get_status != 0 )); then
+    exit "$get_status"
+fi
+
+normalize_path_entry() {
+    local entry=${1//\//\\}
+    entry=${entry,,}
+    if (( ${#entry} > 3 )); then
+        entry=${entry%\\}
+    fi
+    printf '%s' "$entry"
+}
+
+wanted=$(normalize_path_entry "$directory")
+IFS=';' read -r -a entries <<< "$current_path"
+for entry in "${entries[@]}"; do
+    if [[ $(normalize_path_entry "$entry") == "$wanted" ]]; then
+        if [[ $dry_run == true ]]; then
+            printf '%s Path already contains %s; no change\n' "$scope" "$directory"
+        fi
+        exit 0
+    fi
+done
+
+if [[ -n "$current_path" && "$current_path" != *';' ]]; then
+    new_path="$current_path;$directory"
+else
+    new_path="$current_path$directory"
+fi
+
+if [[ $dry_run == true ]]; then
+    "$set_env" Path "$new_path" --scope "$scope" --dry-run
+else
+    "$set_env" Path "$new_path" --scope "$scope"
+fi

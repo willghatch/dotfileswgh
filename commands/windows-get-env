@@ -1,0 +1,119 @@
+#!/usr/bin/env bash
+
+set -o pipefail
+
+usage() {
+    cat <<'EOF'
+Usage: windows-get-env [--scope user|machine|process] NAME
+       windows-get-env --all [--scope process]
+
+Print a Windows environment variable. The default scope is "user".
+The command exits with status 1 when the variable does not exist.
+The process scope reads the environment of the launched PowerShell process.
+With --all, print NAME=VALUE lines from a new cmd.exe process.
+
+For named lookups, set WINDOWS_POWERSHELL to override powershell.exe.
+EOF
+}
+
+scope=user
+scope_given=false
+all=false
+args=()
+while (( $# )); do
+    case "$1" in
+        --help|-h)
+            usage
+            exit 0
+            ;;
+        --scope)
+            if (( $# < 2 )); then
+                echo "windows-get-env: --scope requires a value" >&2
+                exit 2
+            fi
+            scope=$2
+            scope_given=true
+            shift 2
+            ;;
+        --scope=*)
+            scope=${1#*=}
+            scope_given=true
+            shift
+            ;;
+        --all)
+            all=true
+            shift
+            ;;
+        --)
+            shift
+            args+=("$@")
+            break
+            ;;
+        -*)
+            echo "windows-get-env: unknown option: $1" >&2
+            exit 2
+            ;;
+        *)
+            args+=("$1")
+            shift
+            ;;
+    esac
+done
+set -- "${args[@]}"
+
+if [[ $all == true ]]; then
+    if (( $# != 0 )); then
+        usage >&2
+        exit 2
+    fi
+    if [[ $scope_given == true && ${scope,,} != process ]]; then
+        echo "windows-get-env: --all only supports process scope" >&2
+        exit 2
+    fi
+    cmd.exe /c set | while IFS= read -r line || [[ -n $line ]]; do
+        printf '%s\n' "${line%$'\r'}"
+    done
+    exit $?
+fi
+
+if [[ $# -ne 1 || -z "$1" ]]; then
+    usage >&2
+    exit 2
+fi
+
+name=$1
+
+case "${scope,,}" in
+    user) scope=User ;;
+    machine) scope=Machine ;;
+    process) scope=Process ;;
+    *)
+        echo "windows-get-env: invalid scope: $scope" >&2
+        usage >&2
+        exit 2
+        ;;
+esac
+
+powershell=${WINDOWS_POWERSHELL:-powershell.exe}
+name_b64=$(printf '%s' "$name" | base64 | tr -d '\r\n')
+
+powershell_script=$(
+    printf '$nameB64 = '\''%s'\''\n' "$name_b64"
+    printf '$target = [System.EnvironmentVariableTarget]::%s\n' "$scope"
+    cat <<'POWERSHELL'
+$ErrorActionPreference = 'Stop'
+try {
+    $name = [Text.Encoding]::UTF8.GetString([Convert]::FromBase64String($nameB64))
+    $value = [Environment]::GetEnvironmentVariable($name, $target)
+    if ($null -eq $value) {
+        exit 1
+    }
+    [Console]::OutputEncoding = New-Object Text.UTF8Encoding $false
+    Write-Output $value
+} catch {
+    [Console]::Error.WriteLine($_.Exception.Message)
+    exit 2
+}
+POWERSHELL
+)
+"$powershell" -NoLogo -NoProfile -NonInteractive -Command "$powershell_script"

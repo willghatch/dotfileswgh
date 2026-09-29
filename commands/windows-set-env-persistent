@@ -1,0 +1,113 @@
+#!/usr/bin/env bash
+
+set -o pipefail
+
+usage() {
+    cat <<'EOF'
+Usage: windows-set-env-persistent [--scope user|machine] [--dry-run] NAME VALUE
+
+Persist a Windows environment variable. The default scope is "user".
+Setting a machine variable requires an elevated Windows process.
+With --dry-run, print the proposed change without editing Windows.
+
+Set WINDOWS_POWERSHELL to override the default powershell.exe command.
+EOF
+}
+
+scope=user
+dry_run=false
+args=()
+while (( $# )); do
+    case "$1" in
+        --help|-h)
+            usage
+            exit 0
+            ;;
+        --scope)
+            if (( $# < 2 )); then
+                echo "windows-set-env-persistent: --scope requires a value" >&2
+                exit 2
+            fi
+            scope=$2
+            shift 2
+            ;;
+        --scope=*)
+            scope=${1#*=}
+            shift
+            ;;
+        --dry-run)
+            dry_run=true
+            shift
+            ;;
+        --)
+            shift
+            args+=("$@")
+            break
+            ;;
+        -*)
+            echo "windows-set-env-persistent: unknown option: $1" >&2
+            exit 2
+            ;;
+        *)
+            args+=("$1")
+            shift
+            ;;
+    esac
+done
+set -- "${args[@]}"
+
+if [[ $# -ne 2 || -z "$1" ]]; then
+    usage >&2
+    exit 2
+fi
+
+name=$1
+value=$2
+
+case "${scope,,}" in
+    user) scope=User ;;
+    machine) scope=Machine ;;
+    *)
+        echo "windows-set-env-persistent: invalid scope: $scope" >&2
+        usage >&2
+        exit 2
+        ;;
+esac
+
+if [[ $dry_run == true ]]; then
+    printf 'Would set %s environment variable %s to %s\n' "$scope" "$name" "$value"
+    exit 0
+fi
+
+powershell=${WINDOWS_POWERSHELL:-powershell.exe}
+name_b64=$(printf '%s' "$name" | base64 | tr -d '\r\n')
+value_b64=$(printf '%s' "$value" | base64 | tr -d '\r\n')
+
+powershell_script=$(
+    printf '$nameB64 = '\''%s'\''\n' "$name_b64"
+    printf '$valueB64 = '\''%s'\''\n' "$value_b64"
+    printf '$target = [System.EnvironmentVariableTarget]::%s\n' "$scope"
+    cat <<'POWERSHELL'
+$ErrorActionPreference = 'Stop'
+$name = [Text.Encoding]::UTF8.GetString([Convert]::FromBase64String($nameB64))
+$value = [Text.Encoding]::UTF8.GetString([Convert]::FromBase64String($valueB64))
+[Environment]::SetEnvironmentVariable($name, $value, $target)
+
+# Notify interested Windows applications that the environment changed.
+Add-Type @'
+using System;
+using System.Runtime.InteropServices;
+public static class EnvironmentChangeNotifier {
+    [DllImport("user32.dll", SetLastError = true, CharSet = CharSet.Auto)]
+    public static extern IntPtr SendMessageTimeout(
+        IntPtr hWnd, uint Msg, UIntPtr wParam, string lParam,
+        uint flags, uint timeout, out UIntPtr result);
+}
+'@
+$result = [UIntPtr]::Zero
+[void][EnvironmentChangeNotifier]::SendMessageTimeout(
+    [IntPtr]0xffff, 0x001A, [UIntPtr]::Zero, 'Environment',
+    0x0002, 5000, [ref]$result)
+POWERSHELL
+)
+"$powershell" -NoLogo -NoProfile -NonInteractive -Command "$powershell_script"
