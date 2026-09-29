@@ -39,7 +39,8 @@
                     "chmod 644 \"$_docsuez_amd_file\"",
                     "for _docsuez_amd in .claude/CLAUDE.md .codex/AGENTS.md .config/opencode/AGENTS.md .pi/agent/AGENTS.md .config/agents/AGENTS.md; do",
                     "  DOCSUEZ_VOLUMES+=(\"$_docsuez_amd_file:$DOCSUEZ_CONTAINER_HOME/$_docsuez_amd:ro\")",
-                    "done"
+                    "done",
+                    "DOCKER_RUN_EXTRAS+=(-e \"CODEX_HOME=$DOCSUEZ_CONTAINER_HOME/.codex\")"
                 ]
             }
         }
