@@ -1,0 +1,18 @@
+#!/usr/bin/env bash
+
+help() {
+    echo "Usage: $0 <PATH> <NAME> <VALUE>"
+    echo "For use inside WSL."
+    echo "example: $0 'HKCU:\SOFTWARE\Microsoft\Windows\CurrentVersion\Themes\Personalize' AppsUseLightTheme 1"
+    exit 1
+}
+
+if [[ "$@" =~ "--help" ]]; then
+    help
+fi
+if [[ "$#" != 3 ]]; then
+    help
+fi
+
+echo "Set-ItemProperty '$1' -Name '$2' -Value $3" | powershell.exe
+echo ""
