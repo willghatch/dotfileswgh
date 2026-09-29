@@ -77,6 +77,12 @@ build-docsuez.json - Specifies how to build an image:
   }
 }
 
+Prefix a JSON object key with "#" to comment it out.  In a list, an object
+whose keys are all commented out is skipped entirely.  For example,
+{"#search": "dockerfile-components/optional"} disables that Dockerfile
+component; removing the "#" enables it again.  This applies to all config
+lists, including entries loaded through "search-merge".
+
 "search-merge" is an optional Dockerfile extension point.  Its relative path
 is checked under every docsuez search path.  Each match may be a JSON file or
 a directory whose immediate children are regular *.json files.  A JSON file
@@ -176,13 +182,18 @@ def _strip_comment_keys(data):
     """Recursively remove any dict keys starting with '#'.
 
     JSON does not support comments.  This allows users to "comment out" a
-    config key by prefixing it with '#'; those keys are silently ignored
-    when the config is loaded.
+    config key by prefixing it with '#'.  A list item consisting only of
+    commented keys is also ignored, so entries such as {"#search": "path"}
+    do not become invalid empty objects.
     """
     if isinstance(data, dict):
         return {k: _strip_comment_keys(v) for k, v in data.items() if not k.startswith('#')}
     if isinstance(data, list):
-        return [_strip_comment_keys(item) for item in data]
+        return [
+            _strip_comment_keys(item) for item in data
+            if not (isinstance(item, dict) and item
+                    and all(key.startswith('#') for key in item))
+        ]
     return data
 
 

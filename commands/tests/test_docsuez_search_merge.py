@@ -104,6 +104,48 @@ class SearchMergeTest(unittest.TestCase):
         )
         self.assertNotIn("ORDINARY-SECOND", result.stdout)
 
+    def test_commented_dockerfile_entries_are_ignored(self):
+        self.make_build([
+            {"text": "FROM scratch"},
+            {"#relative-path": "missing.Dockerfile"},
+            {"#search": "missing"},
+            {"#text": "COMMENTED-TEXT"},
+            {"#bash-print-text": "exit 99"},
+            {"#search-merge": "missing"},
+            {"#from-docsuez": "missing"},
+            {"#copy-from-docsuez": "missing", "#src": "/x", "#dst": "/y"},
+            {"text": "RUN echo active", "#search": "missing"},
+        ])
+
+        result = self.dry_show()
+
+        self.assert_success(result)
+        self.assert_in_order(result.stdout, "FROM scratch", "RUN echo active")
+        self.assertNotIn("COMMENTED-TEXT", result.stdout)
+
+    def test_commented_entries_in_search_merge_contributions_are_ignored(self):
+        self.make_build([{"text": "FROM scratch"},
+                         {"search-merge": "extensions/hook.json"}])
+        self.write_json(self.first / "extensions/hook.json", {
+            "50": [
+                {"#search": "missing"},
+                {"text": "RUN echo contributed"},
+            ],
+        })
+
+        result = self.dry_show()
+
+        self.assert_success(result)
+        self.assert_in_order(result.stdout, "FROM scratch", "RUN echo contributed")
+
+    def test_empty_dockerfile_entry_is_still_invalid(self):
+        self.make_build([{"text": "FROM scratch"}, {}])
+
+        result = self.dry_show()
+
+        self.assertNotEqual(result.returncode, 0)
+        self.assertIn("exactly one", result.stderr)
+
     def test_missing_path_is_a_noop_but_found_invalid_inputs_are_errors(self):
         self.make_build([
             {"text": "START"},
