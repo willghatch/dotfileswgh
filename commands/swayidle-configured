@@ -11,6 +11,10 @@ monitorOn='swaymsg "output * power on"'
 if [[ -n "$HYPRLAND_INSTANCE_SIGNATURE" ]]; then
   monitorOff='hyprctl dispatch dpms off'
   monitorOn='hyprctl dispatch dpms on'
+elif [[ "$XDG_CURRENT_DESKTOP" = floatile ]]; then
+  # Floatile has no IPC for this, but offers wlr-output-power-management.
+  monitorOff="wlopm --off '*'"
+  monitorOn="wlopm --on '*'"
 fi
 
 # don't actually use monitorOff for now... it seems to be causing problems

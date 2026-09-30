@@ -1,0 +1,18 @@
+#!/usr/bin/env bash
+
+if [[ "$@" =~ "--help" ]]; then
+    echo "Usage: $0"
+    echo "Close the Floatile eww bars if any are open, or else start them with floatile-eww-bar."
+    exit 0
+fi
+
+# The same default as floatile-eww-bar: eww names its daemon after the
+# configuration path, so a different spelling of the same directory would
+# ask a daemon that is not running.
+config="${FLOATILE_EWW_CONFIG:-$DOTFILESWGH/floatile-eww-bar}"
+if eww --config "$config" active-windows 2>/dev/null | grep -q '^bar-'; then
+    eww --config "$config" close-all
+else
+    floatile-eww-bar >/dev/null 2>&1 &
+    disown
+fi

@@ -1,0 +1,211 @@
+;; Floatile demo bar: everything the Waybar configuration showed, plus an
+;; application menu and a power menu.  One `bar' window per vmonitor, opened
+;; by floatile-eww-bar with the vmonitor's name as VMONITOR and the monitor eww
+;; should put it on as MONITOR.
+;;
+;; floatile-eww-bar starts the eww daemon in this directory, so scripts/ is
+;; relative to it; commands in handlers name it through EWW_CONFIG_DIR.
+
+;; ---------------------------------------------------------------------------
+;; Data
+;; ---------------------------------------------------------------------------
+
+(deflisten floatile :initial "{}" "scripts/floatile-bars.scm")
+(deflisten mpris :initial "{\"markup\":\"\",\"shown\":false}" "scripts/mpris.scm")
+(deflisten volume :initial "{\"markup\":\"\",\"muted\":false}" "scripts/volume.scm")
+(deflisten gamma-temperature :initial "" "scripts/gammarelay-watch.sh {t}")
+(deflisten gamma-brightness :initial "" "scripts/gammarelay-watch.sh {bp}")
+(deflisten gamma-gamma :initial "" "scripts/gammarelay-watch.sh {g}")
+(deflisten lightdark :initial "" "scripts/lightdark.sh")
+
+(defpoll idle-inhibit :interval "5s" "wayland-idle-inhibit status")
+(defpoll mooncrater :interval "1s" "cat /tmp/mooncrater-input-status 2>/dev/null || echo 'MC: inactive'")
+(defpoll network :interval "5s" :initial "{\"text\":\"\",\"tooltip\":\"\",\"class\":\"\"}" "scripts/network.scm")
+(defpoll temperature :interval "5s"
+  "cat /sys/class/thermal/thermal_zone*/temp 2>/dev/null | sort -n | tail -1")
+(defpoll backlight :interval "2s"
+  "b=$(ls /sys/class/backlight 2>/dev/null | head -1); [ -n \"$b\" ] && echo $(( 100 * $(cat /sys/class/backlight/$b/brightness) / $(cat /sys/class/backlight/$b/max_brightness) )) || echo ''")
+(defpoll battery :interval "10s" :initial "{\"shown\":false,\"text\":\"\",\"class\":\"\"}" "scripts/battery.scm")
+(defpoll clock :interval "10s" "date '+%a, %Y-%m-%d %H:%M'")
+(defpoll calendar :interval "600s" "cal")
+;; No :initial, so eww runs the script at startup; with one, the menu would
+;; stay empty until the first interval passed.
+(defpoll apps :interval "300s" "scripts/apps.scm")
+
+;; How the window list shows each window: "icon+name", "icon", or "name".
+;; With "icon", a window with no icon found still shows its name.
+(defvar window-list-style "icon+name")
+
+;; The index in `apps' of the category the application menu shows, -1 for
+;; the list of categories.
+(defvar menu-category -1)
+;; The power action waiting to be confirmed, "" for none.
+(defvar power-confirm "")
+
+;; ---------------------------------------------------------------------------
+;; Windows
+;; ---------------------------------------------------------------------------
+
+(defwindow bar [vmonitor monitor]
+  :monitor monitor
+  :geometry (geometry :x "0%" :y "0%" :width "100%" :height "30px" :anchor "top center")
+  :stacking "fg"
+  :exclusive true
+  :namespace "floatile-bar"
+  (bar :vmonitor vmonitor :monitor monitor))
+
+(defwindow menu [monitor]
+  :monitor monitor
+  :geometry (geometry :x "0px" :y "0px" :width "320px" :anchor "top left")
+  :stacking "overlay"
+  :namespace "floatile-bar-menu"
+  (app-menu :monitor monitor))
+
+(defwindow power [monitor]
+  :monitor monitor
+  :geometry (geometry :x "0px" :y "0px" :width "220px" :anchor "top right")
+  :stacking "overlay"
+  :namespace "floatile-bar-power"
+  (power-menu :monitor monitor))
+
+;; ---------------------------------------------------------------------------
+;; The bar
+;; ---------------------------------------------------------------------------
+
+(defwidget bar [vmonitor monitor]
+  (centerbox :class "bar" :orientation "h"
+    (box :class "left" :space-evenly false :halign "start"
+      (button :class "start" :tooltip "Applications"
+              :onclick "eww -c ${EWW_CONFIG_DIR} open --toggle menu --id menu-${monitor} --arg monitor='${monitor}' && eww -c ${EWW_CONFIG_DIR} update menu-category=-1"
+        "")
+      (button :class "terminal" :onclick "vlaunch terminal" "T>")
+      (workspaces :vmonitor vmonitor)
+      (label :class "layout" :text {floatile?.vmonitors?.[vmonitor]?.layout ?: ""})
+      (windows :vmonitor vmonitor))
+    (box)
+    (box :class "right" :space-evenly false :halign "end"
+      (label :class "module mpris" :visible {mpris.shown} :markup {mpris.markup})
+      (button :class "module idle ${idle-inhibit == 'inhibited' ? 'inhibited' : 'no-inhibit'}"
+              :onclick "wayland-idle-inhibit toggle"
+        {idle-inhibit == "inhibited" ? "NOSS" : "SCS"})
+      (label :class "module mooncrater" :text "⌨ ${mooncrater}")
+      (label :class "module network ${network.class}" :text {network.text} :tooltip {network.tooltip})
+      (label :class "module temperature ${temperature != '' && temperature / 1000 >= 80 ? 'critical' : ''}"
+             :visible {temperature != ""}
+             :text "${temperature == '' ? '' : round(temperature / 1000, 0)}°C${temperature == '' ? '' : temperature / 1000 < 50 ? '' : temperature / 1000 < 80 ? '' : ''}")
+      (label :class "module cpu" :text "${round(EWW_CPU.avg, 0)}%")
+      (label :class "module memory" :text "${round(EWW_RAM.used_mem_perc, 0)}%🐏")
+      ;; wl-gammarelay-rs: scroll to change; hidden while its daemon is not running.
+      (eventbox :visible {gamma-temperature != ""}
+                :onscroll "[ {} = up ] && busctl --user -- call rs.wl-gammarelay / rs.wl.gammarelay UpdateTemperature n +100 || busctl --user -- call rs.wl-gammarelay / rs.wl.gammarelay UpdateTemperature n -100"
+        (label :class "module gamma" :text "${gamma-temperature} "))
+      (eventbox :visible {gamma-brightness != ""}
+                :onscroll "[ {} = up ] && busctl --user -- call rs.wl-gammarelay / rs.wl.gammarelay UpdateBrightness d +0.02 || busctl --user -- call rs.wl-gammarelay / rs.wl.gammarelay UpdateBrightness d -0.02"
+        (label :class "module gamma" :text "${gamma-brightness}% "))
+      (eventbox :visible {gamma-gamma != ""}
+                :onscroll "[ {} = up ] && busctl --user -- call rs.wl-gammarelay / rs.wl.gammarelay UpdateGamma d +0.02 || busctl --user -- call rs.wl-gammarelay / rs.wl.gammarelay UpdateGamma d -0.02"
+        (label :class "module gamma" :text "${gamma-gamma}% γ"))
+      ;; Red mode, Floatile's own night light: click to turn on or off,
+      ;; scroll to make it warmer or cooler.  An alternative to wl-gammarelay-rs.
+      (eventbox :onclick "floatilectl night-light toggle >/dev/null"
+                :onscroll "[ {} = up ] && floatilectl night-light adjust 200 >/dev/null || floatilectl night-light adjust -200 >/dev/null"
+                :tooltip "Red mode: click to turn on or off, scroll to change how red"
+        (label :class "module night-light ${(floatile?.night_light?.on ?: false) ? 'on' : 'off'}"
+               :text {(floatile?.night_light?.on ?: false) ? "RED ${floatile.night_light.temperature}K" : "red"}))
+      (eventbox :visible {lightdark != ""}
+                :onclick "lightdark-status toggle >/dev/null 2>&1 &"
+                :tooltip "Light or dark theme: click to switch"
+        (label :class "module lightdark ${lightdark}" :text {lightdark == "light" ? " light" : " dark"}))
+      (eventbox :visible {backlight != ""}
+                :onscroll "[ {} = up ] && state backlight inc || state backlight dec"
+        (label :class "module backlight" :text "${backlight}%∠💡"))
+      (systray :class "module tray" :spacing 10 :icon-size 18)
+      (eventbox :onclick "pavucontrol &"
+                :onscroll "[ {} = up ] && pactl set-sink-volume @DEFAULT_SINK@ +5% || pactl set-sink-volume @DEFAULT_SINK@ -5%"
+        (label :class "module volume ${volume.muted ? 'muted' : ''}" :markup {volume.markup}))
+      (battery)
+      (label :class "module clock" :text clock :tooltip calendar)
+      (button :class "power" :tooltip "Power"
+              :onclick "eww -c ${EWW_CONFIG_DIR} open --toggle power --id power-${monitor} --arg monitor='${monitor}' && eww -c ${EWW_CONFIG_DIR} update power-confirm=''"
+        ""))))
+
+(defwidget workspaces [vmonitor]
+  (box :class "workspaces" :space-evenly false
+    (for ws in {floatile?.vmonitors?.[vmonitor]?.workspaces ?: []}
+      (button :class "${ws.active ? 'active' : ws.shown ? 'shown' : ''} ${ws.urgent ? 'urgent' : ''}"
+              :onclick "floatilectl activate-workspace ${ws.id}"
+        {ws.name}))))
+
+(defwidget windows [vmonitor]
+  (box :class "windows" :space-evenly false
+    (for w in {floatile?.vmonitors?.[vmonitor]?.windows ?: []}
+      ;; activate-window focuses and raises the window, restoring it if
+      ;; minimized.  The class is the window's tags: focused, minimized,
+      ;; floating, maximized, fullscreen, and urgent are styled; others are
+      ;; left alone.
+      (button :class "window ${w.class}"
+              :tooltip {w.tooltip}
+              :onclick "floatilectl activate-window ${w.id}"
+        (box :space-evenly false :spacing 4
+          (image :visible {window-list-style != "name" && w.icon_path != ""}
+                 :path {w.icon_path} :image-width 16 :image-height 16)
+          (label :visible {window-list-style != "icon" || w.icon_path == ""}
+                 :class "name" :text {w.label})
+          ;; Floating, maximized, and fullscreen windows are marked.
+          (label :class "marks"
+                 :visible {w.marks != ""}
+                 :text {w.marks}))))))
+
+(defwidget battery []
+  (label :class "module battery ${battery.class}" :visible {battery.shown} :text {battery.text}))
+
+;; ---------------------------------------------------------------------------
+;; Application menu: categories, then the applications of one
+;; ---------------------------------------------------------------------------
+
+(defwidget app-menu [monitor]
+  (box :class "popup menu" :orientation "v" :space-evenly false
+    (box :visible {menu-category < 0} :orientation "v" :space-evenly false
+      (for category in apps
+        (button :class "menu-item"
+                :onclick "eww -c ${EWW_CONFIG_DIR} update menu-category=${category.index}"
+          (label :xalign 0 :text "${category.label}  ›"))))
+    (box :visible {menu-category >= 0} :orientation "v" :space-evenly false
+      (button :class "menu-item back" :onclick "eww -c ${EWW_CONFIG_DIR} update menu-category=-1"
+        (label :xalign 0 :text "‹  Back"))
+      (scroll :vscroll true :hscroll false :height 480
+        (box :orientation "v" :space-evenly false
+          ;; One loop over the chosen category's applications: a loop nested
+          ;; in the loop over categories showed every category empty.
+          (for app in {menu-category >= 0 ? apps[menu-category].apps : "[]"}
+            (button :class "menu-item"
+                    :onclick "${EWW_CONFIG_DIR}/scripts/launch-app.scm '${app.id}' ; eww -c ${EWW_CONFIG_DIR} close menu-${monitor}"
+              (box :space-evenly false :spacing 8
+                ;; Drawn from the icon's file, which eww scales, so every
+                ;; icon is the same size; by name only when no file was found.
+                (image :visible {app.icon_path != ""} :path {app.icon_path}
+                       :image-width 24 :image-height 24)
+                (image :visible {app.icon_path == ""} :icon {app.icon} :icon-size "large-toolbar")
+                (label :xalign 0 :limit-width 32 :text {app.name})))))))))
+
+;; ---------------------------------------------------------------------------
+;; Power menu: each action asks first
+;; ---------------------------------------------------------------------------
+
+(defwidget power-menu [monitor]
+  (box :class "popup power-menu" :orientation "v" :space-evenly false
+    (box :visible {power-confirm == ""} :orientation "v" :space-evenly false
+      (button :class "menu-item" :onclick "eww -c ${EWW_CONFIG_DIR} update power-confirm=lock" "Lock")
+      (button :class "menu-item" :onclick "eww -c ${EWW_CONFIG_DIR} update power-confirm=logout" "Log out")
+      (button :class "menu-item" :onclick "eww -c ${EWW_CONFIG_DIR} update power-confirm=reboot" "Restart")
+      (button :class "menu-item" :onclick "eww -c ${EWW_CONFIG_DIR} update power-confirm=poweroff" "Power off"))
+    (box :visible {power-confirm != ""} :orientation "v" :space-evenly false
+      (label :class "confirm"
+             :text "${power-confirm == 'lock' ? 'Lock' : power-confirm == 'logout' ? 'Log out' : power-confirm == 'reboot' ? 'Restart' : 'Power off'}: are you sure?")
+      (box :space-evenly true :spacing 8
+        (button :class "menu-item yes"
+                :onclick "eww -c ${EWW_CONFIG_DIR} close power-${monitor} ; case '${power-confirm}' in lock) swaylock-configured ;; logout) floatilectl quit ;; reboot) systemctl reboot ;; poweroff) systemctl poweroff ;; esac"
+          "Yes")
+        (button :class "menu-item no"
+                :onclick "eww -c ${EWW_CONFIG_DIR} update power-confirm='' ; eww -c ${EWW_CONFIG_DIR} close power-${monitor}"
+          "No")))))

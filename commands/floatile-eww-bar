@@ -1,0 +1,38 @@
+#!/usr/bin/env bash
+
+if [[ "$@" =~ "--help" ]]; then
+    echo "Usage: $0"
+    echo "Start the eww bar for Floatile: one bar per vmonitor of the session named by FLOATILE_CONTROL_SOCKET."
+    echo "The eww configuration is \$FLOATILE_EWW_CONFIG, by default \$DOTFILESWGH/floatile-eww-bar."
+    echo "Bars are put on the monitor named like their vmonitor; set FLOATILE_EWW_BY_INDEX=1 to use monitor indices instead."
+    exit 0
+fi
+
+config="${FLOATILE_EWW_CONFIG:-$DOTFILESWGH/floatile-eww-bar}"
+eww=(eww --config "$config")
+
+# The bar's scripts are named relative to its directory, and commands the
+# daemon runs start there.
+cd "$config" || exit 1
+if ! "${eww[@]}" ping >/dev/null 2>&1; then
+    "${eww[@]}" daemon
+    for _ in $(seq 50); do
+        "${eww[@]}" ping >/dev/null 2>&1 && break
+        sleep 0.1
+    done
+fi
+
+# One bar per vmonitor present now.  Floatile shows clients one output per
+# vmonitor, named after it.
+index=0
+floatilectl vmonitors \
+    | guile -c '(for-each (lambda (m) (display (assq-ref m (quote name))) (newline)) (read))' \
+    | while IFS= read -r name; do
+        if [[ -n "${FLOATILE_EWW_BY_INDEX:-}" ]]; then
+            monitor="$index"
+        else
+            monitor="$name"
+        fi
+        "${eww[@]}" open bar --id "bar-$index" --arg vmonitor="$name" --arg monitor="$monitor"
+        index=$((index + 1))
+    done
