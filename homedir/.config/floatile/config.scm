@@ -3,14 +3,8 @@
 ;; ---------------------------------------------------------------------------
 ;; Control socket
 ;; ---------------------------------------------------------------------------
-;; The configuration is loaded before Floatile opens its control socket, so
-;; setting the variable here enables it.  Programs Floatile starts, such as
-;; the eww bar and floatilectl, inherit it.  The process id keeps a socket
-;; left behind by a crashed session from stopping the next one from starting.
-
-(setenv "FLOATILE_CONTROL_SOCKET"
-        (string-append (or (getenv "XDG_RUNTIME_DIR") "/tmp")
-                       "/floatile-control-" (number->string (getpid)) ".sock"))
+;; Floatile's login session sets FLOATILE_CONTROL_SOCKET, which the eww bar and
+;; floatilectl use.
 
 ;; The bar's power menu logs out with `floatilectl quit'.
 (register-command! 'quit (lambda () (floatile-quit)))
