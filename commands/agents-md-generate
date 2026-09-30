@@ -19,6 +19,14 @@ Earlier search paths take priority (first found wins for a given segment name).
 When the same segment name exists as both .md and .prog in the same directory,
 .prog takes priority.  If any segment fails (eg. a .prog exits non-zero),
 nothing is written and the exit status is non-zero.
+
+Selected segments are ordered by dot-separated topic names.  An optional
+decimal number immediately before the final topic sets its position among
+siblings (default 50): 10.git.md anchors the git topic, while
+git.20.worktrees.md places worktrees within git.  A topic's own content
+precedes its children.  Equal positions sort by topic name; multiple files
+for the same topic sort by search path priority, then filename.  Conflicting
+positions for one topic are errors.
 """
 
 import argparse
@@ -68,6 +76,50 @@ def find_all_segments(base_paths):
     default_links = find_link_files(base_paths, "default")
     resolve_links(default_segments, default_links, non_default_segments, PROG_NAME)
     return default_segments, non_default_segments
+
+
+def parse_segment_name(name):
+    """Return a segment's topic path and its explicit or default position."""
+    parts = name.split(".")
+    if not parts or any(not part for part in parts) or parts[-1].isdecimal():
+        raise ValueError("invalid topic name")
+    position = 50
+    if len(parts) > 1 and parts[-2].isdecimal():
+        position = int(parts[-2])
+        del parts[-2]
+    if any(part.isdecimal() for part in parts):
+        raise ValueError("numeric position must precede the final topic")
+    return tuple(parts), position
+
+
+def order_segments(segments, base_paths):
+    """Order selected segments by topic hierarchy and sibling positions."""
+    positions = {}
+    parsed = []
+    base_ranks = {base.resolve(): rank for rank, base in enumerate(base_paths)}
+    for name, path in segments:
+        try:
+            topic, position = parse_segment_name(name)
+        except ValueError as error:
+            raise ValueError(f"invalid segment name '{name}': {error}") from error
+        previous = positions.setdefault(topic, position)
+        if previous != position:
+            raise ValueError(
+                f"conflicting positions for topic '{'.'.join(topic)}': "
+                f"{previous} and {position}"
+            )
+        parsed.append((name, path, topic))
+
+    def sort_key(segment):
+        name, path, topic = segment
+        hierarchy = tuple(
+            (positions.get(topic[:index], 50), part)
+            for index, part in enumerate(topic, 1)
+        )
+        rank = base_ranks[path.parent.parent.resolve()]
+        return hierarchy, rank, name, str(path)
+
+    return [(name, path) for name, path, _ in sorted(parsed, key=sort_key)]
 
 
 def read_segment(name, path, dev_types, git_root):
@@ -388,14 +440,20 @@ def main():
             cmd_parts.extend(["--add", name])
         #print(f"# Regenerate with: {' '.join(cmd_parts)}", file=sys.stderr)
 
-    # Collect segments to emit: defaults (minus omitted) then explicitly added non-defaults
+    # Collect selected segments before ordering their topic hierarchy.
     omit_set = set(args.omit)
     to_emit = []
-    for name in sorted(default_segments):
+    for name in default_segments:
         if name not in omit_set:
             to_emit.append((name, default_segments[name]))
     for name in args.add:
         to_emit.append((name, non_default_segments[name]))
+
+    try:
+        to_emit = order_segments(to_emit, base_paths)
+    except ValueError as error:
+        print(f"{PROG_NAME}: error: {error}", file=sys.stderr)
+        sys.exit(1)
 
     # Read all segments first, so a failing segment produces no partial output
     contents = []
