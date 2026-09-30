@@ -1,38 +1,63 @@
 ---
 name: parley
-description: Procedure for clarification phase before non-trivial work.  Disclose before running parley.
+description: Procedure for clarification phase before non-trivial work.
 ---
 
-# Parley procedure
+# Parley
 
-1. Never edit inputs.
-   Copy input files to `parley-original-BASENAME` in your agent-work-directory, and quote input items verbatim (with org outline path) when referring to them.
-2. First research items marked inline (eg. `(parley chat)`, `parley research item:`) and record the answers; unresolved ones become questions.
-3. Find contradictions (within the prompt, or against code or other instructions), result-changing ambiguity, and missing info (success criteria, scope, output location, verification).
-4. Decide low-stakes choices yourself, as planned assumptions the user can veto.  (Mention them in parley briefly.)
-5. Write `parley-clarifications.org` (no plan document unless asked), then reply with numbered questions, each with a recommended answer, and the file path.
-6. Record the user's answers in the file, ask follow-ups, and wait until the user says to start.
+## Procedure
 
-The file plus the original prompt must suffice for handing off to another agent:
+1. First research items marked inline (eg. `(parley q)`, `parley research:`).
+   Record answers and related questions.
+2. Find contradictions (within the prompt, or against code or other instructions), result-changing ambiguity, and missing info (success criteria, scope, output location, verification).
+3. Decide low-stakes choices yourself, as planned assumptions the user can veto.
+4. Write `parley-clarifications.org`.  Be concise.  Give the file path in chat.  It should include or reference the original prompt.
+5. The user edits the file.
+6. Iterate.  Append to the file only, never edit previous questions or answers.  Ask follow-up questions, move forward in a decision tree, etc.  Get explicit user sign-off before implementation.
+
+## Example clarification file format:
 
 ```org
-* Research findings
-** "MARKED TEXT"
-* Open questions
-** Q1. QUESTION
-Recommended: ANSWER
-* Planned assumptions
-* Test plan
+* Original Prompt
+[Prompt from interactive chat, or file path]
+* Parley Round 1
+** Research findings
+** Questions
+*** Q1. QUESTION
+[optional context]
+**** Recommended
+[answer]
+**** Option B
+[answer]
+**** User:
+[answer]
+*** Q2. QUESTION
+**** Recommended
+[answer]
+User agreed.
+**** Alternate
+[answer]
+** Planned assumptions
+** Test plan
 - BEHAVIOR -- BUG IT CATCHES
-* Resolved
-** Q1. QUESTION
-Answer: ANSWER
+* Parley Round 2
+...
 ```
 
-For to-do lists, group this by item.
+Among answer options, the user can mark acceptance by writing `(user agreed)`, `user: answer`, `user clarification: ...`, etc.
+Don't write a blank `User:` heading, the user will add it if necessary.
 
-## Parallel parley
+## Work
 
-When work will be split across subagents, split the parley the same way: one parley-only subagent per implementation unit, doing steps 1-4 and returning its clarifications file and questions.
-Merge, deduplicate, and ask the user everything at once.
-After sign-off, give implementation subagents `parley done PATHS`.
+Once work starts, don't stop to ask unless a question is truly important; guess and continue.
+Stop for real blockers (data loss, unauthorized irreversible or outward-facing actions, impossible task).
+Record each guess when made in `parley-assumptions.org` (agent-work-directory): one heading each with question, choice and why, and affected files/commits.
+Your final report links every assumptions file (yours and subagents') or says there are none.
+For questions and reports, state assumptions in the answer instead.
+
+Subagent prompts must say `parley done PATHS` or `skip parley`; subagents never wait for sign-off.
+
+## Pedantic Control Phrases
+
+- `parley in chat`, `parley just chat` - skip writing files, just do QA in chat.
+- `parley chat` - before writing or stepping in parley file procedure, just chat to clarify with the user.  IE don't skip the file workflow like `parley in chat`, but have a few rounds of chat-only discussion about the flagged topic (IE usually this is inline as `(parley chat)` to mark a part of the spec where the user lacks some understanding.  `parley resume` to mark being done with interactive chat.

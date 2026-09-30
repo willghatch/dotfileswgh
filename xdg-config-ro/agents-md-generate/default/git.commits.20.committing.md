@@ -1,4 +1,4 @@
-# Git Committing
+### Committing
 
 Commit all repo changes you make for a task, without being asked, unless told not to; this overrides any default of committing only on request.
 The user reviews commits, not loose changes.

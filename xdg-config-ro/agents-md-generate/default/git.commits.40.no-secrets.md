@@ -1,4 +1,4 @@
-# No secrets in commits
+### No secrets in commits
 
 Never commit API keys, passwords, tokens, certificates, or other secrets—even temporarily.
 Use environment variables or a gitignored file (e.g., `.env`) for secrets needed during development.

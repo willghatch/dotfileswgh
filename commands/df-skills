@@ -494,9 +494,11 @@ def cmd_agents_md_snippet(args, dev_types, git_root, roots):
     # Generate snippet output
     print("# df-skills")
     print()
-    print("Skills are detailed instruction documents available on demand.")
-    print("To see the full content of a df-skills skill, run: `df-skills disclose SKILL_NAME`")
-    print("Only disclose skills when you need them for the current task.")
+    print("Skills are docs available on demand.")
+    print("To see skill content, run: `df-skills disclose SKILL_NAME`")
+    print("Only disclose as needed for the current task.")
+    print()
+    print("Some skills explain `control words`, disclose when encountering the word/phrase.")
     print()
     print("## Available df-skills")
 

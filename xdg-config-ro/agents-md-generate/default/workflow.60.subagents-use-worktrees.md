@@ -1,4 +1,4 @@
-# Subagents must use worktrees
+## Subagents must use worktrees
 
 When subagents may need to edit files, or explore files in an active git checkout, they must use temporary worktrees.
 The agent that spawns the subagent must provide them with the worktree path.
