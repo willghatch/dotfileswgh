@@ -1,0 +1,31 @@
+#!/usr/bin/env bash
+
+# Select the copy-mode paragraph containing the cursor.
+set -euo pipefail
+
+usage() {
+    printf 'Usage: tmux-helper-select-paragraph [--end] PANE_ID\n' >&2
+    exit 2
+}
+
+end_side=0
+case $# in
+    1) pane=$1 ;;
+    2)
+        [[ $1 == --end ]] || usage
+        end_side=1
+        pane=$2
+        ;;
+    *) usage ;;
+esac
+tmux send-keys -t "$pane" -X previous-paragraph
+line=$(tmux display-message -p -t "$pane" '#{copy_cursor_line}')
+if [[ -z ${line//[[:space:]]/} ]]; then
+    tmux send-keys -t "$pane" -X cursor-down
+fi
+tmux send-keys -t "$pane" -X start-of-line
+tmux send-keys -t "$pane" -X begin-selection
+tmux send-keys -t "$pane" -X next-paragraph
+if ((!end_side)); then
+    tmux send-keys -t "$pane" -X other-end
+fi

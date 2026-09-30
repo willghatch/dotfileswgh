@@ -1,0 +1,88 @@
+#!/usr/bin/env bash
+
+# Open or copy a selected path or a path under the copy-mode cursor.
+set -euo pipefail
+
+usage() {
+    printf 'Usage: tmux-helper-open-path [--copy] PANE_ID\n' >&2
+    exit 2
+}
+
+copy_only=0
+case $# in
+    1) pane=$1 ;;
+    2)
+        [[ $1 == --copy ]] || usage
+        copy_only=1
+        pane=$2
+        ;;
+    *) usage ;;
+esac
+cwd=$(tmux display-message -p -t "$pane" '#{pane_current_path}')
+selection=$(tmux display-message -p -t "$pane" '#{selection_present}')
+
+path_char() {
+    case $1 in
+        ''|[[:space:]]|'('|')'|'['|']'|'{'|'}'|'<'|'>'|'"'|"'"|'`'|'|') return 1 ;;
+        *) return 0 ;;
+    esac
+}
+
+path_at_cursor() {
+    local line=$1 column=$2 left right candidate file
+    [[ $column =~ ^[0-9]+$ ]] || return 1
+    ((column < ${#line})) || return 1
+
+    if ! path_char "${line:column:1}"; then
+        ((column > 0)) && path_char "${line:column-1:1}" || return 1
+        column=$((column - 1))
+    fi
+
+    left=$column
+    right=$((column + 1))
+    while ((left > 0)) && path_char "${line:left-1:1}"; do
+        left=$((left - 1))
+    done
+    while ((right < ${#line})) && path_char "${line:right:1}"; do
+        right=$((right + 1))
+    done
+    candidate=${line:left:right-left}
+
+    # A report reference may carry a line number or trailing prose punctuation.
+    while [[ -n $candidate ]]; do
+        if [[ $candidate == /* ]]; then file=$candidate; else file=$cwd/$candidate; fi
+        if [[ -f $file ]]; then
+            printf '%s\n' "$candidate"
+            return 0
+        fi
+        if [[ $candidate =~ ^(.+):[0-9]+(:[0-9]+)?$ ]]; then
+            candidate=${BASH_REMATCH[1]}
+            continue
+        fi
+        case ${candidate: -1} in
+            .|,|';'|:) candidate=${candidate:0:${#candidate}-1} ;;
+            *) break ;;
+        esac
+    done
+    return 1
+}
+
+if [[ $selection == 1 ]]; then
+    tmux send-keys -t "$pane" -X copy-selection
+    path=$(tmux show-buffer)
+else
+    line=$(tmux display-message -p -t "$pane" '#{copy_cursor_line}')
+    column=$(tmux display-message -p -t "$pane" '#{copy_cursor_x}')
+    if ! path=$(path_at_cursor "$line" "$column"); then
+        tmux display-message -t "$pane" 'No file path under copy cursor'
+        exit 1
+    fi
+fi
+
+[[ -n $path && $path != *$'\n'* ]] || exit 1
+if ((copy_only)); then
+    tmux set-buffer -- "$path"
+else
+    tmux split-window -h -t "$pane" -c "$cwd" -e "TMUX_OPEN_PATH=$path" \
+        'exec "${EDITOR:-vi}" -- "$TMUX_OPEN_PATH"'
+fi
