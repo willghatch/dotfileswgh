@@ -38,3 +38,28 @@ fi
 #else
 #    source $DOTFILESWGH/env-more.sh
 #fi
+
+# Per-machine extensions: source every xprofile in $XDG_CONFIG_DIRS (default /etc/xdg), in path order, each directory once, as the Floatile configuration does for floatile/config.scm.
+# Relative entries are ignored, as the XDG base directory spec says.
+_xprofile_saved_ifs=$IFS
+_xprofile_seen=:
+IFS=:
+for _xprofile_dir in ${XDG_CONFIG_DIRS:-/etc/xdg}; do
+    IFS=$_xprofile_saved_ifs
+    case "$_xprofile_dir" in
+        /*) ;;
+        *) continue ;;
+    esac
+    while [ "$_xprofile_dir" != / ] && [ "${_xprofile_dir%/}" != "$_xprofile_dir" ]; do
+        _xprofile_dir=${_xprofile_dir%/}
+    done
+    case "$_xprofile_seen" in
+        *":$_xprofile_dir:"*) continue ;;
+    esac
+    _xprofile_seen="$_xprofile_seen$_xprofile_dir:"
+    if [ -f "$_xprofile_dir/xprofile" ]; then
+        . "$_xprofile_dir/xprofile"
+    fi
+done
+IFS=$_xprofile_saved_ifs
+unset _xprofile_saved_ifs _xprofile_seen _xprofile_dir
