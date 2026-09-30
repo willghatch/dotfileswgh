@@ -1,20 +1,28 @@
 #!/bin/sh
-# agent-work-dir -- print the correct agent-work-directory base path
-#
-# Usage:
-#   agent-work-dir            Print REPO/.git/agent-files/work/
-#   agent-work-dir --resolve  Also resolve the path to an absolute canonical form
-#
-# When inside a git repo (including submodules and worktrees), this script
-# finds the top-level .git directory of the outermost repo and prints
-# GITDIR/agent-files/work/.  When not inside a git repo, it prints
-# agent-files/work/ relative to the current directory.
-#
-# Agents should use this script to determine where to place their working
-# files, rather than computing the path themselves.  This avoids the common
-# mistake of placing files under .git/modules/ or .git/worktrees/.
+
+show_help() {
+    cat <<'EOF'
+Usage: agent-work-dir-base [--resolve]
+       agent-work-dir-base --help
+
+Print the base path for agent work directories.
+Inside a Git repository, including submodules and worktrees, find the
+outermost repository's .git directory and print its agent-files/work/ path.
+Outside a Git repository, print agent-files/work/ relative to the current
+directory.
+With --resolve, print an absolute canonical path.
+
+Use this command to locate agent working files without placing them under
+.git/modules/ or .git/worktrees/.
+EOF
+}
 
 set -e
+
+if [ "${1-}" = "--help" ]; then
+    show_help
+    exit 0
+fi
 
 resolve=0
 if [ "$1" = "--resolve" ]; then

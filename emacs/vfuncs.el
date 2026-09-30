@@ -750,9 +750,9 @@ Also syncs to kill ring if REGISTER matches cpo-copy-sync-with-kill-ring-registe
 
 (defun wgh/agent-work-dir-base ()
   "Return the base path for agent-work-directories.
-Delegates to the agent-work-dir shell script, which handles git repos,
+Delegates to the agent-work-dir-base shell script, which handles git repos,
 submodules, worktrees, and non-repo contexts correctly."
-  (string-trim (shell-command-to-string "agent-work-dir --resolve")))
+  (string-trim (shell-command-to-string "agent-work-dir-base --resolve")))
 
 (defun wgh/agent-work-dir-git-dir ()
   "Return the top-level .git directory for the current repo, or nil.
