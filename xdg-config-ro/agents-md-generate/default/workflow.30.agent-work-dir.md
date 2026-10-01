@@ -1,6 +1,7 @@
 ## Agent work directories
 
 Write any scratch files, plans, notes, and intermediate results in your agent-work-directory.
+Put standalone experiments and reports that will not be committed there by default.
 Link relevant work files in your chat reply so the user can find them.
 If not given an agent-work-dir, run `agent-work-dir-base --resolve` from your starting directory, then append `TIMESTAMP_TOPIC/` to make your agent-work-directory.
 Use an explicit agent-work-directory path if one is given.
