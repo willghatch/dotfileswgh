@@ -1,0 +1,213 @@
+#!/usr/bin/env bash
+
+set -euo pipefail
+
+usage() {
+    cat <<'EOF'
+Usage: xdg-path-helper --action ACTION --target TARGET SEARCH-SOURCE...
+
+Find TARGET under ordered XDG and explicit search sources.
+
+Required options:
+  --action ACTION                 list prints matching paths; concat prints a
+                                  temporary concatenation of the matching files
+  --target TARGET                 Relative target to find
+
+Search sources (repeatable and processed in argument order):
+  --xdg-path TYPE                 Add the config or data XDG search path
+  --xdg-path-under POSTFIX TYPE   Add that XDG path below POSTFIX
+  --search-path PATHS             Add a colon-separated search path
+  --search-path-under POSTFIX PATHS
+                                  Add a colon-separated path below POSTFIX
+
+Other options:
+  --skip-home                     Omit HOME from every XDG search source
+  -h, --help                      Show this help
+
+TYPE must be config or data. Each XDG source expands to its XDG_TYPE_HOME
+directory followed by XDG_TYPE_DIRS, using XDG Base Directory defaults.
+Empty PATHS and empty colon-separated elements are skipped. An empty POSTFIX
+means that the source directories are used directly. Effective directories are
+de-duplicated globally after postfixes are applied.
+EOF
+}
+
+die() {
+    echo "Error: $*" >&2
+    echo "Try 'xdg-path-helper --help' for usage." >&2
+    exit 2
+}
+
+validate_xdg_type() {
+    case "$1" in
+        config|data) ;;
+        *) die "XDG path type must be config or data" ;;
+    esac
+}
+
+validate_postfix() {
+    local postfix="$1"
+    if [[ "$postfix" == /* || "$postfix" == ".." || "$postfix" == ../* ||
+          "$postfix" == */../* || "$postfix" == */.. ]]; then
+        die "POSTFIX must be empty or remain below each search directory"
+    fi
+}
+
+action=""
+target=""
+skip_home=false
+source_kinds=()
+source_postfixes=()
+source_values=()
+
+while [[ $# -gt 0 ]]; do
+    case "$1" in
+        --action)
+            [[ $# -ge 2 ]] || die "--action requires a value"
+            [[ -z "$action" ]] || die "--action may be specified only once"
+            action="$2"
+            shift 2
+            ;;
+        --target)
+            [[ $# -ge 2 ]] || die "--target requires a value"
+            [[ -z "$target" ]] || die "--target may be specified only once"
+            target="$2"
+            shift 2
+            ;;
+        --xdg-path)
+            [[ $# -ge 2 ]] || die "--xdg-path requires TYPE"
+            xdg_type="${2,,}"
+            validate_xdg_type "$xdg_type"
+            source_kinds+=(xdg)
+            source_postfixes+=("")
+            source_values+=("$xdg_type")
+            shift 2
+            ;;
+        --xdg-path-under)
+            [[ $# -ge 3 ]] || die "--xdg-path-under requires POSTFIX and TYPE"
+            postfix="$2"
+            xdg_type="${3,,}"
+            validate_postfix "$postfix"
+            validate_xdg_type "$xdg_type"
+            source_kinds+=(xdg)
+            source_postfixes+=("$postfix")
+            source_values+=("$xdg_type")
+            shift 3
+            ;;
+        --search-path)
+            [[ $# -ge 2 ]] || die "--search-path requires PATHS"
+            source_kinds+=(explicit)
+            source_postfixes+=("")
+            source_values+=("$2")
+            shift 2
+            ;;
+        --search-path-under)
+            [[ $# -ge 3 ]] || die "--search-path-under requires POSTFIX and PATHS"
+            postfix="$2"
+            validate_postfix "$postfix"
+            source_kinds+=(explicit)
+            source_postfixes+=("$postfix")
+            source_values+=("$3")
+            shift 3
+            ;;
+        --skip-home)
+            $skip_home && die "--skip-home may be specified only once"
+            skip_home=true
+            shift
+            ;;
+        -h|--help)
+            usage
+            exit 0
+            ;;
+        --)
+            shift
+            [[ $# -eq 0 ]] || die "unexpected positional argument: $1"
+            break
+            ;;
+        -*)
+            die "unknown option: $1"
+            ;;
+        *)
+            die "unexpected positional argument: $1"
+            ;;
+    esac
+done
+
+[[ -n "$action" ]] || die "--action is required"
+[[ "$action" == list || "$action" == concat ]] || die "--action must be list or concat"
+[[ -n "$target" ]] || die "--target is required"
+[[ ${#source_kinds[@]} -gt 0 ]] || die "at least one search source is required"
+
+if [[ "$target" == /* || "$target" == ".." ||
+      "$target" == ../* || "$target" == */../* ||
+      "$target" == */.. || "$target" == */ ]]; then
+    die "--target must remain below each search directory"
+fi
+
+declare -A seen_directories=()
+found_files=()
+
+add_search_path() {
+    local postfix="$1"
+    local path_list="$2"
+    local directories=()
+    local directory effective_directory directory_key file
+
+    IFS=: read -r -a directories <<< "$path_list"
+    for directory in "${directories[@]}"; do
+        [[ -n "$directory" ]] || continue
+        [[ "$directory" =~ ^(.*[^/])/*$ ]] && directory="${BASH_REMATCH[1]}"
+        effective_directory="$directory"
+        if [[ -n "$postfix" ]]; then
+            effective_directory="$effective_directory/$postfix"
+        fi
+        [[ "$effective_directory" =~ ^(.*[^/])/*$ ]] && effective_directory="${BASH_REMATCH[1]}"
+        directory_key="$effective_directory"
+        if [[ -d "$effective_directory" ]]; then
+            directory_key="$(cd -- "$effective_directory" && pwd -P)"
+        fi
+        [[ -z "${seen_directories[$directory_key]:-}" ]] || continue
+        seen_directories[$directory_key]=1
+        file="$effective_directory/$target"
+        if [[ -f "$file" ]]; then
+            found_files+=("$file")
+        fi
+    done
+}
+
+for index in "${!source_kinds[@]}"; do
+    kind="${source_kinds[$index]}"
+    postfix="${source_postfixes[$index]}"
+    value="${source_values[$index]}"
+    if [[ "$kind" == xdg ]]; then
+        case "$value" in
+            config)
+                home_directory="${XDG_CONFIG_HOME:-$HOME/.config}"
+                dirs_value="${XDG_CONFIG_DIRS:-/etc/xdg}"
+                ;;
+            data)
+                home_directory="${XDG_DATA_HOME:-$HOME/.local/share}"
+                dirs_value="${XDG_DATA_DIRS:-/usr/local/share:/usr/share}"
+                ;;
+        esac
+        $skip_home || add_search_path "$postfix" "$home_directory"
+        add_search_path "$postfix" "$dirs_value"
+    else
+        add_search_path "$postfix" "$value"
+    fi
+done
+
+if [[ "$action" == list ]]; then
+    ((${#found_files[@]} == 0)) || printf '%s\n' "${found_files[@]}"
+    exit 0
+fi
+
+temp_dir="$(mktemp -d "${XDG_RUNTIME_DIR:-/tmp}/xdg-path-helper.XXXXXX")"
+output_file="$temp_dir/${target##*/}"
+: > "$output_file"
+for file in "${found_files[@]}"; do
+    cat "$file" >> "$output_file"
+    printf '\n' >> "$output_file"
+done
+chmod 644 "$output_file"
+printf '%s\n' "$output_file"

@@ -1,0 +1,24 @@
+{
+    "#comment": [
+        "Concatenate every codex/config.toml found in the XDG config search path,",
+        "then every config.toml under CODEX_EXTRA_CONFIG_DIRS, and mount the result",
+        "as the container user's Codex config.",
+        "Addons may set or extend CODEX_EXTRA_CONFIG_DIRS after key 0 and before 100.",
+        "CODEX_HOME is also required for Codex to read the AGENTS.md mounted there",
+        "by the agents-md addon."
+    ],
+    "tags": {
+        "codex-config": {
+            "docker-run-script": {
+                "0": [
+                    "CODEX_EXTRA_CONFIG_DIRS=\"${CODEX_EXTRA_CONFIG_DIRS:-}\""
+                ],
+                "100": [
+                    "_docsuez_cc_file=\"$(xdg-path-helper --action concat --target config.toml --xdg-path-under codex config --search-path \"$CODEX_EXTRA_CONFIG_DIRS\")\"",
+                    "DOCSUEZ_VOLUMES+=(\"$_docsuez_cc_file:$DOCSUEZ_CONTAINER_HOME/.codex/config.toml:ro\")",
+                    "DOCKER_RUN_EXTRAS+=(-e \"CODEX_HOME=$DOCSUEZ_CONTAINER_HOME/.codex\")"
+                ]
+            }
+        }
+    }
+}
