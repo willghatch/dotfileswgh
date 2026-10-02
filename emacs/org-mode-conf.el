@@ -43,8 +43,10 @@
             (define-key org-mode-map (kbd "TAB") nil)
             (define-key org-mode-map (kbd "M-h") nil)
 
-            (setq fold-toggle-wgh-fold-func 'org-cycle)
-            (setq fold-toggle-wgh-fold-all-func 'org-shifttab)
+            (setq fold-toggle-wgh-fold-func 'wgh/outline-fold-toggle)
+            (setq fold-toggle-wgh-fold-all-func 'wgh/outline-fold-toggle-all)
+            (setq fold-toggle-wgh-fold-siblings-func 'wgh/outline-fold-toggle-siblings)
+            (setq fold-toggle-wgh-unfold-all-func 'wgh/outline-fold-unfold-all)
             (setq org-cycle-emulate-tab nil)
 
 

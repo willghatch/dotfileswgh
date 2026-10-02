@@ -384,18 +384,219 @@ abort."
   (isearch-abort))
 
 ;;; Folding
+;; Each folding command calls a buffer-local function, so modes can supply
+;; their own folding.  The defaults use yafolding (indentation based); org and
+;; outline buffers set the wgh/outline-fold-* functions in their mode hooks.
 (setq-default fold-toggle-wgh-fold-func 'yafolding-toggle-element)
 (make-variable-buffer-local 'fold-toggle-wgh-fold-func)
 (setq-default fold-toggle-wgh-fold-all-func 'yafolding-toggle-all)
 (make-variable-buffer-local 'fold-toggle-wgh-fold-all-func)
+(setq-default fold-toggle-wgh-fold-siblings-func 'wgh/yafolding-toggle-siblings)
+(make-variable-buffer-local 'fold-toggle-wgh-fold-siblings-func)
+(setq-default fold-toggle-wgh-unfold-all-func 'yafolding-show-all)
+(make-variable-buffer-local 'fold-toggle-wgh-unfold-all-func)
 (defun fold-toggle-wgh ()
+  "Toggle folding of the element at point."
   (interactive)
   (require 'yafolding)
   (call-interactively fold-toggle-wgh-fold-func))
 (defun fold-toggle-wgh-all ()
+  "Toggle folding of the whole buffer."
   (interactive)
   (require 'yafolding)
   (call-interactively fold-toggle-wgh-fold-all-func))
+(defun fold-toggle-wgh-siblings ()
+  "Fold the element at point and its siblings within their parent.
+If they are all folded already, unfold them instead."
+  (interactive)
+  (require 'yafolding)
+  (call-interactively fold-toggle-wgh-fold-siblings-func))
+(defun fold-unfold-wgh-all ()
+  "Unfold everything in the buffer."
+  (interactive)
+  (require 'yafolding)
+  (call-interactively fold-toggle-wgh-unfold-all-func))
+
+(defun wgh/fold--toggle-group (positions folded-p foldable-p hide show)
+  "Fold or unfold the elements starting at POSITIONS as a group.
+Fold the unfolded ones, unless all are folded, in which case unfold them.
+Elements with nothing to fold are ignored.  FOLDED-P, FOLDABLE-P, HIDE, and
+SHOW are called with point at an element."
+  (let* ((at (lambda (f) (lambda (pos) (save-excursion (goto-char pos) (funcall f)))))
+         (foldable (seq-filter (funcall at foldable-p) positions))
+         (all-folded (seq-every-p (funcall at folded-p) foldable)))
+    (cond
+     ((null foldable) (message "Nothing to fold"))
+     (all-folded (mapc (funcall at show) foldable))
+     (t (mapc (funcall at (lambda () (unless (funcall folded-p) (funcall hide))))
+              foldable)))))
+
+;; yafolding: elements are lines, and their children are the following lines
+;; with more indentation.
+
+(defun wgh/yafolding--folded-p ()
+  (yafolding-get-overlays (line-beginning-position) (1+ (line-end-position))))
+
+(defun wgh/yafolding--foldable-p ()
+  (or (wgh/yafolding--folded-p)
+      (let ((region (yafolding-get-element-region)))
+        (> (cadr region) (car region)))))
+
+(defun wgh/yafolding--sibling-positions ()
+  "Line starts of the lines indented like the current one, within its parent.
+The parent's range ends at the nearest less indented lines above and below."
+  (save-excursion
+    (beginning-of-line)
+    (while (and (yafolding-should-ignore-current-line-p)
+                (zerop (forward-line 1))
+                (not (eobp))))
+    (let ((indent (current-indentation))
+          (here (line-beginning-position)))
+      (cl-flet ((scan (direction)
+                  (save-excursion
+                    (let (found)
+                      (while (and (zerop (forward-line direction))
+                                  (or (yafolding-should-ignore-current-line-p)
+                                      (>= (current-indentation) indent)))
+                        (when (and (not (yafolding-should-ignore-current-line-p))
+                                   (= (current-indentation) indent))
+                          (push (line-beginning-position) found)))
+                      found))))
+        (append (scan -1) (list here) (nreverse (scan 1)))))))
+
+(defun wgh/yafolding-toggle-siblings ()
+  "Fold the line at point and its same-indentation siblings, or unfold them.
+See `fold-toggle-wgh-siblings'."
+  (interactive)
+  (require 'yafolding)
+  (wgh/fold--toggle-group (wgh/yafolding--sibling-positions)
+                          #'wgh/yafolding--folded-p
+                          #'wgh/yafolding--foldable-p
+                          #'yafolding-hide-element
+                          #'yafolding-show-element)
+  (when (invisible-p (point))
+    (beginning-of-line)
+    (while (and (invisible-p (point)) (zerop (forward-line -1))))
+    (back-to-indentation)))
+
+;; Outline: org-mode and outline-mode headings.  Unfolding always shows the
+;; whole subtree, so no descendants are left folded.
+
+(defun wgh/outline-fold--org-p ()
+  (derived-mode-p 'org-mode))
+
+(defun wgh/outline-fold--goto-heading ()
+  "Move to the heading containing point.  Return nil if before the first one."
+  (condition-case nil
+      (progn (outline-back-to-heading t) t)
+    (error nil)))
+
+(defun wgh/outline-fold--folded-p ()
+  "Non-nil if the body of the heading at point is folded."
+  (if (wgh/outline-fold--org-p)
+      (org-fold-folded-p (line-end-position))
+    (outline-invisible-p (line-end-position))))
+
+(defun wgh/outline-fold--foldable-p ()
+  (let ((eol (line-end-position)))
+    (save-excursion
+      (if (wgh/outline-fold--org-p) (org-end-of-subtree t) (outline-end-of-subtree))
+      (> (point) eol))))
+
+(defun wgh/outline-fold--hide ()
+  (if (wgh/outline-fold--org-p) (org-fold-hide-subtree) (outline-hide-subtree)))
+
+(defun wgh/outline-fold--show ()
+  (if (wgh/outline-fold--org-p) (org-fold-show-subtree) (outline-show-subtree)))
+
+(defun wgh/outline-fold-toggle ()
+  "Fold the subtree of the heading containing point, or unfold it completely.
+In org, on a block's #+begin line or in a drawer, toggle that instead."
+  (interactive)
+  (cond
+   ((and (wgh/outline-fold--org-p)
+         (not (org-at-heading-p))
+         (save-excursion (beginning-of-line) (looking-at-p "[ \t]*#\\+begin_")))
+    (org-fold-hide-block-toggle))
+   ((and (wgh/outline-fold--org-p) (not (org-at-heading-p)) (org-at-drawer-p))
+    (org-fold-hide-drawer-toggle))
+   ((not (wgh/outline-fold--goto-heading))
+    (user-error "Before the first heading"))
+   ((wgh/outline-fold--folded-p) (wgh/outline-fold--show))
+   (t (wgh/outline-fold--hide))))
+
+(defun wgh/outline-fold--sibling-positions ()
+  "Starts of the headings sharing a parent with the heading at point.
+Before the first heading, these are the top-level headings."
+  (save-excursion
+    (let (level positions)
+      (if (wgh/outline-fold--goto-heading)
+          (setq level (funcall outline-level))
+        (setq level 1)
+        (goto-char (point-min)))
+      (let ((here (and (outline-on-heading-p t) (= (funcall outline-level) level)
+                       (point))))
+        (cl-flet ((scan (step)
+                    (save-excursion
+                      (let (found)
+                        (while (and (funcall step)
+                                    (outline-on-heading-p t)
+                                    (>= (funcall outline-level) level))
+                          (when (= (funcall outline-level) level)
+                            (push (point) found)))
+                        found))))
+          (append (scan (lambda () (let ((p (point)))
+                                     (outline-previous-heading)
+                                     (< (point) p))))
+                  (and here (list here))
+                  (nreverse (scan (lambda () (let ((p (point)))
+                                               (outline-next-heading)
+                                               (> (point) p)))))))))))
+
+(defun wgh/outline-fold-toggle-siblings ()
+  "Fold the heading at point and its siblings, or unfold them.
+See `fold-toggle-wgh-siblings'."
+  (interactive)
+  (wgh/fold--toggle-group (wgh/outline-fold--sibling-positions)
+                          #'wgh/outline-fold--folded-p
+                          #'wgh/outline-fold--foldable-p
+                          #'wgh/outline-fold--hide
+                          #'wgh/outline-fold--show)
+  (when (invisible-p (point))
+    (wgh/outline-fold--goto-heading)))
+
+(defun wgh/outline-fold--top-level-positions ()
+  "Starts of the least deeply nested headings in the buffer."
+  (save-excursion
+    (goto-char (point-min))
+    (unless (outline-on-heading-p t)
+      (outline-next-heading))
+    (let (headings)
+      (while (outline-on-heading-p t)
+        (push (cons (point) (funcall outline-level)) headings)
+        (outline-next-heading))
+      (let ((top (and headings (apply #'min (mapcar #'cdr headings)))))
+        (nreverse (delq nil (mapcar (lambda (h) (and (= (cdr h) top) (car h)))
+                                    headings)))))))
+
+(defun wgh/outline-fold-toggle-all ()
+  "Fold all top-level headings, or, if they are all folded, unfold everything."
+  (interactive)
+  (let* ((at (lambda (f) (lambda (pos) (save-excursion (goto-char pos) (funcall f)))))
+         (foldable (seq-filter (funcall at #'wgh/outline-fold--foldable-p)
+                               (wgh/outline-fold--top-level-positions))))
+    (cond
+     ((null foldable) (message "Nothing to fold"))
+     ((seq-every-p (funcall at #'wgh/outline-fold--folded-p) foldable)
+      (wgh/outline-fold-unfold-all))
+     (t (mapc (funcall at #'wgh/outline-fold--hide) foldable))))
+  (when (invisible-p (point))
+    (wgh/outline-fold--goto-heading)))
+
+(defun wgh/outline-fold-unfold-all ()
+  "Unfold all headings (and, in org, all blocks and drawers)."
+  (interactive)
+  (if (wgh/outline-fold--org-p) (org-fold-show-all) (outline-show-all)))
 
 ;;; checklist helpers
 (defun wgh/increment-number-at-end-of-line ()

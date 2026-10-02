@@ -65,6 +65,15 @@
 (add-hook 'hexl-mode-hook
           'wgh/mode-hook-hexl-mode)
 
+(defun wgh/mode-hook-outline-mode ()
+  ;; org-mode derives from outline-mode, and its own hook overrides these.
+  (setq fold-toggle-wgh-fold-func 'wgh/outline-fold-toggle)
+  (setq fold-toggle-wgh-fold-all-func 'wgh/outline-fold-toggle-all)
+  (setq fold-toggle-wgh-fold-siblings-func 'wgh/outline-fold-toggle-siblings)
+  (setq fold-toggle-wgh-unfold-all-func 'wgh/outline-fold-unfold-all))
+(add-hook 'outline-mode-hook
+          'wgh/mode-hook-outline-mode)
+
 (defun wgh/mode-hook-Buffer-menu-mode ()
   (define-prefix-command 'my-buffer-menu-mode-map)
   (lnkmap "m" 'my-buffer-menu-mode-map)
