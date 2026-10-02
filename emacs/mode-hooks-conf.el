@@ -106,6 +106,16 @@
 (add-hook 'prog-mode-hook
           'wgh/mode-hook-prog-mode)
 
+(defun wgh/mode-hook-git-gutter-mode ()
+  ;; git-gutter sets the margin with `set-window-margins', which only lasts
+  ;; until the window shows another buffer.  Setting the buffer's own margin
+  ;; width means any window showing it again keeps room for the signs.
+  (if git-gutter-mode
+      (setq-local left-margin-width (git-gutter:window-margin))
+    (kill-local-variable 'left-margin-width)))
+(add-hook 'git-gutter-mode-hook
+          'wgh/mode-hook-git-gutter-mode)
+
 
 (defun wgh/mode-hook-lua-mode ()
   (setq-local outline-regexp wgh/lua-outline-regexp)
