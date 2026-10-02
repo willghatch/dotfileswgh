@@ -173,9 +173,9 @@ Its buffers return to git-gutter's default diff base."
 ;; file's diff before jumping to its hunks.
 
 (defun wgh/git-gutter-review--changed-files ()
-  "Return sorted absolute paths of files changed vs the current start revision.
+  "Return sorted true names of files changed vs the current start revision.
 Only existing regular files are included, so deleted files and submodules
-are skipped."
+are skipped.  A symlink and its target count as one file."
   (let ((root (wgh/git-gutter-review--worktree-root))
         (rev (and git-gutter:start-revision
                   (not (string-empty-p git-gutter:start-revision))
@@ -185,10 +185,12 @@ are skipped."
         (setq default-directory root)
         (when (zerop (apply #'process-file "git" nil t nil
                             "diff" "--name-only" (and rev (list rev))))
-          (sort (cl-remove-if-not
-                 #'file-regular-p
-                 (mapcar (lambda (f) (expand-file-name f root))
-                         (split-string (buffer-string) "\n" t)))
+          (sort (delete-dups
+                 (mapcar #'file-truename
+                         (cl-remove-if-not
+                          #'file-regular-p
+                          (mapcar (lambda (f) (expand-file-name f root))
+                                  (split-string (buffer-string) "\n" t)))))
                 #'string<))))))
 
 (defun wgh/git-gutter-review--wait-for-diff ()
@@ -216,7 +218,7 @@ Return non-nil if a file was visited."
   (let* ((files (wgh/git-gutter-review--changed-files))
          (n (length files))
          (cur (and (buffer-file-name)
-                   (cl-position (expand-file-name (buffer-file-name)) files
+                   (cl-position (file-truename (buffer-file-name)) files
                                 :test #'string=)))
          ;; Treat a file not in the list as sitting just outside it, so the
          ;; first step lands on the first (or last) changed file.
