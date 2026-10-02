@@ -15,7 +15,11 @@
                 ],
                 "100": [
                     "_docsuez_cc_file=\"$(xdg-path-helper --action concat --target config.toml --xdg-path-under codex config --search-path \"$CODEX_EXTRA_CONFIG_DIRS\")\"",
-                    "DOCSUEZ_VOLUMES+=(\"$_docsuez_cc_file:$DOCSUEZ_CONTAINER_HOME/.codex/config.toml:ro\")",
+                    "# using /etc/codex/config.toml because codex wants to imperatively manage ~/.codex/config.toml and complains when it can't, and to keep static persistent user settings with programatically and imperatively managed state...",
+                    "# Mounting read/write would be similar, but disallow persisting the programatically managed config in a mounted home dir.",
+                    "# Maybe I should disallow that persistent state, but I'll make that decision separately.",
+                    "DOCSUEZ_VOLUMES+=(\"$_docsuez_cc_file:/etc/codex/config.toml:ro\")",
+                    "# I've had issues with codex loading the ~/.codex/AGENTS.md file if I don't set this.",
                     "DOCKER_RUN_EXTRAS+=(-e \"CODEX_HOME=$DOCSUEZ_CONTAINER_HOME/.codex\")"
                 ]
             }
