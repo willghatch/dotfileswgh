@@ -348,6 +348,9 @@ The command also executes the sentence, with region as the object, if the region
 (emmap " yfa" (cp/ae (cp/verb 'copy-agent-work-directory-fzf-name)))
 (emmap " yT" (cp/ae (cp/verb 'paste-to-terminal-osc)))
 (autoload 'wgh/git-permalink "git-permalink" "" t)
+(autoload 'wgh/git-gutter-review-start "git-gutter-review" "" t)
+(autoload 'wgh/git-gutter-review-end "git-gutter-review" "" t)
+(autoload 'wgh/git-gutter-refresh-all "git-gutter-review" "" t)
 (emmap " yP" (lambda () (interactive)
                (require 'git-permalink)
                (wgh/git-permalink)))
@@ -1249,6 +1252,15 @@ FUNC should be a function whose first two arguments are BEG and END."
 
            (action yafold ((alternate ,nil)) (yafolding-toggle-element ()))
            (action yafold ((alternate 1)) (yafolding-show-all ()))
+
+           (action vcs-change ((alternate 1)) (,(lambda () (call-interactively 'wgh/git-gutter-review-start)) ()))
+           (action vcs-change ((alternate 10)) (wgh/git-gutter-review-end ()))
+           (move vcs-change ((direction forward) (location-within beginning) (alternate 1)) (,(lambda (n) (require 'git-gutter-review) (funcall 'rmo/wgh/git-gutter-hunk-forward-beginning-cycling n)) (num)))
+           (move vcs-change ((direction backward) (location-within beginning) (alternate 1)) (,(lambda (n) (require 'git-gutter-review) (funcall 'rmo/wgh/git-gutter-hunk-backward-beginning-cycling n)) (num)))
+           (move vcs-change ((direction forward) (location-within end) (alternate 1)) (,(lambda (n) (require 'git-gutter-review) (funcall 'rmo/wgh/git-gutter-hunk-forward-end-cycling n)) (num)))
+           (move vcs-change ((direction backward) (location-within end) (alternate 1)) (,(lambda (n) (require 'git-gutter-review) (funcall 'rmo/wgh/git-gutter-hunk-backward-end-cycling n)) (num)))
+           (move vcs-change ((direction forward) (alternate 10)) (,(lambda (n) (require 'git-gutter-review) (funcall 'rmo/wgh/git-gutter-file-forward n)) (num)))
+           (move vcs-change ((direction backward) (alternate 10)) (,(lambda (n) (require 'git-gutter-review) (funcall 'rmo/wgh/git-gutter-file-backward n)) (num)))
 
            (open date-yyyy-mm-dd ((alternate 10)) (,(lambda () (insert (format-time-string "%Y-%m-%d %A"))) ()))
            (open date-yyyy-mm-dd ((alternate 11)) (,(lambda () (insert (format-time-string "%Y-%m-%d %A %H:%M:%S"))) ()))
