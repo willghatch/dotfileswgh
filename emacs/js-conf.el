@@ -18,9 +18,10 @@
    (setq js-indent-level 2)
    (setq typescript-indent-level 2)
 
-   (message "about to require lsp")
-   (lsp-common-setup)
-   (lsp)
+   (unless (derived-mode-p 'js-json-mode)
+     (message "about to require lsp")
+     (lsp-common-setup)
+     (lsp))
 
    ;; TODO - set devdocs-current-docs, with javascript, dom, react, maybe more
    (setq dash-docs-docsets '("JavaScript"))
@@ -76,5 +77,4 @@
 
 (add-hook 'js-mode-hook 'js-conf-setup)
 (add-hook 'typescript-mode-hook 'js-conf-setup)
-
 
