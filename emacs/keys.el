@@ -848,6 +848,8 @@ FUNC should be a function whose first two arguments are BEG and END."
 (emmap "th" 'my-window-map/body)
 (autoload 'projectile-command-map "projectile-conf" "" t 'keymap)
 (emmap "tp" 'projectile-command-map)
+(autoload 'wade-review-command-map "wade-review" "Keymap of wade-review commands." t 'keymap)
+(emmap "tg" 'wade-review-command-map)
 (emmap "tr" 'TODO-select-register)
 (emmap "to" 'estate-pager-state)
 

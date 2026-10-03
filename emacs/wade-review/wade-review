@@ -1,0 +1,24 @@
+#!/usr/bin/env bash
+# Generate an org-mode review file for a git branch.  Run with --help.
+#
+# The generator is wade-review-generate.el, run in a configuration-free
+# batch Emacs found next to this script's real location (symlinks resolved).
+# Arguments go to it inside an --eval form, because Emacs would otherwise
+# interpret some of them (eg. --version) itself.
+
+set -euo pipefail
+
+self=$(readlink -f -- "${BASH_SOURCE[0]}")
+package_dir=$(dirname -- "$self")
+
+args=""
+for arg in "$@"; do
+    arg=${arg//\\/\\\\}
+    arg=${arg//\"/\\\"}
+    args+=" \"$arg\""
+done
+
+exec "${EMACS:-emacs}" -Q --batch \
+     -L "$package_dir" \
+     -l wade-review-generate \
+     --eval "(wade-review-generate-main '($args))"

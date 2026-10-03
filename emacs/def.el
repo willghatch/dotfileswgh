@@ -277,6 +277,9 @@
  (require 'table-highlight)
  (add-hook 'org-mode-hook #'table-highlight-turn-on)
  (add-hook 'markdown-mode-hook #'table-highlight-turn-on)
+ (autoload 'wade-review-mode "wade-review" nil t)
+ (autoload 'wade-review-find-file-hook "wade-review")
+ (add-hook 'find-file-hook #'wade-review-find-file-hook)
  )
 
 (setq wgh/de-fast-run nil)
