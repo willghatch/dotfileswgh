@@ -941,9 +941,9 @@ FUNC should be a function whose first two arguments are BEG and END."
 (emmap "sj" 'rmo/pscroll-down-half)
 (emmap "sk" 'rmo/pscroll-up-half)
 (emmap "sf" 'fold-toggle-wgh)
-(emmap "sFa" 'fold-toggle-wgh-all)
-(emmap "sFe" 'fold-toggle-wgh-siblings)
-(emmap "sFu" 'fold-unfold-wgh-all)
+(emmap " sfa" 'fold-toggle-wgh-all)
+(emmap " sfe" 'fold-toggle-wgh-siblings)
+(emmap " sfu" 'fold-unfold-wgh-all)
 
 ;; Documentation
 ;; TODO - these are also related to LSP doc functionality that I have bound to gdi, related to gdd go-to-def.  I would like to consolidate, but looking up docs is not always related to a symbol at point, though it usually is.
