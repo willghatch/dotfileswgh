@@ -50,6 +50,9 @@
 (set! frame-scheduling "vblank")
 (set! render-timer-interval 16)
 
+;; Let the bar's wlinhibit helper keep the session awake without a mapped window.
+(set! idle-inhibit-unmapped-surfaces #t)
+
 ;; ---------------------------------------------------------------------------
 ;; Window rules and decoration
 ;; ---------------------------------------------------------------------------
