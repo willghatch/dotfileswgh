@@ -22,6 +22,11 @@ button:hover {
   box-shadow: inset 0 -3px #ffffff;
 }
 
+// Modules that react to clicks are eventboxes; mark them on hover too.
+eventbox:hover > .module {
+  box-shadow: inset 0 -3px #ffffff;
+}
+
 .start, .power {
   padding: 0 10px;
   background-color: #3F3F3F;
@@ -119,12 +124,90 @@ button:hover {
   background-color: #f53c3c;
 }
 
+.battery-row {
+  padding: 6px 10px;
+}
+
+.battery-status {
+  font-size: 11px;
+  color: rgba(255, 255, 255, 0.7);
+}
+
+.battery-capacity {
+  font-weight: bold;
+}
+
+.battery-row.warning .battery-capacity {
+  color: #ffbe61;
+}
+
+.battery-row.critical .battery-capacity {
+  color: #f53c3c;
+}
+
 
 .popup {
   background-color: rgba(43, 48, 59, 0.95);
   border: 1px solid rgba(100, 114, 125, 0.8);
   color: #ffffff;
   padding: 6px;
+}
+
+// The calendar popup's GTK calendar, which `all: unset' leaves bare.
+.calendar-popup calendar {
+  padding: 4px;
+}
+
+.calendar-popup calendar.header {
+  font-weight: bold;
+}
+
+.calendar-popup calendar.highlight {
+  color: rgba(255, 255, 255, 0.6);
+}
+
+.calendar-popup calendar:selected {
+  background-color: #64a2aD;
+}
+
+.calendar-popup calendar:indeterminate {
+  color: rgba(255, 255, 255, 0.35);
+}
+
+.calendar-popup calendar.button {
+  padding: 0 6px;
+}
+
+.calendar-popup calendar.button:hover {
+  background-color: #64727D;
+}
+
+.display-row {
+  padding: 4px 10px;
+}
+
+.display-value {
+  color: rgba(255, 255, 255, 0.7);
+}
+
+.display-controls scale trough {
+  min-height: 6px;
+  margin: 6px 0;
+  border-radius: 3px;
+  background-color: #64727D;
+}
+
+.display-controls scale highlight {
+  border-radius: 3px;
+  background-color: #64a2aD;
+}
+
+.display-controls scale slider {
+  min-width: 14px;
+  min-height: 14px;
+  margin: -5px 0;
+  border-radius: 7px;
+  background-color: #ffffff;
 }
 
 .menu-item {

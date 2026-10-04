@@ -25,7 +25,7 @@
   "cat /sys/class/thermal/thermal_zone*/temp 2>/dev/null | sort -n | tail -1")
 (defpoll backlight :interval "2s"
   "b=$(ls /sys/class/backlight 2>/dev/null | head -1); [ -n \"$b\" ] && echo $(( 100 * $(cat /sys/class/backlight/$b/brightness) / $(cat /sys/class/backlight/$b/max_brightness) )) || echo ''")
-(defpoll battery :interval "10s" :initial "{\"shown\":false,\"text\":\"\",\"class\":\"\"}" "scripts/battery.scm")
+(defpoll battery :interval "10s" :initial "{\"text\":\"\",\"class\":\"\",\"batteries\":[]}" "scripts/battery.scm")
 (defpoll clock :interval "10s" "date '+%a, %Y-%m-%d %H:%M'")
 (defpoll calendar :interval "600s" "cal")
 ;; No :initial, so eww runs the script at startup; with one, the menu would
@@ -61,6 +61,29 @@
   :namespace "floatile-bar-menu"
   (app-menu :monitor monitor))
 
+(defwindow batteries [monitor]
+  :monitor monitor
+  :geometry (geometry :x "0px" :y "0px" :width "280px" :anchor "top right")
+  :stacking "overlay"
+  :namespace "floatile-bar-batteries"
+  (battery-list))
+
+(defwindow calendar-popup [monitor]
+  :monitor monitor
+  :geometry (geometry :x "0px" :y "0px" :anchor "top right")
+  :stacking "overlay"
+  :namespace "floatile-bar-calendar"
+  (box :class "popup calendar-popup"
+    ;; GTK's calendar: opens on today; its arrows change month and year.
+    (calendar :show-week-numbers true)))
+
+(defwindow display [monitor]
+  :monitor monitor
+  :geometry (geometry :x "0px" :y "0px" :width "300px" :anchor "top right")
+  :stacking "overlay"
+  :namespace "floatile-bar-display"
+  (display-controls))
+
 (defwindow power [monitor]
   :monitor monitor
   :geometry (geometry :x "0px" :y "0px" :width "220px" :anchor "top right")
@@ -80,31 +103,51 @@
         "")
       (button :class "terminal" :onclick "vlaunch terminal" "T>")
       (workspaces :vmonitor vmonitor)
-      (label :class "layout" :text {floatile?.vmonitors?.[vmonitor]?.layout ?: ""})
+      ;; Click to cycle the layout of this vmonitor's workspace, like
+      ;; super+space; activating it first makes cycle-layout act on it rather
+      ;; than on whichever vmonitor is active.
+      (button :class "layout"
+              :tooltip "Layout: click to cycle"
+              :onclick "floatilectl activate-workspace ${floatile?.vmonitors?.[vmonitor]?.workspace_id ?: -1} >/dev/null && floatilectl cycle-layout >/dev/null"
+        {floatile?.vmonitors?.[vmonitor]?.layout ?: ""})
       (windows :vmonitor vmonitor))
     (box)
     (box :class "right" :space-evenly false :halign "end"
-      (label :class "module mpris" :visible {mpris.shown} :markup {mpris.markup})
+      (eventbox :visible {mpris.shown}
+                :onclick "playerctl play-pause"
+                :onrightclick "playerctl next"
+                :onmiddleclick "playerctl previous"
+                :tooltip "Click: play or pause; right click: next; middle click: previous"
+        (label :class "module mpris" :markup {mpris.markup}))
       (button :class "module idle ${idle-inhibit == 'inhibited' ? 'inhibited' : 'no-inhibit'}"
               :onclick "wayland-idle-inhibit toggle"
         {idle-inhibit == "inhibited" ? "NOSS" : "SCS"})
       (label :class "module mooncrater" :text "⌨ ${mooncrater}")
-      (label :class "module network ${network.class}" :text {network.text} :tooltip {network.tooltip})
-      (label :class "module temperature ${temperature != '' && temperature / 1000 >= 80 ? 'critical' : ''}"
-             :visible {temperature != ""}
-             :text "${temperature == '' ? '' : round(temperature / 1000, 0)}°C${temperature == '' ? '' : temperature / 1000 < 50 ? '' : temperature / 1000 < 80 ? '' : ''}")
-      (label :class "module cpu" :text "${round(EWW_CPU.avg, 0)}%")
-      (label :class "module memory" :text "${round(EWW_RAM.used_mem_perc, 0)}%🐏")
-      ;; wl-gammarelay-rs: scroll to change; hidden while its daemon is not running.
+      (eventbox :onclick "nm-connection-editor &"
+        (label :class "module network ${network.class}" :text {network.text} :tooltip {network.tooltip}))
+      ;; Temperature, CPU, and memory open the system monitor vlaunch names;
+      ;; set sysmonitor in vlaunchrc to choose it per machine.
+      (eventbox :visible {temperature != ""} :onclick "vlaunch sysmonitor"
+        (label :class "module temperature ${temperature != '' && temperature / 1000 >= 80 ? 'critical' : ''}"
+               :text "${temperature == '' ? '' : round(temperature / 1000, 0)}°C${temperature == '' ? '' : temperature / 1000 < 50 ? '' : temperature / 1000 < 80 ? '' : ''}"))
+      (eventbox :onclick "vlaunch sysmonitor"
+        (label :class "module cpu" :text "${round(EWW_CPU.avg, 0)}%"))
+      (eventbox :onclick "vlaunch sysmonitor"
+        (label :class "module memory" :text "${round(EWW_RAM.used_mem_perc, 0)}%🐏"))
+      ;; wl-gammarelay-rs: scroll to change, click for the display popup's
+;; sliders; hidden while its daemon is not running.
       (eventbox :visible {gamma-temperature != ""}
+                :onclick "eww -c ${EWW_CONFIG_DIR} open --toggle display --id display-${monitor} --arg monitor='${monitor}'"
                 :onscroll "[ {} = up ] && busctl --user -- call rs.wl-gammarelay / rs.wl.gammarelay UpdateTemperature n +100 || busctl --user -- call rs.wl-gammarelay / rs.wl.gammarelay UpdateTemperature n -100"
         (label :class "module gamma" :text "${gamma-temperature} "))
       (eventbox :visible {gamma-brightness != ""}
+                :onclick "eww -c ${EWW_CONFIG_DIR} open --toggle display --id display-${monitor} --arg monitor='${monitor}'"
                 :onscroll "[ {} = up ] && busctl --user -- call rs.wl-gammarelay / rs.wl.gammarelay UpdateBrightness d +0.02 || busctl --user -- call rs.wl-gammarelay / rs.wl.gammarelay UpdateBrightness d -0.02"
         (label :class "module gamma" :text "${gamma-brightness}% "))
       (eventbox :visible {gamma-gamma != ""}
+                :onclick "eww -c ${EWW_CONFIG_DIR} open --toggle display --id display-${monitor} --arg monitor='${monitor}'"
                 :onscroll "[ {} = up ] && busctl --user -- call rs.wl-gammarelay / rs.wl.gammarelay UpdateGamma d +0.02 || busctl --user -- call rs.wl-gammarelay / rs.wl.gammarelay UpdateGamma d -0.02"
-        (label :class "module gamma" :text "${gamma-gamma}% γ"))
+        (label :class "module gamma" :text "γ${gamma-gamma}"))
       ;; Red mode, Floatile's own night light: click to turn on or off,
       ;; scroll to make it warmer or cooler.  An alternative to wl-gammarelay-rs.
       (eventbox :onclick "floatilectl night-light toggle >/dev/null"
@@ -117,14 +160,16 @@
                 :tooltip "Light or dark theme: click to switch"
         (label :class "module lightdark ${lightdark}" :text {lightdark == "light" ? " light" : " dark"}))
       (eventbox :visible {backlight != ""}
+                :onclick "eww -c ${EWW_CONFIG_DIR} open --toggle display --id display-${monitor} --arg monitor='${monitor}'"
                 :onscroll "[ {} = up ] && state backlight inc || state backlight dec"
         (label :class "module backlight" :text "${backlight}%∠💡"))
       (systray :class "module tray" :spacing 10 :icon-size 18)
       (eventbox :onclick "pavucontrol &"
                 :onscroll "[ {} = up ] && pactl set-sink-volume @DEFAULT_SINK@ +5% || pactl set-sink-volume @DEFAULT_SINK@ -5%"
         (label :class "module volume ${volume.muted ? 'muted' : ''}" :markup {volume.markup}))
-      (battery)
-      (label :class "module clock" :text clock :tooltip calendar)
+      (battery :monitor monitor)
+      (eventbox :onclick "eww -c ${EWW_CONFIG_DIR} open --toggle calendar-popup --id calendar-${monitor} --arg monitor='${monitor}'"
+        (label :class "module clock" :text clock :tooltip calendar))
       (button :class "power" :tooltip "Power"
               :onclick "eww -c ${EWW_CONFIG_DIR} open --toggle power --id power-${monitor} --arg monitor='${monitor}' && eww -c ${EWW_CONFIG_DIR} update power-confirm=''"
         ""))))
@@ -156,8 +201,12 @@
                  :visible {w.marks != ""}
                  :text {w.marks}))))))
 
-(defwidget battery []
-  (label :class "module battery ${battery.class}" :visible {battery.shown} :text {battery.text}))
+;; Shown even with no system battery, as NO_BAT, so peripheral batteries
+;; stay one click away.
+(defwidget battery [monitor]
+  (eventbox :onclick "eww -c ${EWW_CONFIG_DIR} open --toggle batteries --id batteries-${monitor} --arg monitor='${monitor}'"
+            :tooltip "Batteries: click for the list"
+    (label :class "module battery ${battery.class}" :text {battery.text})))
 
 ;; ---------------------------------------------------------------------------
 ;; Application menu: categories, then the applications of one
@@ -187,6 +236,64 @@
                        :image-width 24 :image-height 24)
                 (image :visible {app.icon_path == ""} :icon {app.icon} :icon-size "large-toolbar")
                 (label :xalign 0 :limit-width 32 :text {app.name})))))))))
+
+;; ---------------------------------------------------------------------------
+;; Battery list: every battery, system ones first
+;; ---------------------------------------------------------------------------
+
+(defwidget battery-list []
+  (box :class "popup battery-list" :orientation "v" :space-evenly false
+    (label :visible {arraylength(battery.batteries) == 0} :class "battery-row" :xalign 0
+           :text "No batteries")
+    (for b in {battery.batteries}
+      (box :class "battery-row ${b.class}" :space-evenly false :spacing 8
+        (box :orientation "v" :space-evenly false :hexpand true
+          (label :class "battery-name" :xalign 0 :limit-width 28 :text {b.name})
+          (label :class "battery-status" :xalign 0
+                 :text "${b.status}${b.detail == '' ? '' : ', ' + b.detail}"))
+        (label :class "battery-capacity" :xalign 1 :text {b.capacity})))))
+
+;; ---------------------------------------------------------------------------
+;; Display popup: wl-gammarelay-rs color and the backlight, as sliders
+;; ---------------------------------------------------------------------------
+;; A friendlier tool would be nice later: saved profiles (eg. day, evening,
+;; film), calibration aids, and per-display settings.  No such GUI for
+;; wl-gammarelay-rs was found, so this covers its three settings.
+
+;; Each slider's command gets the value as {}, possibly with a fraction.
+(defwidget display-controls []
+  (box :class "popup display-controls" :orientation "v" :space-evenly false
+    (label :visible {gamma-temperature == "" && backlight == ""} :class "display-row" :xalign 0
+           :text "Neither wl-gammarelay-rs nor a backlight is available")
+    (box :visible {gamma-temperature != ""} :orientation "v" :space-evenly false
+      (display-slider :title "Temperature" :text "${gamma-temperature}K"
+                      :min 1000 :max 10000 :digits 0
+                      :value {gamma-temperature == "" ? 6500 : gamma-temperature}
+                      :onchange "busctl --user set-property rs.wl-gammarelay / rs.wl.gammarelay Temperature q $(printf %.0f {})")
+      ;; At least 10%, so the screen can't be dimmed to black from here.
+      (display-slider :title "Brightness" :text "${gamma-brightness}%"
+                      :min 10 :max 100 :digits 0
+                      :value {gamma-brightness == "" ? 100 : gamma-brightness}
+                      :onchange "busctl --user set-property rs.wl-gammarelay / rs.wl.gammarelay Brightness d $(awk 'BEGIN { print {} / 100 }')")
+      (display-slider :title "Gamma" :text {gamma-gamma}
+                      :min 0.3 :max 2.5 :digits 2
+                      :value {gamma-gamma == "" ? 1 : gamma-gamma}
+                      :onchange "busctl --user set-property rs.wl-gammarelay / rs.wl.gammarelay Gamma d {}")
+      (button :class "menu-item"
+              :onclick "busctl --user set-property rs.wl-gammarelay / rs.wl.gammarelay Temperature q 6500 ; busctl --user set-property rs.wl-gammarelay / rs.wl.gammarelay Brightness d 1 ; busctl --user set-property rs.wl-gammarelay / rs.wl.gammarelay Gamma d 1"
+        "Reset color"))
+    (box :visible {backlight != ""} :orientation "v" :space-evenly false
+      (display-slider :title "Backlight" :text "${backlight}%"
+                      :min 1 :max 100 :digits 0
+                      :value {backlight == "" ? 100 : backlight}
+                      :onchange "state backlight set $(printf %.0f {})"))))
+
+(defwidget display-slider [title text min max digits value onchange]
+  (box :class "display-row" :orientation "v" :space-evenly false
+    (box :space-evenly false
+      (label :class "display-label" :xalign 0 :hexpand true :text title)
+      (label :class "display-value" :xalign 1 :text text))
+    (scale :min min :max max :round-digits digits :value value :onchange onchange)))
 
 ;; ---------------------------------------------------------------------------
 ;; Power menu: each action asks first

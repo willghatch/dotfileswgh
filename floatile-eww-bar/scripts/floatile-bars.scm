@@ -4,11 +4,12 @@
 ;;;
 ;;; Follows `floatilectl subscribe' and prints, on every change,
 ;;;   {"vmonitors": {"VMONITOR": {"workspaces": [{"id", "name", "shown", "active", "urgent"}],
-;;;                               "layout": "LAYOUT",
+;;;                               "workspace_id": ID, "layout": "LAYOUT",
 ;;;                               "windows": [{"id", "label", "tooltip", "icon_path",
 ;;;                                            "class", "marks", "tags"}]}, ...},
 ;;;    "night_light": {"on", "temperature"}}
-;;; where a vmonitor's layout and windows are those of the workspace it displays.
+;;; where a vmonitor's workspace_id, layout, and windows are those of the
+;;; workspace it displays; workspace_id is false when it displays none.
 ;;; A window's label is a short name: its application's name, else the last
 ;;; part of its app id, else its title, shortened.  Its class is its tags
 ;;; joined by spaces, for styling; the bar knows `focused', `minimized',
@@ -133,6 +134,7 @@
                                                         windows)
                                                    #t)))))
                           workspaces))
+                     (workspace_id . ,(if shown shown-id #f))
                      (layout . ,(if shown (symbol->string (field shown 'layout)) ""))
                      (windows
                       . ,(filter-map
