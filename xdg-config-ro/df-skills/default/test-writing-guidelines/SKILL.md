@@ -16,10 +16,12 @@ Avoid testing the language, standard library, or dependencies in place of the pr
 Assert outcomes instead of internal call sequences.
 Avoid large snapshots unless the output itself is the specification and will change rarely.
 
-Make each test's purpose clear from its name or commentary.
 Avoid mocks and exercise actual implementations.
 Test public APIs, including CLI behavior, file formats, and other user-observable behavior.
 Test private APIs only when the user explicitly requests it.
+
+Make each test's purpose clear from its name or commentary, aimed at readers without deep familiarity of the feature being tested.
+Often tests include setup or other scaffolding; header comments can be less effective than surgical commentary at key lines of the test code to highlight and clarify the key pieces of the test.
 
 Tests have a cost.
 Prefer fast and cheap tests.
