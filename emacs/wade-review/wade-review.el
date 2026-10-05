@@ -43,21 +43,40 @@
   :group 'tools)
 
 (defface wade-review-added
-  '((((class color) (background light)) :background "#e6f4e6" :extend t)
-    (((class color) (background dark)) :background "#1e3320" :extend t))
-  "Background for lines added since the merge base.")
+  '((t :inherit diff-added))
+  "Face for lines added since the merge base.")
 
 (defface wade-review-changed
-  '((((class color) (background light)) :background "#e4ecf7" :extend t)
-    (((class color) (background dark)) :background "#1f2a3a" :extend t))
-  "Background for lines changed since the merge base.")
+  '((t :inherit diff-changed-unspecified))
+  "Face for lines changed since the merge base.")
 
 (defface wade-review-deleted
-  '((((class color) (background light))
-     :background "#f7e4e4" :foreground "#8a8a8a" :extend t)
-    (((class color) (background dark))
-     :background "#3a1f1f" :foreground "#7a7a7a" :extend t))
+  '((t :inherit diff-removed))
   "Face for deleted code shown by `wade-review-toggle-deleted'.")
+
+(defface wade-review-moved-in
+  '((default :inherit diff-added)
+    (((class color) (background light)) :background "#f3f0db")
+    (((class color) (background dark)) :background "#151500"))
+  "Background for code moved into its current location.")
+
+(defface wade-review-moved-out
+  '((default :inherit diff-removed)
+    (((class color) (background light)) :background "#f3f0db")
+    (((class color) (background dark)) :background "#151500"))
+  "Background for code moved away from its old location.")
+
+(defface wade-review-moved-in-indicator
+  '((default :inherit diff-indicator-added)
+    (((class color) (background light)) :background "#d5b43c")
+    (((class color) (background dark)) :background "#6b5700"))
+  "Background for the plus indicator of moved-in code.")
+
+(defface wade-review-moved-out-indicator
+  '((default :inherit diff-indicator-removed)
+    (((class color) (background light)) :background "#d5b43c")
+    (((class color) (background dark)) :background "#6b5700"))
+  "Background for the minus indicator of moved-out code.")
 
 (defconst wade-review--marker-file "wade-review"
   "Name of the file, in a review worktree's git dir, that marks it as one.")
@@ -108,34 +127,101 @@ Save the buffer if it visits a file."
 
 ;;;; Review mode
 
-(defun wade-review--syntax-overlays-to-faces (limit)
-  "Copy diff-mode's syntax highlighting overlays up to LIMIT into faces.
-Org's native src block fontification copies only text properties, while
-diff-mode puts language syntax faces in overlays.  As a font-lock matcher,
-this always reports no match."
-  (dolist (ov (overlays-in (point) limit))
-    (when (eq (overlay-get ov 'diff-mode) 'syntax)
-      (add-face-text-property (overlay-start ov) (overlay-end ov)
-                              (overlay-get ov 'face))))
+(defun wade-review--moved-line-p (line ranges)
+  "Return non-nil if LINE is in the inclusive RANGES string."
+  (when ranges
+    (cl-some (lambda (range)
+               (when (string-match "\\`\\([0-9]+\\)\\(?:-\\([0-9]+\\)\\)?\\'" range)
+                 (<= (string-to-number (match-string 1 range)) line
+                     (string-to-number (or (match-string 2 range)
+                                           (match-string 1 range))))))
+             (split-string ranges "," t))))
+
+(defun wade-review--mark-moved-line (face indicator-face description)
+  "Style the current diff line with FACE and its prefix with INDICATOR-FACE.
+DESCRIPTION is shown when hovering over either overlay."
+  (let ((line (make-overlay (point) (min (1+ (line-end-position)) (point-max))))
+        (indicator (make-overlay (point) (1+ (point)))))
+    (dolist (ov (list line indicator))
+      (overlay-put ov 'wade-review-move t)
+      (overlay-put ov 'help-echo description))
+    (overlay-put line 'face face)
+    (overlay-put indicator 'face indicator-face)
+    (overlay-put indicator 'priority 10)))
+
+(defun wade-review--refresh-move-overlays (&rest _)
+  "Style moved lines in this review using their hunk properties."
+  (when wade-review-mode
+    (remove-overlays (point-min) (point-max) 'wade-review-move t)
+    (save-excursion
+      (goto-char (point-min))
+      (org-map-entries
+       (lambda ()
+         (save-excursion
+          (let ((moved-old (org-entry-get nil "WR_MOVED_OLD"))
+               (moved-new (org-entry-get nil "WR_MOVED_NEW")))
+           (when (or moved-old moved-new)
+             (let ((end (save-excursion (org-end-of-subtree t t))))
+               (when (re-search-forward "^@@ -" end t)
+                 (beginning-of-line)
+                 (when (looking-at wade-review-generate--hunk-header-re)
+                   (let ((old (string-to-number (match-string 1)))
+                         (new (string-to-number (match-string 3))))
+                     (forward-line 1)
+                     (while (and (< (point) end)
+                                 (not (looking-at "^[ \t]*#\\+end_src")))
+                       (pcase (char-after)
+                         (?- (when (wade-review--moved-line-p old moved-old)
+                               (wade-review--mark-moved-line
+                                'wade-review-moved-out
+                                'wade-review-moved-out-indicator
+                                "Moved out of this location"))
+                             (cl-incf old))
+                         (?+ (when (wade-review--moved-line-p new moved-new)
+                               (wade-review--mark-moved-line
+                                'wade-review-moved-in
+                                'wade-review-moved-in-indicator
+                                "Moved into this location"))
+                             (cl-incf new))
+                         (?\s (cl-incf old) (cl-incf new)))
+                       (forward-line 1))))))))))
+       nil 'file))))
+
+(defun wade-review--diff-overlays-to-faces (limit)
+  "Copy diff-mode's syntax and fine highlights up to LIMIT into faces.
+Org's native src block fontification copies text properties but not overlays.
+As a font-lock matcher, this always reports no match."
+  (let ((overlays (overlays-in (point) limit)))
+    (dolist (kind '(syntax fine))
+      (dolist (ov overlays)
+        (when (and (eq (overlay-get ov 'diff-mode) kind)
+                   (overlay-get ov 'face))
+          (add-face-text-property (overlay-start ov) (overlay-end ov)
+                                  (overlay-get ov 'face))))))
   (goto-char limit)
   nil)
 
 (define-derived-mode wade-review-diff-mode diff-mode "WR-Diff"
   "Diff mode for fontifying review hunks in org src blocks.
-Syntax highlighting comes from the hunk text alone: a review file's diff
-blocks are not tied to files in `default-directory'."
+Syntax and fine-change highlighting come from the hunk text alone: a review
+file's diff blocks are not tied to files in `default-directory'."
   (setq-local diff-font-lock-syntax 'hunk-only)
-  (font-lock-add-keywords nil '((wade-review--syntax-overlays-to-faces)) 'append))
+  (font-lock-add-keywords nil '((wade-review--diff-overlays-to-faces)) 'append))
 
 ;;;###autoload
 (define-minor-mode wade-review-mode
   "Minor mode for org files generated by the `wade-review' CLI.
-Diff src blocks get language syntax highlighting.  The commands are in
-`wade-review-command-map'."
+Diff src blocks get language syntax, fine-change, and moved-code highlighting.
+The commands are in `wade-review-command-map'."
   :lighter " WR"
   (if wade-review-mode
-      (setq-local org-src-lang-modes
-                  (cons '("diff" . wade-review-diff) org-src-lang-modes))
+      (progn
+        (setq-local org-src-lang-modes
+                    (cons '("diff" . wade-review-diff) org-src-lang-modes))
+        (add-hook 'after-change-functions #'wade-review--refresh-move-overlays nil t)
+        (wade-review--refresh-move-overlays))
+    (remove-hook 'after-change-functions #'wade-review--refresh-move-overlays t)
+    (remove-overlays (point-min) (point-max) 'wade-review-move t)
     (kill-local-variable 'org-src-lang-modes))
   (when font-lock-mode
     (font-lock-flush)))
@@ -379,52 +465,61 @@ on the xref marker stack, so `xref-go-back' returns."
 
 (defun wade-review-refresh ()
   "Recompute change highlights of the current file against the merge base.
-Highlights reflect the file on disk, so they are refreshed on save."
+Highlights include moved code and reflect the file on disk, so they are
+refreshed on save."
   (interactive)
   (unless wade-review-highlight-mode
     (user-error "`wade-review-highlight-mode' is not enabled here"))
   (let* ((file (file-relative-name buffer-file-name wade-review--root))
-         (paths (delete-dups (delq nil (list wade-review--old-file file))))
-         (hunks (wade-review-generate-parse-hunks
-                 (apply #'wade-review--git wade-review--root
-                        "diff" "--no-color" "--no-ext-diff" "--no-textconv" "-M" "-U0"
-                        "--src-prefix=a/" "--dst-prefix=b/"
-                        wade-review--merge-base "--" paths))))
+         (default-directory wade-review--root)
+         (files (wade-review-generate--review-files wade-review--merge-base nil t))
+         (entry (cl-find file files :key (lambda (f) (plist-get f :file)) :test #'equal))
+         (hunks (plist-get entry :hunks)))
     (save-restriction
       (widen)
       (wade-review--clear-overlays)
       (unless (eq hunks 'binary)
         (dolist (h hunks)
-          (let* ((new-start (plist-get h :new-start))
-                 (new-count (plist-get h :new-count))
-                 (deleted (cl-loop for l in (plist-get h :lines)
-                                   when (string-prefix-p "-" l)
-                                   collect (substring l 1))))
-            (when (> new-count 0)
-              (wade-review--make-overlay
-               (wade-review--line-pos new-start)
-               (wade-review--line-pos (+ new-start new-count))
-               'face (if deleted 'wade-review-changed 'wade-review-added)
-               'priority -50))
-            (when (and deleted wade-review--show-deleted)
-              ;; With no new lines, git's new start is the line before the
-              ;; deletion.
-              (let ((pos (wade-review--line-pos
-                          (if (> new-count 0) new-start (1+ new-start)))))
-                (wade-review--make-overlay
-                 pos pos
-                 'before-string
-                 (propertize (concat (if (and (= pos (point-max))
-                                              (not (eq (char-before pos) ?\n))
-                                              (> pos (point-min)))
-                                         "\n" "")
-                                     (mapconcat (lambda (l) (concat l "\n")) deleted ""))
-                             'face 'wade-review-deleted))))))))))
+          (let ((old (plist-get h :old-start))
+                (new (plist-get h :new-start))
+                (changed (cl-some (lambda (l) (string-prefix-p "-" l))
+                                  (plist-get h :lines))))
+            (dolist (line (plist-get h :lines))
+              (pcase (aref line 0)
+                (?\s (cl-incf old) (cl-incf new))
+                (?+ (wade-review--make-overlay
+                     (wade-review--line-pos new)
+                     (wade-review--line-pos (1+ new))
+                     'face (if (memq new (plist-get h :moved-new))
+                               'wade-review-moved-in
+                             (if changed 'wade-review-changed 'wade-review-added))
+                     'help-echo (when (memq new (plist-get h :moved-new))
+                                  "Moved into this location")
+                     'priority -50)
+                    (cl-incf new))
+                (?- (when wade-review--show-deleted
+                      (let* ((pos (wade-review--line-pos
+                                   (if (= (plist-get h :new-count) 0)
+                                       (1+ new) new)))
+                             (face (if (memq old (plist-get h :moved-old))
+                                       'wade-review-moved-out 'wade-review-deleted)))
+                        (wade-review--make-overlay
+                         pos pos 'face face
+                         'help-echo (when (eq face 'wade-review-moved-out)
+                                      "Moved out of this location")
+                         'before-string
+                         (propertize (concat (if (and (= pos (point-max))
+                                                      (not (eq (char-before pos) ?\n))
+                                                      (> pos (point-min)))
+                                                 "\n" "")
+                                             (substring line 1) "\n")
+                                     'face face))))
+                    (cl-incf old))))))))))
 
 ;;;###autoload
 (define-minor-mode wade-review-highlight-mode
   "Highlight changes since a review's merge base in a review worktree file.
-Added and changed lines get a background highlight; deleted code can be
+Added, changed, and moved lines get a background highlight; deleted code can be
 shown with `wade-review-toggle-deleted'.  If git-gutter is installed,
 `git-gutter-mode' is enabled and pointed at the merge base."
   :lighter " WR-HL"

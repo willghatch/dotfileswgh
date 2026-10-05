@@ -116,12 +116,13 @@ HEAD, a local main or master is used."
   '((?M . "modified") (?A . "added") (?D . "deleted") (?R . "renamed")
     (?C . "copied") (?T . "type-changed")))
 
-(defun wade-review-generate--changed-files (from to)
+(defun wade-review-generate--changed-files (from &optional to)
   "Return changed files between FROM and TO as plists (:status :file :old-file)."
   (let ((fields (split-string
-                 (wade-review-generate--git
-                  "diff" "--no-color" "--no-ext-diff" "--no-relative" "-M"
-                  "--name-status" "-z" from to)
+                 (apply #'wade-review-generate--git
+                        (append '("diff" "--no-color" "--no-ext-diff" "--no-relative" "-M"
+                                  "--name-status" "-z")
+                                (list from) (when to (list to))))
                  "\0" t))
         files)
     (while fields
@@ -140,7 +141,8 @@ HEAD, a local main or master is used."
 (defun wade-review-generate-parse-hunks (diff-text)
   "Parse the hunks of a single-file unified DIFF-TEXT.
 Return a list of plists (:old-start :old-count :new-start :new-count
-:context :header :lines), where :lines are the hunk body lines.  Return
+:context :header :lines :moved-old :moved-new), where :lines are the hunk
+body lines and moved lists are populated by move-aware diff parsing.  Return
 the symbol `binary' for a binary diff."
   (let ((lines (split-string diff-text "\n"))
         hunks current)
@@ -164,12 +166,90 @@ the symbol `binary' for a binary diff."
                                      (string-to-number (match-string 4 line)) 1)
                       :context (match-string 5 line)
                       :header line
-                      :lines nil)))
+                      :lines nil
+                      :moved-old nil :moved-new nil)))
          (current
           (plist-put current :lines (cons line (plist-get current :lines))))))
       (when current (push current hunks))
       (mapcar (lambda (h) (plist-put h :lines (nreverse (plist-get h :lines))))
               (nreverse hunks)))))
+
+(defconst wade-review-generate--ansi-re "\033\\[[0-9;]*m")
+
+(defun wade-review-generate--move-ranges (numbers)
+  "Encode NUMBERS as comma-separated, inclusive line ranges."
+  (when numbers
+    (let ((start (car numbers)) (end (car numbers)) ranges)
+      (dolist (n (cdr numbers))
+        (if (= n (1+ end))
+            (setq end n)
+          (push (if (= start end) (number-to-string start)
+                  (format "%d-%d" start end)) ranges)
+          (setq start n end n)))
+      (push (if (= start end) (number-to-string start)
+              (format "%d-%d" start end)) ranges)
+      (string-join (nreverse ranges) ","))))
+
+(defun wade-review-generate--moved-hunks (section)
+  "Parse a colored Git diff SECTION and mark moved lines in its hunks."
+  (let* ((raw-lines (split-string section "\n"))
+         (plain-lines (mapcar (lambda (line)
+                                (replace-regexp-in-string
+                                 wade-review-generate--ansi-re "" line))
+                              raw-lines))
+         (hunks (wade-review-generate-parse-hunks
+                 (string-join plain-lines "\n")))
+         (remaining hunks) current old new)
+    (cl-mapc
+     (lambda (raw plain)
+       (cond
+        ((string-match wade-review-generate--hunk-header-re plain)
+         (setq current (pop remaining)
+               old (string-to-number (match-string 1 plain))
+               new (string-to-number (match-string 3 plain))))
+        ((and current (> (length plain) 0))
+         (pcase (aref plain 0)
+           (?- (when (string-prefix-p "\033[34m-" raw)
+                 (push old (plist-get current :moved-old)))
+               (cl-incf old))
+           (?+ (when (string-prefix-p "\033[33m+" raw)
+                 (push new (plist-get current :moved-new)))
+               (cl-incf new))
+           (?\s (cl-incf old) (cl-incf new))))))
+     raw-lines plain-lines)
+    (unless (eq hunks 'binary)
+      (dolist (h hunks)
+        (plist-put h :moved-old (nreverse (plist-get h :moved-old)))
+        (plist-put h :moved-new (nreverse (plist-get h :moved-new)))))
+    hunks))
+
+(defun wade-review-generate--review-files (from &optional to zero-context)
+  "Return changed files from FROM to TO, with move-aware parsed hunks.
+When TO is nil, compare FROM to the working tree.  ZERO-CONTEXT uses -U0."
+  (let* ((files (wade-review-generate--changed-files from to))
+         (colored (apply #'wade-review-generate--git
+                         (append '("-c" "color.diff.oldMoved=blue"
+                                   "-c" "color.diff.newMoved=yellow")
+                                 wade-review-generate--diff-args
+                                 '("--color=always" "--color-moved=plain"
+                                   "--color-moved-ws=no")
+                                 (when zero-context '("-U0"))
+                                 (list from) (when to (list to)))))
+         (sections nil) current)
+    (dolist (line (split-string colored "\n"))
+      (if (string-prefix-p "diff --git "
+                           (replace-regexp-in-string wade-review-generate--ansi-re "" line))
+          (progn
+            (when current (push (string-join (nreverse current) "\n") sections))
+            (setq current (list line)))
+        (when current (push line current))))
+    (when current (push (string-join (nreverse current) "\n") sections))
+    (setq sections (nreverse sections))
+    (unless (= (length files) (length sections))
+      (wade-review-generate--fail "Git diff file count changed while detecting moved code"))
+    (cl-mapcar (lambda (file section)
+                 (plist-put file :hunks (wade-review-generate--moved-hunks section)))
+               files sections)))
 
 ;;;; Org output
 
@@ -222,7 +302,11 @@ with `*', and org would end the block early at an indented `#+end_src'."
          (wade-review-generate--properties
           (append file-props
                   `(("WR_OLD_START" . ,(number-to-string (plist-get h :old-start)))
-                    ("WR_NEW_START" . ,(number-to-string (plist-get h :new-start))))))
+                    ("WR_NEW_START" . ,(number-to-string (plist-get h :new-start)))
+                    ("WR_MOVED_OLD" . ,(wade-review-generate--move-ranges
+                                         (plist-get h :moved-old)))
+                    ("WR_MOVED_NEW" . ,(wade-review-generate--move-ranges
+                                         (plist-get h :moved-new))))))
          "#+begin_src diff\n"
          ;; The file header lets diff-mode pick the language for syntax
          ;; highlighting inside the block.
@@ -270,7 +354,7 @@ COMMAND, if given, is recorded in the file as the command that made it."
                branch base)))
          (git-dir (wade-review-generate--git-line
                    "rev-parse" "--path-format=absolute" "--git-common-dir"))
-         (files (wade-review-generate--changed-files merge-base tip)))
+         (files (wade-review-generate--review-files merge-base tip)))
     (concat
      "# -*- mode: org; mode: wade-review -*-\n"
      (format "#+TITLE: Review %s\n" branch)
@@ -292,14 +376,7 @@ COMMAND, if given, is recorded in the file as the command that made it."
      (format "* Review %s [/]\n" branch)
      (mapconcat
       (lambda (file)
-        (wade-review-generate--file-section
-         file
-         (wade-review-generate-parse-hunks
-          (apply #'wade-review-generate--git
-                 (append wade-review-generate--diff-args
-                         (list merge-base tip "--")
-                         (delete-dups (delq nil (list (plist-get file :old-file)
-                                                      (plist-get file :file)))))))))
+        (wade-review-generate--file-section file (plist-get file :hunks)))
       files ""))))
 
 ;;;; CLI

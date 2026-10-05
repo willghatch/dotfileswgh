@@ -340,7 +340,19 @@ branch itself) is an error, not an empty review file."
         (search-forward "+(message \"h")
         (let ((faces (ensure-list (get-text-property (point) 'face))))
           (should (memq 'font-lock-string-face faces))
-          (should (memq 'diff-added faces)))))))
+          (should (memq 'diff-added faces)))
+        (goto-char (point-min))
+        (search-forward "-line 3")
+        (beginning-of-line)
+        (forward-char 2)
+        (should (memq 'diff-refine-removed
+                      (ensure-list (get-text-property (point) 'face))))
+        (goto-char (point-min))
+        (search-forward "+changed 3a")
+        (beginning-of-line)
+        (forward-char 2)
+        (should (memq 'diff-refine-added
+                      (ensure-list (get-text-property (point) 'face))))))))
 
 (ert-deftest wade-review-target-after-reorder ()
   "Jump targets come from the heading and block at point, so they survive
@@ -463,6 +475,87 @@ code relative to the merge base."
           (should (member '(3 . "line 3\n") shown)))
         (wade-review-toggle-deleted)
         (should-not (wade-review-tests--before-strings))))))
+
+(ert-deftest wade-review-cross-file-move-in-review-and-worktree ()
+  "A relocated block stays recognizable on both sides of the review."
+  (wade-review-tests--with-temp-dir tmp
+    (let* ((repo (expand-file-name "repo" tmp))
+           (out (expand-file-name "review.org" tmp))
+           (block (mapconcat
+                   (lambda (i)
+                     (format "def moved_%d(): return 'unchanged substantial line %d'\n" i i))
+                   '(1 2 3 4) ""))
+           (source-lines (split-string (wade-review-tests--lines "source" 32) "\n" t))
+           (dest-lines (split-string (wade-review-tests--lines "dest" 32) "\n" t)))
+      (make-directory repo)
+      (wade-review-tests--git repo "init" "-q" "-b" "main")
+      (wade-review-tests--write
+       repo "source.py"
+       (concat (mapconcat #'identity (seq-take source-lines 4) "\n") "\n"
+               block (mapconcat #'identity (seq-drop source-lines 4) "\n") "\n"))
+      (wade-review-tests--write repo "dest.py" (concat (mapconcat #'identity dest-lines "\n") "\n"))
+      (wade-review-tests--git repo "add" "source.py" "dest.py")
+      (wade-review-tests--git repo "commit" "-q" "-m" "base")
+      (wade-review-tests--git repo "checkout" "-q" "-b" "feature")
+      (setf (nth 19 source-lines) "source 20 genuinely edited")
+      (wade-review-tests--write repo "source.py" (concat (mapconcat #'identity source-lines "\n") "\n"))
+      (wade-review-tests--write
+       repo "dest.py"
+       (concat (mapconcat #'identity (seq-take dest-lines 24) "\n") "\n"
+               block (mapconcat #'identity (seq-drop dest-lines 24) "\n") "\n"))
+      (wade-review-tests--git repo "add" "source.py" "dest.py")
+      (wade-review-tests--git repo "commit" "-q" "-m" "move")
+      (wade-review-tests--git repo "checkout" "-q" "main")
+      (wade-review-tests--generate repo out)
+      (let ((review (find-file-noselect out)))
+        (with-current-buffer review
+          (goto-char (point-min))
+          (search-forward "-def moved_1")
+          (font-lock-ensure)
+          (should (equal (org-entry-get nil "WR_MOVED_OLD" t) "5-8"))
+          (should (eq (face-at-point) 'wade-review-moved-out))
+          (save-excursion
+            (beginning-of-line)
+            (should (eq (face-at-point) 'wade-review-moved-out-indicator)))
+          (should (memq 'wade-review-moved-out
+                        (mapcar (lambda (ov) (overlay-get ov 'face)) (overlays-at (point)))))
+          (org-back-to-heading t)
+          (org-move-subtree-down 1)
+          (goto-char (point-min))
+          (search-forward "-def moved_1")
+          (should (memq 'wade-review-moved-out
+                        (mapcar (lambda (ov) (overlay-get ov 'face)) (overlays-at (point)))))
+          (wade-review-jump)
+          (with-current-buffer (find-file-noselect
+                                (expand-file-name "source.py" (wade-review--keyword "WORKTREE")))
+            (should (memq 'wade-review-changed (wade-review-tests--faces-on-line 20)))
+            (wade-review-toggle-deleted)
+            (should (cl-some (lambda (ov)
+                               (and (eq (overlay-get ov 'face) 'wade-review-moved-out)
+                                    (string-match-p "def moved_1" (overlay-get ov 'before-string))))
+                             (overlays-in (point-min) (point-max)))))
+          (set-buffer review)
+          (goto-char (point-min))
+          (search-forward "+def moved_1")
+          (font-lock-ensure)
+          (should (equal (org-entry-get nil "WR_MOVED_NEW" t) "25-28"))
+          (should (eq (face-at-point) 'wade-review-moved-in))
+          (save-excursion
+            (beginning-of-line)
+            (should (eq (face-at-point) 'wade-review-moved-in-indicator)))
+          (should (memq 'wade-review-moved-in
+                        (mapcar (lambda (ov) (overlay-get ov 'face)) (overlays-at (point)))))
+          (wade-review-jump)
+          (with-current-buffer (find-file-noselect
+                                (expand-file-name "dest.py" (wade-review--keyword "WORKTREE")))
+            (should (memq 'wade-review-moved-in (wade-review-tests--faces-on-line 25)))
+            (should-not (wade-review-tests--faces-on-line 24))
+            (goto-char (point-min))
+            (search-forward "def moved_1")
+            (replace-match "def edited_1")
+            (save-buffer)
+            (should-not (memq 'wade-review-moved-in (wade-review-tests--faces-on-line 25)))
+            (should (memq 'wade-review-moved-in (wade-review-tests--faces-on-line 26)))))))))
 
 (provide 'wade-review-tests)
 
