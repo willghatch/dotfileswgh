@@ -9,21 +9,38 @@ But I decided to keep them, still.
 - Each hunk is in a `diff` src block, with +/- backgrounds, fine highlights on changed text, and the file's language syntax highlighting.
 - Unchanged code moved within or between files has a subtle yellow background and a brighter yellow `-` or `+` indicator.
 - From a heading or a diff line, jump to that place in the file at the branch tip, in a dedicated review worktree.
-- Files in the review worktree highlight lines added or changed since the merge base, can show deleted code, and, if git-gutter is installed, enable `git-gutter-mode` against the merge base (so its hunk navigation works too).
+- Files in the review worktree highlight lines and refined changed text since the comparison start, can show deleted code, and, if git-gutter is installed, enable `git-gutter-mode` against the same start (so its hunk navigation works too).
 
 ## Generating a review
 
 Use the `wade-review` command, which wraps some elisp to be used on the command line.
 
+By default, Wade reviews the current branch from its merge base with the repository's default branch.
+Pass `--base REF` to select a different branch or commit for that merge-base calculation:
+
+```sh
+wade-review --base master --branch feature --output review.org
+```
+
+Pass `--from REF` to use an exact left endpoint without finding a merge base:
+
+```sh
+wade-review --from previously-reviewed --branch feature --output followup.org
+```
+
+`--base` and `--from` are mutually exclusive.
+
 ## The review file
 
 The file's first line enables `org-mode` and `wade-review-mode`, once `wade-review-mode` is autoloaded (see Installation).
 
-Write notes, eg. in sub-headings under a hunk.
-Avoid editing the diff text inside blocks, since jumping counts lines from the block's `@@` line.
+Write notes in sub-headings under a hunk or directly inside a diff block using `# ` at the start of the line.
+Inline commentary has its own highlighting, does not affect language or fine-change highlighting, and does not advance source-line counts used for jumping.
+Customize `wade-review-comment-prefix` before opening a review to use a different exact prefix.
+Avoid other edits to diff text inside blocks, since jumping counts diff lines from the block's `@@` line.
 Moved-line ranges are recorded as `WR_MOVED_OLD` and `WR_MOVED_NEW` properties on each hunk, using line numbers from the old and new files.
 The `-` and `+` prefixes still show which side of the move is being viewed, with their own move-indicator faces.
-Git's move detection is heuristic; lines it does not identify remain ordinary additions and deletions.
+Git's move detection is heuristic; Wade asks for substantial moved blocks, so isolated trivial matches and short genuine moves remain ordinary additions and deletions.
 
 ## Commands
 
@@ -41,16 +58,18 @@ It is not bound to any key; bind it to a prefix of your choice.
 The first jump creates a detached worktree of the reviewed tip at `GIT_DIR/agent-files/wt/user/review-XXXXXX`, and records it in the review file as `#+WR_WORKTREE:`.
 Since these are real files in a real checkout, LSP, xref, and project tools work as usual.
 Jumps push the xref marker stack, so `xref-go-back` (or `pop-tag-mark`) returns to the review.
-Deleted files open read-only, as of the merge base.
+Deleted files open read-only, as of the comparison start.
 
-In worktree files, `wade-review-highlight-mode` highlights lines against the merge base.
+In worktree files, `wade-review-highlight-mode` highlights lines against the comparison start.
 Its faces inherit Emacs diff faces and set no foreground colors, so source syntax highlighting remains visible.
+Changed portions within replacement lines also use Emacs's `diff-refine-added` face.
+When deleted code is shown, its changed portions use `diff-refine-removed`.
 Only moved-in and moved-out lines have Wade-specific background colors.
 Moved-in lines use the same muted background as moved lines in the review.
 When deleted code is shown, moved-out lines use that background too, while actual deletions keep the deletion style.
 It compares the file on disk and refreshes on save.
 For a file renamed on the branch, the highlights treat it as renamed only when it was visited by a jump.
-Faces: `wade-review-added`, `wade-review-changed`, `wade-review-deleted`, `wade-review-moved-in`, `wade-review-moved-out`, `wade-review-moved-in-indicator`, and `wade-review-moved-out-indicator`.
+Faces: `wade-review-added`, `wade-review-changed`, `wade-review-deleted`, `wade-review-moved-in`, `wade-review-moved-out`, `wade-review-moved-in-indicator`, `wade-review-moved-out-indicator`, `wade-review-comment`, and `wade-review-comment-indicator`.
 
 ## Tests
 

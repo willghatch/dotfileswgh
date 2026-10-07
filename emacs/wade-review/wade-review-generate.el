@@ -2,9 +2,9 @@
 
 ;;; Commentary:
 
-;; The generator behind the `wade-review' CLI.  It turns the diff between
-;; a branch and its merge base into an org file with a TODO heading per file
-;; and per hunk, each hunk in a diff src block.
+;; The generator behind the `wade-review' CLI.  It turns a direct or
+;; merge-base comparison into an org file with a TODO heading per file and
+;; per hunk, each hunk in a diff src block.
 ;;
 ;; This file must only depend on built-in Emacs libraries and the git CLI, so
 ;; the CLI works from `emacs -Q --batch' on any machine.
@@ -15,18 +15,22 @@
 (require 'subr-x)
 
 (defconst wade-review-generate--usage
-  "Usage: wade-review [-b BRANCH] -o OUTPUT [--base REF] [--force] [-C DIR]
+  "Usage: wade-review [-b BRANCH] -o OUTPUT [--base REF | --from REF] [--force] [-C DIR]
 
-Generate an org-mode review file for the changes on BRANCH since its merge
-base with REF.
+Generate an org-mode review file for changes ending at BRANCH.  By default,
+compare its merge base with the repository's default branch.  Use --from to
+compare an exact pair of commits instead.
 
   -b, --branch BRANCH  Commit-ish to review (branch, remote branch, SHA).
                        Default: the current branch.
   -o, --output FILE    Org file to write.
-      --base REF       Base to diff against.  Default: the default branch
+      --base REF       Diff merge-base(REF, BRANCH) against BRANCH.
+                       Default REF: the default branch
                        named by origin/HEAD (or the only remote's HEAD),
                        local if it exists, else remote-tracking; without a
                        remote HEAD, a local main or master.
+      --from REF       Diff REF directly against BRANCH, without finding a
+                       merge base.  Mutually exclusive with --base.
       --force          Overwrite FILE if it exists.
   -C DIR               Run as if started in DIR.
   -h, --help           Show this help.
@@ -231,7 +235,10 @@ When TO is nil, compare FROM to the working tree.  ZERO-CONTEXT uses -U0."
                          (append '("-c" "color.diff.oldMoved=blue"
                                    "-c" "color.diff.newMoved=yellow")
                                  wade-review-generate--diff-args
-                                 '("--color=always" "--color-moved=plain"
+                                 ;; Git's blocks mode ignores isolated trivial
+                                 ;; matches, at the cost of missing moved blocks
+                                 ;; below its fixed 20-alphanumeric threshold.
+                                 '("--color=always" "--color-moved=blocks"
                                    "--color-moved-ws=no")
                                  (when zero-context '("-U0"))
                                  (list from) (when to (list to)))))
@@ -330,11 +337,14 @@ with `*', and org would end the block early at an indented `#+end_src'."
   (or (wade-review-generate--git-ok "symbolic-ref" "--short" "-q" "HEAD")
       "HEAD"))
 
-(defun wade-review-generate (&optional branch base command)
-  "Return the review org text for BRANCH against BASE in `default-directory'.
-BRANCH defaults to the current branch.  It is an error if BRANCH is its own
-merge base with BASE, since there would be nothing to review.
+(defun wade-review-generate (&optional branch base from command)
+  "Return review org text for BRANCH from a selected comparison start.
+With FROM, compare FROM directly to BRANCH.  Otherwise compare the merge base
+of BASE and BRANCH to BRANCH, defaulting BASE to the default branch.  BRANCH
+defaults to the current branch.  BASE and FROM are mutually exclusive.
 COMMAND, if given, is recorded in the file as the command that made it."
+  (when (and base from)
+    (wade-review-generate--fail "--base and --from are mutually exclusive"))
   (let* ((toplevel (wade-review-generate--git-ok "rev-parse" "--show-toplevel"))
          ;; Paths from git diff are relative to the top of the working tree,
          ;; but pathspecs are relative to the current directory.
@@ -342,19 +352,26 @@ COMMAND, if given, is recorded in the file as the command that made it."
                                 (file-name-as-directory toplevel)
                               default-directory))
          (branch (or branch (wade-review-generate--current-branch)))
-         (base (or base (wade-review-generate-default-base)))
+         (comparison (if from "direct" "merge-base"))
+         (base (unless from (or base (wade-review-generate-default-base))))
          (tip (wade-review-generate--git-line
                "rev-parse" "--verify" "-q" (concat branch "^{commit}")))
-         (base-tip (wade-review-generate--git-line
-                    "rev-parse" "--verify" "-q" (concat base "^{commit}")))
-         (merge-base (wade-review-generate--git-line "merge-base" base-tip tip))
-         (_ (when (equal tip merge-base)
+         (base-tip (and base
+                        (wade-review-generate--git-line
+                         "rev-parse" "--verify" "-q" (concat base "^{commit}"))))
+         (from-tip (if from
+                       (wade-review-generate--git-line
+                        "rev-parse" "--verify" "-q" (concat from "^{commit}"))
+                     (wade-review-generate--git-line "merge-base" base-tip tip)))
+         (_ (when (equal tip from-tip)
               (wade-review-generate--fail
-               "%s is the merge base with %s, so there is nothing to review"
-               branch base)))
+               (if from
+                   "%s and --from %s resolve to the same commit, so there is nothing to review"
+                 "%s is the merge base with %s, so there is nothing to review")
+               branch (or from base))))
          (git-dir (wade-review-generate--git-line
                    "rev-parse" "--path-format=absolute" "--git-common-dir"))
-         (files (wade-review-generate--review-files merge-base tip)))
+         (files (wade-review-generate--review-files from-tip tip)))
     (concat
      "# -*- mode: org; mode: wade-review -*-\n"
      (format "#+TITLE: Review %s\n" branch)
@@ -365,9 +382,12 @@ COMMAND, if given, is recorded in the file as the command that made it."
                  `(("REPO" . ,toplevel)
                    ("GIT_DIR" . ,git-dir)
                    ("BRANCH" . ,branch)
+                   ("COMPARISON" . ,comparison)
+                   ("FROM" . ,from-tip)
+                   ("FROM_REF" . ,from)
                    ("BASE" . ,base)
                    ("BASE_TIP" . ,base-tip)
-                   ("MERGE_BASE" . ,merge-base)
+                   ("MERGE_BASE" . ,(and base from-tip))
                    ("TIP" . ,tip)
                    ("GENERATED" . ,(format-time-string "%Y-%m-%dT%H:%M:%S%z"))
                    ("COMMAND" . ,command)))
@@ -395,6 +415,7 @@ COMMAND, if given, is recorded in the file as the command that made it."
             ((or "-b" "--branch") (setq opts (plist-put opts :branch (value))))
             ((or "-o" "--output") (setq opts (plist-put opts :output (value))))
             ("--base" (setq opts (plist-put opts :base (value))))
+            ("--from" (setq opts (plist-put opts :from (value))))
             ("-C" (setq opts (plist-put opts :dir (value))))
             ("--force" (setq opts (plist-put opts :force t)))
             ((or "-h" "--help") (setq opts (plist-put opts :help t)))
@@ -411,6 +432,8 @@ COMMAND, if given, is recorded in the file as the command that made it."
         (unless (plist-get opts :output)
           (wade-review-generate--fail
            "--output is required\n\n%s" wade-review-generate--usage))
+        (when (and (plist-get opts :base) (plist-get opts :from))
+          (wade-review-generate--fail "--base and --from are mutually exclusive"))
         (let* ((output (expand-file-name (plist-get opts :output)))
                (default-directory (file-name-as-directory
                                    (expand-file-name (or (plist-get opts :dir) ".")))))
@@ -419,6 +442,7 @@ COMMAND, if given, is recorded in the file as the command that made it."
              "%s exists; pass --force to overwrite it" output))
           (let ((text (wade-review-generate
                        (plist-get opts :branch) (plist-get opts :base)
+                       (plist-get opts :from)
                        (wade-review-generate--shell-quote-args
                         (cons "wade-review" args))))
                 (coding-system-for-write 'utf-8-unix))

@@ -146,6 +146,12 @@ Return DIR."
   (re-search-forward (concat "^\\*+ .*" regexp))
   (org-back-to-heading t))
 
+(defun wade-review-tests--faces-at (pos)
+  "Return text-property and overlay faces active at POS."
+  (delete-dups
+   (append (ensure-list (get-text-property pos 'face))
+           (mapcar (lambda (ov) (overlay-get ov 'face)) (overlays-at pos)))))
+
 ;;;; Generator
 
 (ert-deftest wade-review-generate-structure ()
@@ -169,6 +175,9 @@ review structure for every kind of file change."
         (should (equal (wade-review-tests--keyword "WR_BRANCH") "feature"))
         (should (equal (wade-review-tests--keyword "WR_BASE") "main"))
         (should (equal (wade-review-tests--keyword "WR_MERGE_BASE")
+                       (wade-review-tests--git repo "merge-base" "main" "feature")))
+        (should (equal (wade-review-tests--keyword "WR_COMPARISON") "merge-base"))
+        (should (equal (wade-review-tests--keyword "WR_FROM")
                        (wade-review-tests--git repo "merge-base" "main" "feature")))
         (should (equal (wade-review-tests--keyword "WR_TIP")
                        (wade-review-tests--git repo "rev-parse" "feature")))
@@ -206,6 +215,38 @@ review structure for every kind of file change."
         ;; Binary files get a heading but no block.
         (wade-review-tests--goto-heading "bin\\.dat")
         (should-not (re-search-forward "^#\\+begin_src" (save-excursion (org-end-of-subtree t t)) t))))))
+
+(ert-deftest wade-review-generate-direct-comparison ()
+  "--from compares its exact ref to the reviewed tip and records that choice."
+  (wade-review-tests--with-temp-dir tmp
+    (let ((repo (wade-review-tests--make-repo tmp))
+          (out (expand-file-name "review.org" tmp)))
+      (wade-review-tests--generate repo out "--from" "main")
+      (with-temp-buffer
+        (insert-file-contents out)
+        (org-mode)
+        (should (equal (wade-review-tests--keyword "WR_COMPARISON") "direct"))
+        (should (equal (wade-review-tests--keyword "WR_FROM")
+                       (wade-review-tests--git repo "rev-parse" "main")))
+        (should-not (wade-review-tests--keyword "WR_BASE"))
+        (should-not (wade-review-tests--keyword "WR_BASE_TIP"))
+        (should-not (wade-review-tests--keyword "WR_MERGE_BASE"))
+        ;; main added this after feature diverged, so an exact main-to-feature
+        ;; comparison sees its removal while a merge-base comparison does not.
+        (should (wade-review-tests--file-entry
+                 (wade-review-tests--entries) "unrelated.txt"))))))
+
+(ert-deftest wade-review-generate-rejects-base-with-from ()
+  "The CLI rejects two contradictory ways to select the comparison start."
+  (wade-review-tests--with-temp-dir tmp
+    (let ((repo (wade-review-tests--make-repo tmp))
+          (out (expand-file-name "review.org" tmp)))
+      (let ((result (wade-review-tests--run-cli
+                     repo wade-review-tests--cli "-b" "feature" "-o" out
+                     "--base" "main" "--from" "feature~1")))
+        (should-not (equal (car result) 0))
+        (should (string-match-p "mutually exclusive" (cdr result))))
+      (should-not (file-exists-p out)))))
 
 (ert-deftest wade-review-generate-file-activates-mode ()
   "Opening a generated review file turns on `wade-review-mode'."
@@ -354,6 +395,76 @@ branch itself) is an error, not an empty review file."
         (should (memq 'diff-refine-added
                       (ensure-list (get-text-property (point) 'face))))))))
 
+(ert-deftest wade-review-inline-commentary-highlighting ()
+  "Inline commentary is styled but cannot change surrounding source syntax."
+  (dolist (prefix '("# " "NOTE: "))
+    (let ((wade-review-comment-prefix prefix)
+          (org-src-fontify-natively t))
+      (with-temp-buffer
+        (insert "* Example\n"
+                "#+begin_src diff\n"
+                "--- a/example.py\n"
+                "+++ b/example.py\n"
+                "@@ -1 +1 @@\n"
+                "-print(\"before\")\n"
+                prefix "prose with an unmatched \" quote\n"
+                "+print(\"after\")\n"
+                "#+end_src\n")
+        (org-mode)
+        (wade-review-mode 1)
+        (font-lock-ensure)
+        (goto-char (point-min))
+        (search-forward (concat "\n" prefix))
+        (let ((indicator-pos (- (point) (length prefix))))
+          (should (memq 'wade-review-comment-indicator
+                        (wade-review-tests--faces-at indicator-pos)))
+          (should (memq 'wade-review-comment
+                        (wade-review-tests--faces-at (point)))))
+        (search-forward "after")
+        (let ((faces (wade-review-tests--faces-at (1- (point)))))
+          (should (memq 'font-lock-string-face faces))
+          (should (memq 'diff-refine-added faces)))))))
+
+(ert-deftest wade-review-inline-commentary-does-not-advance-target ()
+  "An inline comment targets the following source position without consuming it."
+  (wade-review-tests--with-temp-dir tmp
+    (let ((repo (wade-review-tests--make-repo tmp))
+          (out (expand-file-name "review.org" tmp)))
+      (wade-review-tests--generate repo out)
+      (with-current-buffer (find-file-noselect out)
+        (goto-char (point-min))
+        (search-forward "\n+changed 3a")
+        (beginning-of-line)
+        (insert "# Explain changed line 3.\n")
+        (forward-line -1)
+        (should (equal (plist-get (wade-review-target-at-point) :line) 3))))))
+
+(ert-deftest wade-review-moved-blocks-ignore-trivial-lines ()
+  "Move highlighting omits isolated trivial matches while retaining real blocks."
+  (wade-review-tests--with-temp-dir tmp
+    (let ((repo (file-name-as-directory (expand-file-name "repo" tmp)))
+          (out (expand-file-name "review.org" tmp)))
+      (make-directory repo)
+      (wade-review-tests--git repo "init" "-q" "-b" "main")
+      (wade-review-tests--write
+       repo "example.py"
+       "header\n\ndef sufficiently_long_function_name():\n    return 'meaningful moved content'\n\nfooter\n")
+      (wade-review-tests--git repo "add" "example.py")
+      (wade-review-tests--git repo "commit" "-q" "-m" "base")
+      (wade-review-tests--git repo "checkout" "-q" "-b" "feature")
+      (wade-review-tests--write
+       repo "example.py"
+       "header\n\nfooter\n\ndef sufficiently_long_function_name():\n    return 'meaningful moved content'\n")
+      (wade-review-tests--git repo "add" "example.py")
+      (wade-review-tests--git repo "commit" "-q" "-m" "feature")
+      (wade-review-tests--generate repo out)
+      (with-temp-buffer
+        (insert-file-contents out)
+        (org-mode)
+        (wade-review-tests--goto-heading "@@ ")
+        (should-not (org-entry-get nil "WR_MOVED_OLD"))
+        (should-not (org-entry-get nil "WR_MOVED_NEW"))))))
+
 (ert-deftest wade-review-target-after-reorder ()
   "Jump targets come from the heading and block at point, so they survive
 reordering subtrees and adding comment sub-headings."
@@ -475,6 +586,78 @@ code relative to the merge base."
           (should (member '(3 . "line 3\n") shown)))
         (wade-review-toggle-deleted)
         (should-not (wade-review-tests--before-strings))))))
+
+(ert-deftest wade-review-worktree-refines-replacements ()
+  "Worktree highlights refine changed additions and displayed deletions."
+  (wade-review-tests--with-temp-dir tmp
+    (let ((repo (file-name-as-directory (expand-file-name "repo" tmp)))
+          (out (expand-file-name "review.org" tmp)))
+      (make-directory repo)
+      (wade-review-tests--git repo "init" "-q" "-b" "main")
+      (wade-review-tests--write repo "example.py" "value = \"old value\"\n")
+      (wade-review-tests--git repo "add" "example.py")
+      (wade-review-tests--git repo "commit" "-q" "-m" "base")
+      (wade-review-tests--git repo "checkout" "-q" "-b" "feature")
+      (wade-review-tests--write repo "example.py" "value = \"new value\"\n")
+      (wade-review-tests--git repo "add" "example.py")
+      (wade-review-tests--git repo "commit" "-q" "-m" "feature")
+      (wade-review-tests--git repo "checkout" "-q" "main")
+      (wade-review-tests--generate repo out)
+      (with-current-buffer (find-file-noselect out)
+        (goto-char (point-min))
+        (search-forward "+value = \"new value\"")
+        (wade-review-jump)
+        (font-lock-ensure)
+        (goto-char (point-min))
+        (search-forward "new")
+        (let ((faces (wade-review-tests--faces-at (1- (point)))))
+          (should (memq 'wade-review-changed faces))
+          (should (memq 'diff-refine-added faces))
+          (should (memq 'font-lock-string-face faces)))
+        (wade-review-toggle-deleted)
+        (let* ((ov (cl-find-if (lambda (candidate)
+                                 (overlay-get candidate 'before-string))
+                               (overlays-in (point-min) (point-max))))
+               (text (overlay-get ov 'before-string))
+               (old-pos (string-match "old" text)))
+          (should old-pos)
+          (should (memq 'diff-refine-removed
+                        (ensure-list (get-text-property old-pos 'face text)))))
+        (let ((diff-refine nil))
+          (wade-review-refresh))
+        (goto-char (point-min))
+        (search-forward "new")
+        (should-not (memq 'diff-refine-added
+                          (wade-review-tests--faces-at (1- (point)))))))))
+
+(ert-deftest wade-review-direct-start-drives-worktree-highlighting ()
+  "A direct review highlights only changes after its exact --from commit."
+  (wade-review-tests--with-temp-dir tmp
+    (let ((repo (file-name-as-directory (expand-file-name "repo" tmp)))
+          (out (expand-file-name "review.org" tmp))
+          first-tip)
+      (make-directory repo)
+      (wade-review-tests--git repo "init" "-q" "-b" "main")
+      (wade-review-tests--write repo "example.txt" "old one\nold two\n")
+      (wade-review-tests--git repo "add" "example.txt")
+      (wade-review-tests--git repo "commit" "-q" "-m" "base")
+      (wade-review-tests--git repo "checkout" "-q" "-b" "feature")
+      (wade-review-tests--write repo "example.txt" "new one\nold two\n")
+      (wade-review-tests--git repo "add" "example.txt")
+      (wade-review-tests--git repo "commit" "-q" "-m" "first change")
+      (setq first-tip (wade-review-tests--git repo "rev-parse" "HEAD"))
+      (wade-review-tests--write repo "example.txt" "new one\nnew two\n")
+      (wade-review-tests--git repo "add" "example.txt")
+      (wade-review-tests--git repo "commit" "-q" "-m" "second change")
+      (wade-review-tests--git repo "checkout" "-q" "main")
+      (wade-review-tests--generate repo out "--from" first-tip)
+      (with-current-buffer (find-file-noselect out)
+        (goto-char (point-min))
+        (search-forward "+new two")
+        (wade-review-jump)
+        (should-not (wade-review-tests--faces-on-line 1))
+        (should (memq 'wade-review-changed
+                      (wade-review-tests--faces-on-line 2)))))))
 
 (ert-deftest wade-review-cross-file-move-in-review-and-worktree ()
   "A relocated block stays recognizable on both sides of the review."

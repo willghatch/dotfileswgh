@@ -6,11 +6,12 @@
 ;; file with a TODO heading per changed file and per hunk; see README.md.
 ;;
 ;; - `wade-review-mode' is enabled in review files (via their -*- line).
-;;   It gives diff blocks language syntax highlighting.
+;;   It gives diff blocks language syntax and inline-comment highlighting.
 ;; - `wade-review-jump' visits the file and line at point, in a detached
 ;;   review worktree at the reviewed tip, created on first use.
 ;; - Files in a review worktree get `wade-review-highlight-mode', which
-;;   highlights code changed since the merge base, and can show deleted code.
+;;   highlights code changed since the comparison start, including refined
+;;   changed text, and can show deleted code.
 ;; - `wade-review-command-map' holds the commands.  It is not bound to
 ;;   any key; bind it to a prefix of your choice.
 ;;
@@ -42,13 +43,19 @@
   "Review git branches in org-mode."
   :group 'tools)
 
+(defcustom wade-review-comment-prefix "# "
+  "Exact prefix that marks inline commentary inside review diffs.
+The prefix must be nonempty and starts in the diff indicator column."
+  :type 'string
+  :group 'wade-review)
+
 (defface wade-review-added
   '((t :inherit diff-added))
-  "Face for lines added since the merge base.")
+  "Face for lines added since the comparison start.")
 
 (defface wade-review-changed
   '((t :inherit diff-changed-unspecified))
-  "Face for lines changed since the merge base.")
+  "Face for lines changed since the comparison start.")
 
 (defface wade-review-deleted
   '((t :inherit diff-removed))
@@ -77,6 +84,14 @@
     (((class color) (background light)) :background "#d5b43c")
     (((class color) (background dark)) :background "#6b5700"))
   "Background for the minus indicator of moved-out code.")
+
+(defface wade-review-comment
+  '((t :inherit font-lock-comment-face))
+  "Face for inline commentary inside review diffs.")
+
+(defface wade-review-comment-indicator
+  '((t :inherit font-lock-comment-delimiter-face :weight bold))
+  "Face for the prefix of inline commentary inside review diffs.")
 
 (defconst wade-review--marker-file "wade-review"
   "Name of the file, in a review worktree's git dir, that marks it as one.")
@@ -126,6 +141,126 @@ Save the buffer if it visits a file."
     (save-buffer)))
 
 ;;;; Review mode
+
+(defun wade-review--comment-line-p (line)
+  "Return non-nil when LINE begins with the configured comment prefix."
+  (and (not (string-empty-p wade-review-comment-prefix))
+       (string-prefix-p wade-review-comment-prefix line)))
+
+(defun wade-review--mask-comments-in-hunk (hunk)
+  "Replace commentary in HUNK with whitespace of the same width."
+  (mapconcat (lambda (line)
+               (if (wade-review--comment-line-p line)
+                   (make-string (length line) ?\s)
+                 line))
+             (split-string hunk "\n") "\n"))
+
+(defun wade-review--filter-diff-hunk-text (args)
+  "Hide inline commentary from `diff-hunk-text' in review diff buffers."
+  (if (derived-mode-p 'wade-review-diff-mode)
+      (cons (wade-review--mask-comments-in-hunk (car args)) (cdr args))
+    args))
+
+(advice-add 'diff-hunk-text :filter-args #'wade-review--filter-diff-hunk-text)
+
+(defun wade-review--diff-end-of-hunk (original &rest args)
+  "Call ORIGINAL with ARGS, ignoring diff counts in review diff buffers.
+Each generated source block contains one hunk, and its user commentary must
+not be mistaken for the start of non-diff text."
+  (if (and (derived-mode-p 'wade-review-diff-mode)
+           (looking-at diff-hunk-header-re))
+      (progn
+        (forward-line 1)
+        (if (re-search-forward diff-hunk-header-re nil t)
+            (goto-char (match-beginning 0))
+          (goto-char (point-max))))
+    (apply original args)))
+
+(advice-add 'diff-end-of-hunk :around #'wade-review--diff-end-of-hunk)
+
+(defun wade-review--comment-match (limit)
+  "Find inline commentary before LIMIT for font locking."
+  (and (not (string-empty-p wade-review-comment-prefix))
+       (re-search-forward
+        (concat "^\\(" (regexp-quote wade-review-comment-prefix) "\\)\\(.*\\)$")
+        limit t)))
+
+(defun wade-review--comment-free-hunk (hunk)
+  "Return (TEXT . LINE-MAP) for HUNK with commentary lines removed.
+LINE-MAP is a vector mapping each zero-based line in TEXT to its original
+zero-based line in HUNK."
+  (let (lines line-map)
+    (cl-loop for line in (split-string hunk "\n")
+             for index from 0
+             unless (wade-review--comment-line-p line)
+             do (push line lines) (push index line-map))
+    (cons (string-join (nreverse lines) "\n")
+          (vconcat (nreverse line-map)))))
+
+(defun wade-review--refined-hunk-ranges (hunk)
+  "Return fine-change ranges from HUNK with commentary excluded.
+Each result is (LINE START END FACE), where LINE is zero-based in the original
+HUNK and START and END are columns that include its diff indicator column."
+  (pcase-let* ((`(,text . ,line-map) (wade-review--comment-free-hunk hunk))
+               (ranges nil))
+    (with-temp-buffer
+      (let ((default-directory temporary-file-directory)
+            (diff-refine nil))
+        (insert text)
+        (diff-mode)
+        (goto-char (point-min))
+        (diff-refine-hunk)
+        (dolist (ov (overlays-in (point-min) (point-max)))
+          (when (memq (overlay-get ov 'face)
+                      '(diff-refine-added diff-refine-removed diff-refine-changed))
+            (let ((pos (overlay-start ov))
+                  (end (overlay-end ov))
+                  (face (overlay-get ov 'face)))
+              (while (< pos end)
+                (goto-char pos)
+                (let* ((line (1- (line-number-at-pos pos)))
+                       (line-beg (line-beginning-position))
+                       (line-end (line-end-position))
+                       (piece-end (min end line-end)))
+                  (when (< pos piece-end)
+                    (push (list (aref line-map line)
+                                (- pos line-beg) (- piece-end line-beg) face)
+                          ranges))
+                  (setq pos (min end (1+ line-end))))))))))
+    (nreverse ranges)))
+
+(defvar-local wade-review--diff-refine nil)
+
+(defun wade-review--diff-font-lock-refined (limit)
+  "Create commentary-aware fine-change overlays up to LIMIT."
+  (when wade-review--diff-refine
+    (when (get-char-property (point) 'diff--font-lock-refined)
+      (goto-char (next-single-char-property-change
+                  (point) 'diff--font-lock-refined nil limit)))
+    (diff--iterate-hunks
+     limit
+     (lambda (beg end)
+       (unless (get-char-property beg 'diff--font-lock-refined)
+         (dolist (range (wade-review--refined-hunk-ranges
+                         (buffer-substring-no-properties beg end)))
+           (save-excursion
+             (goto-char beg)
+             (forward-line (nth 0 range))
+             (let ((ov (make-overlay (+ (point) (nth 1 range))
+                                     (+ (point) (nth 2 range)))))
+               (overlay-put ov 'diff-mode 'fine)
+               (overlay-put ov 'evaporate t)
+               (overlay-put ov 'modification-hooks
+                            '(diff--overlay-auto-delete))
+               (overlay-put ov 'face (nth 3 range)))))
+         (let ((ov (make-overlay beg end)))
+           (overlay-put ov 'diff--font-lock-refined t)
+           (overlay-put ov 'diff-mode 'fine)
+           (overlay-put ov 'evaporate t)
+           (overlay-put ov 'modification-hooks
+                        '(diff--overlay-auto-delete)))))))
+  (goto-char limit)
+  nil)
 
 (defun wade-review--moved-line-p (line ranges)
   "Return non-nil if LINE is in the inclusive RANGES string."
@@ -205,8 +340,17 @@ As a font-lock matcher, this always reports no match."
   "Diff mode for fontifying review hunks in org src blocks.
 Syntax and fine-change highlighting come from the hunk text alone: a review
 file's diff blocks are not tied to files in `default-directory'."
-  (setq-local diff-font-lock-syntax 'hunk-only)
-  (font-lock-add-keywords nil '((wade-review--diff-overlays-to-faces)) 'append))
+  (setq-local diff-font-lock-syntax 'hunk-only
+              wade-review--diff-refine diff-refine
+              diff-refine nil)
+  (font-lock-add-keywords
+   nil
+   '((wade-review--diff-font-lock-refined)
+     (wade-review--diff-overlays-to-faces)
+     (wade-review--comment-match
+      (1 'wade-review-comment-indicator t)
+      (2 'wade-review-comment t)))
+   'append))
 
 ;;;###autoload
 (define-minor-mode wade-review-mode
@@ -276,7 +420,7 @@ absent from that side, the line it would precede."
   "Return the review target at point as (:file :old-file :status :line).
 FILE is the path at the reviewed tip, relative to the repository root.
 LINE is a line of that file, or, for deleted files, of OLD-FILE at the
-merge base.  Inside a diff block it is the line at point; elsewhere it is
+comparison start.  Inside a diff block it is the line at point; elsewhere it is
 the start of the hunk (or the file's first hunk) at point."
   (when (org-before-first-heading-p)
     (user-error "No review heading at point"))
@@ -321,7 +465,7 @@ It is a detached checkout of the reviewed tip, recorded in the review file."
         (message "Creating review worktree %s..." wt)
         (wade-review--git git-dir "worktree" "add" "--detach" "-q" wt tip)
         (let ((wt-git-dir (string-trim (wade-review--git wt "rev-parse" "--absolute-git-dir")))
-              (marker (list :merge-base (wade-review--require-keyword "MERGE_BASE")
+              (marker (list :from (wade-review--require-keyword "FROM")
                             :tip tip
                             :review-file buffer-file-name)))
           (with-temp-file (expand-file-name wade-review--marker-file wt-git-dir)
@@ -397,7 +541,7 @@ discarding uncommitted changes in the worktree."
 ;;;; Jumping
 
 (defvar-local wade-review--old-file nil
-  "For a renamed file, its path at the merge base (relative to the root).")
+  "For a renamed file, its path at the comparison start, relative to the root.")
 
 (defun wade-review--show-old-file (git-dir rev file line)
   "Show FILE as of REV, read-only, at LINE."
@@ -417,8 +561,8 @@ discarding uncommitted changes in the worktree."
   "Visit the file and line for the review heading or diff line at point.
 Files are visited in the review worktree, which is created if needed
 (see `wade-review-close-worktree').
-Deleted files are shown read-only as of the merge base.  The jump is pushed
-on the xref marker stack, so `xref-go-back' returns."
+Deleted files are shown read-only as of the comparison start.  The jump is
+pushed on the xref marker stack, so `xref-go-back' returns."
   (interactive)
   (unless wade-review-mode
     (user-error "Not in a wade-review file"))
@@ -426,7 +570,7 @@ on the xref marker stack, so `xref-go-back' returns."
          (line (plist-get target :line)))
     (if (equal (plist-get target :status) "deleted")
         (let ((git-dir (wade-review--require-keyword "GIT_DIR"))
-              (rev (wade-review--require-keyword "MERGE_BASE")))
+              (rev (wade-review--require-keyword "FROM")))
           (xref-push-marker-stack)
           (wade-review--show-old-file git-dir rev (plist-get target :old-file) line))
       (let ((wt (wade-review--ensure-worktree)))
@@ -444,7 +588,7 @@ on the xref marker stack, so `xref-go-back' returns."
 (defvar-local wade-review--show-deleted nil
   "Non-nil when deleted code is shown in this buffer.")
 
-(defvar-local wade-review--merge-base nil)
+(defvar-local wade-review--from nil)
 (defvar-local wade-review--root nil)
 
 (defun wade-review--clear-overlays ()
@@ -463,8 +607,46 @@ on the xref marker stack, so `xref-go-back' returns."
       (overlay-put ov (pop props) (pop props)))
     ov))
 
+(defun wade-review--hunk-refinements (hunk)
+  "Return fine-change ranges for parsed HUNK, or nil when disabled."
+  (when diff-refine
+    (wade-review--refined-hunk-ranges
+     (concat (plist-get hunk :header) "\n"
+             (string-join (plist-get hunk :lines) "\n") "\n"))))
+
+(defun wade-review--line-refinements (ranges line)
+  "Return members of RANGES belonging to zero-based hunk LINE."
+  (cl-remove-if-not (lambda (range) (= (car range) line)) ranges))
+
+(defun wade-review--refine-worktree-line (ranges hunk-line source-line)
+  "Apply RANGES for HUNK-LINE to the worktree's SOURCE-LINE."
+  (let ((line-start (wade-review--line-pos source-line)))
+    (dolist (range (wade-review--line-refinements ranges hunk-line))
+      (let ((start (+ line-start (max 0 (1- (nth 1 range)))))
+            (end (+ line-start (max 0 (1- (nth 2 range))))))
+        (when (< start end)
+          (wade-review--make-overlay
+           start (min end (wade-review--line-end-position-at line-start))
+           'face (nth 3 range) 'priority -40))))))
+
+(defun wade-review--refine-deleted-string (text ranges hunk-line)
+  "Apply RANGES for HUNK-LINE to deleted diff-line TEXT and return it."
+  (dolist (range (wade-review--line-refinements ranges hunk-line))
+    (let ((start (max 0 (1- (nth 1 range))))
+          (end (max 0 (1- (nth 2 range)))))
+      (when (< start end)
+        (add-face-text-property start (min end (length text))
+                                (nth 3 range) t text))))
+  text)
+
+(defun wade-review--line-end-position-at (pos)
+  "Return the end position of the line containing POS."
+  (save-excursion
+    (goto-char pos)
+    (line-end-position)))
+
 (defun wade-review-refresh ()
-  "Recompute change highlights of the current file against the merge base.
+  "Recompute change highlights against the review's comparison start.
 Highlights include moved code and reflect the file on disk, so they are
 refreshed on save."
   (interactive)
@@ -472,7 +654,7 @@ refreshed on save."
     (user-error "`wade-review-highlight-mode' is not enabled here"))
   (let* ((file (file-relative-name buffer-file-name wade-review--root))
          (default-directory wade-review--root)
-         (files (wade-review-generate--review-files wade-review--merge-base nil t))
+         (files (wade-review-generate--review-files wade-review--from nil t))
          (entry (cl-find file files :key (lambda (f) (plist-get f :file)) :test #'equal))
          (hunks (plist-get entry :hunks)))
     (save-restriction
@@ -482,46 +664,54 @@ refreshed on save."
         (dolist (h hunks)
           (let ((old (plist-get h :old-start))
                 (new (plist-get h :new-start))
+                (hunk-line 1)
+                (refinements (wade-review--hunk-refinements h))
                 (changed (cl-some (lambda (l) (string-prefix-p "-" l))
                                   (plist-get h :lines))))
             (dolist (line (plist-get h :lines))
               (pcase (aref line 0)
                 (?\s (cl-incf old) (cl-incf new))
-                (?+ (wade-review--make-overlay
-                     (wade-review--line-pos new)
-                     (wade-review--line-pos (1+ new))
-                     'face (if (memq new (plist-get h :moved-new))
-                               'wade-review-moved-in
-                             (if changed 'wade-review-changed 'wade-review-added))
-                     'help-echo (when (memq new (plist-get h :moved-new))
-                                  "Moved into this location")
-                     'priority -50)
+                (?+ (let ((source-line new))
+                      (wade-review--make-overlay
+                       (wade-review--line-pos source-line)
+                       (wade-review--line-pos (1+ source-line))
+                       'face (if (memq source-line (plist-get h :moved-new))
+                                 'wade-review-moved-in
+                               (if changed 'wade-review-changed 'wade-review-added))
+                       'help-echo (when (memq source-line (plist-get h :moved-new))
+                                    "Moved into this location")
+                       'priority -50)
+                      (wade-review--refine-worktree-line
+                       refinements hunk-line source-line))
                     (cl-incf new))
                 (?- (when wade-review--show-deleted
                       (let* ((pos (wade-review--line-pos
                                    (if (= (plist-get h :new-count) 0)
                                        (1+ new) new)))
                              (face (if (memq old (plist-get h :moved-old))
-                                       'wade-review-moved-out 'wade-review-deleted)))
+                                       'wade-review-moved-out 'wade-review-deleted))
+                             (deleted (propertize (concat (substring line 1) "\n")
+                                                 'face face)))
                         (wade-review--make-overlay
                          pos pos 'face face
                          'help-echo (when (eq face 'wade-review-moved-out)
                                       "Moved out of this location")
                          'before-string
-                         (propertize (concat (if (and (= pos (point-max))
-                                                      (not (eq (char-before pos) ?\n))
-                                                      (> pos (point-min)))
-                                                 "\n" "")
-                                             (substring line 1) "\n")
-                                     'face face))))
-                    (cl-incf old))))))))))
+                         (concat (if (and (= pos (point-max))
+                                          (not (eq (char-before pos) ?\n))
+                                          (> pos (point-min)))
+                                     (propertize "\n" 'face face) "")
+                                 (wade-review--refine-deleted-string
+                                  deleted refinements hunk-line)))))
+                    (cl-incf old)))
+              (cl-incf hunk-line))))))))
 
 ;;;###autoload
 (define-minor-mode wade-review-highlight-mode
-  "Highlight changes since a review's merge base in a review worktree file.
+  "Highlight changes since a review's start in a review worktree file.
 Added, changed, and moved lines get a background highlight; deleted code can be
 shown with `wade-review-toggle-deleted'.  If git-gutter is installed,
-`git-gutter-mode' is enabled and pointed at the merge base."
+`git-gutter-mode' is enabled and pointed at the comparison start."
   :lighter " WR-HL"
   (if wade-review-highlight-mode
       (let ((info (and buffer-file-name (wade-review--worktree-info buffer-file-name))))
@@ -530,13 +720,13 @@ shown with `wade-review-toggle-deleted'.  If git-gutter is installed,
               (setq wade-review-highlight-mode nil)
               (user-error "Not a file in a wade-review worktree"))
           (setq wade-review--root (car info)
-                wade-review--merge-base (plist-get (cdr info) :merge-base))
+                wade-review--from (plist-get (cdr info) :from))
           (add-hook 'after-save-hook #'wade-review-refresh nil t)
           (require 'git-gutter nil t)
           ;; Check the feature rather than require's value, which advice on
           ;; `require' may change.
           (when (featurep 'git-gutter)
-            (setq git-gutter:start-revision wade-review--merge-base)
+            (setq git-gutter:start-revision wade-review--from)
             (if (bound-and-true-p git-gutter-mode)
                 (wade-review--git-gutter-restart)
               (git-gutter-mode 1)))
@@ -562,7 +752,7 @@ revision."
   (git-gutter))
 
 (defun wade-review-toggle-deleted ()
-  "Toggle showing code deleted since the merge base in the current file."
+  "Toggle code deleted since the comparison start in the current file."
   (interactive)
   (unless wade-review-highlight-mode
     (user-error "`wade-review-highlight-mode' is not enabled here"))
