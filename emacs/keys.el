@@ -179,11 +179,11 @@ The command also executes the sentence, with region as the object, if the region
 (emmap (kbd "M-c") 'helm-M-x)
 (global-set-key (kbd "M-c") 'helm-M-x)
 
-(autoload 'wgh/init-minad "minad-stack-conf" "" t)
-(emmap "z" (lambda () (interactive) (nobreak (wgh/init-minad)) (call-interactively 'execute-extended-command)))
-(eimap (kbd "M-c") (lambda () (interactive) (nobreak (wgh/init-minad)) (call-interactively 'execute-extended-command)))
-(emmap (kbd "M-c") (lambda () (interactive) (nobreak (wgh/init-minad)) (call-interactively 'execute-extended-command)))
-(global-set-key (kbd "M-c") (lambda () (interactive) (nobreak (wgh/init-minad)) (call-interactively 'execute-extended-command)))
+(autoload 'wgh/init-minibuffer-completion "minad-stack-conf" "" t)
+(emmap "z" (lambda () (interactive) (wgh/init-minibuffer-completion) (call-interactively 'execute-extended-command)))
+(eimap (kbd "M-c") (lambda () (interactive) (wgh/init-minibuffer-completion) (call-interactively 'execute-extended-command)))
+(emmap (kbd "M-c") (lambda () (interactive) (wgh/init-minibuffer-completion) (call-interactively 'execute-extended-command)))
+(global-set-key (kbd "M-c") (lambda () (interactive) (wgh/init-minibuffer-completion) (call-interactively 'execute-extended-command)))
 
 
 (enmap "=" 'indent-region)
@@ -810,7 +810,7 @@ FUNC should be a function whose first two arguments are BEG and END."
 
 ;;(emmap "tia" 'wgh/ido-switch-buffer)
 (emmap "tia" (lambda () (interactive)
-               (nobreak (wgh/init-minad))
+               (wgh/init-minibuffer-completion)
                (call-interactively 'switch-to-buffer)))
 (emmap "tic" 'kill-buffer-or-quit-emacs)
 (emmap " tica" 'save-buffers-kill-terminal)
@@ -951,19 +951,19 @@ FUNC should be a function whose first two arguments are BEG and END."
 ;; TODO - also bindings for racket-xp-describe and racket-xp-documentation
 
 ;; TODO - can set devdocs-current-docs for buffer.  Using devdocs-lookup will set it on first run, but if you want multiple doc sources at once, you need to set the variable manually.
-(emmap "sdd" (cons "devdocs" (lambda () (interactive) (require 'devdocs) (wgh/init-minad) (devdocs-lookup)))) ;; TODO - use symbol at point
+(emmap "sdd" (cons "devdocs" (lambda () (interactive) (require 'devdocs) (wgh/init-minibuffer-completion) (devdocs-lookup)))) ;; TODO - use symbol at point
 ;; TODO - must set dash-docs-common-docsets or dash-doc-docsets, or run dash-docs-activate-docset
 ;; TODO - can set dash-docs-browser-func to 'eww, but it maybe doesn't work beautifully.
 ;; TODO - can I switch counsel-dash here to just dash-docs, and have a useful function to call at the end, maybe filtered with vertico?  I didn't find the function after a brief search, but I should look again some time.
 (emmap "sdh" (cons "dash-docs" (lambda () (interactive) (require 'counsel-dash) (counsel-dash-at-point))))
 (emmap "sdH" (cons "dash-docs-eww" (lambda () (interactive) (require 'counsel-dash) (let ((counsel-dash-browser-func 'eww)) (counsel-dash-at-point)))))
 (emmap "sdb" 'eldoc-doc-buffer)
-(emmap "sdt" (cons "tldr" (lambda () (interactive) (require 'tldr) (wgh/init-minad) (tldr))))
-(emmap "sdm" (cons "(wo)man" (lambda () (interactive) (wgh/init-minad) (woman))))
-(emmap "sdM" (cons "man" (lambda () (interactive) (wgh/init-minad) (man))))
-(emmap "sdii" (cons "info-top" (lambda () (interactive) (wgh/init-minad) (info)))) ;; TODO - this is also C-h i, should I move other doc stuff under C-h?
-(emmap "sdis" (cons "info-search" (lambda () (interactive) (wgh/init-minad) (info-search))))
-(emmap "sdi/" (cons "info-search" (lambda () (interactive) (wgh/init-minad) (info-search))))
+(emmap "sdt" (cons "tldr" (lambda () (interactive) (require 'tldr) (wgh/init-minibuffer-completion) (tldr))))
+(emmap "sdm" (cons "(wo)man" (lambda () (interactive) (wgh/init-minibuffer-completion) (woman))))
+(emmap "sdM" (cons "man" (lambda () (interactive) (wgh/init-minibuffer-completion) (man))))
+(emmap "sdii" (cons "info-top" (lambda () (interactive) (wgh/init-minibuffer-completion) (info)))) ;; TODO - this is also C-h i, should I move other doc stuff under C-h?
+(emmap "sdis" (cons "info-search" (lambda () (interactive) (wgh/init-minibuffer-completion) (info-search))))
+(emmap "sdi/" (cons "info-search" (lambda () (interactive) (wgh/init-minibuffer-completion) (info-search))))
 (emmap "sdb" 'browse-url-at-point)
 ;; TODO - C-h r is the emacs manual, and there are several other related things, eg. for packages, etc.  Should I try to put them all under one umbrella here, or should I move what I'm doing under C-h?
 

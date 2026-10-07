@@ -1,19 +1,57 @@
 ;;; -*- lexical-binding: t; -*-
-;; I'm going to give the Minad stack a try.  I haven't yet read through the docs on all of these, but I'll see how they go together for a bit.
+;; Configuration for minibuffer and completion-at-point interfaces.
 
-(setq wgh/init-minad-done nil)
-(defun wgh/init-minad ()
-  (when (not wgh/init-minad-done)
-    (require 'vertico) ;; vertico provides a completion UI in a window at the bottom, like helm, good for M-x and big lists
-    (require 'marginalia) ;; provides extra documentation to completion display
-    (require 'consult)
-    (require 'embark) ;; provides more ways to act on completion candidates
-    (require 'orderless) ;; a completion filtering system, IE a function for how what you type filters and sorts the completion candidates
+(setq wgh/init-minibuffer-completion-done nil)
+(setq wgh/minibuffer-completion-backend nil)
+(setq wgh/minibuffer-completion-error nil)
 
-    (setq completion-styles '(orderless basic))
+(defun wgh/init-minibuffer-completion-fallback (error-data)
+  "Enable built-in visible completion after ERROR-DATA prevented Vertico setup."
+  ;; Vertico initialization should be atomic, but turn it off explicitly in
+  ;; case the failure happened while enabling the mode.
+  (when (bound-and-true-p vertico-mode)
+    (vertico-mode -1))
 
-    (vertico-mode)
-    (marginalia-mode)
+  (require 'icomplete)
+  (setq completion-styles '(substring partial-completion basic)
+        completion-auto-help 'always
+        icomplete-show-matches-on-no-input t
+        icomplete-prospects-height 10)
+  (if (fboundp 'icomplete-vertical-mode)
+      (icomplete-vertical-mode 1)
+    (icomplete-mode 1))
+
+  (setq wgh/minibuffer-completion-backend 'icomplete
+        wgh/minibuffer-completion-error error-data)
+  (display-warning
+   'wgh/completion
+   (format "Vertico/Orderless initialization failed; using Icomplete: %S"
+           error-data)))
+
+(defun wgh/init-minibuffer-completion ()
+  "Enable Vertico with Orderless, or a visible built-in fallback."
+  (unless wgh/init-minibuffer-completion-done
+    (setq wgh/minibuffer-completion-error nil)
+    (condition-case err
+        (progn
+          ;; Load the complete preferred pair before changing global state.
+          (require 'vertico)
+          (require 'orderless)
+
+          (when (bound-and-true-p fido-vertical-mode)
+            (fido-vertical-mode -1))
+          (when (bound-and-true-p fido-mode)
+            (fido-mode -1))
+          (when (bound-and-true-p icomplete-vertical-mode)
+            (icomplete-vertical-mode -1))
+          (when (bound-and-true-p icomplete-mode)
+            (icomplete-mode -1))
+
+          (setq completion-styles '(orderless basic))
+          (vertico-mode 1)
+          (setq wgh/minibuffer-completion-backend 'vertico))
+      (error
+       (wgh/init-minibuffer-completion-fallback err)))
 
     ;; Hide commands in M-x which do not work in the current mode.  Vertico
     ;; commands are hidden in normal buffers. This setting is useful beyond
@@ -29,19 +67,16 @@
                      crm-separator)
                     (car args))
             (cdr args)))
-    (advice-add #'completing-read-multiple :filter-args #'crm-indicator)
+    (unless (advice-member-p #'crm-indicator #'completing-read-multiple)
+      (advice-add #'completing-read-multiple :filter-args #'crm-indicator))
 
-    ;; TODO - consult provides commands, the most interesting one so far is probably consult-ripgrep
+    (setq wgh/init-minibuffer-completion-done t)))
 
-    ;; TODO - embark seems really powerful, but something I need to take time to learn, not just drop in and be using within 30 minutes.
-    ;; (global-set-key (kbd "\C-o") nil)
-    ;; (global-set-key (kbd "\C-o a") 'embark-act)
-    ;; (global-set-key (kbd "\C-o d") 'embark-dwim)
-    ;; (global-set-key (kbd "\C-h B") 'embark-bindings)
-
-    (setq wgh/init-minad-done t)
-
-    ))
+;; Marginalia is useful with either minibuffer backend, but it is not required
+;; for completion itself and must not prevent the fallback from working.
+(with-demoted-errors "Error initializing Marginalia: %S"
+  (require 'marginalia)
+  (marginalia-mode 1))
 
 
 
@@ -61,22 +96,25 @@
 (setq wgh/init-corfu-done nil)
 (defun wgh/init-corfu ()
   (when (not wgh/init-corfu-done)
-    (setq wgh/init-corfu-done t)
+    (wgh/init-minibuffer-completion)
 
-    (wgh/init-minad)
+    ;; Load everything before enabling modes, so a missing component does not
+    ;; leave Corfu partially initialized.
+    (require 'corfu) ;; Corfu provides drop downs of completion candidates where you are typing over the buffer, similar to company mode.
+    (require 'cape) ;; extra completion-at-point-functions, IE more ways to get completion candidates in different situations, and ways to compose them
+    (require 'corfu-info) ;; for corfu-info-documentation, M-h in completion list
+    (unless (display-graphic-p)
+      ;; TODO - in emacs 31 supposedly this isn't necessary.  But as far as I can tell, the latest released version is 29... so that is probably a ways out.
+      (require 'corfu-terminal))
 
     (setq corfu-cycle t)
     ;;(setq corfu-quit-at-boundary 'separator)
 
-    (require 'corfu) ;; Corfu provides drop downs of completion candidates where you are typing over the buffer, similar to company mode.
     (global-corfu-mode)
-    (require 'cape) ;; extra completion-at-point-functions, IE more ways to get completion candidates in different situations, and ways to compose them
-
-    (require 'corfu-info) ;; for corfu-info-documentation, M-h in completion list
     (unless (display-graphic-p)
-      ;; TODO - in emacs 31 supposedly this isn't necessary.  But as far as I can tell, the latest released version is 29... so that is probably a ways out.
-      (require 'corfu-terminal)
       (corfu-terminal-mode +1))
+
+    (setq wgh/init-corfu-done t)
     ))
 
 ;; TODO - I would like to be able to start completion without actually completing anything.  I can use undo if I don't like the completion given if there is a single completion, but it would be nice to just show available completions...

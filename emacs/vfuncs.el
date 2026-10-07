@@ -139,7 +139,7 @@ git-relative resolution uses the repo that owns that .git directory."
 (defun wgh/find-file-no-ffap ()
   (interactive)
   (require 'minad-stack-conf)
-  (nobreak (wgh/init-minad))
+  (wgh/init-minibuffer-completion)
   (let ((file-name-at-point-functions nil))
     (call-interactively 'find-file)))
 

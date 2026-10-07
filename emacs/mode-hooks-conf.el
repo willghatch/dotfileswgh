@@ -92,7 +92,7 @@
    (rainbow-identifiers-mode 1)
    (whitespace-mode 1)
    ;; Something is breaking the lazy loading in at least some prog modes...
-   (wgh/init-minad)
+   (wgh/init-minibuffer-completion)
    (wgh/init-corfu)
    ;;(company-conf-init)
    ;;(company-mode 1)
