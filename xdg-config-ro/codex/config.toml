@@ -1,1 +1,3 @@
-tui.raw_output_mode = true
+# Raw output mode can be toggled with "/raw" command (with optional on/off arg), or key binding alt+r.
+# Raw output is nice because it removes the left margin that breaks copy/paste (eg. breaking indentation-sensitive code like python and bash here-docs), but it is bad because it removes al color and other styling (italic, half-bright, etc) that lets you differentiate commands run vs thinking vs chat replies.
+#tui.raw_output_mode = true
