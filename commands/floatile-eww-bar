@@ -14,9 +14,12 @@ eww=(eww --config "$config")
 # The bar's scripts are named relative to its directory, and commands the
 # daemon runs start there.
 cd "$config" || exit 1
+# Wait up to 30 seconds for the daemon, which can be slow to start early in a
+# session.  If eww open below finds no daemon, it starts a second one, which
+# takes over the socket and leaves the first one's bar orphaned.
 if ! "${eww[@]}" ping >/dev/null 2>&1; then
     "${eww[@]}" daemon
-    for _ in $(seq 50); do
+    for _ in $(seq 300); do
         "${eww[@]}" ping >/dev/null 2>&1 && break
         sleep 0.1
     done
