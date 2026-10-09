@@ -763,7 +763,7 @@ FUNC should be a function whose first two arguments are BEG and END."
    "register" :exit nil)
   (" " (lambda (n) (interactive "p") (funcall (cp/add (cp/mod 'surrounding-space 'surrounding-space)) n)) "surrounding-space" :exit nil)
   ("b" (lambda (n) (interactive "p") (funcall (cp/add (cp/mod 'absolute 'absolute)) n)) "absolute" :exit nil) ;; For absolute numbering (within tree if respect tree is on).  Ignore forward/backward direction.
-  ("m" (lambda (n) (interactive "p") (funcall (cp/add (cp/mod 'matching 'matching)) n)) "matching" :exit nil) ;; Eg. for finding the next matching word, symbol, whatever.
+  ("M" (lambda (n) (interactive "p") (funcall (cp/add (cp/mod 'matching 'matching)) n)) "matching" :exit nil) ;; Eg. for finding the next matching word, symbol, whatever.
   ("a" (lambda (n) (interactive "p") (funcall (cp/add (cp/mod+ 'alternate 1)) n)) "alternate+1" :exit nil) ;; For object-specific alternate behavior...
   ("A" (lambda (n) (interactive "p") (funcall (cp/add (cp/mod+ 'alternate 10)) n)) "alternate+10" :exit nil)
   ("v" (lambda (n) (interactive "p") (funcall (cp/add (cp/mod+ 'verb-alternate 1)) n)) "verb-alt+1" :exit nil) ;; For object-specific alternate behavior...
