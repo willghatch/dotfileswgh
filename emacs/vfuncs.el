@@ -395,27 +395,31 @@ abort."
 (make-variable-buffer-local 'fold-toggle-wgh-fold-siblings-func)
 (setq-default fold-toggle-wgh-unfold-all-func 'yafolding-show-all)
 (make-variable-buffer-local 'fold-toggle-wgh-unfold-all-func)
+(defun wgh/fold--call (function)
+  "Call the buffer's folding FUNCTION, clearing search highlights in Org."
+  (require 'yafolding)
+  ;; Persistent search highlighting can leave temporary Org folds behind.
+  (when (derived-mode-p 'org-mode)
+    (isearch-exit))
+  (call-interactively function))
+
 (defun fold-toggle-wgh ()
   "Toggle folding of the element at point."
   (interactive)
-  (require 'yafolding)
-  (call-interactively fold-toggle-wgh-fold-func))
+  (wgh/fold--call fold-toggle-wgh-fold-func))
 (defun fold-toggle-wgh-all ()
   "Toggle folding of the whole buffer."
   (interactive)
-  (require 'yafolding)
-  (call-interactively fold-toggle-wgh-fold-all-func))
+  (wgh/fold--call fold-toggle-wgh-fold-all-func))
 (defun fold-toggle-wgh-siblings ()
   "Fold the element at point and its siblings within their parent.
 If they are all folded already, unfold them instead."
   (interactive)
-  (require 'yafolding)
-  (call-interactively fold-toggle-wgh-fold-siblings-func))
+  (wgh/fold--call fold-toggle-wgh-fold-siblings-func))
 (defun fold-unfold-wgh-all ()
   "Unfold everything in the buffer."
   (interactive)
-  (require 'yafolding)
-  (call-interactively fold-toggle-wgh-unfold-all-func))
+  (wgh/fold--call fold-toggle-wgh-unfold-all-func))
 
 (defun wgh/fold--toggle-group (positions folded-p foldable-p hide show)
   "Fold or unfold the elements starting at POSITIONS as a group.
