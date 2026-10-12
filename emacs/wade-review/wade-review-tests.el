@@ -248,6 +248,52 @@ review structure for every kind of file change."
         (should (string-match-p "mutually exclusive" (cdr result))))
       (should-not (file-exists-p out)))))
 
+(ert-deftest wade-review-generate-diff-targets ()
+  "Diff targets select committed snapshots, including implicit HEAD."
+  (wade-review-tests--with-temp-dir tmp
+    (let ((repo (wade-review-tests--make-repo tmp)))
+      (dolist (target '("feature" "main..feature" "main...feature"))
+        (let* ((out (expand-file-name (concat target ".org") tmp))
+               (result (wade-review-tests--run-cli
+                        repo wade-review-tests--cli "-o" out
+                        (concat "--diff-target=" target)))
+               (merge-p (equal target "main...feature"))
+               (single-p (equal target "feature")))
+          (should (equal (car result) 0))
+          (with-temp-buffer
+            (insert-file-contents out)
+            (org-mode)
+            (should (equal (wade-review-tests--keyword "WR_TIP")
+                           (wade-review-tests--git repo "rev-parse"
+                                                   (if single-p "HEAD" "feature"))))
+            (should (equal (wade-review-tests--keyword "WR_FROM")
+                           (if merge-p
+                               (wade-review-tests--git repo "merge-base" "main" "feature")
+                             (wade-review-tests--git repo "rev-parse"
+                                                     (if single-p "feature" "main")))))
+            (should (equal (wade-review-tests--keyword "WR_COMPARISON")
+                           (if merge-p "merge-base" "direct")))
+            (should (eq (not (null (wade-review-tests--file-entry
+                                   (wade-review-tests--entries) "unrelated.txt")))
+                        (not merge-p)))))))))
+
+(ert-deftest wade-review-generate-rejects-invalid-diff-targets ()
+  "Ambiguous or incomplete targets must not produce a review."
+  (wade-review-tests--with-temp-dir tmp
+    (let ((repo (wade-review-tests--make-repo tmp))
+          (out (expand-file-name "review.org" tmp)))
+      (dolist (args '(("--diff-target" "main" "--branch" "feature")
+                      ("--diff-target" "main" "--base" "main")
+                      ("--diff-target" "main" "--from" "feature")
+                      ("--diff-target" "")
+                      ("--diff-target" "main..")
+                      ("--diff-target" "...feature")
+                      ("--diff-target" "main....feature")))
+        (let ((result (apply #'wade-review-tests--run-cli
+                             repo wade-review-tests--cli "-o" out args)))
+          (should-not (equal (car result) 0))
+          (should-not (file-exists-p out)))))))
+
 (ert-deftest wade-review-generate-file-activates-mode ()
   "Opening a generated review file turns on `wade-review-mode'."
   (wade-review-tests--with-temp-dir tmp

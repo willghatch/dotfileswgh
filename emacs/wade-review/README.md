@@ -30,6 +30,23 @@ wade-review --from previously-reviewed --branch feature --output followup.org
 
 `--base` and `--from` are mutually exclusive.
 
+Use `--diff-target` for comparisons between committed snapshots:
+
+```sh
+wade-review --diff-target main --output review.org          # main to HEAD
+wade-review --diff-target main..feature --output review.org # main to feature
+wade-review --diff-target main...feature --output review.org # merge base to feature
+```
+
+Both endpoints are required for the two-dot and three-dot forms.
+`--diff-target` is mutually exclusive with `--branch`, `--base`, and `--from`.
+It does not compare against the index or working tree.
+Omitting it preserves the default branch review described above.
+
+The `gdw TARGET` alias generates a review in a temporary `.org` file and opens it with `e`.
+For example, `gdw main...HEAD` reviews changes since the merge base with `main`.
+The temporary file is retained so it can be revisited in the editor.
+
 ## The review file
 
 The file's first line enables `org-mode` and `wade-review-mode`, once `wade-review-mode` is autoloaded (see Installation).

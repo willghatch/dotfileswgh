@@ -15,7 +15,7 @@
 (require 'subr-x)
 
 (defconst wade-review-generate--usage
-  "Usage: wade-review [-b BRANCH] -o OUTPUT [--base REF | --from REF] [--force] [-C DIR]
+  "Usage: wade-review [-b BRANCH] -o OUTPUT [--base REF | --from REF | --diff-target TARGET] [--force] [-C DIR]
 
 Generate an org-mode review file for changes ending at BRANCH.  By default,
 compare its merge base with the repository's default branch.  Use --from to
@@ -31,6 +31,11 @@ compare an exact pair of commits instead.
                        remote HEAD, a local main or master.
       --from REF       Diff REF directly against BRANCH, without finding a
                        merge base.  Mutually exclusive with --base.
+      --diff-target TARGET
+                       A compares A directly to HEAD; A..B compares A to B;
+                       A...B compares merge-base(A, B) to B.
+                       Both range endpoints are required.  Mutually exclusive
+                       with --branch, --base, and --from.
       --force          Overwrite FILE if it exists.
   -C DIR               Run as if started in DIR.
   -h, --help           Show this help.
@@ -406,7 +411,7 @@ COMMAND, if given, is recorded in the file as the command that made it."
   (let (opts)
     (while args
       (let ((arg (pop args)))
-        (when (string-match "\\`\\(--[a-z]+\\)=\\(.*\\)\\'" arg)
+        (when (string-match "\\`\\(--[a-z-]+\\)=\\(.*\\)\\'" arg)
           (push (match-string 2 arg) args)
           (setq arg (match-string 1 arg)))
         (cl-flet ((value () (or (pop args)
@@ -416,10 +421,28 @@ COMMAND, if given, is recorded in the file as the command that made it."
             ((or "-o" "--output") (setq opts (plist-put opts :output (value))))
             ("--base" (setq opts (plist-put opts :base (value))))
             ("--from" (setq opts (plist-put opts :from (value))))
+            ("--diff-target" (setq opts (plist-put opts :diff-target (value))))
             ("-C" (setq opts (plist-put opts :dir (value))))
             ("--force" (setq opts (plist-put opts :force t)))
             ((or "-h" "--help") (setq opts (plist-put opts :help t)))
             (_ (wade-review-generate--fail "unknown argument: %s" arg))))))
+    (when-let ((target (plist-get opts :diff-target)))
+      (when (or (plist-get opts :branch) (plist-get opts :base) (plist-get opts :from))
+        (wade-review-generate--fail
+         "--diff-target is mutually exclusive with --branch, --base, and --from"))
+      (let* ((parts (split-string target "\\.\\.\\.?"))
+             (old (car parts))
+             (new (if (cdr parts) (cadr parts) "HEAD")))
+        (unless (and (<= (length parts) 2)
+                     (not (string-empty-p old)) (not (string-empty-p new))
+                     (not (string-match-p "\\.\\." old))
+                     (not (string-match-p "\\.\\." new))
+                     (not (string-prefix-p "." new)))
+          (wade-review-generate--fail "invalid --diff-target: %s" target))
+        (setq opts (plist-put opts :branch new))
+        (setq opts (plist-put opts
+                             (if (string-match-p "\\.\\.\\." target) :base :from)
+                             old))))
     opts))
 
 (defun wade-review-generate-main (args)

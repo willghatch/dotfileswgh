@@ -1,0 +1,14 @@
+#!/bin/sh
+set -eu
+
+if [ "$#" -ne 1 ]; then
+    echo 'Usage: gdw DIFF_TARGET' >&2
+    exit 1
+fi
+
+review_file=$(mktemp "${TMPDIR:-/tmp}/wade-review.XXXXXXXX.org")
+if ! wade-review --diff-target "$1" --output "$review_file" --force; then
+    rm -f -- "$review_file"
+    exit 1
+fi
+exec e "$review_file"
