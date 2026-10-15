@@ -85,6 +85,16 @@ export ANDROID_USER_HOME=${ANDROID_USER_HOME:-$XDG_DATA_HOME/android}
 export PLATFORMIO_CORE_DIR=${PLATFORMIO_CORE_DIR:-$XDG_DATA_HOME/platformio}
 # libX11 compiled Compose table cache; only used if the directory exists (made in bazshrc).
 export XCOMPOSECACHE=${XCOMPOSECACHE:-$XDG_CACHE_HOME/compose-cache}
+# NOTE: apparently GTK reads $XDG_CONFIG_HOME/gtk-3.0/Compose (or 4.0 ...) and falls back to ~/.XCompose without reading XCOMPOSEFILE.  So maybe this one is not worth the hassle.  (Untested)
+# libX11 compose file, instead of ~/.XCompose.
+#export XCOMPOSEFILE=${XCOMPOSEFILE:-${XDG_CONFIG_HOME:-$HOME/.config}/XCompose}
+export DOCKER_CONFIG=${DOCKER_CONFIG:-${XDG_CONFIG_HOME:-$HOME/.config}/docker}
+export DVDCSS_CACHE=${DVDCSS_CACHE:-$XDG_CACHE_HOME/dvdcss}
+# OpenSSL random seed file, instead of ~/.rnd.
+export RANDFILE=${RANDFILE:-$XDG_STATE_HOME/openssl-rnd}
+# PulseAudio clients fall back to ~/.pulse-cookie.
+export PULSE_COOKIE=${PULSE_COOKIE:-${XDG_CONFIG_HOME:-$HOME/.config}/pulse/cookie}
+export WGETRC=${WGETRC:-$DOTFILESWGH/wgetrc}
 # less reads the lesskey source file directly, so no compiled ~/.less is needed.
 export LESSKEYIN=${LESSKEYIN:-$DOTFILESWGH/lesskey}
 export LESSHISTFILE=${LESSHISTFILE:-$XDG_STATE_HOME/less/history}

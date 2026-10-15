@@ -40,8 +40,8 @@ set cursorline     " Highlight current line
 "set insertmode     " make vim modeless - bad idea.
 
 set backup    " Make backup files
-if !isdirectory($HOME . "/.cache/vimtmp")
-    call mkdir($HOME . "/.cache/vimtmp", "p")
+if !isdirectory($HOME . "/.local/cache/vimtmp")
+    call mkdir($HOME . "/.local/cache/vimtmp", "p")
 endif
 set backupdir=$HOME/.local/cache/vimtmp   " Directory for backup files
 set directory=$HOME/.local/cache/vimtmp   " Directory for swap files
@@ -50,6 +50,8 @@ set directory=$HOME/.local/cache/vimtmp   " Directory for swap files
 set nobackup
 set nowritebackup
 set noswapfile
+" Instead of ~/.viminfo.  Directly in the state dir, since vim won't create a missing parent dir.
+set viminfofile=$HOME/.local/state/viminfo
 
 
 """ Command window stuff
