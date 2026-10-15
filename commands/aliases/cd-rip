@@ -1,0 +1,2 @@
+#!/bin/sh
+exec abcde -c "${DOTFILESWGH:-$HOME/dotfileswgh}/config/abcde/abcde.conf" "$@"

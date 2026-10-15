@@ -68,6 +68,9 @@ export XDG_CACHE_HOME=$HOME/.cache
 export MANWIDTH=80
 
 export ZDOTDIR=$DOTFILESWGH/zsh
+# Programs without XDG config support, pointed at their XDG-style locations.
+export INPUTRC=${XDG_CONFIG_HOME:-$HOME/.config}/readline/inputrc
+export NPM_CONFIG_USERCONFIG=${XDG_CONFIG_HOME:-$HOME/.config}/npm/npmrc
 
 export EDITOR=e
 #export EDITOR=premacs-use-or-create-t

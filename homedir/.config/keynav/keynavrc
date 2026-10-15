@@ -1,5 +1,5 @@
 # This is a keynavrc file. Yours should live in 
-# $HOME/.keynavrc
+# $XDG_CONFIG_HOME/keynav/keynavrc (or $HOME/.keynavrc)
 #
 # Lines beginning with '#' are comments.
 # Format is:

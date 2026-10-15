@@ -39,7 +39,7 @@ do_more() {
     mkdir -p $HOME/prifs
     chmod 700 $HOME/prifs
     mkdir -p $HOME/dl # my default download directory
-    mkdir -p $HOME/.themes
+    mkdir -p $HOME/.local/share/themes
     mkdir -p $HOME/.config
     # dirs for mpd
     mkdir -p $HOME/.cache/mpd/playlists
