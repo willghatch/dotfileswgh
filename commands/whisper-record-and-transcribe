@@ -54,7 +54,7 @@ Model Selection:
 
 Environment Variables:
     WHISPER_MODEL_DIR      Directory containing whisper models
-                           (default: \$XDG_CACHE_HOME/whisper-models, where XDG_CACHE_HOME defaults to ~/.cache)
+                           (default: \$XDG_DATA_HOME/whisper-models, where XDG_DATA_HOME defaults to ~/.local/share)
     WHISPER_MODEL          Whisper model name or path (default: ggml-base.bin)
     PULSE_SOURCE           Default PulseAudio source, used when --microphone is not given
 
@@ -127,7 +127,7 @@ while [[ $# -gt 0 ]]; do
     esac
 done
 
-WHISPER_MODEL_DIR="${WHISPER_MODEL_DIR:-${XDG_CACHE_HOME:-$HOME/.cache}/whisper-models}"
+WHISPER_MODEL_DIR="${WHISPER_MODEL_DIR:-${XDG_DATA_HOME:-$HOME/.local/share}/whisper-models}"
 WHISPER_MODEL="${MODEL_ARG:-${WHISPER_MODEL:-ggml-base.bin}}"
 
 # Print the model filenames in WHISPER_MODEL_DIR, sorted, one per line
