@@ -41,7 +41,7 @@ if [ -z "$GUI_SESSION_COMMON_RUN_P" ]; then
   #rm -f "$unicoder_socket"
   racket -l the-unicoder -- --server --port "$unicoder_socket" &
 
-  #libnotifylogger.py $HOME/.cache/notifications.log &
+  #libnotifylogger.py $XDG_CACHE_HOME/notifications.log &
 
   # start kdeconnect daemon, let my phone drive
   #kdeconnect-cli

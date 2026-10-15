@@ -43,8 +43,8 @@ set backup    " Make backup files
 if !isdirectory($HOME . "/.cache/vimtmp")
     call mkdir($HOME . "/.cache/vimtmp", "p")
 endif
-set backupdir=$HOME/.cache/vimtmp   " Directory for backup files
-set directory=$HOME/.cache/vimtmp   " Directory for swap files
+set backupdir=$HOME/.local/cache/vimtmp   " Directory for backup files
+set directory=$HOME/.local/cache/vimtmp   " Directory for swap files
 " I haven't needed these backups in years, and I don't want to make backups
 " when editing key files and such.  So just don't make them anymore.
 set nobackup

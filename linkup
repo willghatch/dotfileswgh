@@ -19,8 +19,9 @@ do_base() {
     fi
 
     # the cache and state dirs could hold sensitive stuff
-    mkdir -p $HOME/.local/state
-    chmod 700 $HOME/.cache $HOME/.local/state
+    cache_dir=${XDG_CACHE_HOME:-$HOME/.local/cache}
+    mkdir -p "$cache_dir" $HOME/.local/state
+    chmod 700 "$cache_dir" $HOME/.local/state
 
     # get terminfo set up
     terminfo_dir=${XDG_DATA_HOME:-$HOME/.local/share}/terminfo
@@ -38,15 +39,16 @@ do_base() {
 do_more() {
     # Make sundry directories and files so things (especially vim) don't complain
     # and stuff that I just like to be there in general
-    mkdir -p $HOME/.cache/vimtmp
+    cache_dir=${XDG_CACHE_HOME:-$HOME/.local/cache}
+    mkdir -p "$cache_dir/vimtmp"
     mkdir -p $HOME/prifs
     chmod 700 $HOME/prifs
     mkdir -p $HOME/dl # my default download directory
     mkdir -p $HOME/.local/share/themes
     mkdir -p $HOME/.config
     # dirs for mpd
-    mkdir -p $HOME/.cache/mpd/playlists
-    mkdir -p $HOME/.cache/mutt
+    mkdir -p "$cache_dir/mpd/playlists"
+    mkdir -p "$cache_dir/mutt"
     mkdir -p $HOME/musc-local
     #mkdir -p ~/dotfileswgh-dotlocal/firefox-default-profile
     #mkdir -p ~/dotfileswgh-dotlocal/firefox-default-profile/chrome

@@ -62,7 +62,7 @@ export XDG_DATA_DIRS=$DOTFILESWGH/local/share:$XDG_DATA_DIRS:/usr/local/share:/u
 export XDG_CONFIG_DIRS=$DOTFILESWGH_PRI_DOTLOCAL/xdg-config-ro:$DOTFILESWGH_DOTLOCAL/xdg-config-ro:$DOTFILESWGH_ROOTGIT/xdg-config-ro:$DOTFILESWGH_PRI/xdg-config-ro:$DOTFILESWGH_GHP/xdg-config-ro:$DOTFILESWGH/xdg-config-ro:$XDG_CONFIG_DIRS
 #XDG_CONFIG_DIRS=/etc/xdg
 # writable cache dir
-export XDG_CACHE_HOME=$HOME/.cache
+export XDG_CACHE_HOME=$HOME/.local/cache
 # writable state location (histories, logs, etc)
 export XDG_STATE_HOME=${XDG_STATE_HOME:-$HOME/.local/state}
 

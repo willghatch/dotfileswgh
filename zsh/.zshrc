@@ -1,6 +1,6 @@
 # -*- mode: shell-script; -*-
 
-COMPDUMPFILE=$HOME/.cache/zshcompdump
+COMPDUMPFILE=${XDG_CACHE_HOME:-$HOME/.local/cache}/zshcompdump
 ZSH_COMPDUMP=$COMPDUMPFILE
 # autoload compinit to get the compdef function
 # compinit -d <dumpfile> [ -u to use insecure dirs, -i to ignore SILENTLY, -C to skip security check ]
@@ -100,7 +100,7 @@ search-backward-current-command-repeat(){
 # zaw bookmark file
 BOOKMARKFILE=${XDG_STATE_HOME:-$HOME/.local/state}/zsh/zaw-bookmarks
 # setup for zshmarks plugin
-#BOOKMARKS_FILE=~/.cache/zsh/zsh-bookmarks
+#BOOKMARKS_FILE=~/.local/cache/zsh/zsh-bookmarks
 #jd(){
 #    if [[ "ls" = "$1" ]]; then
 #        showmarks
