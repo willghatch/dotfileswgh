@@ -1,0 +1,12 @@
+# XDG user directories, read by GLib, Qt, browsers, etc. (not from environment variables).
+# Everything but downloads lives under ~/xdgu-dirs to keep it out of the home directory.
+# These directories are not created ahead of time; user-dirs.conf disables xdg-user-dirs-update, which would otherwise create them (and rewrite this file) at login.
+XDG_DOWNLOAD_DIR="$HOME/dl"
+XDG_DESKTOP_DIR="$HOME/xdgu-dirs/desktop"
+XDG_DOCUMENTS_DIR="$HOME/xdgu-dirs/documents"
+XDG_MUSIC_DIR="$HOME/xdgu-dirs/music"
+XDG_PICTURES_DIR="$HOME/xdgu-dirs/pictures"
+XDG_VIDEOS_DIR="$HOME/xdgu-dirs/videos"
+XDG_TEMPLATES_DIR="$HOME/xdgu-dirs/templates"
+XDG_PUBLICSHARE_DIR="$HOME/xdgu-dirs/public"
+XDG_PROJECTS_DIR="$HOME/xdgu-dirs/projects"
