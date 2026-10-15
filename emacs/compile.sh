@@ -14,7 +14,7 @@ external_files=$(find $DOTFILESWGH/external/emacs -type f -name '*.el')
 
 compile-single() {
     # For things outside of my dotfiles, that don't implicitly depend on my sloppy emacs code, don't load def.el.
-    emacs -l $DOTFILESWGH/emacs/dotfileswgh-env-conf.el -batch --eval "(with-demoted-errors (batch-native-compile))" "$1"
+    emacs --init-directory "${EMACS_DOT_D_PATH:-$DOTFILESWGH_DOTLOCAL/emacs.d}" -l $DOTFILESWGH/emacs/dotfileswgh-env-conf.el -batch --eval "(with-demoted-errors (batch-native-compile))" "$1"
 }
 
 #for f in $external_files; do
@@ -25,4 +25,4 @@ compile-single() {
 #emacs -l $DOTFILESWGH/emacs/dotfileswgh-env-conf.el -batch --eval "(with-demoted-errors (batch-native-compile))" $external_files
 
 # batch compile all of my non-packaged elisp together
-emacs -l $DOTFILESWGH/emacs/def.el -batch --eval "(with-demoted-errors (batch-native-compile))" $files
+emacs --init-directory "${EMACS_DOT_D_PATH:-$DOTFILESWGH_DOTLOCAL/emacs.d}" -l $DOTFILESWGH/emacs/def.el -batch --eval "(with-demoted-errors (batch-native-compile))" $files

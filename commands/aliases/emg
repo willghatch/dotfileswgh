@@ -1,4 +1,4 @@
 #!/usr/bin/env bash
 
 # graphical version of em -- no -nw
-emacs -l $DOTFILESWGH/emacs/def "$@"
+emacs --init-directory "${EMACS_DOT_D_PATH:-$DOTFILESWGH_DOTLOCAL/emacs.d}" -l $DOTFILESWGH/emacs/def "$@"

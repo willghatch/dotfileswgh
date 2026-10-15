@@ -1,4 +1,4 @@
 #!/usr/bin/env bash
 
 # emacs with just packaging config
-emacs -nw -l $DOTFILESWGH/emacs/package-conf.el "$@"
+emacs --init-directory "${EMACS_DOT_D_PATH:-$DOTFILESWGH_DOTLOCAL/emacs.d}" -nw -l $DOTFILESWGH/emacs/package-conf.el "$@"

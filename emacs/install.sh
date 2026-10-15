@@ -55,4 +55,4 @@ case "$1" in
         ;;
 esac
 
-emacs -batch -l "$df/emacs/install.el" -- "$mode" "$@"
+emacs -batch --init-directory "${EMACS_DOT_D_PATH:-$DOTFILESWGH_DOTLOCAL/emacs.d}" -l "$df/emacs/install.el" -- "$mode" "$@"

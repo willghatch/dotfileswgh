@@ -5,4 +5,4 @@ if [[ -z "$CURRENT_DEV_MODE" && -e "$DOTFILESWGH_DOTLOCAL/e-is-premacs" && ! "$(
 fi
 
 #exec em "$@"
-SHELL=/bin/sh exec emacs --eval '(setq wgh/fast-start t)' -nw -q -l $DOTFILESWGH/emacs/def "$@"
+SHELL=/bin/sh exec emacs --init-directory "${EMACS_DOT_D_PATH:-$DOTFILESWGH_DOTLOCAL/emacs.d}" --eval '(setq wgh/fast-start t)' -nw -q -l $DOTFILESWGH/emacs/def "$@"

@@ -12,7 +12,7 @@ script="$1"
 daemon="$(premacs-use-next-daemon)"
 
 if [[ "none" = "$daemon" ]]; then
-    emacs --batch -l $DOTFILESWGH/emacs/def.el --eval "$script"
+    emacs --batch --init-directory "${EMACS_DOT_D_PATH:-$DOTFILESWGH_DOTLOCAL/emacs.d}" -l $DOTFILESWGH/emacs/def.el --eval "$script"
     exit
 fi
 

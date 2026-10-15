@@ -55,7 +55,7 @@ read -r -d '' ELISP <<'EOF' || true
   (setq command-line-args-left nil))
 EOF
 
-emacs --batch \
+emacs --batch --init-directory "${EMACS_DOT_D_PATH:-$DOTFILESWGH_DOTLOCAL/emacs.d}" \
       -l "$DOTFILESWGH/emacs/dotfileswgh-env-conf.el" \
       --eval "$ELISP" \
       "$@"
