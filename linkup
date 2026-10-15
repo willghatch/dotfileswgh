@@ -56,8 +56,8 @@ do_more() {
     #echo '@import url("./usercss/master.css")' > dotlocal/firefox-default-profile/chrome/userContent.css
 
 
-    mkdir -p $HOME/.mozilla/firefox/
-    cp -f firefox-profile.ini $HOME/.mozilla/firefox/profiles.ini
+    mkdir -p "${XDG_CONFIG_HOME:-$HOME/.config}/mozilla/firefox/"
+    cp -f firefox-profile.ini "${XDG_CONFIG_HOME:-$HOME/.config}/mozilla/firefox/profiles.ini"
 }
 
 
