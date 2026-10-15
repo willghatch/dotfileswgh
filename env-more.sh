@@ -83,6 +83,8 @@ export DOTNET_CLI_HOME=${DOTNET_CLI_HOME:-$XDG_DATA_HOME/dotnet}
 export NUGET_PACKAGES=${NUGET_PACKAGES:-$XDG_CACHE_HOME/NuGetPackages}
 export ANDROID_USER_HOME=${ANDROID_USER_HOME:-$XDG_DATA_HOME/android}
 export PLATFORMIO_CORE_DIR=${PLATFORMIO_CORE_DIR:-$XDG_DATA_HOME/platformio}
+# libX11 compiled Compose table cache; only used if the directory exists (made in bazshrc).
+export XCOMPOSECACHE=${XCOMPOSECACHE:-$XDG_CACHE_HOME/compose-cache}
 # less reads the lesskey source file directly, so no compiled ~/.less is needed.
 export LESSKEYIN=${LESSKEYIN:-$DOTFILESWGH/lesskey}
 export LESSHISTFILE=${LESSHISTFILE:-$XDG_STATE_HOME/less/history}

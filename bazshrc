@@ -216,6 +216,8 @@ dfterm() {
 # less and python won't create the parent directories of their history files (set in env-more.sh).
 if [ -n "$LESSHISTFILE" ]; then mkdir -p "${LESSHISTFILE%/*}"; fi
 if [ -n "$PYTHON_HISTORY" ]; then mkdir -p "${PYTHON_HISTORY%/*}"; fi
+# libX11 falls back to ~/.compose-cache if XCOMPOSECACHE does not exist.
+if [ -n "$XCOMPOSECACHE" ]; then mkdir -p "$XCOMPOSECACHE"; fi
 
 source $DOTFILESWGH/bazsh/grml-funcs.sh
 
