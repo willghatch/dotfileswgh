@@ -15,7 +15,8 @@ if [ -z "$GUI_SESSION_COMMON_RUN_P" ]; then
 
 
   # Be sure I have a decent terminfo available
-  tic $DOTFILESWGH/xterm-256color-italic.terminfo
+  mkdir -p "$XDG_DATA_HOME/terminfo"
+  tic -o "$XDG_DATA_HOME/terminfo" $DOTFILESWGH/xterm-256color-italic.terminfo
 
 
 
@@ -25,6 +26,8 @@ if [ -z "$GUI_SESSION_COMMON_RUN_P" ]; then
   dunst &
   dunst-lock-monitor &
 
+  # mpd won't create its state directories.
+  mkdir -p "${XDG_STATE_HOME:-$HOME/.local/state}/mpd/playlists"
   mpd &
   mpDris2 &
 

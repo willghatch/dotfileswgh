@@ -45,17 +45,19 @@
 
 ;; backup settings
 (nobreak (require 'sensitive-mode))
+(defvar wgh/emacs-state-dir
+  (expand-file-name "emacs/" (or (getenv "XDG_STATE_HOME") "~/.local/state")))
 (setq
  backup-by-copying t      ;; don't clobber symlinks
- backup-directory-alist '(("." . "~/.cache/emacs/bak"))    ;; don't litter my fs tree
+ backup-directory-alist `(("." . ,(concat wgh/emacs-state-dir "bak")))    ;; don't litter my fs tree
  delete-old-versions t
  kept-new-versions 8
  kept-old-versions 4
  version-control t)       ;; use versioned backups
-(setq auto-save-file-name-transforms '((".*" "~/.cache/emacs/auto/\\1" t))) ;; auto-saves (## files) here
+(setq auto-save-file-name-transforms `((".*" ,(concat wgh/emacs-state-dir "auto/\\1") t))) ;; auto-saves (## files) here
 (nobreak
- (make-directory "~/.cache/emacs/bak/" t)
- (make-directory "~/.cache/emacs/auto/" t))
+ (make-directory (concat wgh/emacs-state-dir "bak/") t)
+ (make-directory (concat wgh/emacs-state-dir "auto/") t))
 ;; For now, just don't make backups -- I haven't needed them since I started using git everywhere.
 (setq make-backup-files nil)
 

@@ -202,9 +202,10 @@ cpost()
 
 # fix terminal
 dftic() {
-    tic -x $DOTFILESWGH/xterm-256color-italic.terminfo
-    tic -x $DOTFILESWGH/xterm-24bit.terminfo
-    tic -x $DOTFILESWGH/xterm-24bit-italic.terminfo
+    mkdir -p "$XDG_DATA_HOME/terminfo"
+    tic -x -o "$XDG_DATA_HOME/terminfo" $DOTFILESWGH/xterm-256color-italic.terminfo
+    tic -x -o "$XDG_DATA_HOME/terminfo" $DOTFILESWGH/xterm-24bit.terminfo
+    tic -x -o "$XDG_DATA_HOME/terminfo" $DOTFILESWGH/xterm-24bit-italic.terminfo
 }
 dfterm() {
     if [[ "$TERM" = "xterm" || "$TERM" = "xterm-256color" ]]; then
@@ -212,7 +213,9 @@ dfterm() {
     fi
 }
 
-lesskey $DOTFILESWGH/lesskey 2>/dev/null
+# less and python won't create the parent directories of their history files (set in env-more.sh).
+if [ -n "$LESSHISTFILE" ]; then mkdir -p "${LESSHISTFILE%/*}"; fi
+if [ -n "$PYTHON_HISTORY" ]; then mkdir -p "${PYTHON_HISTORY%/*}"; fi
 
 source $DOTFILESWGH/bazsh/grml-funcs.sh
 

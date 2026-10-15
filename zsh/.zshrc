@@ -9,6 +9,8 @@ COMPINIT_COMMAND="compinit -d $COMPDUMPFILE -i"
 compdef(){}
 compinit(){}
 
+HISTFILE=${XDG_STATE_HOME:-$HOME/.local/state}/zsh/history
+mkdir -p "${HISTFILE:h}"
 HISTSIZE=1000
 SAVEHIST=1000
 
@@ -96,7 +98,7 @@ search-backward-current-command-repeat(){
 }; zle -N search-backward-current-command-repeat
 
 # zaw bookmark file
-BOOKMARKFILE=~/.cache/zsh/zaw-bookmarks
+BOOKMARKFILE=${XDG_STATE_HOME:-$HOME/.local/state}/zsh/zaw-bookmarks
 # setup for zshmarks plugin
 #BOOKMARKS_FILE=~/.cache/zsh/zsh-bookmarks
 #jd(){

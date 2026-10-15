@@ -23,7 +23,8 @@ fi
 GEOM=${1:-$DEFAULT_GEOMETRY}
 
 BASHRUNRC=$DOTFILESWGH/minimal-bashrunrc
-export HISTFILE=$HOME/.cache/minimal-bashrun-history
+export HISTFILE=${XDG_STATE_HOME:-$HOME/.local/state}/minimal-bashrun-history
+mkdir -p "${HISTFILE%/*}"
 #export HISTCONTROL=ignoredups:erasedups
 
 #XTERM=lxterminal

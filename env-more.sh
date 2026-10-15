@@ -52,7 +52,7 @@ export PATH=${CURRENT_DEV_PATH:-$RACKET_NO_DEV_PATH}:$DOTFILESWGH_COMMAND_PATH:$
 #
 # writable data location
 ## TODO -- add dotfile dirs to CONFIG/DATA_DIRS, but not the ones that are symlinked
-#XDG_DATA_HOME=$HOME/.local/share
+export XDG_DATA_HOME=${XDG_DATA_HOME:-$HOME/.local/share}
 # read-only but searched data locations
 #XDG_DATA_DIRS=/usr/local/share/:/usr/share/
 export XDG_DATA_DIRS=$DOTFILESWGH/local/share:$XDG_DATA_DIRS:/usr/local/share:/usr/share
@@ -63,6 +63,8 @@ export XDG_CONFIG_DIRS=$DOTFILESWGH_PRI_DOTLOCAL/xdg-config-ro:$DOTFILESWGH_DOTL
 #XDG_CONFIG_DIRS=/etc/xdg
 # writable cache dir
 export XDG_CACHE_HOME=$HOME/.cache
+# writable state location (histories, logs, etc)
+export XDG_STATE_HOME=${XDG_STATE_HOME:-$HOME/.local/state}
 
 
 export MANWIDTH=80
@@ -71,6 +73,24 @@ export ZDOTDIR=$DOTFILESWGH/zsh
 # Programs without XDG config support, pointed at their XDG-style locations.
 export INPUTRC=${XDG_CONFIG_HOME:-$HOME/.config}/readline/inputrc
 export NPM_CONFIG_USERCONFIG=${XDG_CONFIG_HOME:-$HOME/.config}/npm/npmrc
+# The rest keep any value already set, eg. by a container launcher.
+export NPM_CONFIG_CACHE=${NPM_CONFIG_CACHE:-$XDG_CACHE_HOME/npm}
+export CARGO_HOME=${CARGO_HOME:-$XDG_DATA_HOME/cargo}
+export RUSTUP_HOME=${RUSTUP_HOME:-$XDG_DATA_HOME/rustup}
+export GRADLE_USER_HOME=${GRADLE_USER_HOME:-$XDG_DATA_HOME/gradle}
+# dotnet makes a .dotnet directory inside DOTNET_CLI_HOME.
+export DOTNET_CLI_HOME=${DOTNET_CLI_HOME:-$XDG_DATA_HOME/dotnet}
+export NUGET_PACKAGES=${NUGET_PACKAGES:-$XDG_CACHE_HOME/NuGetPackages}
+export ANDROID_USER_HOME=${ANDROID_USER_HOME:-$XDG_DATA_HOME/android}
+export PLATFORMIO_CORE_DIR=${PLATFORMIO_CORE_DIR:-$XDG_DATA_HOME/platformio}
+# less reads the lesskey source file directly, so no compiled ~/.less is needed.
+export LESSKEYIN=${LESSKEYIN:-$DOTFILESWGH/lesskey}
+export LESSHISTFILE=${LESSHISTFILE:-$XDG_STATE_HOME/less/history}
+# Python >= 3.13
+export PYTHON_HISTORY=${PYTHON_HISTORY:-$XDG_STATE_HOME/python/history}
+# Compile terminfo entries here with `tic -o`, instead of the default ~/.terminfo.
+# The trailing empty entry (when TERMINFO_DIRS was unset) means the system default.
+export TERMINFO_DIRS=$XDG_DATA_HOME/terminfo:${TERMINFO_DIRS}
 
 export EDITOR=e
 #export EDITOR=premacs-use-or-create-t

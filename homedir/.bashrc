@@ -34,6 +34,10 @@ export DOTFILESWGH="${DOTFILESWGH:-$HOME/dotfileswgh}"
 
 . $DOTFILESWGH/bazshrc
 
+# Keep history out of $HOME; bash won't create the directory.
+HISTFILE=${XDG_STATE_HOME:-$HOME/.local/state}/bash/history
+mkdir -p "${HISTFILE%/*}"
+
 
 # Turn off TTY "start" and "stop" commands in all interactive shells.
 # They default to C-q and C-s, Bash uses C-s to do a forward history search.
