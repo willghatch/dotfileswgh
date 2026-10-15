@@ -139,6 +139,9 @@
 ;; -- Windows --
 (bind-key main-keymap '(super) "j"      (lambda () (floatile-focus-next)))
 (bind-key main-keymap '(super) "k"      (lambda () (floatile-focus-prev)))
+;; Shift+Tab produces the ISO_Left_Tab keysym.
+(bind-key main-keymap '(alt) "Tab"          (lambda () (floatile-focus-next)))
+(bind-key main-keymap '(alt) "ISO_Left_Tab" (lambda () (floatile-focus-prev)))
 (bind-key main-keymap '(alt super) "j"  (lambda () (floatile-swap-next)))
 (bind-key main-keymap '(alt super) "k"  (lambda () (floatile-swap-prev)))
 (bind-key main-keymap '(super) "h"      (lambda () (floatile-resize-main-minus)))
