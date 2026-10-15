@@ -39,9 +39,13 @@
            (concat dotfileswgh-dotlocal "emacs.d/")))))
 
 ;; Set the name that emacs actually knows...
+;; The wrapper scripts also pass --init-directory, because startup computes paths from user-emacs-directory before any -l file is loaded.
+;; The settings below fix up those paths when emacs was started without it.
 (setq user-emacs-directory local-emacs.d-path)
 
-(setq native-comp-eln-load-path (list (concat local-emacs.d-path "eln-cache/")))
+;; Replace only the user eln-cache, keeping the system native-lisp dir so bundled libraries aren't recompiled.
+(startup-redirect-eln-cache (concat local-emacs.d-path "eln-cache/"))
+(setq auto-save-list-file-prefix (concat local-emacs.d-path "auto-save-list/.saves-"))
 
 ;; Straight.el config
 (defvar bootstrap-version)
