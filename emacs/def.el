@@ -274,7 +274,7 @@
    ;;(lsp)
    )
  (require 'org-mode-conf)
- (autoload 'markdown-mode "markdown-mode")
+ (autoload 'markdown-mode "markdown-mode" nil t)
  (add-to-list 'auto-mode-alist '("\\.md$" . markdown-mode))
  (require 'table-highlight)
  (add-hook 'org-mode-hook #'table-highlight-turn-on)
