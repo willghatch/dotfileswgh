@@ -68,6 +68,8 @@ export XDG_STATE_HOME=${XDG_STATE_HOME:-$HOME/.local/state}
 
 
 export MANWIDTH=80
+# Use overstrikes so less applies the LESS_TERMCAP_* man-page colors.
+export GROFF_NO_SGR=1
 
 export ZDOTDIR=$DOTFILESWGH/zsh
 # Programs without XDG config support, pointed at their XDG-style locations.
