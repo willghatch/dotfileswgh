@@ -24,6 +24,11 @@ locations contain skill directories directly, with no dev-type or
 default/non-default nesting; their skills are treated as default skills.
 DF_SKILLS_EXTRA_DIRS and DF_SKILLS_EXTRA_DIRS_DIRECT are colon-delimited.
 
+`disclose` searches configured dev-types and base/direct locations first, then
+inactive dev-types, following location path order in each pass.
+Within each root, default skills precede non-default skills.
+Use `disclose --strict-dev-types` to restrict lookup to the configured scope.
+
 `disclose` also accepts:
   - Sub-skills, e.g. `disclose foo/bar`.  The relative path is appended to
     each skill location in priority order (default locations before
@@ -142,6 +147,16 @@ def get_skill_roots(dev_types, git_root):
     return deduped
 
 
+def get_all_skill_layers(git_root):
+    """Yield (dev-type or None, root) for every configured skill layer."""
+    for base in get_skill_roots([], git_root):
+        yield None, base
+        if not base.direct and base.path.is_dir():
+            for child in sorted(base.path.iterdir()):
+                if child.name not in ("default", "non-default") and child.is_dir():
+                    yield child.name, SkillRoot(child)
+
+
 def find_skills(roots, category):
     """Find all skills of the given category across all skill roots.
 
@@ -216,6 +231,8 @@ def find_subskill(roots, rel_path):
 def resolve_disclose_target(skill_name, roots):
     """Find the skill directory for a disclose argument.
 
+    Roots are searched in order, checking default before non-default within
+    each root.
     Returns a Path, or None if no skill was found.
     """
     parts = PurePosixPath(skill_name).parts
@@ -228,17 +245,42 @@ def resolve_disclose_target(skill_name, roots):
         path = Path(os.path.abspath(os.path.expanduser(skill_name)))
         return path if path.is_dir() else None
 
-    if len(parts) == 1:
-        default_skills, non_default_skills = find_all_skills(roots)
-        skill_dir = default_skills.get(parts[0]) or non_default_skills.get(parts[0])
-    else:
-        skill_dir = find_subskill(roots, Path(*parts))
-    if skill_dir is not None:
-        return skill_dir
+    for root in roots:
+        for category in ("default", "non-default"):
+            parent = root.category_dir(category)
+            if parent is None:
+                continue
+            candidate = parent / Path(*parts)
+            if is_skill_dir(candidate):
+                return candidate
+            if (len(parts) == 1 and not root.direct and category == "default"
+                    and (parent / f"link:{skill_name}").is_file()):
+                donor = find_skills(roots, "non-default").get(skill_name)
+                if donor is not None and is_skill_dir(donor):
+                    return donor
 
     # Fall back to a skill directory relative to the current directory
     path = Path(os.path.abspath(skill_name))
     return path if is_skill_dir(path) else None
+
+
+def get_disclose_roots(dev_types, git_root, active_roots):
+    """Append inactive roots in path order after the complete active scope."""
+    inactive_types = []
+    for dev_type, _root in get_all_skill_layers(git_root):
+        if (dev_type is not None and dev_type not in dev_types
+                and dev_type not in inactive_types):
+            inactive_types.append(dev_type)
+
+    roots = list(active_roots)
+    seen = {(root.path.resolve(), root.direct) for root in roots}
+    for root in get_skill_roots(inactive_types, git_root):
+        key = (root.path.resolve(), root.direct)
+        if key not in seen:
+            roots.append(root)
+            seen.add(key)
+    dev_types.extend(inactive_types)
+    return roots
 
 
 def get_skill_content_label(content_path):
@@ -537,6 +579,8 @@ def cmd_agents_md_snippet(args, dev_types, git_root, roots):
 def cmd_disclose(args, dev_types, git_root, roots):
     """Print the full content of a skill."""
     skill_name = args.skill_name
+    if args.all_dev_types:
+        roots = get_disclose_roots(dev_types, git_root, roots)
     skill_dir = resolve_disclose_target(skill_name, roots)
     if skill_dir is None:
         print(
@@ -643,6 +687,46 @@ def cmd_list(args, dev_types, git_root, roots):
                 print(f"{name}\tnon-default\t{non_default_skills[name]}")
 
 
+def cmd_inventory(args, dev_types, git_root, roots):
+    """Show all top-level skills and promotion links in every configured layer.
+
+    Unlike list, this includes inactive dev-types and shadowed occurrences.
+    Locations identify skill directories or link:NAME promotion files.
+    Skill programs are never executed.
+    """
+    rows = []
+    for dev_type, root in get_all_skill_layers(git_root):
+        for category in ("default", "non-default"):
+            parent = root.category_dir(category)
+            if parent is None or not parent.is_dir():
+                continue
+            for entry in sorted(parent.iterdir()):
+                if is_skill_dir(entry):
+                    name = entry.name
+                elif (not root.direct and entry.is_file()
+                      and entry.name.startswith("link:") and entry.name[5:]):
+                    name = entry.name[5:]
+                else:
+                    continue
+                rows.append((dev_type or "-", category, name, str(entry.absolute())))
+
+    if args.names_only:
+        for name in sorted({row[2] for row in rows}):
+            print(name)
+        return
+
+    rows.sort(key=lambda row: row[:3])
+    headers = ("dev-type", "default-status", "skill-name", "location")
+    widths = [
+        max(len(row[i]) for row in [headers, *rows])
+        for i in range(len(headers) - 1)
+    ]
+    for row in [headers, *rows]:
+        print("  ".join(
+            [row[i].ljust(width) for i, width in enumerate(widths)] + [row[-1]]
+        ))
+
+
 def cmd_save_state(args, dev_types, git_root, roots):
     """Save skill configuration to state file."""
     # Handle --delete-state
@@ -717,11 +801,34 @@ def cmd_save_state(args, dev_types, git_root, roots):
     save_state(state_path, dev_types, sorted(added), sorted(omitted))
 
 
+class SkillArgumentParser(argparse.ArgumentParser):
+    """Keep human-only commands out of ordinary invalid-choice diagnostics."""
+
+    def _check_value(self, action, value):
+        if (isinstance(action, argparse._SubParsersAction)
+                and value not in action.choices):
+            choices = ", ".join(
+                name for name in action.choices
+                if self.human_help or name not in ("inventory",)
+            )
+            raise argparse.ArgumentError(
+                action, f"invalid choice: {value!r} (choose from {choices})"
+            )
+        super()._check_value(action, value)
+
+
 def main():
-    parser = argparse.ArgumentParser(
+    human_help = "--human-help" in sys.argv[1:]
+    parser = SkillArgumentParser(
         description="Manage reusable skill documents for AI agents.",
         formatter_class=argparse.RawDescriptionHelpFormatter,
         epilog=__doc__,
+    )
+    parser.human_help = human_help
+    parser.add_argument(
+        "--human-help",
+        action="help",
+        help="Show full help including commands for human inspection",
     )
     parser.add_argument(
         "--dev-type", "-d",
@@ -737,7 +844,27 @@ def main():
         help="Print search paths and exit",
     )
 
-    subparsers = parser.add_subparsers(dest="subcommand")
+    visible_commands = ["agents-md-snippet", "disclose", "list", "save-state"]
+    if human_help:
+        visible_commands.append("inventory")
+    subparsers = parser.add_subparsers(
+        dest="subcommand", metavar="{" + ",".join(visible_commands) + "}",
+    )
+    inventory_description = (
+        "List all top-level skills across dev-types for human inspection; "
+        "agents should use list or agents-md-snippet. "
+        "Columns: dev-type (- for base/direct), default/non-default, "
+        "skill-name, and location. Includes inactive dev-types and shadowed "
+        "copies. Locations are skill directories or link:NAME promotion files."
+    )
+    inventory_options = {"help": inventory_description} if human_help else {}
+    inventory_parser = subparsers.add_parser(
+        "inventory", description=inventory_description, **inventory_options,
+    )
+    inventory_parser.add_argument(
+        "--names-only", action="store_true",
+        help="Print unique skill names, one per line",
+    )
 
     # agents-md-snippet subcommand
     snippet_parser = subparsers.add_parser(
@@ -759,6 +886,27 @@ def main():
     disclose_parser = subparsers.add_parser(
         "disclose",
         help="Show full content of a skill",
+    )
+    disclose_parser.add_argument(
+        "--human-help",
+        action="help",
+        help="Show full disclosure help for human inspection",
+    )
+    disclose_parser.set_defaults(all_dev_types=True)
+    disclose_scope = disclose_parser.add_mutually_exclusive_group()
+    disclose_scope.add_argument(
+        "--all-dev-types",
+        action="store_true",
+        help=(
+            "Search active scope first, then inactive dev-types (the default); "
+            "also enables all dev-types in shell completion"
+        ) if human_help else argparse.SUPPRESS,
+    )
+    disclose_scope.add_argument(
+        "--strict-dev-types",
+        action="store_false",
+        dest="all_dev_types",
+        help="Search only configured dev-types and base/direct skill locations",
     )
     disclose_parser.add_argument(
         "skill_name",
@@ -861,6 +1009,8 @@ def main():
         cmd_disclose(args, dev_types, git_root, roots)
     elif args.subcommand == "list":
         cmd_list(args, dev_types, git_root, roots)
+    elif args.subcommand == "inventory":
+        cmd_inventory(args, dev_types, git_root, roots)
     elif args.subcommand == "save-state":
         cmd_save_state(args, dev_types, git_root, roots)
 

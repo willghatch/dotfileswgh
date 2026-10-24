@@ -6,6 +6,7 @@ _df_skills() {
 
     _arguments -C \
         '(- :)--help[Show help and exit]' \
+        '(- :)--human-help[Show full help including commands for human inspection]' \
         '(- :)--show-paths[Show search paths and exit]' \
         '*--dev-type=[Add dev-type layer]:dev type:->dev_types' \
         '*-d=[Add dev-type layer]:dev type:->dev_types' \
@@ -20,6 +21,7 @@ _df_skills() {
                 'agents-md-snippet:Generate AGENTS.md snippet with skill frontmatter'
                 'disclose:Show full content of a skill'
                 'list:List available skills'
+                'inventory:List all skills across dev-types for human inspection'
                 'save-state:Save skill configuration to state file'
             )
             _describe 'subcommand' subcommands
@@ -32,20 +34,17 @@ _df_skills() {
                         '--from-state-strict[Use saved state (error if no state)]'
                     ;;
                 disclose)
-                    # Skill paths are rare, so only complete directories
-                    # when the word looks like a path (starts with / or .)
-                    if [[ $PREFIX == [/.]* ]]; then
-                        _files -/
-                    else
-                        local -a skills
-                        skills=("${(@f)$(df-skills list --names-only 2>/dev/null)}")
-                        skills=(${skills:#})
-                        if (( ${#skills} )); then
-                            _describe 'skill' skills
-                        else
-                            _message 'no skills found'
-                        fi
-                    fi
+                    _arguments -C \
+                        '(- :)--help[Show help and exit]' \
+                        '(- :)--human-help[Show full disclosure help for human inspection]' \
+                        '(--strict-dev-types)--all-dev-types[Search and complete all dev-types]' \
+                        '(--all-dev-types)--strict-dev-types[Search only configured dev-types]' \
+                        '1:skill:->disclose_skill'
+                    ;;
+                inventory)
+                    _arguments \
+                        '(- :)--help[Show inventory help and exit]' \
+                        '--names-only[Print unique skill names, one per line]'
                     ;;
                 list)
                     _arguments \
@@ -67,6 +66,26 @@ _df_skills() {
                     ;;
             esac
             case $state in
+                disclose_skill)
+                    # Skill paths are rare, so only complete directories
+                    # when the word looks like a path (starts with / or .)
+                    if [[ $PREFIX == [/.]* ]]; then
+                        _files -/
+                    else
+                        local -a skills
+                        if (( ${+opt_args[--all-dev-types]} )); then
+                            skills=("${(@f)$(df-skills inventory --names-only 2>/dev/null)}")
+                        else
+                            skills=("${(@f)$(df-skills list --names-only 2>/dev/null)}")
+                        fi
+                        skills=(${skills:#})
+                        if (( ${#skills} )); then
+                            _describe 'skill' skills
+                        else
+                            _message 'no skills found'
+                        fi
+                    fi
+                    ;;
                 all_skills)
                     local skills
                     skills=("${(@f)$(df-skills list --names-only 2>/dev/null)}")
