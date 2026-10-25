@@ -87,12 +87,14 @@
                              (event-field event 'effectively-floating)))
 
 ;; Windows that resize themselves are answered by their layouts: tiling
-;; layouts give a tiled window its slot again.
+;; layouts give a tiled window its slot again.  The session's programs start
+;; when the session does; see Startup programs below.
 (floatile-set-event-handler!
   (on-events '(window-created) apply-window-rules!
     (on-events '(window-floating-changed window-tiling-changed) decorate-for-presentation!
       (on-events '(window-resized-itself) floatile-layout-handle-window-resized-itself
-        floatile-default-event-handler))))
+        (on-events '(session-started) (lambda (event) (start-session-programs!))
+          floatile-default-event-handler)))))
 
 ;; ---------------------------------------------------------------------------
 
@@ -105,16 +107,27 @@
 (floatile-set-spawn-environment! "QT_WAYLAND_DISABLE_WINDOWDECORATION" "1")
 (floatile-set-spawn-environment! "QT_QPA_PLATFORMTHEME" "gtk3")
 (floatile-set-spawn-environment! "ELECTRON_OZONE_PLATFORM_HINT" "auto")
+;; Floatile's session script marks a uwsm session with FLOATILE_UWSM; programs
+;; started here, such as a nested Floatile, must not take the session for theirs.
+(floatile-set-spawn-environment! "FLOATILE_UWSM" #f)
 
 ;; ---------------------------------------------------------------------------
 ;; Startup programs
 ;; ---------------------------------------------------------------------------
-(set! startup-commands
-  (list (enable-xwayland-satellite!)
-        '("floatile-startup-programs.sh")
-        ;; This does nothing for floatile, but I do need something LIKE it to watch theme change and set theme colors appropriately.
-        ;;'("bash" "/home/wgh/dotfileswgh/config/hypr/lightdark-update")
-        ))
+;; The Wayland socket is not ready while this file loads, so programs start
+;; from the session-started event, which arrives only once even when this file is
+;; reloaded.  Satellite comes first: it sets DISPLAY for what follows.  Then
+;; uwsm is told the session is ready, which gives services systemd and D-Bus
+;; start (such as a notification daemon) the session's displays, before the
+;; programs that might start them.  uwsm waits for this call; nothing else
+;; makes it.
+(define (start-session-programs!)
+  (floatile-start-xwayland-satellite!)
+  (floatile-uwsm-finalize!)
+  (floatile-spawn "floatile-startup-programs.sh")
+  ;; This does nothing for floatile, but I do need something LIKE it to watch theme change and set theme colors appropriately.
+  ;;(floatile-spawn "bash" "/home/wgh/dotfileswgh/config/hypr/lightdark-update")
+  )
 
 ;; ---------------------------------------------------------------------------
 ;; Mouse bindings
@@ -138,8 +151,10 @@
 ;; ordinary modifier rather than NumLock -- the number pad always behaves as
 ;; though NumLock were on -- so Mod2 is left out of the ignore list the
 ;; shipped configuration sets, and named here instead.
-(floatile-set-xkb-file!
- "/rootgit/mooncrater-input.rootgit/examples/xkb-layout_qwerty-mod-mooncrater_compiled.xkb")
+;; Kept to the first load: a reload leaves the keymap alone.
+(floatile-ignore-on-reload
+ (floatile-set-xkb-file!
+  "/rootgit/mooncrater-input.rootgit/examples/xkb-layout_qwerty-mod-mooncrater_compiled.xkb"))
 (set-ignored-modifiers! '())
 (define-modifier-alias! 'hyper 'mod2)
 
@@ -223,8 +238,8 @@
 (bind-key main-keymap '(alt super) "q"  (lambda () (floatile-quit)))              ; exit
 (bind-key main-keymap '(super) "q"      (lambda () (floatile-spawn "swaylock-configured")))
 
-;; Not yet implemented: reloading the configuration at runtime
-(bind-key main-keymap '(alt super) "r" (lambda () (floatile-reload-config)))
+;; Reload this file, for trying out changes to it.
+(bind-key main-keymap '(alt super) "r" (lambda () (floatile-reload-config!)))
 
 ;; -- $hyp (MOD2) utilities --
 (bind-key main-keymap '(hyper) "l" (lambda () (floatile-spawn "lightdark-status" "toggle")))

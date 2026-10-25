@@ -3,7 +3,7 @@
 if [[ "$@" =~ "--help" ]]; then
     echo "Usage: $0"
     echo "Launch startup programs for a Floatile session: the eww bar, everything in wayland-startup-programs.sh, then each floatile/floatile-startup-programs.sh in \$XDG_CONFIG_DIRS."
-    echo "Run by startup-commands in the Floatile configuration."
+    echo "Run by the session-started handler in the Floatile configuration."
     exit 0
 fi
 
