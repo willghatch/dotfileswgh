@@ -12,9 +12,9 @@ openDefault() {
     if [[ "$1" == *.html
                 || "$1" == *.htm
         ]]; then
-        exec a ffxd "$1"
+        exec ffxd "$1"
     elif [[ "$1" == *.pdf ]]; then
-        exec a sphouse-pdf "$1"
+        exec sphouse-pdf "$1"
     elif [[ "$1" == *.mp3
                 || "$1" == *.ogg
                 || "$1" == *.flac
@@ -23,7 +23,8 @@ openDefault() {
                 || "$1" == *.mkv
                 || "$1" == *.mov
           ]]; then
-        exec a vlc "$1"
+        #exec a vlc "$1"
+        exec celluloid "$1"
     fi
 }
 
