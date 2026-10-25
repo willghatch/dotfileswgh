@@ -65,6 +65,13 @@
     ((title . "^the-unicoder$"))
     ((title . "^Surge XT$"))))
 
+;; Windows that never swallow the swallowable window that launched them, as
+;; match specifications for `window-matches?'.  Fixed-size windows are often
+;; splash screens, which would otherwise swallow the terminal and leave the
+;; program's main window to appear beside the empty slot.
+(define no-swallowing-window-matches
+  '(((fixed-size . #t))))
+
 (define (apply-window-rules! event)
   (let ((window-id (event-field event 'window-id)))
     (do-window-match* window-id
@@ -73,16 +80,22 @@
     (when (any (lambda (match) (window-matches? window-id match))
                floating-window-matches)
       (set-window-floating! window-id #t))
+    (when (any (lambda (match) (window-matches? window-id match))
+               no-swallowing-window-matches)
+      (floatile-add-window-tag! window-id 'no-swallowing))
     (window-decoration-policy! window-id (window-effectively-floating? window-id))))
 
 (define (decorate-for-presentation! event)
   (window-decoration-policy! (event-field event 'window-id)
                              (event-field event 'effectively-floating)))
 
+;; Windows that resize themselves are answered by their layouts: tiling
+;; layouts give a tiled window its slot again.
 (floatile-set-event-handler!
   (on-events '(window-created) apply-window-rules!
     (on-events '(window-floating-changed window-tiling-changed) decorate-for-presentation!
-      floatile-default-event-handler)))
+      (on-events '(window-resized-itself) floatile-layout-handle-window-resized-itself
+        floatile-default-event-handler))))
 
 ;; ---------------------------------------------------------------------------
 
