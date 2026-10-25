@@ -57,32 +57,29 @@
 ;; Window rules and decoration
 ;; ---------------------------------------------------------------------------
 
-;; Floating windows wear a title bar; tiled windows do not.  This is the
-;; default `window-decoration-policy!'; replace it with set! to change it.
-
-(define floating-window-matches
-  '(((app-id . "^bashrun$"))
-    ((title . "^the-unicoder$"))
-    ((title . "^Surge XT$"))))
-
-;; Windows that never swallow the swallowable window that launched them, as
-;; match specifications for `window-matches?'.  Fixed-size windows are often
-;; splash screens, which would otherwise swallow the terminal and leave the
-;; program's main window to appear beside the empty slot.
-(define no-swallowing-window-matches
-  '(((fixed-size . #t))))
-
+;; Can get window app-id and title by watching `floatilectl subscribe`, and running a program with `WAYLAND_DEBUG=1` gives a lot of protocol-level detail that includes app-id and title.
 (define (apply-window-rules! event)
   (let ((window-id (event-field event 'window-id)))
-    (do-window-match* window-id
-      ('((title . "foot")) (set-window-swallowable! window-id #t))
-      ('((title . "wezterm")) (set-window-swallowable! window-id #t)))
-    (when (any (lambda (match) (window-matches? window-id match))
-               floating-window-matches)
-      (set-window-floating! window-id #t))
-    (when (any (lambda (match) (window-matches? window-id match))
-               no-swallowing-window-matches)
-      (floatile-add-window-tag! window-id 'no-swallowing))
+    (do-window-match*
+     window-id
+     ('((title . "foot")) (set-window-swallowable! window-id #t))
+     ('((title . "wezterm")) (set-window-swallowable! window-id #t))
+     )
+    (do-window-match*
+     window-id
+     ('((app-id . "^bashrun$")) (set-window-floating! window-id #t))
+     ('((title . "^the-unicoder$")) (set-window-floating! window-id #t))
+     ('((title . "^Surge XT$")) (set-window-floating! window-id #t))
+                      ;;;; Splash screens -- should float and have no-swallowing tag.
+     ;; prusa-slicer splash screen has both app-id and title as prusa-slicer, the main window has a different title (based on version number).
+     ('((app-id . "^prusa-slicer$") (title . "^prusa-slicer$"))
+      (begin (set-window-floating! window-id #t)
+             (floatile-add-window-tag! window-id 'no-swallowing)))
+     ;; fixed-size windows are often splash screens
+     ('((fixed-size . #t))
+      (begin (set-window-floating! window-id #t)
+             (floatile-add-window-tag! window-id 'no-swallowing)))
+     )
     (window-decoration-policy! window-id (window-effectively-floating? window-id))))
 
 (define (decorate-for-presentation! event)
