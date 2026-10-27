@@ -192,6 +192,8 @@
 (bind-key main-keymap '(super) "f"      (lambda () (floatile-toggle-maximize)))
 
 (bind-key main-keymap '(super) "F"      (lambda () (floatile-toggle-fullscreen)))
+;; Label every window with what window rules match on.
+(bind-key main-keymap '(super) "i"      (lambda () (toggle-window-metadata!)))
 
 ;; -- Workspaces --
 (bind-key main-keymap '(super) "g"      (lambda () (floatile-create-workspace)))
