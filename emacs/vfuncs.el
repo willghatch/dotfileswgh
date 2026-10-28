@@ -399,7 +399,8 @@ abort."
   "Call the buffer's folding FUNCTION, clearing search highlights in Org."
   (require 'yafolding)
   ;; Persistent search highlighting can leave temporary Org folds behind.
-  (when (derived-mode-p 'org-mode)
+  (when (and (derived-mode-p 'org-mode)
+             (bound-and-true-p isearch-mode))
     (isearch-exit))
   (call-interactively function))
 
