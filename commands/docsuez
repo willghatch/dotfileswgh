@@ -43,6 +43,11 @@ the same key keep their merge order.
 "pre-tmux-script" uses the same forms and ordering, but its lines run inside
 the container before the tmux server starts.
 
+"include" names other run configs to merge in first, in order, with this
+config merged over them.  Their tags join this config's tags rather than
+being applied up front, so this config or an addon can replace an included
+tag by defining a tag with the same name.
+
 Volumes: "volumes" maps host paths to container paths.  Both sides are
 expanded by bash (in double quotes) after all docker-run-script parts have
 run, so they can use variables set there (eg. $DOCSUEZ_CONTAINER_HOME).  They
@@ -301,13 +306,16 @@ class DocsuezConfig:
 
         Precedence (lowest to highest):
         1. Default addon tags  (*.default.run-docsuez.json)
-        2. Base config tags
+        2. Base config tags, including tags from included configs
         3. Default-override addon tags  (*.default-override.run-docsuez.json)
         4. User-specified addon tags  (-a flag)
 
         Two sources at the same priority level that define the same tag key
         are an error.  When sources at different levels define the same tag,
         the higher-priority source wins (its content replaces the lower one).
+        Within the base config level, the including config's tags replace
+        same-named tags from its includes, and later includes replace earlier
+        ones.
         """
         def _load_tags(path):
             with open(path, 'r') as f:
@@ -334,7 +342,7 @@ class DocsuezConfig:
         # Level 1: base config
         base_tags = {
             tag: (self.config_path.name, content)
-            for tag, content in self._raw_config.get("tags", {}).items()
+            for tag, content in self._base_tags().items()
         }
 
         # Level 2: regular defaults
@@ -370,6 +378,33 @@ class DocsuezConfig:
             result = self._deep_merge(result, tag_content)
         return result
 
+    def _included_configs(self) -> List["DocsuezConfig"]:
+        """Load this config's includes, in order, skipping any not found."""
+        included_configs = []
+        for include_path in self._raw_config.get("include", []):
+            included_config_path = self.searcher.find_config(include_path)
+            if included_config_path:
+                included = DocsuezConfig(included_config_path, self.searcher)
+                included.load()
+                included_configs.append(included)
+        return included_configs
+
+    def _base_tags(self) -> Dict[str, Any]:
+        """Return this config's tags, unresolved, over those of its includes."""
+        tags = {}
+        for included in self._included_configs():
+            tags.update(included._base_tags())
+        tags.update(self._raw_config.get("tags", {}))
+        return tags
+
+    def _untagged_config(self) -> Dict[str, Any]:
+        """Return this config merged over its includes, without any tags."""
+        merged = {}
+        for included in self._included_configs():
+            merged = self._deep_merge(merged, included._untagged_config())
+        config_without_tags = {k: v for k, v in self._raw_config.items() if k != "tags"}
+        return self._deep_merge(merged, config_without_tags)
+
     def _merge_configs(self) -> Dict[str, Any]:
         """Merge this config with any included configs and addons"""
         if self._merged_config is not None:
@@ -378,22 +413,9 @@ class DocsuezConfig:
         # Resolve tags first, before merging
         resolved_tags = self._resolve_tags()
 
-        merged = {}
-
-        # First, process includes
-        includes = self._raw_config.get("include", [])
-        for include_path in includes:
-            included_config_path = self.searcher.find_config(include_path)
-            if included_config_path:
-                included = DocsuezConfig(included_config_path, self.searcher)
-                included.load()
-                included_merged = included._merge_configs()
-                # Deep merge the included config
-                merged = self._deep_merge(merged, included_merged)
-
-        # Then overlay this config (without tags)
-        config_without_tags = {k: v for k, v in self._raw_config.items() if k != "tags"}
-        merged = self._deep_merge(merged, config_without_tags)
+        # Includes, then this config, without tags; their tags are
+        # resolved above, at the base config level.
+        merged = self._untagged_config()
 
         # Merge default addons first (without tags)
         for name, addon_path, _kind in self.default_addons:
