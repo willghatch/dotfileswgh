@@ -8,7 +8,12 @@
         "ENV CI=0",
         "",
         "ENV DEBIAN_FRONTEND=noninteractive",
-        "",
+        ""
+      ]
+    },
+    {"search-merge": "build-snippets/gpu-env-pre-apt-update"},
+    {
+      "text": [
         "# Update package lists",
         "RUN apt update",
         "",
@@ -66,6 +71,7 @@
       "RUN usermod -aG sudo wgh",
       "RUN echo '%sudo ALL=(ALL) NOPASSWD:ALL' >> /etc/sudoers"
     ]},
+    {"search-merge": "build-snippets/gpu-env-end"},
     {"text": ""}
   ],
   "build-context-directory": "."

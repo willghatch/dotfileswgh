@@ -1,0 +1,6 @@
+{
+    "#": "Replace the gpu-mount tag with nothing, for machines without /dev/kfd or /dev/dri.",
+    "tags": {
+        "gpu-mount": {}
+    }
+}

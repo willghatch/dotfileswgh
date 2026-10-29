@@ -9,7 +9,12 @@
                 "ENV CI=0",
                 "",
                 "ENV DEBIAN_FRONTEND=noninteractive",
-                "",
+                ""
+            ]
+        },
+        {"search-merge": "build-snippets/gpu-env-pre-apt-update"},
+        {
+            "text": [
                 "# Update package lists",
                 "RUN apt update",
                 "",
@@ -27,6 +32,7 @@
         {"search": "dockerfile-components/dfcomp-nodejs-install"},
         {"search": "dockerfile-components/dfcomp-uv-install"},
         {"bash-print-text": "echo 'RUN usermod -l wgh $(getent passwd ' $UID '| cut -d : -f 1)' '||' 'useradd -u' $UID 'wgh \n RUN chsh -s /bin/zsh wgh'"},
+        {"search-merge": "build-snippets/gpu-env-end"},
         {"text": ""}
     ],
     "build-context-directory": "."

@@ -49,11 +49,14 @@
       "docker-args": [
         "--cap-add=SYS_PTRACE",
         "--security-opt", "seccomp=unconfined",
-        "--ipc=host",
+        "--ipc=host"
+      ]
+    },
+    "gpu-mount": {
+      "docker-args": [
         "--device=/dev/kfd",
         "--device=/dev/dri"
       ]
-
     }
   }
 }
