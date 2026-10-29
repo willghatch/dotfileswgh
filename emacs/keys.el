@@ -1287,83 +1287,73 @@ FUNC should be a function whose first two arguments are BEG and END."
            (copy-git-fzf-file-name
             ,(lambda (x) t) ()
             (,(lambda (register)
-                (require 'fzf)
-                (let ((fzf--target-validator #'fzf--pass-through)
-                      (path (locate-dominating-file (file-truename default-directory) ".git")))
+                (let ((path (locate-dominating-file (file-truename default-directory) ".git")))
                   (if path
-                      (wgh/fzf-with-command-and-alt-actions
-                       "git ls-files"
-                       (lambda (x) (wgh/cpo-copy-string (file-relative-name x path) register))
-                       wgh/fzf-file-alt-actions
-                       path)
+                      (wgh/pick "git ls-files"
+                                (lambda (x) (wgh/cpo-copy-string (file-relative-name x path) register))
+                                :alt-actions wgh/fzf-file-alt-actions
+                                :directory path
+                                :prompt "Copy file name: ")
                     (user-error "Not inside a Git repository"))))
              (register)))
            (copy-all-fzf-file-name
             ,(lambda (x) t) ()
             (,(lambda (register)
-                (require 'fzf)
-                (let ((fzf--target-validator #'fzf--pass-through)
-                      (path (locate-dominating-file (file-truename default-directory) ".git")))
+                (let ((path (locate-dominating-file (file-truename default-directory) ".git")))
                   (if path
-                      (wgh/fzf-with-command-and-alt-actions
-                       "{ git ls-files; git ls-files --others --exclude-standard; } | sort -u"
-                       (lambda (x) (wgh/cpo-copy-string (file-relative-name x path) register))
-                       wgh/fzf-file-alt-actions
-                       path)
+                      (wgh/pick "{ git ls-files; git ls-files --others --exclude-standard; } | sort -u"
+                                (lambda (x) (wgh/cpo-copy-string (file-relative-name x path) register))
+                                :alt-actions wgh/fzf-file-alt-actions
+                                :directory path
+                                :prompt "Copy file name: ")
                     (user-error "Not inside a Git repository"))))
              (register)))
            (copy-untracked-fzf-file-name
             ,(lambda (x) t) ()
             (,(lambda (register)
-                (require 'fzf)
-                (let ((fzf--target-validator #'fzf--pass-through)
-                      (path (locate-dominating-file (file-truename default-directory) ".git")))
+                (let ((path (locate-dominating-file (file-truename default-directory) ".git")))
                   (if path
-                      (wgh/fzf-with-command-and-alt-actions
-                       "git ls-files --others --exclude-standard"
-                       (lambda (x) (wgh/cpo-copy-string (file-relative-name x path) register))
-                       wgh/fzf-file-alt-actions
-                       path)
+                      (wgh/pick "git ls-files --others --exclude-standard"
+                                (lambda (x) (wgh/cpo-copy-string (file-relative-name x path) register))
+                                :alt-actions wgh/fzf-file-alt-actions
+                                :directory path
+                                :prompt "Copy file name: ")
                     (user-error "Not inside a Git repository"))))
              (register)))
            (copy-submodule-fzf-file-name
             ,(lambda (x) t) ()
             (,(lambda (register)
-                (require 'fzf)
-                (let* ((fzf--target-validator #'fzf--pass-through)
-                       (root-dir (wgh/git-root-superproject)))
+                (let ((root-dir (wgh/git-root-superproject)))
                   (if root-dir
-                      (wgh/fzf-with-command-and-alt-actions
-                       "git ls-files --recurse-submodules"
-                       (lambda (x) (wgh/cpo-copy-string (file-relative-name x root-dir) register))
-                       wgh/fzf-file-alt-actions
-                       root-dir)
+                      (wgh/pick "git ls-files --recurse-submodules"
+                                (lambda (x) (wgh/cpo-copy-string (file-relative-name x root-dir) register))
+                                :alt-actions wgh/fzf-file-alt-actions
+                                :directory root-dir
+                                :prompt "Copy file name: ")
                     (user-error "Not inside a Git repository"))))
              (register)))
            (copy-agent-work-directory-fzf-name
             ,(lambda (x) t) ()
             (,(lambda (register)
-                (require 'fzf)
-                (let ((bases (wgh/agent-work-dir-all-bases))
-                      (fzf--target-validator #'fzf--pass-through))
+                (let ((bases (wgh/agent-work-dir-all-bases)))
                   (unless bases
                     (user-error "No agent working directories found"))
                   (if (= (length bases) 1)
-                      (wgh/fzf-with-command-and-alt-actions
-                       "find . | sort -r"
-                       (lambda (x) (wgh/cpo-copy-string (expand-file-name x (car bases)) register))
-                       wgh/fzf-file-alt-actions
-                       (car bases))
+                      (wgh/pick "find . | sort -r"
+                                (lambda (x) (wgh/cpo-copy-string (expand-file-name x (car bases)) register))
+                                :alt-actions wgh/fzf-file-alt-actions
+                                :directory (car bases)
+                                :prompt "Copy file name: ")
                     (let* ((find-cmd (mapconcat
                                       (lambda (base)
                                         (format "find %s" (shell-quote-argument base)))
                                       bases " ; "))
                            (cmd (concat "{ " find-cmd " ; } | sort -r")))
-                      (wgh/fzf-with-command-and-alt-actions
-                       cmd
-                       (lambda (x) (wgh/cpo-copy-string x register))
-                       wgh/fzf-file-alt-actions
-                       (or (wgh/agent-work-dir-git-dir) default-directory))))))
+                      (wgh/pick cmd
+                                (lambda (x) (wgh/cpo-copy-string x register))
+                                :alt-actions wgh/fzf-file-alt-actions
+                                :directory (or (wgh/agent-work-dir-git-dir) default-directory)
+                                :prompt "Copy file name: ")))))
              (register)))
 
            (paste-to-terminal-osc

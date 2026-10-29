@@ -26,12 +26,13 @@
   (load-file (expand-file-name "./dotfileswgh-env-conf.el" conf-dir)))
 
 (defun load-library--around (orig-fun &rest args)
-  (let ((curtime (current-time))
-        (mylib (car args)))
-    (apply orig-fun args)
+  (let* ((curtime (current-time))
+         (mylib (car args))
+         (result (apply orig-fun args)))
     (let ((diff (time-to-seconds (time-subtract (current-time) curtime))))
       (when (>= diff 0.005)
-        (message (format "load time for %s: %f" mylib diff))))))
+        (message (format "load time for %s: %f" mylib diff))))
+    result))
 
 (nobreak
  (advice-add 'load-library :around #'load-library--around)

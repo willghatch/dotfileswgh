@@ -1118,7 +1118,7 @@ Any <psnip: NAME> tags in the text are expanded in the exported file."
       (message "Copied: %s" msg))))
 
 (defun wgh/prompt-snippet-insert ()
-  "Show an fzf list of prompt snippet names and insert a reference or content.
+  "Pick a prompt snippet name and insert a reference or content.
 Enter inserts the short-form tag <psnip: NAME> for later expansion.
 C-j inserts the full snippet content inline."
   (interactive)
@@ -1143,12 +1143,10 @@ C-j inserts the full snippet content inline."
               (when (and content (not (string-empty-p content)))
                 (insert content))))))
     (if names
-        (let ((fzf--target-validator #'fzf--pass-through))
-          (wgh/fzf-with-command-and-alt-actions
-           "prompt-snippet list"
-           insert-tag
-           `(("ctrl-j" . ,insert-full))
-           nil))
+        (wgh/pick names
+                  insert-tag
+                  :alt-actions `(("ctrl-j" . ,insert-full))
+                  :prompt "Prompt snippet: ")
       (user-error "No prompt snippets found"))))
 
 (provide 'vfuncs)

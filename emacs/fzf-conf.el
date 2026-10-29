@@ -1,12 +1,19 @@
-;;; fzf-conf.el --- fzf alternate actions and configuration -*- lexical-binding: t; -*-
+;;; fzf-conf.el --- generic picker with fzf and completing-read backends -*- lexical-binding: t; -*-
 
-;;; fzf alternate actions
+;;; Picker overview
 ;;
-;; When selecting a file in fzf, alternate key bindings trigger different
-;; actions on the selected entry:
-;;   C-j  -- open a second fzf with a menu of things to do with the file
+;; `wgh/pick' takes a list of candidates (a shell command or a list of
+;; strings), lets the user choose one, and runs an action on it.  It uses fzf
+;; when both the fzf.el package and the fzf executable are available, and
+;; otherwise falls back to `completing-read' with whatever minibuffer
+;; completion UI is configured (see minad-stack-conf.el).
+;;
+;; Alternate key bindings trigger different actions on the chosen entry:
+;;   C-j  -- open a second picker with a menu of things to do with the file
 ;;   C-x  -- directly copy the super-repo-relative path
 ;;   Enter -- perform the original/default action (open file, copy path, etc.)
+;;
+;;; fzf alternate actions
 ;;
 ;; The mechanism uses fzf's --expect option, which causes fzf to print the
 ;; pressed key on a separate line before the selected entry.  A custom exit
@@ -21,8 +28,14 @@
 ;; appended by `term-handle-exit' itself.  The parsing logic must
 ;; account for this.
 
-(require 'fzf)
+(require 'cl-lib)
 (require 'seq)
+
+;; fzf is loaded lazily, since it is not always installed.  Declare the
+;; variables this file let-binds so the bindings stay dynamic when this file
+;; is compiled without fzf loaded.
+(defvar fzf--target-validator)
+(defvar fzf--extractor-list)
 
 (defun wgh/fzf--after-term-handle-exit-with-expect
     (directory action alt-action-alist target-validator extractor-list)
@@ -92,12 +105,16 @@ TARGET-VALIDATOR and EXTRACTOR-LIST are as in `fzf--after-term-handle-exit'."
 ALT-ACTION-ALIST is an alist of (KEY-STRING . FUNCTION).
 Each function receives (FILE-PATH DIRECTORY)."
   (require 'term)
+  (require 'fzf)
   (fzf--close)
   (unless (executable-find fzf/executable)
     (user-error "Can't find fzf/executable '%s'" fzf/executable))
   (window-configuration-to-register fzf--window-register)
   (let* ((expect-keys (mapconcat #'car alt-action-alist ","))
-         (expect-arg (format " --expect=%s" expect-keys))
+         ;; fzf rejects an empty --expect list.
+         (expect-arg (if alt-action-alist
+                         (format " --expect=%s" expect-keys)
+                       ""))
          (term-exec-hook nil)
          (buf (get-buffer-create fzf/buffer-name))
          (min-height (min fzf/window-height (/ (window-height) 2)))
@@ -137,9 +154,11 @@ Each function receives (FILE-PATH DIRECTORY)."
   "Run fzf on the output of COMMAND with alternate action support.
 ACTION is the default action for Enter.
 ALT-ACTION-ALIST is an alist of (KEY-STRING . FUNCTION) for alternate keys.
-DIRECTORY is the working directory for fzf."
-  (let ((fzf--target-validator (or (bound-and-true-p fzf-target-validator)
-                                   #'fzf--pass-through)))
+DIRECTORY is the working directory for fzf.
+Most callers should use `wgh/pick' instead, which falls back to
+`completing-read' when fzf is unavailable."
+  (require 'fzf)
+  (let ((fzf--target-validator #'fzf--pass-through))
     (if command
         (let ((process-environment
                (cons (concat "FZF_DEFAULT_COMMAND=" command)
@@ -148,7 +167,147 @@ DIRECTORY is the working directory for fzf."
       (wgh/fzf--start-with-expect directory action alt-action-alist))))
 
 
-;;; File path helpers for fzf alt actions
+;;; Generic picker: fzf when available, completing-read otherwise
+
+(defcustom wgh/pick-backend 'auto
+  "Backend used by `wgh/pick'.
+`auto' uses fzf when both the fzf.el package and the fzf executable are
+available, and `completing-read' otherwise.  `fzf' and `completing-read'
+force that backend."
+  :type '(choice (const auto) (const fzf) (const completing-read))
+  :group 'convenience)
+
+(defcustom wgh/pick-completion-styles '(flex basic)
+  "Completion styles for the `completing-read' backend of `wgh/pick'.
+These are used when Orderless is not loaded; when it is, `wgh/pick' uses
+Orderless like the rest of minibuffer completion."
+  :type '(repeat symbol)
+  :group 'convenience)
+
+(defun wgh/pick--fzf-available-p ()
+  "Return non-nil if `wgh/pick' should use fzf."
+  (pcase wgh/pick-backend
+    ('fzf t)
+    ('completing-read nil)
+    (_ (and (require 'fzf nil t)
+            (executable-find fzf/executable)
+            t))))
+
+(defun wgh/pick--source-command (source)
+  "Return a shell command that prints the candidates in SOURCE."
+  (if (stringp source)
+      source
+    (concat "printf '%s\\n' "
+            (mapconcat #'shell-quote-argument source " "))))
+
+(defun wgh/pick--source-candidates (source directory)
+  "Return the candidates in SOURCE as a list of strings.
+A command SOURCE is run in DIRECTORY, if non-nil."
+  (if (stringp source)
+      (let ((default-directory (or directory default-directory)))
+        (seq-remove #'string-empty-p
+                    (process-lines-ignore-status
+                     shell-file-name shell-command-switch source)))
+    source))
+
+(defun wgh/pick--fzf-key-to-emacs (key)
+  "Translate fzf key name KEY (eg. \"ctrl-j\") to an Emacs key description."
+  (replace-regexp-in-string
+   "\\(ctrl\\|alt\\)-"
+   (lambda (m) (if (string-prefix-p "ctrl" m) "C-" "M-"))
+   key t t))
+
+(defun wgh/pick--current-candidate ()
+  "Return the candidate currently selected in the minibuffer, or nil."
+  (let ((candidate
+         (if (and (bound-and-true-p vertico-mode)
+                  (fboundp 'vertico--candidate))
+             (vertico--candidate)
+           ;; Icomplete and fido rotate the selection to the front of this
+           ;; (possibly dotted) list.
+           (car-safe (completion-all-sorted-completions)))))
+    (and (stringp candidate)
+         (substring-no-properties candidate))))
+
+(defvar-local wgh/pick--alt-map-alist nil
+  "Emulation keymap alist active while a `wgh/pick' minibuffer is open.")
+(add-to-list 'emulation-mode-map-alists 'wgh/pick--alt-map-alist)
+
+(defun wgh/pick--completing-read (candidates prompt alt-actions)
+  "Choose one of CANDIDATES with `completing-read'.
+RET and ALT-ACTIONS keys (fzf key names) exit with the selected candidate.
+Return (KEY . CANDIDATE), where KEY is nil for RET, or nil if no valid
+candidate was chosen."
+  (when (require 'minad-stack-conf nil t)
+    (wgh/init-minibuffer-completion))
+  (let* ((result nil)
+         (map (make-sparse-keymap))
+         (table (lambda (string pred action)
+                  (if (eq action 'metadata)
+                      '(metadata (category . wgh-pick)
+                                 (display-sort-function . identity)
+                                 (cycle-sort-function . identity))
+                    (complete-with-action action candidates string pred))))
+         (completion-category-overrides
+          (cons `(wgh-pick (styles . ,(if (featurep 'orderless)
+                                          '(orderless basic)
+                                        wgh/pick-completion-styles)))
+                completion-category-overrides)))
+    ;; RET is bound like the alternate keys so that it always chooses the
+    ;; selected candidate, as in fzf, rather than the typed input (which is
+    ;; what plain Icomplete would try to use).
+    (dolist (key (cons nil (mapcar #'car alt-actions)))
+      (define-key map (kbd (if key (wgh/pick--fzf-key-to-emacs key) "RET"))
+                  (lambda ()
+                    (interactive)
+                    (let ((candidate (wgh/pick--current-candidate)))
+                      (if (not (member candidate candidates))
+                          (minibuffer-message "No match")
+                        (setq result (cons key candidate))
+                        (exit-minibuffer))))))
+    ;; An emulation keymap takes precedence over the keymaps that completion
+    ;; UIs install, which may bind the same keys (eg. Icomplete binds C-j).
+    (minibuffer-with-setup-hook
+        (lambda ()
+          (setq wgh/pick--alt-map-alist `((t . ,map)))
+          (add-hook 'minibuffer-exit-hook
+                    (lambda () (setq wgh/pick--alt-map-alist nil))
+                    nil t))
+      (completing-read prompt table nil t))
+    result))
+
+(cl-defun wgh/pick (source action &key alt-actions directory (prompt "Pick: "))
+  "Choose an entry from SOURCE and run ACTION on it.
+SOURCE is a shell command whose output lines are the candidates, or a list
+of candidate strings.  A command is run in DIRECTORY, if non-nil.
+If DIRECTORY is non-nil, relative entries are joined to it before being
+passed to an action.
+
+ACTION is called with the chosen entry when it is chosen with Enter.
+ALT-ACTIONS is an alist of (FZF-KEY-NAME . FUNCTION), eg. (\"ctrl-j\" . f);
+choosing an entry with that key calls FUNCTION with the entry and DIRECTORY.
+
+Uses fzf when available, otherwise `completing-read' (see
+`wgh/pick-backend').  PROMPT is only used by `completing-read'."
+  (if (wgh/pick--fzf-available-p)
+      (wgh/fzf-with-command-and-alt-actions
+       (wgh/pick--source-command source) action alt-actions directory)
+    (let* ((candidates (wgh/pick--source-candidates source directory))
+           (_ (unless candidates (user-error "Nothing to pick from")))
+           (result (wgh/pick--completing-read candidates prompt alt-actions)))
+      (when result
+        (let* ((selection (cdr result))
+               (target (if (and directory (not (file-name-absolute-p selection)))
+                           (concat (file-name-as-directory directory) selection)
+                         selection))
+               (alt-action (and (car result)
+                                (cdr (assoc (car result) alt-actions)))))
+          (if alt-action
+              (funcall alt-action target directory)
+            (funcall action target)))))))
+
+
+;;; File path helpers for picker alt actions
 
 (defun wgh/file-super-repo-relative (file-path)
   "Return FILE-PATH relative to the outermost git superproject root.
@@ -174,7 +333,7 @@ If not in a git repo, return the absolute path."
 ;;; The fzf action menu (C-j action)
 
 (defun wgh/fzf-file-action-menu (file-path &optional _directory)
-  "Present a second fzf menu of actions for FILE-PATH.
+  "Present a second picker menu of actions for FILE-PATH.
 The menu offers: open file, copy absolute path, copy repo-relative path,
 copy super-repo-relative path, copy basename, and copy directory."
   (let* ((abs-path (expand-file-name file-path))
@@ -209,7 +368,7 @@ copy super-repo-relative path, copy basename, and copy directory."
                ((string-prefix-p "copy-" action-name)
                 (wgh/cpo-copy-string value cpo-copy-default-register))
                (t (message "Unknown action: %s" action-name)))))))
-    (fzf-with-entries entries action-func)))
+    (wgh/pick entries action-func :prompt "Action: ")))
 
 
 ;;; C-x action: copy super-repo-relative path
@@ -226,7 +385,7 @@ copy super-repo-relative path, copy basename, and copy directory."
 (defvar wgh/fzf-file-alt-actions
   '(("ctrl-j" . wgh/fzf-file-action-menu)
     ("ctrl-x" . wgh/fzf-copy-super-repo-relative))
-  "Alist of alternate fzf key bindings for file-picking commands.
+  "Alist of alternate `wgh/pick' key bindings for file-picking commands.
 Each entry is (FZF-KEY-NAME . FUNCTION).
 Functions receive (FILE-PATH DIRECTORY).")
 
@@ -261,80 +420,70 @@ so we must check its output rather than relying on exit codes."
         dir))))
 
 
-;;; fzf file commands with alt-action support
+;;; File-picking commands with alt-action support
 
 (defun wgh/fzf-git-files ()
-  "Open a tracked git file using fzf, with alternate actions (C-j menu, C-x super-rel copy)."
+  "Open a tracked git file using `wgh/pick', with alternate actions (C-j menu, C-x super-rel copy)."
   (interactive)
-  (require 'fzf)
-  (let* ((fzf--target-validator #'fzf--validate-filename)
-         (path (locate-dominating-file (file-truename default-directory) ".git")))
+  (let ((path (locate-dominating-file (file-truename default-directory) ".git")))
     (if path
-        (wgh/fzf-with-command-and-alt-actions
-         "git ls-files"
-         #'fzf--action-find-file
-         wgh/fzf-file-alt-actions
-         path)
+        (wgh/pick "git ls-files"
+                  #'find-file
+                  :alt-actions wgh/fzf-file-alt-actions
+                  :directory path
+                  :prompt "File: ")
       (user-error "Not inside a Git repository"))))
 
 (defun wgh/fzf-all-files ()
-  "Open a file from the current git repo using fzf, including untracked files.
+  "Open a file from the current git repo using `wgh/pick', including untracked files.
 Lists both tracked and untracked (but not ignored) files.
 Supports alternate actions (C-j menu, C-x super-rel copy)."
   (interactive)
-  (require 'fzf)
-  (let* ((fzf--target-validator #'fzf--validate-filename)
-         (path (locate-dominating-file (file-truename default-directory) ".git")))
+  (let ((path (locate-dominating-file (file-truename default-directory) ".git")))
     (if path
-        (wgh/fzf-with-command-and-alt-actions
-         "{ git ls-files; git ls-files --others --exclude-standard; } | sort -u"
-         #'fzf--action-find-file
-         wgh/fzf-file-alt-actions
-         path)
+        (wgh/pick "{ git ls-files; git ls-files --others --exclude-standard; } | sort -u"
+                  #'find-file
+                  :alt-actions wgh/fzf-file-alt-actions
+                  :directory path
+                  :prompt "File: ")
       (user-error "Not inside a Git repository"))))
 
 (defun wgh/fzf-untracked-files ()
-  "Open an untracked file from the current git repo using fzf.
+  "Open an untracked file from the current git repo using `wgh/pick'.
 Lists only untracked (but not ignored) files.
 Supports alternate actions (C-j menu, C-x super-rel copy)."
   (interactive)
-  (require 'fzf)
-  (let* ((fzf--target-validator #'fzf--validate-filename)
-         (path (locate-dominating-file (file-truename default-directory) ".git")))
+  (let ((path (locate-dominating-file (file-truename default-directory) ".git")))
     (if path
-        (wgh/fzf-with-command-and-alt-actions
-         "git ls-files --others --exclude-standard"
-         #'fzf--action-find-file
-         wgh/fzf-file-alt-actions
-         path)
+        (wgh/pick "git ls-files --others --exclude-standard"
+                  #'find-file
+                  :alt-actions wgh/fzf-file-alt-actions
+                  :directory path
+                  :prompt "File: ")
       (user-error "Not inside a Git repository"))))
 
 (defun wgh/fzf-submodule-files ()
-  "Open a file using fzf, recursing into submodules from the root repo.
+  "Open a file using `wgh/pick', recursing into submodules from the root repo.
 Walks up to find the outermost git repo (the root superproject) and
 lists all tracked files including those in submodules.
 Supports alternate actions (C-j menu, C-x super-rel copy)."
   (interactive)
-  (require 'fzf)
-  (let* ((fzf--target-validator #'fzf--validate-filename)
-         (root (wgh/git-root-superproject)))
+  (let ((root (wgh/git-root-superproject)))
     (if root
-        (wgh/fzf-with-command-and-alt-actions
-         "git ls-files --recurse-submodules"
-         #'fzf--action-find-file
-         wgh/fzf-file-alt-actions
-         root)
+        (wgh/pick "git ls-files --recurse-submodules"
+                  #'find-file
+                  :alt-actions wgh/fzf-file-alt-actions
+                  :directory root
+                  :prompt "File: ")
       (user-error "Not inside a Git repository"))))
 
 (defun wgh/agent-work-dir-fzf-open ()
-  "Open a file in agent-work-directories using fzf.
+  "Open a file in agent-work-directories using `wgh/pick'.
 Searches the canonical location and also any misplaced agent-files/work/
 directories under .git/modules/ or .git/worktrees/.
 Supports alternate actions (C-j menu, C-x super-rel copy)."
   (interactive)
-  (require 'fzf)
-  (let ((bases (wgh/agent-work-dir-all-bases))
-        (fzf--target-validator #'fzf--pass-through))
+  (let ((bases (wgh/agent-work-dir-all-bases)))
     (unless bases
       (user-error "No agent working directories found"))
     (let* ((find-cmd (mapconcat
@@ -342,11 +491,11 @@ Supports alternate actions (C-j menu, C-x super-rel copy)."
                         (format "find %s -type f" (shell-quote-argument base)))
                       bases " ; "))
            (cmd (concat "{ " find-cmd " ; } | sort -r")))
-      (wgh/fzf-with-command-and-alt-actions
-       cmd
-       (lambda (x) (find-file x))
-       wgh/fzf-file-alt-actions
-       (or (wgh/agent-work-dir-git-dir) default-directory)))))
+      (wgh/pick cmd
+                #'find-file
+                :alt-actions wgh/fzf-file-alt-actions
+                :directory (or (wgh/agent-work-dir-git-dir) default-directory)
+                :prompt "File: "))))
 
 
 ;;; Dotfileswgh mixin path helpers
@@ -363,9 +512,9 @@ only those where PATH is an existing directory."
               dotfileswgh-labeled-list))
 
 (cl-defun wgh/fzf-mixin-paths (relative-path &key extra-paths extra-mixin-paths action)
-  "Search for files with fzf across dotfileswgh mixin directories under RELATIVE-PATH.
+  "Search for files with `wgh/pick' across dotfileswgh mixin directories under RELATIVE-PATH.
 Appends RELATIVE-PATH to each mixin root in `dotfileswgh-list', filters to
-directories that exist, and runs fzf across all of them.
+directories that exist, and picks from all of them.
 
 EXTRA-PATHS is an optional list of additional absolute directory paths to
 include in the search (appended after the mixin-derived paths).  Each element
@@ -382,12 +531,11 @@ or nil.
 ACTION is an optional function called with the selected file path.  If nil,
 defaults to `find-file'.
 
-Each fzf result is displayed as LABEL:RELPATH where LABEL is the short name
+Each candidate is displayed as LABEL:RELPATH where LABEL is the short name
 of the mixin root (e.g. \"dotfileswgh\", \"pri\", \"dotlocal\") and RELPATH is
 the path relative to that mixin's subdirectory.
 
 Supports alternate actions (C-j menu, C-x super-rel copy)."
-  (require 'fzf)
   (let* ((action (or action #'find-file))
          ;; Build list of (label . directory) pairs from mixin roots
          (mixin-dirs
@@ -445,7 +593,7 @@ Supports alternate actions (C-j menu, C-x super-rel copy)."
       (user-error "No existing directories found for relative path: %s" relative-path))
     ;; Build a find command that prefixes each result with its label.
     ;; Output format: LABEL:relative/path/to/file
-    ;; We pass nil as the directory to fzf-with-command so it does not
+    ;; We pass no directory to `wgh/pick' so it does not
     ;; prepend anything to the selection; our fzf-action resolves the
     ;; full path from the LABEL:RELPATH format via label-to-dir.
     (let* ((find-parts
@@ -489,8 +637,9 @@ Supports alternate actions (C-j menu, C-x super-rel copy)."
                                               (funcall fzf-alt-action selection directory)
                                               directory)))))
                      wgh/fzf-file-alt-actions)))
-        (wgh/fzf-with-command-and-alt-actions
-         command fzf-action resolved-alt-actions nil)))))
+        (wgh/pick command fzf-action
+                  :alt-actions resolved-alt-actions
+                  :prompt "File: ")))))
 
 (defun wgh/fzf-dotfileswgh-mixin (&optional relative-path extra-paths)
   "Interactively search for files across dotfileswgh mixin directories.
