@@ -189,7 +189,9 @@
 (bind-key main-keymap '(super) "space"  (lambda () (floatile-cycle-layout)))
 
 (bind-key main-keymap '(super) "c"      (lambda () (floatile-close-window)))
+(bind-key main-keymap '(alt) "F4"       (lambda () (floatile-close-window)))
 (bind-key main-keymap '(super) "f"      (lambda () (floatile-toggle-maximize)))
+(bind-key main-keymap '(alt) "F10"      (lambda () (floatile-toggle-maximize)))
 
 (bind-key main-keymap '(super) "F"      (lambda () (floatile-toggle-fullscreen)))
 ;; Label every window with what window rules match on.
@@ -222,8 +224,10 @@
 ;; -- Screens --
 (bind-key main-keymap '(super) "n"      (lambda () (floatile-focus-next-vmonitor)))
 (bind-key main-keymap '(super) "p"      (lambda () (floatile-focus-prev-vmonitor)))
-(bind-key main-keymap '(alt super) "n"  (lambda () (floatile-move-window-to-next-vmonitor)))
-(bind-key main-keymap '(alt super) "p"  (lambda () (floatile-move-window-to-prev-vmonitor)))
+(bind-key main-keymap '(alt super) "n"
+          (lambda () (and (floatile-move-window-to-next-vmonitor) (floatile-focus-next-vmonitor))))
+(bind-key main-keymap '(alt super) "p"
+          (lambda () (and (floatile-move-window-to-prev-vmonitor) (floatile-focus-prev-vmonitor))))
 (bind-key main-keymap '(ctrl super) "n" (lambda () (floatile-move-workspace-to-next-vmonitor)))
 (bind-key main-keymap '(ctrl super) "p" (lambda () (floatile-move-workspace-to-prev-vmonitor)))
 
@@ -233,6 +237,7 @@
 (bind-key main-keymap '(alt super) "v"  (lambda () (floatile-spawn "vlaunch" "terminal2")))
 (bind-key main-keymap '(ctrl super) "v" (lambda () (floatile-spawn "vlaunch" "terminal3")))
 (bind-key main-keymap '(super) "r"      (lambda () (floatile-spawn "vlaunch" "launcher")))
+(bind-key main-keymap '(alt) "F2"       (lambda () (floatile-spawn "vlaunch" "launcher")))
 (bind-key main-keymap '(super) "u"      (lambda () (floatile-spawn "vlaunch" "unicode")))
 (bind-key main-keymap '() "XF86DOS"     (lambda () (floatile-spawn "vlaunch" "unicode")))
 
