@@ -207,6 +207,10 @@
                ))
 
 
+;; Estate state changes don't modify the buffer or move point, so redisplay
+;; may skip the mode line until the next command.  Force the update.
+(add-hook 'estate-state-change-hook #'force-mode-line-update)
+
 (mapcar (lambda (b) (progn
                       (set-buffer b)
                       (setq mode-line-format (default-value 'mode-line-format))))
