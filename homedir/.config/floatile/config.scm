@@ -28,6 +28,8 @@
 ;; windows never gain or lose focus by pointing.
 (set! focus-policy "follow-mouse-tiled")
 
+(set! warp-pointer-on-vmonitor-focus #t)
+
 ;; Scale every physical display when it connects.  The default is 1.
 ;; (set! default-pmonitor-scale 2)
 (auto-vmonitors)
@@ -278,19 +280,31 @@
 (bind-key main-keymap '() "XF86MonBrightnessDown" (lambda () (floatile-spawn "state" "backlight" "dec")))
 (bind-key main-keymap '() "XF86MonBrightnessUp"   (lambda () (floatile-spawn "state" "backlight" "inc")))
 
-;; -- VT switching --
-(bind-key main-keymap '(alt ctrl) "F1"  (lambda () (floatile-switch-vt 1)))
-(bind-key main-keymap '(alt ctrl) "F2"  (lambda () (floatile-switch-vt 2)))
-(bind-key main-keymap '(alt ctrl) "F3"  (lambda () (floatile-switch-vt 3)))
-(bind-key main-keymap '(alt ctrl) "F4"  (lambda () (floatile-switch-vt 4)))
-(bind-key main-keymap '(alt ctrl) "F5"  (lambda () (floatile-switch-vt 5)))
-(bind-key main-keymap '(alt ctrl) "F6"  (lambda () (floatile-switch-vt 6)))
-(bind-key main-keymap '(alt ctrl) "F7"  (lambda () (floatile-switch-vt 7)))
-(bind-key main-keymap '(alt ctrl) "F8"  (lambda () (floatile-switch-vt 8)))
-(bind-key main-keymap '(alt ctrl) "F9"  (lambda () (floatile-switch-vt 9)))
-(bind-key main-keymap '(alt ctrl) "F10" (lambda () (floatile-switch-vt 10)))
-(bind-key main-keymap '(alt ctrl) "F11" (lambda () (floatile-switch-vt 11)))
-(bind-key main-keymap '(alt ctrl) "F12" (lambda () (floatile-switch-vt 12)))
+;; -- VT switching, also from the lock screen --
+(bind-key main-keymap '(alt ctrl) "F1"  (lambda () (floatile-switch-vt 1))
+          #:allow-when-locked #t)
+(bind-key main-keymap '(alt ctrl) "F2"  (lambda () (floatile-switch-vt 2))
+          #:allow-when-locked #t)
+(bind-key main-keymap '(alt ctrl) "F3"  (lambda () (floatile-switch-vt 3))
+          #:allow-when-locked #t)
+(bind-key main-keymap '(alt ctrl) "F4"  (lambda () (floatile-switch-vt 4))
+          #:allow-when-locked #t)
+(bind-key main-keymap '(alt ctrl) "F5"  (lambda () (floatile-switch-vt 5))
+          #:allow-when-locked #t)
+(bind-key main-keymap '(alt ctrl) "F6"  (lambda () (floatile-switch-vt 6))
+          #:allow-when-locked #t)
+(bind-key main-keymap '(alt ctrl) "F7"  (lambda () (floatile-switch-vt 7))
+          #:allow-when-locked #t)
+(bind-key main-keymap '(alt ctrl) "F8"  (lambda () (floatile-switch-vt 8))
+          #:allow-when-locked #t)
+(bind-key main-keymap '(alt ctrl) "F9"  (lambda () (floatile-switch-vt 9))
+          #:allow-when-locked #t)
+(bind-key main-keymap '(alt ctrl) "F10" (lambda () (floatile-switch-vt 10))
+          #:allow-when-locked #t)
+(bind-key main-keymap '(alt ctrl) "F11" (lambda () (floatile-switch-vt 11))
+          #:allow-when-locked #t)
+(bind-key main-keymap '(alt ctrl) "F12" (lambda () (floatile-switch-vt 12))
+          #:allow-when-locked #t)
 
 ;; ---------------------------------------------------------------------------
 ;; Per-machine extensions
