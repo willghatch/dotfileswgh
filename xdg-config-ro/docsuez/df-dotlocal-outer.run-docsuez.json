@@ -1,0 +1,9 @@
+{
+    "tags": {
+        "dotfileswgh-dotlocal": {
+            "volumes": {
+                "$HOME/dotfileswgh-dotlocal": "$DOCSUEZ_CONTAINER_HOME/dotfileswgh-dotlocal"
+            }
+        }
+    }
+}
