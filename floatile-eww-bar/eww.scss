@@ -102,6 +102,10 @@ eventbox:hover > .module {
   background-color: #3F3F3F;
 }
 
+.mpris.paused .mpris-text {
+  font-style: italic;
+}
+
 .network.disconnected {
   background-color: #f53c3c;
 }
