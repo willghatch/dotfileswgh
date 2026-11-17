@@ -51,6 +51,8 @@
 
 
             (setq org-hide-leading-stars t)
+            ;; Don't hide links behind "frindly" display.  This can be toggled with org-toggle-link-display.
+            (setq org-link-descriptive nil)
             ;; TODO - what indent-line-function do I really want for org-mode?  I think maybe I want no indentation for org-mode.
             (setq indent-line-function 'indent-relative)
             ;; Reload theme so that the stupid hidden asterisks are slightly visible
