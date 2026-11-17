@@ -13,6 +13,8 @@
 (setq byte-compile-warnings '(not obsolete))
 (setq warning-suppress-log-types '((comp) (bytecomp)))
 (setq native-comp-async-report-warnings-errors 'silent)
+;; The lexical binding cookie warning triggers for third party libraries.  If I could get it to only warn for my own files, I would like it.
+(add-to-list 'warning-suppress-types '(files missing-lexbind-cookie))
 
 
 ;; macro for more robust starting-up

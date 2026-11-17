@@ -44,7 +44,8 @@
 (setq user-emacs-directory local-emacs.d-path)
 
 ;; Replace only the user eln-cache, keeping the system native-lisp dir so bundled libraries aren't recompiled.
-(startup-redirect-eln-cache (concat local-emacs.d-path "eln-cache/"))
+(with-demoted-errors "Warning: %S"
+  (startup-redirect-eln-cache (concat local-emacs.d-path "eln-cache/")))
 (setq auto-save-list-file-prefix (concat local-emacs.d-path "auto-save-list/.saves-"))
 
 ;; Straight.el config
