@@ -9,20 +9,20 @@
         ("rackterm" . "xterm-256color")
         ("screen-256color" . "xterm-256color")))
 
-;; Silence warnings
-(setq byte-compile-warnings '(not obsolete))
-(setq warning-suppress-log-types '((comp) (bytecomp)))
-(setq native-comp-async-report-warnings-errors 'silent)
-;; The lexical binding cookie warning triggers for third party libraries.  If I could get it to only warn for my own files, I would like it.
-(add-to-list 'warning-suppress-types '(files missing-lexbind-cookie))
-
-
 ;; macro for more robust starting-up
 (defmacro nobreak (&rest args)
   `(progn
      ,@(mapcar (lambda (form)
                  (list 'with-demoted-errors "Error %S" form))
                args)))
+
+;; Silence warnings
+(setq byte-compile-warnings '(not obsolete))
+(setq warning-suppress-log-types '((comp) (bytecomp)))
+(setq native-comp-async-report-warnings-errors 'silent)
+;; The lexical binding cookie warning triggers for third party libraries.  If I could get it to only warn for my own files, I would like it.
+(nobreak (add-to-list 'warning-suppress-types '(files missing-lexbind-cookie)))
+
 
 (let ((conf-dir (file-name-directory load-file-name)))
   (load-file (expand-file-name "./dotfileswgh-env-conf.el" conf-dir)))
