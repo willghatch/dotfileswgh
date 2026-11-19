@@ -1,0 +1,20 @@
+#!/bin/sh
+# reset-soft: Restore normal terminal behavior without clearing the screen
+
+# Restore sane line settings (visible typing, Enter, Ctrl+C).
+stty sane 2>/dev/null
+
+# Reset text attributes (colors, bold, reverse video).
+tput sgr0 2>/dev/null
+
+# Force standard ASCII character set (fixes scrambled line-drawing symbols).
+printf '\033(B'
+
+# Restore normal cursor visibility.
+tput cnorm 2>/dev/null
+
+# Disable stuck mouse tracking modes (X10, normal, button-event, any-event, SGR).
+printf '\033[?9l\033[?1000l\033[?1002l\033[?1003l\033[?1006l'
+
+# Disable bracketed paste mode if it was left on.
+printf '\033[?2004l'
