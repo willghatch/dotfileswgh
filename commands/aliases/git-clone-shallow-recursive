@@ -1,0 +1,3 @@
+#!/usr/bin/env bash
+
+exec git clone --depth=2 --recursive --shallow-submodules "$@"
