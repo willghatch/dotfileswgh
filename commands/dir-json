@@ -1,0 +1,421 @@
+#!/usr/bin/env python3
+"""Copy a directory tree as JSON or recreate one from JSON on stdin."""
+
+from __future__ import annotations
+
+import argparse
+import base64
+import binascii
+import json
+import os
+import stat
+import sys
+from dataclasses import dataclass
+from pathlib import Path, PurePosixPath, PureWindowsPath
+
+
+class UserError(Exception):
+    """An input or filesystem error that should be reported without a traceback."""
+
+
+@dataclass
+class Entry:
+    path: PurePosixPath
+    kind: str
+    value: bytes | str
+
+
+def parse_args() -> argparse.Namespace:
+    parser = argparse.ArgumentParser(
+        description=(
+            "Copy regular files under --target to a JSON object on stdout, or "
+            "create files from that JSON object read on stdin. JSON keys are "
+            "relative paths. UTF-8 files are JSON strings; binary files use "
+            "base64 objects; symlinks use symlink objects. Long file contents "
+            "use arrays of string chunks to keep terminal paste lines short."
+        ),
+        epilog=(
+            "Examples:\n"
+            "  dir-json --copy --target ./small-dir\n"
+            "  dir-json --paste --target ./destination\n"
+            "  dir-json --paste --target ./destination --force\n"
+            "Symlink modes: false rejects symlinks; internal preserves only "
+            "relative links within the target tree; all preserves any link; "
+            "copy-data follows file symlinks and stores their contents."
+        ),
+        formatter_class=argparse.RawDescriptionHelpFormatter,
+    )
+    mode = parser.add_mutually_exclusive_group(required=True)
+    mode.add_argument(
+        "--copy", action="store_true", help="emit the directory as JSON"
+    )
+    mode.add_argument(
+        "--paste", action="store_true", help="create files from JSON on stdin"
+    )
+    parser.add_argument(
+        "--target",
+        required=True,
+        metavar="PATH",
+        help="source directory for --copy, or destination root for --paste",
+    )
+    parser.add_argument(
+        "--allow-symlinks",
+        choices=("false", "internal", "all", "copy-data"),
+        default="false",
+        help="symlink handling policy (default: false)",
+    )
+    overwrite = parser.add_mutually_exclusive_group()
+    overwrite.add_argument(
+        "--force",
+        action="store_true",
+        help="overwrite existing destination files without prompting",
+    )
+    overwrite.add_argument(
+        "--no-clobber",
+        action="store_true",
+        help="abort if any destination file already exists",
+    )
+    return parser.parse_args()
+
+
+def encode_file(data: bytes) -> str | dict[str, object]:
+    try:
+        contents = data.decode("utf-8")
+        encoding = "utf-8"
+    except UnicodeDecodeError:
+        contents = base64.b64encode(data).decode("ascii")
+        encoding = "base64"
+    # Canonical terminals accept at most 4095 input bytes per line on Linux.
+    # A Unicode character can expand to 12 ASCII bytes as a JSON surrogate pair.
+    if len(json.dumps(contents)) > 3000:
+        return {
+            "encoding": encoding,
+            "contents": [contents[start:start + 240] for start in range(0, len(contents), 240)],
+        }
+    if encoding == "utf-8":
+        return contents
+    return {"encoding": encoding, "contents": contents}
+
+
+def path_is_within(path: Path, root: Path) -> bool:
+    try:
+        path.relative_to(root)
+        return True
+    except ValueError:
+        return False
+
+
+def resolved(path: Path, description: str) -> Path:
+    try:
+        return path.resolve(strict=False)
+    except (OSError, RuntimeError) as error:
+        raise UserError(f"cannot resolve {description}: {error}") from error
+
+
+def check_internal_link(root: Path, relative: PurePosixPath, target: str) -> None:
+    windows_target = PureWindowsPath(target)
+    if os.path.isabs(target) or windows_target.is_absolute() or windows_target.drive:
+        raise UserError(f"internal symlink must have a relative target: {relative}")
+    if "\\" in target:
+        raise UserError(f"internal symlink target must use '/' separators: {relative}")
+    candidate = resolved(
+        root.joinpath(*relative.parts[:-1], target), f"symlink {relative}"
+    )
+    if not path_is_within(candidate, root):
+        raise UserError(f"symlink points outside the target directory: {relative}")
+
+
+def copy_tree(root: Path, symlink_policy: str) -> dict[str, object]:
+    result: dict[str, object] = {}
+
+    def visit(directory: Path, relative_directory: PurePosixPath) -> None:
+        try:
+            children = sorted(os.scandir(directory), key=lambda entry: entry.name)
+        except OSError as error:
+            raise UserError(f"cannot read directory {directory}: {error}") from error
+
+        for child in children:
+            relative = relative_directory / child.name
+            key = relative.as_posix()
+            parse_relative_path(key)
+            child_path = directory / child.name
+            try:
+                if child.is_symlink():
+                    if symlink_policy == "false":
+                        raise UserError(
+                            f"symlink found while --allow-symlinks is false: {relative}"
+                        )
+                    try:
+                        link_target = os.readlink(child_path)
+                    except OSError as error:
+                        raise UserError(
+                            f"cannot read symlink {relative}: {error}"
+                        ) from error
+
+                    if symlink_policy == "internal":
+                        check_internal_link(root, relative, link_target)
+                        result[key] = {"type": "symlink", "path": link_target}
+                    elif symlink_policy == "all":
+                        result[key] = {"type": "symlink", "path": link_target}
+                    elif symlink_policy == "copy-data":
+                        try:
+                            target_stat = child_path.stat()
+                        except OSError as error:
+                            raise UserError(
+                                f"cannot read symlink target {relative}: {error}"
+                            ) from error
+                        if not stat.S_ISREG(target_stat.st_mode):
+                            raise UserError(
+                                f"--allow-symlinks copy-data only supports links to regular files: {relative}"
+                            )
+                        try:
+                            result[key] = encode_file(child_path.read_bytes())
+                        except OSError as error:
+                            raise UserError(
+                                f"cannot read symlink target {relative}: {error}"
+                            ) from error
+                    continue
+
+                if child.is_dir(follow_symlinks=False):
+                    visit(child_path, relative)
+                    continue
+                if child.is_file(follow_symlinks=False):
+                    try:
+                        result[key] = encode_file(child_path.read_bytes())
+                    except OSError as error:
+                        raise UserError(f"cannot read file {relative}: {error}") from error
+                    continue
+                raise UserError(f"unsupported special filesystem entry: {relative}")
+            except OSError as error:
+                raise UserError(f"cannot inspect {relative}: {error}") from error
+
+    visit(root, PurePosixPath())
+    return result
+
+
+def unique_object(pairs: list[tuple[str, object]]) -> dict[str, object]:
+    result: dict[str, object] = {}
+    for key, value in pairs:
+        if key in result:
+            raise UserError(f"duplicate JSON object key: {key!r}")
+        result[key] = value
+    return result
+
+
+def parse_relative_path(value: object) -> PurePosixPath:
+    if not isinstance(value, str) or not value:
+        raise UserError("each JSON file key must be a non-empty relative path")
+    if "\x00" in value or "\\" in value:
+        raise UserError(f"path must use '/' separators and contain no NUL: {value!r}")
+    windows_path = PureWindowsPath(value)
+    if value.startswith("/") or windows_path.is_absolute() or windows_path.drive:
+        raise UserError(f"path must be relative: {value!r}")
+    parts = value.split("/")
+    if any(part in ("", ".", "..") for part in parts):
+        raise UserError(f"path must not contain empty, '.' or '..' components: {value!r}")
+    return PurePosixPath(*parts)
+
+
+def decode_entry(relative: PurePosixPath, value: object) -> Entry:
+    if isinstance(value, str):
+        return Entry(relative, "file", value.encode("utf-8"))
+    if not isinstance(value, dict):
+        raise UserError(f"contents for {relative} must be a string or object")
+
+    if value.get("type") == "symlink":
+        if set(value) != {"type", "path"} or not isinstance(value.get("path"), str):
+            raise UserError(f"symlink object for {relative} must contain only string field 'path'")
+        target = value["path"]
+        if not target or "\x00" in target:
+            raise UserError(f"symlink target for {relative} must be non-empty and contain no NUL")
+        return Entry(relative, "symlink", target)
+
+    if set(value) - {"encoding", "contents"} or "contents" not in value:
+        raise UserError(f"file object for {relative} must contain 'contents' and optional 'encoding'")
+    encoding = value.get("encoding", "utf-8")
+    contents = value["contents"]
+    if isinstance(contents, list):
+        if not all(isinstance(chunk, str) for chunk in contents):
+            raise UserError(f"contents chunks for {relative} must be strings")
+        contents = "".join(contents)
+    if not isinstance(encoding, str) or not isinstance(contents, str):
+        raise UserError(f"encoding for {relative} must be a string; contents must be a string or array of strings")
+    normalized_encoding = encoding.casefold().replace("_", "-")
+    if normalized_encoding == "base64":
+        try:
+            data = base64.b64decode(contents, validate=True)
+        except (ValueError, binascii.Error) as error:
+            raise UserError(f"invalid base64 contents for {relative}") from error
+        return Entry(relative, "file", data)
+    try:
+        return Entry(relative, "file", contents.encode(encoding))
+    except LookupError as error:
+        raise UserError(f"unknown encoding {encoding!r} for {relative}") from error
+    except UnicodeEncodeError as error:
+        raise UserError(f"contents for {relative} cannot be encoded as {encoding!r}") from error
+
+
+def load_manifest() -> list[Entry]:
+    try:
+        manifest = json.loads(sys.stdin.read(), object_pairs_hook=unique_object)
+    except UserError:
+        raise
+    except json.JSONDecodeError as error:
+        detail = str(error)
+        if "control character" in error.msg.casefold() and error.pos < len(error.doc):
+            invalid = error.doc[error.pos]
+            detail += f"; found {invalid!r} (U+{ord(invalid):04X})"
+        raise UserError(f"invalid JSON input: {detail}") from error
+    except UnicodeError as error:
+        raise UserError(f"invalid JSON input: {error}") from error
+    if not isinstance(manifest, dict):
+        raise UserError("JSON input must be an object mapping relative paths to file contents")
+
+    entries = [decode_entry(parse_relative_path(path), value) for path, value in manifest.items()]
+    entries.sort(key=lambda entry: entry.path.as_posix())
+    by_path = {entry.path: entry for entry in entries}
+    for entry in entries:
+        for parent in entry.path.parents:
+            if parent == PurePosixPath("."):
+                break
+            parent_entry = by_path.get(parent)
+            if parent_entry is not None:
+                raise UserError(f"manifest path {parent} cannot also contain {entry.path}")
+    return entries
+
+
+def is_existing(path: Path) -> bool:
+    return path.exists() or path.is_symlink()
+
+
+def validate_destination(
+    root: Path, entries: list[Entry], symlink_policy: str
+) -> list[tuple[Entry, Path, bool]]:
+    planned: list[tuple[Entry, Path, bool]] = []
+    for entry in entries:
+        destination = root.joinpath(*entry.path.parts)
+        current = root
+        for component in entry.path.parts[:-1]:
+            current = current / component
+            try:
+                metadata = current.lstat()
+            except FileNotFoundError:
+                break
+            except OSError as error:
+                raise UserError(f"cannot inspect destination parent {current}: {error}") from error
+            if stat.S_ISLNK(metadata.st_mode):
+                raise UserError(f"destination path contains a symlink parent: {current}")
+            if not stat.S_ISDIR(metadata.st_mode):
+                raise UserError(f"destination parent is not a directory: {current}")
+
+        exists = is_existing(destination)
+        if exists:
+            try:
+                metadata = destination.lstat()
+            except OSError as error:
+                raise UserError(f"cannot inspect destination {destination}: {error}") from error
+            if stat.S_ISDIR(metadata.st_mode):
+                raise UserError(f"cannot overwrite a directory with a file: {destination}")
+            if not (stat.S_ISREG(metadata.st_mode) or stat.S_ISLNK(metadata.st_mode)):
+                raise UserError(f"cannot overwrite a non-regular filesystem entry: {destination}")
+
+        if entry.kind == "symlink":
+            if symlink_policy not in ("internal", "all"):
+                raise UserError(
+                    f"manifest contains symlink {entry.path}; use --allow-symlinks internal or all"
+                )
+            if symlink_policy == "internal":
+                check_internal_link(root, entry.path, str(entry.value))
+        planned.append((entry, destination, exists))
+    return planned
+
+
+def confirm_overwrite(
+    conflicts: list[Path], root: Path, force: bool, no_clobber: bool
+) -> None:
+    if not conflicts:
+        return
+    if force:
+        return
+    if no_clobber:
+        preview = ", ".join(str(path.relative_to(root)) for path in conflicts[:5])
+        suffix = " …" if len(conflicts) > 5 else ""
+        raise UserError(f"destination files already exist ({preview}{suffix}); nothing was written")
+    preview = ", ".join(str(path.relative_to(root)) for path in conflicts[:5])
+    suffix = " …" if len(conflicts) > 5 else ""
+    prompt = f"Overwrite {len(conflicts)} existing file(s) ({preview}{suffix})? [y/N] "
+    try:
+        with open("/dev/tty", "r+", encoding="utf-8") as terminal:
+            terminal.write(prompt)
+            terminal.flush()
+            answer = terminal.readline().strip().casefold()
+    except OSError as error:
+        raise UserError(
+            "destination files exist but no controlling terminal is available; "
+            "use --force or --no-clobber"
+        ) from error
+    if answer not in ("y", "yes"):
+        raise UserError("overwrite declined; nothing was written")
+
+
+def write_entries(root: Path, planned: list[tuple[Entry, Path, bool]]) -> None:
+    for entry, destination, exists in planned:
+        try:
+            destination.parent.mkdir(parents=True, exist_ok=True)
+            if exists:
+                destination.unlink()
+            if entry.kind == "symlink":
+                os.symlink(str(entry.value), destination)
+            else:
+                destination.write_bytes(bytes(entry.value))
+        except OSError as error:
+            raise UserError(f"cannot create {destination.relative_to(root)}: {error}") from error
+
+
+def run(args: argparse.Namespace) -> None:
+    if args.copy and (args.force or args.no_clobber):
+        raise UserError("--force and --no-clobber are only valid with --paste")
+    if args.paste and args.allow_symlinks == "copy-data":
+        raise UserError("--allow-symlinks copy-data is only valid with --copy")
+
+    target = Path(args.target).expanduser()
+    if args.copy:
+        try:
+            root = target.resolve(strict=True)
+        except (OSError, RuntimeError) as error:
+            raise UserError(f"cannot resolve copy target {target}: {error}") from error
+        if not root.is_dir():
+            raise UserError(f"copy target is not a directory: {target}")
+        result = copy_tree(root, args.allow_symlinks)
+        sys.stdout.write(json.dumps(result, indent=2, sort_keys=True) + "\n")
+        return
+
+    entries = load_manifest()
+    try:
+        target.mkdir(parents=True, exist_ok=True)
+        root = target.resolve(strict=True)
+    except (OSError, RuntimeError) as error:
+        raise UserError(f"cannot prepare paste target {target}: {error}") from error
+    if not root.is_dir():
+        raise UserError(f"paste target is not a directory: {target}")
+    planned = validate_destination(root, entries, args.allow_symlinks)
+    conflicts = [destination for _, destination, exists in planned if exists]
+    confirm_overwrite(conflicts, root, args.force, args.no_clobber)
+    write_entries(root, planned)
+
+
+def main() -> int:
+    args = parse_args()
+    try:
+        run(args)
+    except UserError as error:
+        print(f"dir-json: {error}", file=sys.stderr)
+        return 1
+    except OSError as error:
+        print(f"dir-json: filesystem error: {error}", file=sys.stderr)
+        return 1
+    return 0
+
+
+if __name__ == "__main__":
+    raise SystemExit(main())
